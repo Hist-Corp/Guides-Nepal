@@ -177,7 +177,7 @@ export default function LivePageEditor({ slug, title, path, initialSections, onS
       setSections(list)
     } catch (e) {
       console.error(e)
-      if (initialSections) setSections(JSON.parse(JSON.stringify(initialSections)))
+      if (initialSections) setSections(JSON.parse(JSON.stringify(initialSections);})
     } finally { setLoading(false) }
   }
 
@@ -366,8 +366,10 @@ export default function LivePageEditor({ slug, title, path, initialSections, onS
                 <div className="border-t pt-4">
                   <div className="font-semibold text-gray-700 text-sm mb-2">Customization</div>
                   <div className="grid grid-cols-2 gap-3">
-{STYLE_FIELDS.map((f) => (
-              <div key={f.key}>
+{STYLE_FIELDS.map((f) => {
+  const placeholder = getStylePlaceholder(f.key);
+return (
+    <div key={f.key}>
                 <label className="block text-xs font-medium text-gray-600 mb-1">{f.label}</label>
                 {f.type === "color" ? (
                   <input type="color" value={selected.style[f.key] || "#000000"} onChange={(e) => updateStyle(f.key, e.target.value)} className="w-full h-9 border border-gray-300 rounded cursor-pointer" />
@@ -380,7 +382,7 @@ export default function LivePageEditor({ slug, title, path, initialSections, onS
                     value={selected.style[f.key] || ""} 
                     onChange={(e) => updateStyle(f.key, e.target.value)} 
                     className="w-full border border-gray-300 rounded-lg px-2 py-2 text-sm"
-                    placeholder={getStylePlaceholder(f.key)}
+                    placeholder={placeholder}
                   />
                 )}
               </div>
