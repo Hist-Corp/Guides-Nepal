@@ -38,7 +38,9 @@ export default function NavSidebar() {
           { to: `${base}`, label: "Overview" },
           { to: `${base}/pages`, label: "Pages" },
           { to: `${base}/blog`, label: "Blog" },
-          { to: `${base}/guides-content`, label: "Guides Content" }
+          { to: `${base}/guides-content`, label: "Guides Content" },
+          { to: `${base}/media`, label: "Media Library" },
+          { to: `${base}/seo`, label: "SEO Management" }
         ]
       : []
 

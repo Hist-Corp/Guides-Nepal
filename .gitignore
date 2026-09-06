@@ -89,6 +89,10 @@ pip-delete-this-directory.txt
 .coverage
 htmlcov/
 .pytest_cache/
+coverage/
+*.lcov
+playwright-report/
+test-results/
 
 # Package lock files (for security audits, but use npm ci)
 # Uncomment if using npm ci for production:
@@ -107,3 +111,19 @@ backend/app/uploads/
 *.key
 cert.pem
 key.pem
+
+# Vercel
+.vercel
+
+# Turborepo
+.turbo
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Misc
+*.tsbuildinfo
+.vercel
+.turbo

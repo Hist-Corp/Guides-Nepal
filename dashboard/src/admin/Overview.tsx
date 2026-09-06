@@ -1,5 +1,5 @@
-import useFetch from "../hooks/useFetch"
-import { getExperiences } from "../services/api"
+import { useState, useEffect } from "react"
+import { getAdminStats, getAdminExperiences, getAdminGuides, getAdminBookings } from "../services/api"
 import StatCard from "../components/StatCard"
 import KPICard from "../components/KPICard"
 import HeroGreeting from "../components/HeroGreeting"
@@ -8,11 +8,37 @@ import DonutChart from "../components/DonutChart"
 import Table from "../components/Table"
 import Badge from "../components/Badge"
 import SchedulePanel from "../components/SchedulePanel"
-import { mockAnalyticsSeries, mockTasks, mockActivity, mockEmployees, mockSources, mockExperiences, mockScheduleItems } from "../mock/data"
+import { mockAnalyticsSeries, mockTasks, mockActivity, mockEmployees, mockSources, mockScheduleItems } from "../mock/data"
 
 export default function AdminOverview() {
-  const { data, loading } = useFetch(getExperiences)
-  const experiences = Array.isArray(data) ? data : []
+  const [stats, setStats] = useState<any>({})
+  const [experiences, setExperiences] = useState<any[]>([])
+  const [guides, setGuides] = useState<any[]>([])
+  const [bookings, setBookings] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [statsData, expData, guideData, bookingData] = await Promise.all([
+          getAdminStats().catch(() => ({})),
+          getAdminExperiences().catch(() => []),
+          getAdminGuides().catch(() => []),
+          getAdminBookings().catch(() => [])
+        ])
+        setStats(statsData || {})
+        setExperiences(Array.isArray(expData) ? expData : [])
+        setGuides(Array.isArray(guideData) ? guideData : [])
+        setBookings(Array.isArray(bookingData) ? bookingData : [])
+      } catch (error) {
+        console.error("Error fetching admin data:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
+
   return (
     <div className="space-y-6">
       <div className="text-2xl font-bold text-darkBlue">Dashboard</div>
@@ -20,9 +46,9 @@ export default function AdminOverview() {
         <div className="lg:col-span-2">
           <HeroGreeting />
         </div>
-        <KPICard title="Total Experiences" value={loading ? "…" : experiences.length} sub="Listed across cities" />
-        <KPICard title="Response Rate" value="92%" sub="Last 30 days" />
-        <KPICard title="Bookings" value="1,242" sub="This month" />
+        <KPICard title="Total Users" value={loading ? "…" : (stats.total_users || 0)} sub="Registered users" />
+        <KPICard title="Total Guides" value={loading ? "…" : (stats.total_guides || 0)} sub={`${stats.verified_guides || 0} verified`} />
+        <KPICard title="Bookings" value={loading ? "…" : (stats.total_bookings || 0)} sub="Total bookings" />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="rounded-2xl bg-white p-4 border space-y-2 lg:col-span-2">
@@ -75,17 +101,19 @@ export default function AdminOverview() {
         <div className="rounded-2xl bg-white p-4 border space-y-2 lg:col-span-2">
           <div className="font-semibold text-darkBlue">Current Experiences</div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {mockExperiences.map((e) => (
+            {experiences.length > 0 ? experiences.slice(0, 6).map((e: any) => (
               <div key={e.id} className="rounded-2xl border p-3 bg-white">
                 <div className="font-semibold text-darkBlue">{e.title}</div>
-                <div className="text-xs text-gray-600">{e.city}</div>
+                <div className="text-xs text-gray-600">{e.city || e.host?.name}</div>
                 <div className="flex items-center gap-2 mt-2">
-                  <Badge text={`$${e.price}`} />
-                  <Badge text={e.duration} />
-                  <Badge text={e.status} />
+                  <Badge text={`$${e.price || 0}`} />
+                  <Badge text={e.duration || "N/A"} />
+                  <Badge text={e.status || "active"} />
                 </div>
               </div>
-            ))}
+            )) : (
+              <div className="col-span-3 text-center text-gray-500 py-4">No experiences found</div>
+            )}
           </div>
         </div>
       </div>

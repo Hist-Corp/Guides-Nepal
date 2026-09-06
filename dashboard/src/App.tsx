@@ -18,6 +18,8 @@ import WriterOverview from "./writer/Overview"
 import WriterPages from "./writer/Pages"
 import WriterBlog from "./writer/Blog"
 import WriterGuidesContent from "./writer/GuidesContent"
+import WriterMedia from "./writer/Media"
+import WriterSeo from "./writer/Seo"
 import HostOverview from "./host/Overview"
 import HostGuides from "./host/Guides"
 import HostTours from "./host/Tours"
@@ -69,6 +71,8 @@ export default function App() {
           <Route path="pages" element={<WriterPages />} />
           <Route path="blog" element={<WriterBlog />} />
           <Route path="guides-content" element={<WriterGuidesContent />} />
+          <Route path="media" element={<WriterMedia />} />
+          <Route path="seo" element={<WriterSeo />} />
         </Route>
         <Route
           path="host/*"

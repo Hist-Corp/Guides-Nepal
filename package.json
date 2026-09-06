@@ -1,18 +1,76 @@
 {
   "name": "guides-nepal",
   "version": "1.0.0",
-  "description": "A React + Vite app showcasing city experiences (Kathmandu, Pokhara, Lalitpur, Bhaktapur, Bharatpur) with consistent booking UI across pages.",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
-  },
+  "description": "A comprehensive tourism guide platform for Nepal featuring city experiences across Kathmandu, Pokhara, Lalitpur, Bhaktapur, and Bharatpur.",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "dashboard"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" \"npm run dev:dashboard\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && .venv\\Scripts\\activate && uvicorn app.main:app --reload",
+    "dev:dashboard": "cd dashboard && npm run dev",
+    "build": "npm run build:frontend && npm run build:dashboard && npm run build:backend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:dashboard": "cd dashboard && npm run build",
+    "build:backend": "cd backend && docker build -t guides-nepal-backend .",
+    "test": "npm run test:frontend && npm run test:backend && npm run test:dashboard",
+    "test:frontend": "cd frontend && npm run test",
+    "test:backend": "cd backend && .venv\\Scripts\\activate && pytest --cov=app --cov-report=xml --cov-report=html",
+    "test:dashboard": "cd dashboard && npm run test",
+    "test:e2e": "cd tests/e2e && npx playwright test",
+    "test:e2e:ui": "cd tests/e2e && npx playwright test --ui",
+    "lint": "npm run lint:frontend && npm run lint:dashboard && npm run lint:backend",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:dashboard": "cd dashboard && npm run lint",
+    "lint:backend": "cd backend && .venv\\Scripts\\activate && ruff check app",
+    "format": "npm run format:frontend && npm run format:dashboard && npm run format:backend",
+    "format:frontend": "cd frontend && npx prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "format:dashboard": "cd dashboard && npx prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "format:backend": "cd backend && .venv\\Scripts\\activate && black app && ruff check --fix app",
+    "typecheck": "npm run typecheck:frontend && npm run typecheck:dashboard && npm run typecheck:backend",
+    "typecheck:frontend": "cd frontend && npm run check",
+    "typecheck:dashboard": "cd dashboard && npm run typecheck",
+    "typecheck:backend": "cd backend && .venv\\Scripts\\activate && mypy app",
+    "setup": "node scripts/setup.js",
+    "prepare": "husky install",
+    "clean": "npm run clean:frontend && npm run clean:dashboard && npm run clean:backend",
+    "clean:frontend": "cd frontend && rimraf dist node_modules",
+    "clean:dashboard": "cd dashboard && rimraf dist node_modules",
+    "clean:backend": "cd backend && rimraf .venv __pycache__ .mypy_cache .pytest_cache .ruff_cache"
   },
-  "keywords": [],
+  "keywords": [
+    "nepal",
+    "tourism",
+    "travel",
+    "guides",
+    "experiences"
+  ],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@supabase/supabase-js": "^2.110.2"
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^22.15.30",
+    "concurrently": "^9.1.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.11",
+    "prettier": "^3.4.2",
+    "rimraf": "^6.0.1"
+  },
+  "lint-staged": {
+    "frontend/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "dashboard/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "backend/**/*.py": [
+      "black",
+      "ruff check --fix"
+    ]
   }
 }

@@ -52,6 +52,23 @@ import OutdoorActivitiesPage from './pages/OutdoorActivitiesPage';
 import CookingClassesPage from './pages/CookingClassesPage';
 import FoodTourCulturePage from './pages/food/FoodTourCulturePage';
 
+// Footer Pages
+import AboutPage from './pages/AboutPage';
+import JobsPage from './pages/JobsPage';
+import BlogPage from './pages/BlogPage';
+import PressPage from './pages/PressPage';
+import SustainabilityPage from './pages/SustainabilityPage';
+import DestinationsPage from './pages/DestinationsPage';
+import HowItWorksPage from './pages/HowItWorksPage';
+import GiftCardsPage from './pages/GiftCardsPage';
+import HostCenterPage from './pages/HostCenterPage';
+import ContactPage from './pages/ContactPage';
+import FaqPage from './pages/FaqPage';
+import TermsPage from './pages/TermsPage';
+import HelpPage from './pages/HelpPage';
+import HostingPage from './pages/HostingPage';
+import CommunityPage from './pages/CommunityPage';
+
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
@@ -119,6 +136,26 @@ function App() {
           <Route path="/local/:id/portfolio" element={<GuidePortfolioPage />} />
           <Route path="/local/:id/contact" element={<ContactGuidePage />} />
           <Route path="/city/:cityId" element={<CityPage />} />
+          
+          {/* Footer Pages */}
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/jobs" element={<JobsPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/press" element={<PressPage />} />
+          <Route path="/sustainability" element={<SustainabilityPage />} />
+          <Route path="/destinations" element={<DestinationsPage />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/gift-cards" element={<GiftCardsPage />} />
+          <Route path="/host-center" element={<HostCenterPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/faq" element={<FaqPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/help" element={<HelpPage />} />
+          <Route path="/hosting" element={<HostingPage />} />
+          <Route path="/community" element={<CommunityPage />} />
+          <Route path="/host" element={<BecomeHostPage />} />
+          <Route path="/careers" element={<JobsPage />} />
+          
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
       </Router>

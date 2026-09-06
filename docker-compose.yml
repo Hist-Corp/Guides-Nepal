@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: guides-nepal-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: guides_nepal
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - guides-nepal-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: guides-nepal-backend
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/guides_nepal
+      - SECRET_KEY=your-secret-key-change-in-production
+      - ENV=development
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - RESET_PASSWORD_REDIRECT_URL=${RESET_PASSWORD_REDIRECT_URL:-http://localhost:5175/reset-password}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/.venv
+    networks:
+      - guides-nepal-network
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    image: node:20-alpine
+    container_name: guides-nepal-frontend
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    environment:
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - VITE_SUPABASE_PUBLISHABLE_KEY=${VITE_SUPABASE_PUBLISHABLE_KEY}
+      - VITE_API_URL=http://localhost:8000/api/v1
+    ports:
+      - "5175:5175"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - guides-nepal-network
+    restart: unless-stopped
+
+  # Dashboard
+  dashboard:
+    image: node:20-alpine
+    container_name: guides-nepal-dashboard
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    environment:
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - VITE_SUPABASE_PUBLISHABLE_KEY=${VITE_SUPABASE_PUBLISHABLE_KEY}
+      - VITE_API_BASE_URL=http://localhost:8000/api/v1
+    ports:
+      - "5176:5176"
+    volumes:
+      - ./dashboard:/app
+      - /app/node_modules
+    networks:
+      - guides-nepal-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  guides-nepal-network:
+    driver: bridge
