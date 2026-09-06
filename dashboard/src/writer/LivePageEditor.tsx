@@ -380,7 +380,7 @@ export default function LivePageEditor({ slug, title, path, initialSections, onS
                     value={selected.style[f.key] || ""} 
                     onChange={(e) => updateStyle(f.key, e.target.value)} 
                     className="w-full border border-gray-300 rounded-lg px-2 py-2 text-sm"
-                    placeholder={f.key === "headingSize" ? "2rem (e.g., 1.5rem, 2em)" : f.key === "padding" ? "2.5rem (e.g., 1rem 2rem)" : ""}
+                    placeholder={getStylePlaceholder(f.key)}
                   />
                 )}
               </div>
@@ -401,6 +401,12 @@ export default function LivePageEditor({ slug, title, path, initialSections, onS
       {toast && <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-darkBlue text-white px-5 py-2 rounded-lg shadow-lg text-sm">{toast}</div>}
     </div>
   )
+}
+
+function getStylePlaceholder(key: string): string {
+  if (key === "headingSize") return "2rem (e.g., 1.5rem, 2em)";
+  if (key === "padding") return "2.5rem (e.g., 1rem 2rem)";
+  return "";
 }
 
 function SplitItems({ items, onAdd, onUpdate, onRemove }: any) {
