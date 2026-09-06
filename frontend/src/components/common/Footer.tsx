@@ -1,8 +1,10 @@
-import React from 'react';
+﻿import React from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { useCmsSection } from '../../hooks/useCms';
 
 export const Footer: React.FC = () => {
+  const cmsFooter = useCmsSection('home', 'home-footer');
   return (
     <footer>
       {/* Magenta Strip (OCR Requirement) */}
@@ -70,7 +72,7 @@ export const Footer: React.FC = () => {
         <div className="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
              <span className="text-primary font-bold text-lg">guides-nepal</span>
-             <span className="text-xs text-slate-500">© {new Date().getFullYear()} guides-nepal. All rights reserved.</span>
+             <span className="text-xs text-slate-500">© {new Date().getFullYear()} {cmsFooter?.content?.copyright || "guides-nepal. All rights reserved."}</span>
           </div>
           <div className="flex gap-4">
             <a href="#" className="text-slate-400 hover:text-primary transition-colors"><Facebook className="w-5 h-5" /></a>

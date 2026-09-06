@@ -37,16 +37,29 @@ const categories = [
   },
 ];
 
+import { useCmsSection } from '../../hooks/useCms';
+
 export const CategoryGrid: React.FC = () => {
+  const cmsCat = useCmsSection('home', 'home-categories');
   return (
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-10">
            <h2 className="text-xl font-bold text-brand-yellow mb-2 uppercase tracking-wide">
+             {cmsCat?.content?.heading ? (
+               cmsCat.content.heading
+             ) : (
+               <>
              <Link to="/most-popular">Most Popular</Link>. <Link to="/most-delicious">Most Delicious</Link>.
+               </>
+             )}
            </h2>
            <h3 className="text-3xl font-bold text-slate-800">
-             <Link to="/real-good-travel">Real-Good Travel.</Link>
+             {cmsCat?.content?.subtitle ? (
+               cmsCat.content.subtitle
+             ) : (
+               <Link to="/real-good-travel">Real-Good Travel.</Link>
+             )}
            </h3>
         </div>
 

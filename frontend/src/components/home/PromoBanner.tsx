@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../common/Button';
+import { useCmsSection } from '../../hooks/useCms';
 
 export const PromoBanner: React.FC = () => {
   const navigate = useNavigate();
+  const cmsPromo = useCmsSection('home', 'home-promo');
 
   return (
     <section className="py-16 bg-background-cream">
@@ -11,21 +13,35 @@ export const PromoBanner: React.FC = () => {
           <div className="bg-sky-500 rounded-3xl overflow-hidden flex flex-col md:flex-row text-white relative">
             {/* Left Content */}
             <div className="flex-1 p-8 md:p-12 lg:p-16 z-10">
-               <h3 className="text-sm font-bold uppercase tracking-wider text-brand-yellow mb-4">Adventures</h3>
+               {cmsPromo?.content?.tagline && (
+                 <h3 className="text-sm font-bold uppercase tracking-wider text-brand-yellow mb-4">{cmsPromo.content.tagline}</h3>
+               )}
                <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight">
+                  {cmsPromo?.content?.heading ? (
+                    cmsPromo.content.heading
+                  ) : (
+                    <>
                   We have released our <span className="text-brand-yellow">2024</span><br />
                   Impact Report!
+                    </>
+                  )}
                </h2>
                <p className="text-white/80 mb-8 max-w-md leading-relaxed">
+                  {cmsPromo?.content?.subtitle ? (
+                    cmsPromo.content.subtitle
+                  ) : (
+                    <>
                   Discover the true power of your travel with our 2024 Impact Report. 
                   See how responsible tourism supports local communities, preserves culture, 
                   and protects the planet.
+                    </>
+                  )}
                </p>
                <Button 
                  className="bg-white text-sky-500 hover:bg-slate-100 border-none"
                  onClick={() => navigate('/impact-report-2024')}
                >
-                  Read our report
+                  {cmsPromo?.content?.buttonText || 'Read our report'}
                </Button>
             </div>
 

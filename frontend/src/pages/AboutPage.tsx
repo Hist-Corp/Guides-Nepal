@@ -2,8 +2,13 @@ import React from 'react';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { Users, MapPin, Award, Heart } from 'lucide-react';
+import { useCmsSection, useSeoMeta } from '../hooks/useCms';
 
 const AboutPage: React.FC = () => {
+  useSeoMeta('about', 'About Us | Guides Nepal');
+  const cmsHero = useCmsSection('about', 'about-hero');
+  const cmsMission = useCmsSection('about', 'about-mission');
+  const cmsValues = useCmsSection('about', 'about-values');
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -11,9 +16,11 @@ const AboutPage: React.FC = () => {
         {/* Hero Section */}
         <section className="bg-primary py-20 text-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">About Guides Nepal</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              {cmsHero?.content?.heading || 'About Guides Nepal'}
+            </h1>
             <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              Connecting travelers with authentic local experiences across Nepal's most beautiful destinations.
+              {cmsHero?.content?.subtitle || "Connecting travelers with authentic local experiences across Nepal's most beautiful destinations."}
             </p>
           </div>
         </section>
@@ -22,9 +29,11 @@ const AboutPage: React.FC = () => {
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center mb-12">
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">Our Mission</h2>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">
+                {cmsMission?.content?.heading || 'Our Mission'}
+              </h2>
               <p className="text-lg text-slate-600">
-                We believe that the best travel experiences come from connecting with locals who share their passion, knowledge, and culture. Our platform makes it easy to find authentic guided experiences across Nepal.
+                {cmsMission?.content?.body || 'We believe that the best travel experiences come from connecting with locals who share their passion, knowledge, and culture. Our platform makes it easy to find authentic guided experiences across Nepal.'}
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-12">

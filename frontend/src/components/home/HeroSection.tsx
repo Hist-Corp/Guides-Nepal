@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, MapPin, ChevronRight } from 'lucide-react';
 import { useUIStore } from '../../store/uiStore';
 import { Link } from 'react-router-dom';
+import { useCmsSection } from '../../hooks/useCms';
 
 const destinations = [
   {
@@ -86,6 +87,7 @@ export const HeroSection: React.FC = () => {
   const [destination, setDestination] = useState('');
   const [currentDestIndex, setCurrentDestIndex] = useState(0);
   const { openSearch, setSearchQuery } = useUIStore();
+  const cmsHero = useCmsSection('home', 'home-hero');
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,13 +109,25 @@ export const HeroSection: React.FC = () => {
           <div className="flex-1 space-y-10 z-10 max-w-2xl text-center md:text-left mx-auto md:mx-0">
             <div className="space-y-4">
               <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tight">
+                {cmsHero?.content?.heading ? (
+                  <span className="text-[#547792]">{cmsHero.content.heading}</span>
+                ) : (
+                  <>
                 <span className="text-[#547792]">Enchanting experiences,</span><br />
                 <span className="text-[#547792]">with </span>
                 <span className="text-[#F4B400] drop-shadow-sm">incredible locals</span>
+                  </>
+                )}
               </h1>
               <p className="text-xl text-[#555555] font-medium max-w-lg leading-relaxed mx-auto md:mx-0">
+                {cmsHero?.content?.subtitle ? (
+                  cmsHero.content.subtitle
+                ) : (
+                  <>
                 Book unique and memorable travel<br className="hidden md:block" />
                 experiences guided by locals
+                  </>
+                )}
               </p>
             </div>
 

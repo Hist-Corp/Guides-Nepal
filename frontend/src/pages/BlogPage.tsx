@@ -3,8 +3,10 @@ import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { Clock, User, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { getCmsBlogPosts } from '../services/cms';
 
-const blogPosts = [
+const staticBlogPosts = [
   {
     id: 1,
     title: '10 Hidden Gems in Kathmandu You Must Visit',
@@ -62,6 +64,36 @@ const blogPosts = [
 ];
 
 const BlogPage: React.FC = () => {
+  const [cmsPosts, setCmsPosts] = useState<any[]>([]);
+
+  useEffect(() => {
+    getCmsBlogPosts().then(setCmsPosts);
+  }, []);
+
+  // Merge CMS-edited posts over the static defaults by id, so dashboard edits show live
+  const blogPosts = staticBlogPosts.map((p) => {
+    const cms = cmsPosts.find((c) => c.id === p.id);
+    if (!cms) return p;
+    return {
+      ...p,
+      title: cms.title || p.title,
+      excerpt: cms.content ? cms.content.slice(0, 140) + (cms.content.length > 140 ? '…' : '') : p.excerpt,
+      author: cms.author || p.author,
+      date: cms.date || p.date,
+    };
+  }).concat(
+    cmsPosts.filter((c) => !staticBlogPosts.some((p) => p.id === c.id))
+      .map((c) => ({
+        id: c.id,
+        title: c.title,
+        excerpt: (c.content || '').slice(0, 140),
+        author: c.author || 'Guides Nepal Team',
+        date: c.date || '',
+        image: 'https://images.unsplash.com/photo-1531572753322-ad063cecc140?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+        category: 'Community',
+      }))
+  );
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />

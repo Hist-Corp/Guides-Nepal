@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { Mail, Phone, MapPin, MessageCircle } from 'lucide-react';
+import { useCmsSection, useSeoMeta } from '../hooks/useCms';
 
 const ContactPage: React.FC = () => {
+  useSeoMeta('contact', 'Contact Us | Guides Nepal');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const cmsHero = useCmsSection('contact', 'contact-hero');
+  const cmsInfo = useCmsSection('contact', 'contact-info');
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -15,9 +19,11 @@ const ContactPage: React.FC = () => {
       <main className="flex-grow">
         <section className="bg-primary py-20 text-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              {cmsHero?.content?.heading || 'Contact Us'}
+            </h1>
             <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              Have a question or need help? We're here for you.
+              {cmsHero?.content?.subtitle || "Have a question or need help? We're here for you."}
             </p>
           </div>
         </section>
@@ -35,7 +41,7 @@ const ContactPage: React.FC = () => {
                       </div>
                       <div>
                         <h3 className="font-bold text-slate-900">Email</h3>
-                        <p className="text-slate-600">support@guides-nepal.com</p>
+                        <p className="text-slate-600">{cmsInfo?.content?.email || 'support@guides-nepal.com'}</p>
                         <p className="text-slate-500 text-sm">We respond within 24 hours</p>
                       </div>
                     </div>
@@ -45,7 +51,7 @@ const ContactPage: React.FC = () => {
                       </div>
                       <div>
                         <h3 className="font-bold text-slate-900">Phone</h3>
-                        <p className="text-slate-600">+977-1-1234567</p>
+                        <p className="text-slate-600">{cmsInfo?.content?.phone || '+977-1-1234567'}</p>
                         <p className="text-slate-500 text-sm">Mon-Fri, 9am-6pm NPT</p>
                       </div>
                     </div>
@@ -55,7 +61,7 @@ const ContactPage: React.FC = () => {
                       </div>
                       <div>
                         <h3 className="font-bold text-slate-900">Office</h3>
-                        <p className="text-slate-600">Thamel, Kathmandu, Nepal</p>
+                        <p className="text-slate-600">{cmsInfo?.content?.address || 'Thamel, Kathmandu, Nepal'}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-4">
