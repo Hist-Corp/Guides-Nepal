@@ -373,7 +373,7 @@ export default function LivePageEditor({ slug, title, path, initialSections, onS
                   <input type="color" value={selected.style[f.key] || "#000000"} onChange={(e) => updateStyle(f.key, e.target.value)} className="w-full h-9 border border-gray-300 rounded cursor-pointer" />
                 ) : f.type === "select" ? (
                   <select value={selected.style[f.key] || "center"} onChange={(e) => updateStyle(f.key, e.target.value)} className="w-full border border-gray-300 rounded-lg px-2 py-2 text-sm">
-                    {f.options?.map((o) => (<option key={o} value={o}>{o}</option>))
+                    {f.options?.map((o) => (<option key={o} value={o}>{o}</option>))}
                   </select>
                 ) : (
                   <input 
