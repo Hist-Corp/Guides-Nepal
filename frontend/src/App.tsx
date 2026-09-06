@@ -36,6 +36,7 @@ import BecomeHostPage from './pages/host/BecomeHostPage';
 import HostApplicationPage from './pages/host/HostApplicationPage';
 import BookingsPage from './pages/user/BookingsPage';
 import ProfilePage from './pages/user/ProfilePage';
+import AccountSettingsPage from './pages/user/AccountSettingsPage';
 import FavoritesPage from './pages/user/FavoritesPage';
 import ChatPage from './pages/user/ChatPage';
 import ConsentPage from './pages/ConsentPage';
@@ -96,6 +97,7 @@ function App() {
           <Route path="/host-application" element={<HostApplicationPage />} />
           <Route path="/bookings" element={<BookingsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/account" element={<AccountSettingsPage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/maila-dai" element={<MailaDaiChatPage />} />

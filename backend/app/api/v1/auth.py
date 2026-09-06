@@ -8,9 +8,12 @@ from app.schemas.auth import (
     Token,
     ForgotPasswordRequest,
     SyncPasswordRequest,
+    ChangePasswordRequest,
 )
 from app.services.auth_service import AuthService
 from app.core.config import settings, Settings
+from app.core.dependencies import get_current_user
+from app.models.user import User
 import httpx
 import urllib.parse
 import logging
@@ -142,6 +145,43 @@ def login(login_data: UserLogin, db: Session = Depends(get_db)) -> dict:
     # This handles users who registered before Supabase sync was added.
     auth_service.ensure_supabase_user(str(user.email), login_data.password)
     return auth_service.create_tokens(user)
+
+
+@router.post("/change-password")
+def change_password(
+    request: ChangePasswordRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    """Change the logged-in user's password.
+
+    Requires the current password to be correct, then validates the new
+    password against the same strength policy used at registration and
+    updates the stored hash.
+    """
+    auth_service = AuthService(db)
+
+    # Ensure the current password matches what we have on file.
+    if not auth_service.authenticate_user(str(current_user.email), request.current_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect",
+        )
+
+    # The new password must actually be different.
+    if request.current_password == request.new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be different from your current password",
+        )
+
+    # Validate strength and persist the new hash.
+    try:
+        auth_service.update_user_password(current_user, request.new_password)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    return {"message": "Password updated successfully"}
 
 
 # --- Password Reset ---

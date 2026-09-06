@@ -27,7 +27,7 @@ export const Footer: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
           {/* Company */}
           <div>
-            <h4 className="font-bold text-slate-900 mb-4">About Withlocals</h4>
+            <h4 className="font-bold text-slate-900 mb-4">About Guides Nepal</h4>
             <ul className="space-y-2 text-sm text-slate-600">
               <li><Link to="/about" className="hover:text-primary transition-colors">About Us</Link></li>
               <li><Link to="/careers" className="hover:text-primary transition-colors">Jobs</Link></li>

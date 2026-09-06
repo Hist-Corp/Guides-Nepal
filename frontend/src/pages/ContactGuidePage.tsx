@@ -250,7 +250,7 @@ const ContactGuidePage: React.FC = () => {
              </div>
              <div className="text-sm text-gray-600">
                 <span className="font-bold text-gray-900 block mb-1">Safety first</span>
-                For your safety, always communicate and transfer money via the Withlocals website or app. <a href="#" className="text-brand-yellow font-bold hover:underline">Learn more</a>
+                For your safety, always communicate and transfer money via the Guides Nepal website or app. <a href="#" className="text-brand-yellow font-bold hover:underline">Learn more</a>
              </div>
           </div>
 

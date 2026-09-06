@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
@@ -120,7 +121,7 @@ const ProfilePage: React.FC = () => {
           {/* Left: Profile Card */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <div className="flex justify-end mb-2">
+              <div className="flex flex-wrap items-center justify-end gap-2 mb-2">
                 {!isEditing ? (
                   <button
                     onClick={() => setIsEditing(true)}
@@ -160,6 +161,12 @@ const ProfilePage: React.FC = () => {
                     Save
                   </button>
                 )}
+                <Link
+                  to="/account"
+                  className="px-3 py-2 rounded-full bg-gray-100 text-gray-800 text-sm font-bold hover:bg-gray-200 transition-colors"
+                >
+                  Account Settings
+                </Link>
               </div>
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden border border-gray-300 flex items-center justify-center">

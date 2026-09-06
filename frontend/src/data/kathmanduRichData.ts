@@ -103,7 +103,7 @@ export const kathmanduRichData: RichExperienceData[] = [
         commonGuides[3],
         commonGuides[2]
     ],
-    description: "Want to see the best of Kathmandu? We got you covered. But as you can expect from a Withlocals experience, the real excitement is its hidden gems. Join your favorite local and get a feeling of the city's real vibe.",
+    description: "Want to see the best of Kathmandu? We got you covered. But as you can expect from a Guides Nepal experience, the real excitement is its hidden gems. Join your favorite local and get a feeling of the city's real vibe.",
     tourStructure: {
       steps: [
         { name: "Garden of Dreams", label: "Start" },

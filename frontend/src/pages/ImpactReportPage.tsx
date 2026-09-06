@@ -289,7 +289,7 @@ const ImpactReportPage: React.FC = () => {
                  Become a <span className="text-primary">host</span>.
               </h2>
               <p className="text-slate-600 mb-10 max-w-2xl mx-auto text-lg">
-                 Visit us in your city, join our community and teach travelers our global community of Withlocals hosts and fuel your passion into practice.
+                 Visit us in your city, join our community and teach travelers our global community of Guides Nepal hosts and fuel your passion into practice.
           </p>
           <Button 
             className="bg-primary hover:bg-primary-hover text-white rounded-full px-8 py-3 text-lg font-bold border-none"

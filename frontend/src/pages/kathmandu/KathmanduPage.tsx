@@ -401,7 +401,7 @@ export const KathmanduPage: React.FC = () => {
                  </div>
               </div>
               <div className="absolute bottom-8 right-8 text-white font-bold text-xl tracking-widest">
-                 Withlocals
+                 Guides Nepal
               </div>
            </div>
 
@@ -473,10 +473,10 @@ export const KathmanduPage: React.FC = () => {
            </div>
         </div>
 
-        {/* Why Withlocals Icons Grid (Bottom) */}
+        {/* Why Guides Nepal Icons Grid (Bottom) */}
         <div className="mb-24 pt-16 border-t border-gray-100">
            <div className="text-center mb-12">
-              <h2 className="text-2xl font-bold text-[#213448]">Why do Withlocals love what they do?</h2>
+              <h2 className="text-2xl font-bold text-[#213448]">Why do Guides Nepal love what they do?</h2>
            </div>
            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
               {[
@@ -515,7 +515,7 @@ export const KathmanduPage: React.FC = () => {
                  Want to escape the hustle and bustle? Take a day trip to <strong className="text-gray-900">Nagarkot</strong> or <strong className="text-gray-900">Bhaktapur</strong>. These places are just a short drive away and offer a completely different vibe. You can enjoy the stunning views of the Himalayas or wander through the ancient streets of a medieval city.
               </p>
               <p>
-                 No matter what you're interested in, there's always something to do in Kathmandu. And with a Withlocals tour, you can customize your experience to fit your interests perfectly. So what are you waiting for? Book your private tour today and discover the magic of Kathmandu!
+                 No matter what you're interested in, there's always something to do in Kathmandu. And with a Guides Nepal tour, you can customize your experience to fit your interests perfectly. So what are you waiting for? Book your private tour today and discover the magic of Kathmandu!
               </p>
            </div>
         </div>

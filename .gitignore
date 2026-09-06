@@ -33,6 +33,9 @@ __pycache__/
 env/
 venv/
 
+# Local dev/debug artifacts (screenshots, temp scripts, css dumps, logs)
+.dev-logs/
+
 # ⚠️  SECURITY: Environment variables (NEVER commit)
 .env
 .env.local

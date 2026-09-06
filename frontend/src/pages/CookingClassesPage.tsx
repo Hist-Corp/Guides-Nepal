@@ -271,9 +271,9 @@ export const CookingClassesPage: React.FC = () => {
           </div>
         </div>
         
-        {/* Why Withlocals Section */}
+        {/* Why Guides Nepal Section */}
         <div className="py-20 text-center">
-           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12">Why do Withlocals love what they do?</h2>
+           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12">Why do Guides Nepal love what they do?</h2>
            <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-12">
               <div className="flex flex-col items-center">
                  <h3 className="font-bold text-xl text-gray-900 mb-2">A fair income</h3>
@@ -311,7 +311,7 @@ export const CookingClassesPage: React.FC = () => {
               <p>Start your culinary journey with Dal Bhat, the national dish that powers Nepal. This nutritious combination of lentil soup, rice, and vegetables is more than just food—it's a daily ritual that brings families together.</p>
               <p>If you're a fan of dumplings, you're in for a treat! Momo making is an art form in Nepal. These juicy dumplings, filled with spiced meat or vegetables, are steamed to perfection and served with fiery tomato chutney.</p>
               <p>Want to explore beyond the basics? Discover Newari cuisine, the indigenous food culture of the Kathmandu Valley. From spicy choila meat to sweet yomari dumplings, these ancient recipes offer a taste of authentic Nepali heritage.</p>
-              <p>No matter what your culinary interests are, there's always something delicious to learn in Nepal. And with a Withlocals cooking class, you can customize your experience to focus on your favorite flavors. So what are you waiting for? Book your private cooking class today and discover the magic of Nepali cuisine!</p>
+              <p>No matter what your culinary interests are, there's always something delicious to learn in Nepal. And with a Guides Nepal cooking class, you can customize your experience to focus on your favorite flavors. So what are you waiting for? Book your private cooking class today and discover the magic of Nepali cuisine!</p>
             </div>
           </div>
         </div>
@@ -578,7 +578,7 @@ export const CookingClassesPage: React.FC = () => {
                 <p className="text-lg">Experience authentic Nepali hospitality and traditional cooking methods.</p>
               </div>
               <div className="absolute bottom-8 right-8 text-white font-bold text-xl tracking-widest">
-                 Withlocals
+                 Guides Nepal
               </div>
            </div>
 
@@ -650,10 +650,10 @@ export const CookingClassesPage: React.FC = () => {
            </div>
         </div>
 
-        {/* Why Withlocals Icons Grid (Bottom) */}
+        {/* Why Guides Nepal Icons Grid (Bottom) */}
         <div className="mb-24 pt-16 border-t border-gray-100">
            <div className="text-center mb-12">
-              <h2 className="text-2xl font-bold text-[#213448]">Why do Withlocals love what they do?</h2>
+              <h2 className="text-2xl font-bold text-[#213448]">Why do Guides Nepal love what they do?</h2>
            </div>
            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
               {[
@@ -692,7 +692,7 @@ export const CookingClassesPage: React.FC = () => {
                  Want to explore beyond the basics? Discover <strong className="text-gray-900">Newari cuisine</strong>, the indigenous food culture of the Kathmandu Valley. From spicy choila meat to sweet yomari dumplings, these ancient recipes offer a taste of authentic Nepali heritage.
               </p>
               <p>
-                 No matter what your culinary interests are, there's always something delicious to learn in Nepal. And with a Withlocals cooking class, you can customize your experience to focus on your favorite flavors. So what are you waiting for? Book your private cooking class today and discover the magic of Nepali cuisine!
+                 No matter what your culinary interests are, there's always something delicious to learn in Nepal. And with a Guides Nepal cooking class, you can customize your experience to focus on your favorite flavors. So what are you waiting for? Book your private cooking class today and discover the magic of Nepali cuisine!
               </p>
            </div>
         </div>

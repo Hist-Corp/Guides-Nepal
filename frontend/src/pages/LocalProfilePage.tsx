@@ -482,13 +482,13 @@ const LocalProfilePage: React.FC = () => {
                 </button>
               </section>
 
-              {/* This is Withlocals Section */}
+              {/* This is Guides Nepal Section */}
               <section className="space-y-6 pt-8 border-t border-gray-200">
-                <h2 className="text-2xl font-bold text-gray-900">This is Withlocals</h2>
+                <h2 className="text-2xl font-bold text-gray-900">This is Guides Nepal</h2>
                 <div className="rounded-2xl overflow-hidden relative aspect-video group cursor-pointer">
                    <img 
                      src="https://images.unsplash.com/photo-1527632946353-c516d0c5a319?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
-                     alt="This is Withlocals" 
+                     alt="This is Guides Nepal" 
                      className="w-full h-full object-cover brightness-75 group-hover:scale-105 transition-transform duration-700"
                    />
                    <div className="absolute inset-0 flex items-center justify-center">

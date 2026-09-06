@@ -16,6 +16,11 @@
 html {
 }
 
+/* Prevent horizontal overflow (scrollbars from wide fixed elements) without breaking sticky header */
+body {
+  overflow-x: clip;
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

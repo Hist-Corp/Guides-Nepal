@@ -20,7 +20,7 @@ const BecomeHostPage: React.FC = () => {
     { question: "What is an experience?", answer: "An experience is an activity that goes beyond the typical tour or class, designed and led by locals all over the world. Show off your city, craft, cause, or culture by hosting an experience." },
     { question: "What can I host?", answer: "You can host a food tour, a workshop, a city walk, a day trip, or any unique activity that shares your passion and local knowledge." },
     { question: "Do I need to be an experienced host?", answer: "No! You just need passion for your city and a desire to meet new people. We provide the tools and support to help you succeed." },
-    { question: "Do I need insurance?", answer: "We recommend checking your local regulations. However, Withlocals provides liability insurance for most experiences hosted on our platform." },
+    { question: "Do I need insurance?", answer: "We recommend checking your local regulations. However, Guides Nepal provides liability insurance for most experiences hosted on our platform." },
     { question: "How do I get paid?", answer: "We offer secure payouts directly to your bank account or via other payment methods, processed shortly after the experience takes place." },
     { question: "Is it safe to host travelers?", answer: "Safety is our priority. We verify travelers and hosts, and our review system builds trust within the community." }
   ];
@@ -47,7 +47,7 @@ const BecomeHostPage: React.FC = () => {
             Share your city. <span className="text-brand-yellow">Earn money.</span>
           </h1>
           <p className="text-lg md:text-xl text-slate-700 mb-8 font-medium">
-            <span className="text-brand-yellow font-bold">#Withlocals</span> helps you turn your passion into income.
+            <span className="text-brand-yellow font-bold">#GuidesNepal</span> helps you turn your passion into income.
           </p>
           
           {/* Search Bar */}
@@ -71,7 +71,7 @@ const BecomeHostPage: React.FC = () => {
             <span className="text-brand-yellow font-bold border-b-2 border-brand-yellow pb-1 uppercase tracking-wider text-sm">Earn money</span>
             <h2 className="text-3xl md:text-4xl font-bold mt-6 mb-4">Earn money doing what you love in your city</h2>
             <p className="text-gray-600 max-w-3xl mx-auto text-lg">
-              Withlocals lets you share your local knowledge and passions by creating unique experiences for travelers. Set your own schedule and earn money doing what you love.
+              Guides Nepal lets you share your local knowledge and passions by creating unique experiences for travelers. Set your own schedule and earn money doing what you love.
             </p>
           </div>
 
@@ -112,7 +112,7 @@ const BecomeHostPage: React.FC = () => {
             <span className="text-brand-yellow font-bold border-b-2 border-brand-yellow pb-1 uppercase tracking-wider text-sm">Global community</span>
             <h2 className="text-3xl md:text-4xl font-bold mt-6 mb-4">Thousands of local hosts. One global community.</h2>
             <p className="text-gray-600 max-w-3xl mx-auto text-lg flex items-center justify-center gap-4">
-              At Withlocals, we're a diverse community of locals sharing authentic experiences.
+              At Guides Nepal, we're a diverse community of locals sharing authentic experiences.
               <span className="flex gap-2 text-gray-400">
                 <Facebook className="w-5 h-5 hover:text-brand-yellow cursor-pointer" />
                 <Instagram className="w-5 h-5 hover:text-brand-yellow cursor-pointer" />
@@ -124,17 +124,17 @@ const BecomeHostPage: React.FC = () => {
             {[
               {
                 name: "Mina Gloria",
-                quote: "When I host with Withlocals, I feel like I'm traveling the world right from my own city. I've made friends from everywhere!",
+                quote: "When I host with Guides Nepal, I feel like I'm traveling the world right from my own city. I've made friends from everywhere!",
                 img: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80"
               },
               {
                 name: "Jaafar",
-                quote: "Withlocals allows me to show the real side of my city. I'm proud to be part of it and share my culture.",
+                quote: "Guides Nepal allows me to show the real side of my city. I'm proud to be part of it and share my culture.",
                 img: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80"
               },
               {
                 name: "Zsofia",
-                quote: "Hosting with Withlocals feels like doing what I love, not just a job. The flexibility is amazing for my lifestyle.",
+                quote: "Hosting with Guides Nepal feels like doing what I love, not just a job. The flexibility is amazing for my lifestyle.",
                 img: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80"
               }
             ].map((host, i) => (
@@ -156,7 +156,7 @@ const BecomeHostPage: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <span className="text-brand-yellow font-bold border-b-2 border-brand-yellow pb-1 uppercase tracking-wider text-sm">Originals</span>
-            <h2 className="text-3xl md:text-4xl font-bold mt-6 mb-4">Start hosting fast with Withlocals Originals!</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mt-6 mb-4">Start hosting fast with Guides Nepal Originals!</h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg">
               Ready-made experiences you can personalize and launch quickly. No need to start from scratch!
             </p>

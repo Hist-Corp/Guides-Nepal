@@ -457,10 +457,10 @@ export const CulturalToursPage: React.FC = () => {
            </div>
         </div>
 
-        {/* Why Withlocals Icons Grid (Bottom) */}
+        {/* Why Guides Nepal Icons Grid (Bottom) */}
         <div className="mb-24 pt-16 border-t border-gray-100">
            <div className="text-center mb-12">
-              <h2 className="text-2xl font-bold text-[#213448]">Why do Withlocals love what they do?</h2>
+              <h2 className="text-2xl font-bold text-[#213448]">Why do Guides Nepal love what they do?</h2>
            </div>
            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
               {[
@@ -499,7 +499,7 @@ export const CulturalToursPage: React.FC = () => {
                  Want to experience living culture? Participate in a <strong className="text-gray-900">traditional ceremony</strong> or festival. Learn about Hindu rituals, witness traditional dances, or visit local artisan workshops. These immersive experiences will give you deep insights into Nepali culture.
               </p>
               <p>
-                 No matter what aspect of culture interests you, there's always a cultural experience in Nepal. And with a Withlocals tour, you can customize your cultural journey to fit your interests perfectly. So what are you waiting for? Book your private cultural tour today and discover the rich heritage of Nepal!
+                 No matter what aspect of culture interests you, there's always a cultural experience in Nepal. And with a Guides Nepal tour, you can customize your cultural journey to fit your interests perfectly. So what are you waiting for? Book your private cultural tour today and discover the rich heritage of Nepal!
               </p>
            </div>
         </div>

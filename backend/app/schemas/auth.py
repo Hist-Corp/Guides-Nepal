@@ -57,3 +57,15 @@ class SyncPasswordRequest(BaseModel):
 
     supabase_access_token: str
     password: str
+
+
+class ChangePasswordRequest(BaseModel):
+    """Request body for changing the password while logged in.
+
+    current_password must match the user's existing password; the new
+    password is validated against the same strength policy used at
+    registration before being hashed server-side.
+    """
+
+    current_password: str
+    new_password: str

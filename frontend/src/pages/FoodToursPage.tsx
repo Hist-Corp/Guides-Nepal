@@ -353,7 +353,7 @@ export const FoodToursPage: React.FC = () => {
         </div>
 
         <div className="py-20 text-center">
-           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12">Why do Withlocals love what they do?</h2>
+           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12">Why do Guides Nepal love what they do?</h2>
            <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-12">
               <div className="flex flex-col items-center">
                  <h3 className="font-bold text-xl text-gray-900 mb-2">A fair income</h3>
@@ -390,7 +390,7 @@ export const FoodToursPage: React.FC = () => {
               <p>Start your culinary journey with a Street Food Safari, diving into the heart of Kathmandu's vibrant food scene. This is the best way to discover authentic local snacks, from savory samosas to sweet jalebis, guided by a local expert.</p>
               <p>If you're a fan of dumplings, you're in for a treat! Momo Mania is an art form in Nepal. These juicy dumplings, filled with spiced meat or vegetables, are a national obsession. A food tour will take you to the best spots to taste them, steamed, fried, or in a spicy soup.</p>
               <p>Want to explore beyond the basics? Discover Newari cuisine, the indigenous food culture of the Kathmandu Valley. From spicy choila meat to sweet yomari dumplings, these ancient recipes offer a taste of authentic Nepali heritage.</p>
-              <p>No matter what your culinary interests are, there's always something delicious to discover in Nepal. And with a Withlocals food tour, you can customize your experience to focus on your favorite flavors. So what are you waiting for? Book your private food tour today and discover the magic of Nepali cuisine!</p>
+              <p>No matter what your culinary interests are, there's always something delicious to discover in Nepal. And with a Guides Nepal food tour, you can customize your experience to focus on your favorite flavors. So what are you waiting for? Book your private food tour today and discover the magic of Nepali cuisine!</p>
             </div>
           </div>
         </div>

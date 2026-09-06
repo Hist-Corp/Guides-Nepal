@@ -34,7 +34,7 @@ export const kathmanduTours = [
     duration: "3 hours",
     type: "City highlight tours",
     price: 49.21,
-    description: "Want to see the best of Kathmandu? We got you covered. But as you can expect from a Withlocals experience, the real excitement is its hidden gems. Join your favorite local and get a feeling of the city's real vibe on a tour that has it all, so you can say: I experienced the real Kathmandu!",
+    description: "Want to see the best of Kathmandu? We got you covered. But as you can expect from a Guides Nepal experience, the real excitement is its hidden gems. Join your favorite local and get a feeling of the city's real vibe on a tour that has it all, so you can say: I experienced the real Kathmandu!",
     image: "https://images.unsplash.com/photo-1547292283-7c664a092534?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Artty", "Sammy"]
   },
@@ -73,7 +73,7 @@ export const kathmanduTours = [
     duration: "12 hours",
     type: "Day trips",
     price: 137.00,
-    description: "Imagine this: a scenic road trip from Kathmandu to explore Nagarkot with stops along the way to discover viewpoints, villages, incredible nature, and cultural gems. Sounds like a dream? No, it's possible on a Withlocals day trip with a local host leading the way!",
+    description: "Imagine this: a scenic road trip from Kathmandu to explore Nagarkot with stops along the way to discover viewpoints, villages, incredible nature, and cultural gems. Sounds like a dream? No, it's possible on a Guides Nepal day trip with a local host leading the way!",
     image: "https://images.unsplash.com/photo-1542347589-8c225e9c8a73?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Chef Hnoi", "Jida"]
   },
@@ -112,7 +112,7 @@ export const kathmanduTours = [
     duration: "5 hours",
     type: "City highlight tours",
     price: 75.71,
-    description: "Ready for a jam-packed tour, full of history, culture, stories, and sights? Checkmark from your travel bucket list all your must-sees of Kathmandu, because if there's a Withlocals tour that shows you all the city's ins and outs, it's this complete and personalized tour of Kathmandu.",
+    description: "Ready for a jam-packed tour, full of history, culture, stories, and sights? Checkmark from your travel bucket list all your must-sees of Kathmandu, because if there's a Guides Nepal tour that shows you all the city's ins and outs, it's this complete and personalized tour of Kathmandu.",
     image: "https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Agrindra", "Araya"]
   },

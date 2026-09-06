@@ -2,7 +2,7 @@ import axios from "axios"
 
 const BASE = process.env.API_BASE || "http://localhost:8000/api/v1"
 const email = "huhehaha.prakaz@gmail.com"
-const password = "admin"
+const password = "Admin@123"
 
 async function run() {
   try {

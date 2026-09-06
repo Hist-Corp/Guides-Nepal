@@ -111,7 +111,7 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
         isVisible ? 'translate-y-0' : '-translate-y-full'
       } ${hasPassedFeatured ? 'bg-white shadow-md' : 'bg-peach'}`}
     >
-      <div className="container mx-auto px-4 h-20 flex items-center justify-between">
+      <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-2">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 shrink-0">
            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
@@ -180,13 +180,12 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
                    </div>
                 </button>
                 {/* Dropdown for logout */}
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 hidden group-hover:block animate-in fade-in zoom-in-95 duration-200">
+                <div className="absolute right-0 top-full pt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 hidden group-hover:block animate-in fade-in zoom-in-95 duration-200">
                   <div className="px-4 py-2 border-b border-gray-100 mb-2">
                      <p className="font-bold text-gray-900 truncate">{user?.firstName} {user?.lastName}</p>
                      <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                   </div>
                   <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary">Profile</Link>
-                  <Link to="/account" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary">Account Settings</Link>
                   <button 
                     onClick={() => {
                       logout();
@@ -223,7 +222,7 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
         </div>
 
         {/* Mobile Actions */}
-        <div className="flex items-center gap-3 md:hidden">
+        <div className="flex items-center gap-2 md:hidden">
            {/* Mobile Search Icon (non-home) */}
            {!isHomePage && !isHostApplicationPage && (
               <button 
@@ -237,13 +236,13 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
              <>
                <button 
                  onClick={() => setIsLoginOpen(true)}
-                 className="text-sm font-bold px-3 py-2 rounded-full transition-colors shadow-sm bg-white hover:bg-slate-50 text-gray-800"
+                 className="shrink-0 text-sm font-bold px-3 py-2 rounded-full transition-colors shadow-sm bg-white hover:bg-slate-50 text-gray-800"
                >
                  Log in
                </button>
                <button 
                  onClick={() => setIsSignupOpen(true)}
-                 className="bg-brand-yellow hover:bg-[#E5A800] text-[#213448] text-sm font-bold px-4 py-2 rounded-full transition-colors shadow-sm"
+                 className="shrink-0 bg-brand-yellow hover:bg-[#E5A800] text-[#213448] text-sm font-bold px-3.5 py-2 rounded-full transition-colors shadow-sm"
                >
                  Sign up
                </button>
@@ -345,9 +344,6 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
                       </Link>
                       <Link to="/profile" className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2" onClick={() => setIsMenuOpen(false)}>
                         Profile
-                      </Link>
-                      <Link to="/account" className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2" onClick={() => setIsMenuOpen(false)}>
-                        Account Settings
                       </Link>
                       <button 
                         onClick={() => {
