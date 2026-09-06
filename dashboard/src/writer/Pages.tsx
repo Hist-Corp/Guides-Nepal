@@ -25,6 +25,7 @@ export type PageRecord = {
   slug: string;
   status?: string;
   content?: string;
+  path?: string;
 };
 
 function slugify(value: string) {
@@ -219,7 +220,7 @@ export default function WriterPages() {
         <LivePageEditor
           slug={liveEdit.slug}
           title={liveEdit.title}
-          path="/pages"
+          path={liveEdit.path || undefined}
           initialSections={[
             {
               id: "page-hero",
@@ -256,9 +257,9 @@ export default function WriterPages() {
               },
             },
           ]}
-          onSaved={async (sections) => {
-            const hero = sections.find((s) => s.id === "page-hero");
-            const body = sections.find((s) => s.id === "page-body");
+onSaved={async (sections) => {
+            const hero = sections.find((s) => s.type === "hero");
+            const body = sections.find((s) => s.type === "text");
             if (hero?.content?.heading || body?.content?.body) {
               try {
                 await updateContentPage(liveEdit.id, {

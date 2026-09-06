@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom"
 import { useState } from "react"
 import Table from "../components/Table"
 import Modal from "../components/Modal"
@@ -13,19 +14,22 @@ export default function AdminContent() {
       <div className="text-2xl font-bold text-darkBlue">Content Management</div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="rounded-2xl bg-white p-4 border">
-          <div className="font-semibold text-darkBlue">Pages</div>
-          <div className="text-sm text-gray-600">Static pages and SEO metadata</div>
-          <button className="mt-3 rounded-lg px-3 py-2 bg-brand-yellow text-darkBlue font-semibold">Create page</button>
+          <NavLink to="/dashboard/content-writer/pages" className="block text-center py-4">
+            <div className="font-semibold text-darkBlue">Pages</div>
+            <div className="text-sm text-gray-600">Static pages and SEO metadata</div>
+          </NavLink>
         </div>
         <div className="rounded-2xl bg-white p-4 border">
-          <div className="font-semibold text-darkBlue">Blog</div>
-          <div className="text-sm text-gray-600">Articles and editorial content</div>
-          <button className="mt-3 rounded-lg px-3 py-2 bg-brand-yellow text-darkBlue font-semibold">Write article</button>
+          <NavLink to="/dashboard/content-writer/blog" className="block text-center py-4">
+            <div className="font-semibold text-darkBlue">Blog</div>
+            <div className="text-sm text-gray-600">Articles and editorial content</div>
+          </NavLink>
         </div>
         <div className="rounded-2xl bg-white p-4 border">
-          <div className="font-semibold text-darkBlue">Guides Content</div>
-          <div className="text-sm text-gray-600">Experience descriptions and profiles</div>
-          <button className="mt-3 rounded-lg px-3 py-2 bg-brand-yellow text-darkBlue font-semibold">Add content</button>
+          <NavLink to="/dashboard/content-writer/guides-content" className="block text-center py-4">
+            <div className="font-semibold text-darkBlue">Guides Content</div>
+            <div className="text-sm text-gray-600">Experience descriptions and profiles</div>
+          </NavLink>
         </div>
       </div>
       <div className="rounded-2xl bg-white p-4 border space-y-2">

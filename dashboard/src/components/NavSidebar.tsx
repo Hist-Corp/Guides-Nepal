@@ -10,7 +10,7 @@ export default function NavSidebar() {
           { to: `${base}`, label: "Overview" },
           { to: `${base}/hosts`, label: "Hosts" },
           { to: `${base}/guides`, label: "Guides" },
-          { to: `${base}/content`, label: "Contant Writer" },
+          { to: `${base}/content`, label: "Content Writer" },
           { to: `${base}/analytics`, label: "Analytics" },
           { to: `${base}/revenue`, label: "Revenue & payouts" },
           { to: `${base}/settings`, label: "System settings" }

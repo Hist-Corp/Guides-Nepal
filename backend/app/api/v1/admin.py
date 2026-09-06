@@ -2,16 +2,19 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from app.core.database import get_db
+from app.core.dependencies import require_role
 from app.models.user import User
 from app.models.guide import Guide
 from app.models.booking import Booking
 
 router = APIRouter()
 
+ADMIN_ONLY = require_role("admin")
+
 
 # --- User Management ---
 @router.get("/users")
-def list_users(role: Optional[str] = None, db: Session = Depends(get_db)) -> List[dict]:
+def list_users(role: Optional[str] = None, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> List[dict]:
     query = db.query(User)
     if role:
         query = query.filter(User.role == role)
@@ -28,7 +31,7 @@ def list_users(role: Optional[str] = None, db: Session = Depends(get_db)) -> Lis
 
 
 @router.patch("/users/{user_id}")
-def update_user(user_id: int, payload: dict, db: Session = Depends(get_db)) -> dict:
+def update_user(user_id: int, payload: dict, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> dict:
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -41,7 +44,7 @@ def update_user(user_id: int, payload: dict, db: Session = Depends(get_db)) -> d
 
 
 @router.post("/users/{user_id}/suspend")
-def suspend_user(user_id: int, db: Session = Depends(get_db)) -> dict:
+def suspend_user(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> dict:
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -51,7 +54,7 @@ def suspend_user(user_id: int, db: Session = Depends(get_db)) -> dict:
 
 
 @router.post("/users/{user_id}/activate")
-def activate_user(user_id: int, db: Session = Depends(get_db)) -> dict:
+def activate_user(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> dict:
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -61,7 +64,7 @@ def activate_user(user_id: int, db: Session = Depends(get_db)) -> dict:
 
 
 @router.delete("/users/{user_id}")
-def delete_user(user_id: int, db: Session = Depends(get_db)) -> dict:
+def delete_user(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> dict:
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -72,7 +75,7 @@ def delete_user(user_id: int, db: Session = Depends(get_db)) -> dict:
 
 # --- Guide Management ---
 @router.get("/guides")
-def list_guides_admin(city: Optional[str] = None, db: Session = Depends(get_db)) -> List[dict]:
+def list_guides_admin(city: Optional[str] = None, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> List[dict]:
     query = db.query(Guide)
     if city:
         query = query.filter(Guide.cities.contains([city]))
@@ -91,7 +94,7 @@ def list_guides_admin(city: Optional[str] = None, db: Session = Depends(get_db))
 
 
 @router.patch("/guides/{guide_id}")
-def update_guide(guide_id: int, payload: dict, db: Session = Depends(get_db)) -> dict:
+def update_guide(guide_id: int, payload: dict, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> dict:
     guide = db.query(Guide).filter(Guide.id == guide_id).first()
     if not guide:
         raise HTTPException(status_code=404, detail="Guide not found")
@@ -104,7 +107,7 @@ def update_guide(guide_id: int, payload: dict, db: Session = Depends(get_db)) ->
 
 
 @router.post("/guides/{guide_id}/verify")
-def verify_guide(guide_id: int, db: Session = Depends(get_db)) -> dict:
+def verify_guide(guide_id: int, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> dict:
     guide = db.query(Guide).filter(Guide.id == guide_id).first()
     if not guide:
         raise HTTPException(status_code=404, detail="Guide not found")
@@ -114,7 +117,7 @@ def verify_guide(guide_id: int, db: Session = Depends(get_db)) -> dict:
 
 
 @router.post("/guides/{guide_id}/suspend")
-def suspend_guide(guide_id: int, db: Session = Depends(get_db)) -> dict:
+def suspend_guide(guide_id: int, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> dict:
     guide = db.query(Guide).filter(Guide.id == guide_id).first()
     if not guide:
         raise HTTPException(status_code=404, detail="Guide not found")
@@ -124,7 +127,7 @@ def suspend_guide(guide_id: int, db: Session = Depends(get_db)) -> dict:
 
 
 @router.delete("/guides/{guide_id}")
-def delete_guide(guide_id: int, db: Session = Depends(get_db)) -> dict:
+def delete_guide(guide_id: int, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> dict:
     guide = db.query(Guide).filter(Guide.id == guide_id).first()
     if not guide:
         raise HTTPException(status_code=404, detail="Guide not found")
@@ -135,7 +138,7 @@ def delete_guide(guide_id: int, db: Session = Depends(get_db)) -> dict:
 
 # --- Experience Management ---
 @router.get("/experiences")
-def list_experiences_admin(city: Optional[str] = None, db: Session = Depends(get_db)) -> List[dict]:
+def list_experiences_admin(city: Optional[str] = None, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> List[dict]:
     from app.api.v1.public import MOCK_EXPERIENCES
     results = MOCK_EXPERIENCES.copy()
     if city:
@@ -144,7 +147,7 @@ def list_experiences_admin(city: Optional[str] = None, db: Session = Depends(get
 
 
 @router.post("/experiences")
-def create_experience(payload: dict, db: Session = Depends(get_db)) -> dict:
+def create_experience(payload: dict, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> dict:
     from app.api.v1.public import MOCK_EXPERIENCES
     new_id = max(e["id"] for e in MOCK_EXPERIENCES) + 1 if MOCK_EXPERIENCES else 1
     new_exp = {"id": new_id, **payload}
@@ -153,7 +156,7 @@ def create_experience(payload: dict, db: Session = Depends(get_db)) -> dict:
 
 
 @router.patch("/experiences/{exp_id}")
-def update_experience(exp_id: int, payload: dict, db: Session = Depends(get_db)) -> dict:
+def update_experience(exp_id: int, payload: dict, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> dict:
     from app.api.v1.public import MOCK_EXPERIENCES
     for i, exp in enumerate(MOCK_EXPERIENCES):
         if exp["id"] == exp_id:
@@ -163,7 +166,7 @@ def update_experience(exp_id: int, payload: dict, db: Session = Depends(get_db))
 
 
 @router.delete("/experiences/{exp_id}")
-def delete_experience(exp_id: int, db: Session = Depends(get_db)) -> dict:
+def delete_experience(exp_id: int, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> dict:
     from app.api.v1.public import MOCK_EXPERIENCES
     for i, exp in enumerate(MOCK_EXPERIENCES):
         if exp["id"] == exp_id:
@@ -174,7 +177,7 @@ def delete_experience(exp_id: int, db: Session = Depends(get_db)) -> dict:
 
 # --- Booking Management ---
 @router.get("/bookings")
-def list_bookings(status: Optional[str] = None, db: Session = Depends(get_db)) -> List[dict]:
+def list_bookings(status: Optional[str] = None, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> List[dict]:
     query = db.query(Booking)
     if status:
         query = query.filter(Booking.status == status)
@@ -191,7 +194,7 @@ def list_bookings(status: Optional[str] = None, db: Session = Depends(get_db)) -
 
 
 @router.patch("/bookings/{booking_id}")
-def update_booking(booking_id: int, payload: dict, db: Session = Depends(get_db)) -> dict:
+def update_booking(booking_id: int, payload: dict, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> dict:
     booking = db.query(Booking).filter(Booking.id == booking_id).first()
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
@@ -204,7 +207,7 @@ def update_booking(booking_id: int, payload: dict, db: Session = Depends(get_db)
 
 
 @router.post("/bookings/{booking_id}/cancel")
-def cancel_booking(booking_id: int, db: Session = Depends(get_db)) -> dict:
+def cancel_booking(booking_id: int, db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> dict:
     booking = db.query(Booking).filter(Booking.id == booking_id).first()
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
@@ -215,7 +218,7 @@ def cancel_booking(booking_id: int, db: Session = Depends(get_db)) -> dict:
 
 # --- Dashboard Stats ---
 @router.get("/stats")
-def get_stats(db: Session = Depends(get_db)) -> dict:
+def get_stats(db: Session = Depends(get_db), current_user: User = Depends(ADMIN_ONLY)) -> dict:
     total_users = db.query(User).count()
     total_guides = db.query(Guide).count()
     total_bookings = db.query(Booking).count()

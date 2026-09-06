@@ -1,7 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from app.core.dependencies import require_role
+from app.models.user import User
 import copy
 
 router = APIRouter()
+
+CMS_WRITER_OR_ADMIN = require_role("admin", "content-writer")
 
 DB: dict[str, list] = {
     "pages": [
@@ -57,41 +61,70 @@ def _find(key: str, item_id: int):
     raise HTTPException(status_code=404, detail=f"{key[:-1]} not found")
 
 
-def _crud_routes(key: str, tag: str):
-    @router.get(f"/{key}")
-    def list_items():
-        items = _clone(DB[key])
-        if key == "pages":
-            for it in items:
-                it["sectionCount"] = len(_get_sections(it.get("slug", "")))
-        return items
+def _crud_routes(key: str, tag: str, auth_dep=None):
+    if auth_dep:
+        @router.get(f"/{key}")
+        def list_items(current_user: User = Depends(auth_dep)):
+            items = _clone(DB[key])
+            if key == "pages":
+                for it in items:
+                    it["sectionCount"] = len(_get_sections(it.get("slug", "")))
+            return items
 
-    @router.post(f"/{key}")
-    def create_item(payload: dict):
-        global NEXT_ID
-        item = {**payload, "id": NEXT_ID}
-        NEXT_ID += 1
-        DB[key].append(item)
-        return _clone(item)
+        @router.post(f"/{key}")
+        def create_item(payload: dict, current_user: User = Depends(auth_dep)):
+            global NEXT_ID
+            item = {**payload, "id": NEXT_ID}
+            NEXT_ID += 1
+            DB[key].append(item)
+            return _clone(item)
 
-    @router.patch(f"/{key}/{{item_id}}")
-    def update_item(item_id: int, payload: dict):
-        item = _find(key, item_id)
-        item.update(payload)
-        return _clone(item)
+        @router.patch(f"/{key}/{{item_id}}")
+        def update_item(item_id: int, payload: dict, current_user: User = Depends(auth_dep)):
+            item = _find(key, item_id)
+            item.update(payload)
+            return _clone(item)
 
-    @router.delete(f"/{key}/{{item_id}}")
-    def delete_item(item_id: int):
-        item = _find(key, item_id)
-        DB[key].remove(item)
-        return {"status": "ok", "message": "Deleted"}
+        @router.delete(f"/{key}/{{item_id}}")
+        def delete_item(item_id: int, current_user: User = Depends(auth_dep)):
+            item = _find(key, item_id)
+            DB[key].remove(item)
+            return {"status": "ok", "message": "Deleted"}
+    else:
+        @router.get(f"/{key}")
+        def list_items():
+            items = _clone(DB[key])
+            if key == "pages":
+                for it in items:
+                    it["sectionCount"] = len(_get_sections(it.get("slug", "")))
+            return items
+
+        @router.post(f"/{key}")
+        def create_item(payload: dict):
+            global NEXT_ID
+            item = {**payload, "id": NEXT_ID}
+            NEXT_ID += 1
+            DB[key].append(item)
+            return _clone(item)
+
+        @router.patch(f"/{key}/{{item_id}}")
+        def update_item(item_id: int, payload: dict):
+            item = _find(key, item_id)
+            item.update(payload)
+            return _clone(item)
+
+        @router.delete(f"/{key}/{{item_id}}")
+        def delete_item(item_id: int):
+            item = _find(key, item_id)
+            DB[key].remove(item)
+            return {"status": "ok", "message": "Deleted"}
 
 
-_crud_routes("pages", "pages")
-_crud_routes("blog", "blog")
-_crud_routes("guides", "guides-content")
-_crud_routes("media", "media")
-_crud_routes("seo", "seo")
+_crud_routes("pages", "pages", CMS_WRITER_OR_ADMIN)
+_crud_routes("blog", "blog", CMS_WRITER_OR_ADMIN)
+_crud_routes("guides", "guides-content", CMS_WRITER_OR_ADMIN)
+_crud_routes("media", "media", CMS_WRITER_OR_ADMIN)
+_crud_routes("seo", "seo", CMS_WRITER_OR_ADMIN)
 # --- Page Sections (Live Editor) ---
 SECTION_OVERRIDES: dict[str, list] = {}
 NEXT_SECTION_ID = 100
@@ -181,31 +214,31 @@ def _upsert_section(slug: str, section: dict):
 
 
 @router.get("/pages/{slug}/sections")
-def get_page_sections(slug: str) -> dict:
+def get_page_sections(slug: str, current_user: User = Depends(CMS_WRITER_OR_ADMIN)) -> dict:
     return {"slug": slug, "sections": _get_sections(slug)}
 
 
 @router.post("/pages/{slug}/sections")
-def create_page_section(slug: str, payload: dict) -> dict:
+def create_page_section(slug: str, payload: dict, current_user: User = Depends(CMS_WRITER_OR_ADMIN)) -> dict:
     section = _upsert_section(slug, payload)
     return {"status": "ok", "section": section}
 
 
 @router.put("/pages/{slug}/sections/{section_id}")
-def update_page_section(slug: str, section_id: str, payload: dict) -> dict:
+def update_page_section(slug: str, section_id: str, payload: dict, current_user: User = Depends(CMS_WRITER_OR_ADMIN)) -> dict:
     saved = _upsert_section(slug, {**payload, "id": section_id})
     return {"status": "ok", "section": saved}
 
 
 @router.put("/pages/{slug}/sections")
-def update_all_sections(slug: str, payload: dict) -> dict:
+def update_all_sections(slug: str, payload: dict, current_user: User = Depends(CMS_WRITER_OR_ADMIN)) -> dict:
     sections = payload.get("sections", [])
     SECTION_OVERRIDES[slug] = _clone(sections)
     return {"status": "ok", "count": len(sections)}
 
 
 @router.delete("/pages/{slug}/sections/{section_id}")
-def delete_page_section(slug: str, section_id: str) -> dict:
+def delete_page_section(slug: str, section_id: str, current_user: User = Depends(CMS_WRITER_OR_ADMIN)) -> dict:
     if slug not in SECTION_OVERRIDES:
         SECTION_OVERRIDES[slug] = _clone(DEFAULT_SECTIONS.get(slug, []))
     before = len(SECTION_OVERRIDES[slug])

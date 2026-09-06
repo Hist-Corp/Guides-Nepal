@@ -346,27 +346,45 @@ export default function LivePageEditor({ slug, title, path, initialSections, onS
                       )}
                     </div>
                   ))}
-                  {(selected.type === "categories" || selected.type === "values") && (
-                    <SplitItems items={selected.content.items || []} onAdd={() => addItem("items")} onUpdate={(i: number, v: string) => updateItem("items", i, v)} onRemove={(i: number) => removeItem("items", i)} />
-                  )}
+{(selected.type === "categories" || selected.type === "values") && (
+  <SplitItems 
+    items={selected.content.items || []} 
+    onAdd={() => addItem("items")} 
+    onUpdate={(i: number, v: string) => updateItem("items", i, v)} 
+    onRemove={(i: number) => removeItem("items", i)} 
+  />
+)}
+{(selected.type === "footer") && (
+  <SplitItems 
+    items={selected.content.topLinks || []} 
+    onAdd={() => addItem("topLinks")} 
+    onUpdate={(i: number, v: string) => updateItem("topLinks", i, v)} 
+    onRemove={(i: number) => removeItem("topLinks", i)} 
+  />
+)}
                 </div>
                 <div className="border-t pt-4">
                   <div className="font-semibold text-gray-700 text-sm mb-2">Customization</div>
                   <div className="grid grid-cols-2 gap-3">
-                    {STYLE_FIELDS.map((f) => (
-                      <div key={f.key}>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">{f.label}</label>
-                        {f.type === "color" ? (
-                          <input type="color" value={selected.style[f.key] || "#000000"} onChange={(e) => updateStyle(f.key, e.target.value)} className="w-full h-9 border border-gray-300 rounded cursor-pointer" />
-                        ) : f.type === "select" ? (
-                          <select value={selected.style[f.key] || "center"} onChange={(e) => updateStyle(f.key, e.target.value)} className="w-full border border-gray-300 rounded-lg px-2 py-2 text-sm">
-                            {f.options?.map((o) => (<option key={o} value={o}>{o}</option>))}
-                          </select>
-                        ) : (
-                          <input value={selected.style[f.key] || ""} onChange={(e) => updateStyle(f.key, e.target.value)} className="w-full border border-gray-300 rounded-lg px-2 py-2 text-sm" />
-                        )}
-                      </div>
-                    ))}
+{STYLE_FIELDS.map((f) => (
+              <div key={f.key}>
+                <label className="block text-xs font-medium text-gray-600 mb-1">{f.label}</label>
+                {f.type === "color" ? (
+                  <input type="color" value={selected.style[f.key] || "#000000"} onChange={(e) => updateStyle(f.key, e.target.value)} className="w-full h-9 border border-gray-300 rounded cursor-pointer" />
+                ) : f.type === "select" ? (
+                  <select value={selected.style[f.key] || "center"} onChange={(e) => updateStyle(f.key, e.target.value)} className="w-full border border-gray-300 rounded-lg px-2 py-2 text-sm">
+                    {f.options?.map((o) => (<option key={o} value={o}>{o}</option>))
+                  </select>
+                ) : (
+                  <input 
+                    value={selected.style[f.key] || ""} 
+                    onChange={(e) => updateStyle(f.key, e.target.value)} 
+                    className="w-full border border-gray-300 rounded-lg px-2 py-2 text-sm"
+                    placeholder={f.key === "headingSize" ? "2rem (e.g., 1.5rem, 2em)" : f.key === "padding" ? "2.5rem (e.g., 1rem 2rem)" : ""}
+                  />
+                )}
+              </div>
+            ))}
                   </div>
                 </div>
               </div>
