@@ -17,7 +17,7 @@ const ContactPage: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-grow">
-        <section className="bg-primary py-20 text-white">
+        <section data-cms-id="contact-hero" data-cms-label="Contact Hero" className="bg-primary py-20 text-white">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               {cmsHero?.content?.heading || 'Contact Us'}
@@ -28,7 +28,7 @@ const ContactPage: React.FC = () => {
           </div>
         </section>
 
-        <section className="py-16 bg-white">
+        <section data-cms-id="contact-info" data-cms-label="Contact Info" className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">

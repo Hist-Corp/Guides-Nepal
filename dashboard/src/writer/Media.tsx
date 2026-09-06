@@ -1,90 +1,125 @@
-import { useState, useEffect } from "react"
-import { getMedia, uploadMedia, deleteMedia, updateMedia } from "../services/api"
-import LivePageEditor from "./LivePageEditor"
+import { useState, useEffect } from "react";
+import PageShell from "../components/PageShell";
+import Button from "../components/Button";
+import Loading from "../components/Loading";
+import Modal from "../components/Modal";
+import { uploadMedia, getMedia, deleteMedia } from "../services/api";
+
+type MediaItem = {
+  id: number;
+  filename: string;
+  url: string;
+  type: string;
+  size?: number;
+};
 
 export default function WriterMedia() {
-  const [media, setMedia] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [actionLoading, setActionLoading] = useState<number | null>(null)
-  const [liveEdit, setLiveEdit] = useState<any>(null)
-  const [uploadForm, setUploadForm] = useState({ name: "", type: "image", url: "" })
+  const [media, setMedia] = useState<MediaItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [openPreview, setOpenPreview] = useState<MediaItem | null>(null);
+  const [previewSrc, setPreviewSrc] = useState("");
 
-  const fetchMedia = async () => {
-    setLoading(true)
-    try { setMedia(await getMedia()) } catch (e) { console.error(e) } finally { setLoading(false) }
-  }
-
-  useEffect(() => { fetchMedia() }, [])
-
-  const handleUpload = async () => {
-    if (!uploadForm.name.trim()) return
-    setActionLoading(-1)
+  const loadMedia = async () => {
+    setLoading(true);
     try {
-      await uploadMedia({ ...uploadForm, size: "1.0 MB", uploaded: new Date().toISOString().slice(0, 10) })
-      setUploadForm({ name: "", type: "image", url: "" })
-      await fetchMedia()
-    } catch (e) { console.error(e); alert("Failed to upload media") } finally { setActionLoading(null) }
-  }
+      const data = await getMedia();
+      setMedia(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error fetching media:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Delete this media file?")) return
-    setActionLoading(id)
-    try { await deleteMedia(id); await fetchMedia() } catch (e) { console.error(e); alert("Failed to delete") } finally { setActionLoading(null) }
-  }
+  useEffect(() => {
+    loadMedia();
+  }, []);
 
   return (
-    <div className="space-y-6">
-      <div className="text-2xl font-bold text-darkBlue">Media Library</div>
-      <div className="rounded-2xl bg-white p-4 border">
-        <div className="font-semibold text-darkBlue mb-3">Upload Media</div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-          <input value={uploadForm.name} onChange={(e) => setUploadForm({ ...uploadForm, name: e.target.value })} placeholder="File name (e.g. hero.jpg)" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <select value={uploadForm.type} onChange={(e) => setUploadForm({ ...uploadForm, type: e.target.value })} className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-            <option value="image">Image</option><option value="video">Video</option><option value="document">Document</option>
-          </select>
-          <input value={uploadForm.url} onChange={(e) => setUploadForm({ ...uploadForm, url: e.target.value })} placeholder="URL (optional)" className="border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-          <button className="rounded-lg px-3 py-2 bg-brand-yellow text-darkBlue font-semibold disabled:opacity-50" onClick={handleUpload} disabled={!uploadForm.name.trim() || actionLoading === -1}>{actionLoading === -1 ? "Uploading..." : "Upload"}</button>
+    <PageShell
+      title="Media Library"
+      description="Upload and manage images, documents and videos used across your content."
+      action={
+        <label className="cursor-pointer">
+          <input
+            type="file"
+            className="hidden"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              setUploading(true);
+              try {
+                const item = await uploadMedia(file);
+                setMedia((prev) => [item, ...prev]);
+              } catch (error) {
+                console.error("Upload failed:", error);
+                alert("Upload failed");
+              } finally {
+                setUploading(false);
+                e.target.value = "";
+              }
+            }}
+          />
+          <span
+            className={`inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium transition ${
+              uploading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-primary text-white hover:opacity-90"
+            }`}
+          >
+            {uploading ? "Uploading…" : "Upload media"}
+          </span>
+        </label>
+      }
+    >
+      {loading ? (
+        <Loading label="Loading media…" />
+      ) : media.length === 0 ? (
+        <div className="text-center py-12 text-gray-500">
+          <p>No media found.</p>
+          <p className="mt-1 text-sm">Upload your first media file to get started.</p>
         </div>
-      </div>
-      <div className="rounded-2xl bg-white p-4 border">
-        {loading ? (
-          <div className="flex items-center justify-center py-8"><div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div></div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {media.length === 0 ? (
-              <div className="text-sm text-gray-500 py-4 text-center col-span-full">No media files found</div>
-            ) : media.map((item) => (
-              <div key={item.id} className="border rounded-xl p-3">
-                <div className="h-24 bg-gray-100 rounded-lg mb-2 flex items-center justify-center text-gray-400 text-sm">{item.type === "image" ? "🖼" : item.type === "video" ? "🎬" : "📄"} {item.name}</div>
-                <div className="text-sm font-medium truncate">{item.name}</div>
-                <div className="text-xs text-gray-500 mb-3">{item.type} - {item.size} - {item.uploaded}</div>
-                <div className="flex gap-2">
-                  <button className="flex-1 rounded-lg px-3 py-1 border text-sm hover:bg-gray-50 disabled:opacity-50" onClick={() => setLiveEdit(item)} disabled={actionLoading === item.id}>Edit</button>
-                  <button className="flex-1 rounded-lg px-3 py-1 border bg-red-50 text-red-700 hover:bg-red-100 text-sm disabled:opacity-50" onClick={() => handleDelete(item.id)} disabled={actionLoading === item.id}>Delete</button>
-                </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {media.map((item) => (
+            <div key={item.id} className="group relative">
+              <div
+                className={`aspect-square flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden cursor-zoom-in ${item.type.startsWith("image/") ? "p-0" : "p-3"}`}
+                onClick={() => {
+                  setOpenPreview(item);
+                  setPreviewSrc(item.url);
+                }}
+              >
+                {item.type.startsWith("image/") ? (
+                  <img src={item.url} alt={item.filename} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-3xl">📎</span>
+                )}
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-      {liveEdit && (
-        <LivePageEditor
-          slug={`media-${liveEdit.id}`}
-          title={liveEdit.name}
-          initialSections={[{
-            id: "media-card", title: "Media Preview", type: "hero",
-            content: { heading: liveEdit.name, subtitle: `Type: ${liveEdit.type} - Size: ${liveEdit.size}`, buttonText: "View File", tagline: liveEdit.url || "" },
-            style: { backgroundColor: "#213448", textColor: "#ffffff", accentColor: "#F4B400", alignment: "center", headingSize: "2rem", padding: "3rem" },
-          }]}
-          onSaved={async (sections) => {
-            const card = sections.find((s) => s.id === "media-card")
-            if (card?.content?.heading) {
-              try { await updateMedia(liveEdit.id, { name: card.content.heading }) } catch { /* persisted in sections */ }
-            }
-          }}
-          onClose={fetchMedia}
-        />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                <Button variant="ghost" size="sm" className="text-white" onClick={() => setOpenPreview(item)}>
+                  Preview
+                </Button>
+                <Button variant="danger" size="sm" onClick={async () => { await deleteMedia(item.id); loadMedia(); }}>
+                  Remove
+                </Button>
+              </div>
+              <p className="mt-1 text-xs text-gray-500 truncate">{item.filename}</p>
+            </div>
+          ))}
+        </div>
       )}
-    </div>
-  )
+
+      <Modal open={openPreview !== null} title={openPreview?.filename || "Preview"} onClose={() => { setOpenPreview(null); setPreviewSrc(""); }}>
+        <div className="flex justify-center">
+          {previewSrc && openPreview?.type.startsWith("image/") ? (
+            <img src={previewSrc} alt={openPreview?.filename} className="max-w-full max-h-96 rounded" />
+          ) : previewSrc ? (
+            <iframe src={previewSrc} title={openPreview?.filename} className="w-full h-96 rounded" />
+          ) : null}
+        </div>
+      </Modal>
+    </PageShell>
+  );
 }

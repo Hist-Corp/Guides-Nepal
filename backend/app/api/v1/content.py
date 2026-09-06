@@ -5,9 +5,22 @@ router = APIRouter()
 
 DB: dict[str, list] = {
     "pages": [
-        {"id": 1, "title": "Homepage", "slug": "home", "status": "published", "path": "/"},
-        {"id": 2, "title": "About", "slug": "about", "status": "published", "path": "/about"},
-        {"id": 3, "title": "Contact", "slug": "contact", "status": "published", "path": "/contact"},
+        {"id": 1, "title": "Home", "slug": "home", "status": "published", "path": "/", "description": "The landing page — hero, category grid, promo banner and footer are all editable blocks."},
+        {"id": 2, "title": "About", "slug": "about", "status": "published", "path": "/about", "description": "Brand story — hero, mission, values and team sections."},
+        {"id": 3, "title": "Contact", "slug": "contact", "status": "published", "path": "/contact", "description": "Contact page — hero and contact info band with email, phone and address."},
+        {"id": 4, "title": "Blog", "slug": "blog", "status": "published", "path": "/blog", "description": "Journal / Learn — article listing page, editable hero and intro copy."},
+        {"id": 5, "title": "FAQ", "slug": "faq", "status": "published", "path": "/faq", "description": "Frequently asked questions — hero and body copy editable."},
+        {"id": 6, "title": "Destinations", "slug": "destinations", "status": "published", "path": "/destinations", "description": "Destination overview — hero and intro copy for Nepal's cities."},
+        {"id": 7, "title": "How It Works", "slug": "how-it-works", "status": "published", "path": "/how-it-works", "description": "The booking process explained — hero and step-by-step copy."},
+        {"id": 8, "title": "Sustainability", "slug": "sustainability", "status": "published", "path": "/sustainability", "description": "Responsible travel commitments — hero and body copy."},
+        {"id": 9, "title": "Press", "slug": "press", "status": "published", "path": "/press", "description": "Press and media coverage — hero and body copy."},
+        {"id": 10, "title": "Jobs", "slug": "jobs", "status": "published", "path": "/jobs", "description": "Careers page — hero and body copy for open roles."},
+        {"id": 11, "title": "Gift Cards", "slug": "gift-cards", "status": "published", "path": "/gift-cards", "description": "Gift cards — hero and body copy."},
+        {"id": 12, "title": "Host Center", "slug": "host-center", "status": "published", "path": "/host-center", "description": "B2B onboarding for hosts — hero, benefits and signup band."},
+        {"id": 13, "title": "Hosting", "slug": "hosting", "status": "published", "path": "/hosting", "description": "Hosting with Guides Nepal — hero and body copy."},
+        {"id": 14, "title": "Community", "slug": "community", "status": "published", "path": "/community", "description": "Community page — hero and body copy."},
+        {"id": 15, "title": "Terms", "slug": "terms", "status": "published", "path": "/terms", "description": "Terms of service — hero and body copy."},
+        {"id": 16, "title": "Help", "slug": "help", "status": "published", "path": "/help", "description": "Help center — hero and body copy."},
     ],
     "blog": [
         {"id": 1, "title": "Top 10 Treks in Nepal", "slug": "top-10-treks-in-nepal", "author": "Priya Sharma", "date": "2026-08-12", "status": "published", "content": "Nepal is home to some of the world's best trekking routes. From the Everest Base Camp trail to the Annapurna Circuit, here are our top picks."},
@@ -47,7 +60,11 @@ def _find(key: str, item_id: int):
 def _crud_routes(key: str, tag: str):
     @router.get(f"/{key}")
     def list_items():
-        return _clone(DB[key])
+        items = _clone(DB[key])
+        if key == "pages":
+            for it in items:
+                it["sectionCount"] = len(_get_sections(it.get("slug", "")))
+        return items
 
     @router.post(f"/{key}")
     def create_item(payload: dict):
@@ -114,6 +131,34 @@ DEFAULT_SECTIONS = {
          "style": {"backgroundColor": "#ffffff", "textColor": "#213448"}},
     ],
 }
+
+# Auto-generate a default section template for every frontend page that
+# does not have an explicit template above, so each page in the Pages
+# list is editable in the live editor and stays synced with the real page.
+_FRONTEND_PAGE_TITLES = {
+    "blog": "Blog", "faq": "FAQ", "destinations": "Destinations",
+    "how-it-works": "How It Works", "sustainability": "Sustainability",
+    "press": "Press", "jobs": "Jobs", "gift-cards": "Gift Cards",
+    "host-center": "Host Center", "hosting": "Hosting",
+    "community": "Community", "terms": "Terms", "help": "Help",
+}
+
+
+def _default_template(slug: str) -> list:
+    label = _FRONTEND_PAGE_TITLES.get(slug, slug.replace("-", " ").title())
+    return [
+        {"id": f"{slug}-hero", "title": f"{label} Hero", "type": "hero",
+         "content": {"heading": label, "subtitle": f"{label} page on Guides Nepal.", "buttonText": ""},
+         "style": {"backgroundColor": "#213448", "textColor": "#ffffff", "accentColor": "#F4B400", "alignment": "center", "headingSize": "3rem", "padding": "4rem"}},
+        {"id": f"{slug}-body", "title": f"{label} Body", "type": "text",
+         "content": {"heading": "", "body": f"Content for the {label} page. Click this section in the live preview to edit it."},
+         "style": {"backgroundColor": "#ffffff", "textColor": "#213448", "alignment": "left", "padding": "2.5rem"}},
+    ]
+
+
+for _slug in _FRONTEND_PAGE_TITLES:
+    if _slug not in DEFAULT_SECTIONS:
+        DEFAULT_SECTIONS[_slug] = _default_template(_slug)
 
 
 def _get_sections(slug: str):

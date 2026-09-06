@@ -1,40 +1,72 @@
-type Column<T> = {
-  key: keyof T | string
-  label: string
-  render?: (row: T) => React.ReactNode
+import { ReactNode } from "react";
+import { cn } from "../utils/cn";
+
+export type Column<T> = {
+  key: keyof T | string;
+  label: string;
+  render?: (row: T, index?: number) => ReactNode;
+};
+
+export interface TableProps<T extends Record<string, any>> {
+  columns: Column<T>[];
+  rows: T[];
+  emptyMessage?: string;
+  rowKey?: (row: T, index: number) => string | number;
+  className?: string;
 }
 
 export default function Table<T extends Record<string, any>>({
   columns,
-  rows
-}: {
-  columns: Column<T>[]
-  rows: T[]
-}) {
+  rows,
+  emptyMessage = "No records found.",
+  rowKey,
+  className,
+}: TableProps<T>) {
   return (
-    <div className="overflow-x-auto rounded-2xl border bg-white shadow-sm">
+    <div
+      className={cn(
+        "overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm",
+        className
+      )}
+    >
       <table className="min-w-full text-sm">
-        <thead className="bg-lightBlue/50">
+        <thead className="bg-lightBlue/40">
           <tr>
             {columns.map((c, ci) => (
-              <th key={`${String(c.key)}-${ci}`} className="text-left px-3 py-2 font-semibold text-darkBlue">
+              <th
+                key={`${String(c.key)}-${ci}`}
+                className="text-left px-3 py-2 text-xs font-semibold uppercase text-darkBlue"
+              >
                 {c.label}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-100">
           {rows.map((r, idx) => (
-            <tr key={idx} className="border-t">
+            <tr
+              key={rowKey ? rowKey(r, idx) : idx}
+              className="hover:bg-gray-50"
+            >
               {columns.map((c, ci) => (
-                <td key={`${String(c.key)}-${ci}`} className="px-3 py-2">
-                  {"render" in c && c.render ? (c.render as any)(r, idx) : String(r[c.key as keyof T] ?? "")}
+                <td
+                  key={`${String(c.key)}-${ci}`}
+                  className="px-3 py-2 align-top"
+                >
+                  {"render" in c && c.render
+                    ? (c.render as any)(r, idx)
+                    : String(r[c.key as keyof T] ?? "")}
                 </td>
               ))}
             </tr>
           ))}
         </tbody>
       </table>
+      {rows.length === 0 ? (
+        <div className="py-8 text-center text-sm text-gray-500">
+          {emptyMessage}
+        </div>
+      ) : null}
     </div>
-  )
+  );
 }

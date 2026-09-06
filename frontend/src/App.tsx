@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ScrollToTop from './components/common/ScrollToTop';
+import CmsEditMode from './components/common/CmsEditMode';
 import { GlobalImageFallback } from './components/common/GlobalImageFallback';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { CartProvider } from './contexts/CartContext';
@@ -76,6 +77,7 @@ function App() {
     <CurrencyProvider>
       <CartProvider>
         <Router>
+          <CmsEditMode />
           <ScrollToTop />
           <GlobalImageFallback />
           <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />

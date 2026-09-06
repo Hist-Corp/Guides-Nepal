@@ -6,7 +6,7 @@ import { useCmsSection } from '../../hooks/useCms';
 export const Footer: React.FC = () => {
   const cmsFooter = useCmsSection('home', 'home-footer');
   return (
-    <footer>
+    <footer data-cms-id="home-footer" data-cms-label="Footer">
       {/* Magenta Strip (OCR Requirement) */}
       <div className="bg-primary py-8">
         <div className="container mx-auto px-4 flex flex-wrap justify-between items-center text-white gap-4">

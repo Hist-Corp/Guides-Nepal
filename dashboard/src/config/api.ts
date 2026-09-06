@@ -11,3 +11,12 @@ export const API_BASE_URL =
 export const getApiUrl = (path: string): string => {
   return `${API_BASE_URL}${path}`;
 };
+
+/**
+ * URL of the real frontend site. The live page editor embeds the actual
+ * frontend page (with ?cms_edit=1) so the writer previews and edits the
+ * exact real page, not an approximation.
+ */
+export const FRONTEND_URL =
+  import.meta.env.VITE_FRONTEND_URL ||
+  (import.meta.env.DEV ? 'http://localhost:5173' : 'https://guides-nepal.onrender.com');

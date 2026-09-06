@@ -8,7 +8,7 @@ export const PromoBanner: React.FC = () => {
   const cmsPromo = useCmsSection('home', 'home-promo');
 
   return (
-    <section className="py-16 bg-background-cream">
+    <section data-cms-id="home-promo" data-cms-label="Promo Banner" className="py-16 bg-background-cream">
        <div className="container mx-auto px-4">
           <div className="bg-sky-500 rounded-3xl overflow-hidden flex flex-col md:flex-row text-white relative">
             {/* Left Content */}

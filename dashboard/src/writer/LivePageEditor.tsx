@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { getPageSections, updateAllSections } from "../services/api"
+import { FRONTEND_URL } from "../config/api"
 
 const FIELD_GROUPS: Record<string, { key: string; label: string; type: string }[]> = {
   hero: [
@@ -119,9 +120,10 @@ function PreviewSection({ section, selected, onSelect }: any) {
     </div>
   )
 }
-export default function LivePageEditor({ slug, title, initialSections, onSaved, onClose }: {
+export default function LivePageEditor({ slug, title, path, initialSections, onSaved, onClose }: {
   slug: string
   title: string
+  path?: string
   initialSections?: any[]
   onSaved?: (sections: any[]) => void
   onClose: () => void
@@ -133,8 +135,35 @@ export default function LivePageEditor({ slug, title, initialSections, onSaved, 
   const [dirty, setDirty] = useState(false)
   const [toast, setToast] = useState("")
   const [newType, setNewType] = useState("hero")
+  // When the real frontend page path is known, preview the exact real page
+  // inside an iframe (click-to-edit); otherwise fall back to the replica.
+  const [previewMode, setPreviewMode] = useState<"real" | "replica">(path ? "real" : "replica")
+  const iframeRef = useRef<HTMLIFrameElement | null>(null)
+  const previewUrl = `${FRONTEND_URL}${path || "/"}?cms_edit=1&cms_slug=${encodeURIComponent(slug)}`
 
   useEffect(() => { load() }, [slug])
+
+  // Listen for clicks on sections of the real page inside the preview iframe
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      const data = e.data || {}
+      if (data.type === "cms-section-click") {
+        const match = sections.find((s) => s.id === data.id)
+        if (match) {
+          setSelected(match)
+        } else {
+          showToast(`Section "${data.label || data.id}" is not part of this page template yet`)
+        }
+      }
+    }
+    window.addEventListener("message", onMessage)
+    return () => window.removeEventListener("message", onMessage)
+  }, [sections])
+
+  // Tell the embedded real page to re-fetch CMS content after a save
+  const refreshRealPreview = () => {
+    iframeRef.current?.contentWindow?.postMessage({ type: "cms-refresh", slug }, "*")
+  }
 
   const load = async () => {
     setLoading(true)
@@ -200,6 +229,7 @@ export default function LivePageEditor({ slug, title, initialSections, onSaved, 
       await updateAllSections(slug, sections)
       setDirty(false)
       showToast("Changes saved successfully")
+      refreshRealPreview()
       onSaved?.(sections)
     } catch (e) {
       console.error(e)
@@ -261,9 +291,26 @@ export default function LivePageEditor({ slug, title, initialSections, onSaved, 
         <div className="flex items-center justify-center flex-1"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-darkBlue"></div></div>
       ) : (
         <div className="flex flex-1 overflow-hidden">
-          <div className="flex-1 overflow-y-auto bg-white">
-            <div className="border-b border-gray-200 px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50">LIVE PREVIEW - click any section to edit it</div>
-            {sections.length === 0 ? (
+          <div className="flex-1 overflow-y-auto bg-white flex flex-col">
+            <div className="border-b border-gray-200 px-4 py-2 flex items-center justify-between bg-gray-50">
+              <span className="text-xs font-semibold text-gray-500">
+                {previewMode === "real" ? "LIVE PREVIEW - real page - click any section to edit it" : "REPLICA PREVIEW - click any section to edit it"}
+              </span>
+              {path && (
+                <div className="flex items-center gap-1">
+                  <button onClick={() => setPreviewMode("real")} className={"text-xs px-2 py-1 rounded font-semibold " + (previewMode === "real" ? "bg-darkBlue text-white" : "border text-gray-600 hover:bg-gray-100")}>Real page</button>
+                  <button onClick={() => setPreviewMode("replica")} className={"text-xs px-2 py-1 rounded font-semibold " + (previewMode === "replica" ? "bg-darkBlue text-white" : "border text-gray-600 hover:bg-gray-100")}>Replica</button>
+                </div>
+              )}
+            </div>
+            {previewMode === "real" && path ? (
+              <iframe
+                ref={iframeRef}
+                src={previewUrl}
+                title={`Live preview of ${title}`}
+                className="flex-1 w-full border-0"
+              />
+            ) : sections.length === 0 ? (
               <div className="text-center text-gray-400 py-16">No sections yet. Add one with the button above.</div>
             ) : (
               sections.map((s) => (

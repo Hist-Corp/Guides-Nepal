@@ -68,3 +68,13 @@ export async function getCmsSeoEntries(): Promise<CmsSeoEntry[]> {
     return []
   }
 }
+
+/**
+ * Clears the cached sections (optionally for one slug) so the next
+ * getPageSections call re-fetches fresh data from the CMS. Used by the
+ * live-preview edit mode when the dashboard saves changes.
+ */
+export function clearCmsSectionsCache(slug?: string) {
+  if (slug) delete sectionsCache[slug]
+  else Object.keys(sectionsCache).forEach((k) => delete sectionsCache[k])
+}

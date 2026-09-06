@@ -102,7 +102,7 @@ export const HeroSection: React.FC = () => {
   const currentCity = destinations[currentDestIndex];
 
   return (
-    <section className="bg-peach py-12 md:py-20 relative overflow-hidden">
+    <section data-cms-id="home-hero" data-cms-label="Hero" className="bg-peach py-12 md:py-20 relative overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
           {/* Left Content */}

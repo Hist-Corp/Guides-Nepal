@@ -14,7 +14,7 @@ const AboutPage: React.FC = () => {
       <Header />
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="bg-primary py-20 text-white">
+        <section data-cms-id="about-hero" data-cms-label="About Hero" className="bg-primary py-20 text-white">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               {cmsHero?.content?.heading || 'About Guides Nepal'}
@@ -26,7 +26,7 @@ const AboutPage: React.FC = () => {
         </section>
 
         {/* Mission Section */}
-        <section className="py-16 bg-white">
+        <section data-cms-id="about-mission" data-cms-label="Our Mission" className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center mb-12">
               <h2 className="text-3xl font-bold text-slate-900 mb-4">
@@ -70,7 +70,7 @@ const AboutPage: React.FC = () => {
         </section>
 
         {/* Values Section */}
-        <section className="py-16 bg-gray-50">
+        <section data-cms-id="about-values" data-cms-label="Our Values" className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">Our Values</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
