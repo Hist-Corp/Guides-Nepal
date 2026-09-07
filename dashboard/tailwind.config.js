@@ -32,9 +32,8 @@ export default {
           paper: "#f5f7fa",
           dark: "#f0f4f8"
         }
-      },
-      fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"]
+      },      fontFamily: {
+        sans: ["SF Pro", "SF Pro Display", "SF Pro Text", "-apple-system", "BlinkMacSystemFont", "system-ui", "sans-serif"]
       }
     }
   },
