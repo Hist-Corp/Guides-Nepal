@@ -1,37 +1,27 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project are documented in this file.
 
-## [0.1.0] - 2026-01-27
-
-### Added
-- User Profile page with editable info and avatar upload (frontend)
-- Favorites page for bookmarks (frontend)
-- Backend profile API: GET/PATCH /api/v1/profile/me
-- Backend uploads: POST /api/v1/profile/photos/upload with static serving at /uploads
-- Bookmarks backend: model, service, endpoints (list/create/delete)
-- Mobile header login button
-- Profile icon navigates to /profile while keeping dropdown on hover
-- Persistent login: auth store now uses localStorage (Zustand persist)
-
-### Changed
-- AI chat fallback response now mentions “Maila Dai” to satisfy tests
-- Technical architecture documentation updated to reflect TypeScript frontend and FastAPI backend
-- README expanded: quick start, checks, migrations, API summary, security notes, contributing
-
-### Fixed
-- Ruff unused import errors in backend schemas and readiness script
-- Mypy return type annotations for profile endpoints and readiness script
-
-### Tests
-- Backend tests passing (health, AI fallback)
-
-### Security
-- Bandit informational items noted in streaming code (timeouts and try/except control flow)
-  - Future hardening: add explicit timeouts and refined exception handling in streaming paths
-
----
+The format is based on "Keep a Changelog" and is intended to give contributors and deployers a concise overview of recent work.
 
 ## [Unreleased]
-- Further AI streaming robustness and security hardening
-- Additional backend tests and CI enhancements
+- Ongoing improvements to CMS and dashboard features.
+- UI/UX polish and accessibility fixes.
+- Small backend API improvements and stability fixes.
+
+## [1.0.1] - 2026-09-08
+### Added
+- Improved developer documentation and onboarding (README updates).
+- Example environment files for frontend and backend.
+
+### Changed
+- Minor UX and tooling improvements across frontend and dashboard.
+
+## [1.0.0] - Initial public release
+- Base platform: React + Vite frontend, FastAPI backend, PostgreSQL.
+- Core features: browsing experiences, bookings, user profiles, AI chat integration, RBAC dashboard.
+
+
+Notes
+- For the full commit history, use the repository commit log on GitHub.
+- When preparing releases, update this file and move Unreleased items into a new version section.
