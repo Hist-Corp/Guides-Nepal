@@ -1,5 +1,6 @@
 import { Link, NavLink, Outlet } from "react-router-dom"
 import { CITIES, CATEGORIES } from "../data/catalog"
+import SupportWidget from "./components/SupportWidget"
 
 function categoryPath(category: string) {
   return "/" + category.toLowerCase().replace(/[^a-z0-9]+/g, "-")
@@ -25,6 +26,12 @@ export default function PublicLayout() {
             <NavLink to="/most-popular" className={({ isActive }) => isActive ? "font-semibold text-darkBlue" : "text-gray-600 hover:text-darkBlue"}>Most Popular</NavLink>
           </nav>
           <div className="ml-auto flex items-center gap-3">
+            <Link to="/support" className="text-sm text-gray-600 hover:text-darkBlue flex items-center gap-1">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+              </svg>
+              Support
+            </Link>
             <Link to="/dashboard" className="rounded-lg px-4 py-2 bg-darkBlue text-white text-sm font-semibold hover:opacity-90">
               Sign in
             </Link>
@@ -43,6 +50,7 @@ export default function PublicLayout() {
       <main className="flex-1">
         <Outlet />
       </main>
+      <SupportWidget />
       <footer className="bg-darkBlue text-white mt-12">
         <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
           <div>

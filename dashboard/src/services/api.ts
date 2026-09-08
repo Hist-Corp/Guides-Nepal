@@ -110,9 +110,25 @@ export async function getSupportTickets(params?: { status?: string }) {
   return res.data
 }
 
+export async function getSupportTicket(id: number) {
+  const res = await http.get(`/operations/support-tickets/${id}`)
+  return res.data
+}
+
+export async function createSupportTicket(payload: {
+  subject: string
+  description?: string
+  customer_name?: string
+  customer_email?: string
+  priority?: string
+}) {
+  const res = await http.post("/operations/support-tickets", payload)
+  return res.data
+}
+
 export async function updateSupportTicket(
   id: number,
-  payload: { status?: string; priority?: string; assigned_to?: string }
+  payload: { status?: string; priority?: string; assigned_to?: string; resolution?: string }
 ) {
   const res = await http.patch(`/operations/support-tickets/${id}`, payload)
   return res.data
@@ -280,8 +296,18 @@ export async function getMedia() {
   return res.data
 }
 
-export async function uploadMedia(payload: any) {
-  const res = await http.post("/content/media", payload)
+export async function uploadMedia(file: File, replaceId?: number) {
+  const form = new FormData()
+  form.append("file", file)
+  const res = await http.post("/content/media/upload", form, {
+    params: replaceId != null ? { replace_id: replaceId } : undefined,
+    headers: { "Content-Type": "multipart/form-data" },
+  })
+  return res.data
+}
+
+export async function uploadMediaFromUrl(url: string) {
+  const res = await http.post("/content/media/upload-url", { url })
   return res.data
 }
 
@@ -292,6 +318,22 @@ export async function deleteMedia(mediaId: number) {
 
 export async function updateMedia(mediaId: number, payload: any) {
   const res = await http.patch(`/content/media/${mediaId}`, payload)
+  return res.data
+}
+
+// --- Image Placements API ---
+export async function getPlacements() {
+  const res = await http.get("/content/placements")
+  return res.data as { placements: Record<string, string>; slots: { key: string; label: string }[] }
+}
+
+export async function setPlacement(key: string, mediaId: number) {
+  const res = await http.put(`/content/placements/${key}`, { media_id: mediaId })
+  return res.data
+}
+
+export async function clearPlacement(key: string) {
+  const res = await http.delete(`/content/placements/${key}`)
   return res.data
 }
 

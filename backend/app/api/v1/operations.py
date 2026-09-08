@@ -52,6 +52,7 @@ class SupportTicketUpdate(BaseModel):
     status: Optional[str] = None  # open / in_progress / resolved / closed
     priority: Optional[str] = None
     assigned_to: Optional[str] = None
+    resolution: Optional[str] = None  # support staff resolution note
 
 
 # ---------------- Host applications ----------------
@@ -141,6 +142,8 @@ def list_support_tickets(
             "status": t.status,
             "priority": t.priority,
             "assigned_to": t.assigned_to,
+            "resolution": t.resolution,
+            "resolved_at": t.resolved_at.isoformat() if t.resolved_at else None,
             "created_at": t.created_at.isoformat() if t.created_at else None,
         }
         for t in tickets
@@ -176,5 +179,42 @@ def update_support_ticket(
         ticket.priority = payload.priority
     if payload.assigned_to is not None:
         ticket.assigned_to = payload.assigned_to
+    if payload.resolution is not None:
+        ticket.resolution = payload.resolution
+        if payload.resolution.strip():
+            ticket.resolved_at = func.now()
     db.commit()
-    return {"id": ticket.id, "status": ticket.status}
+    db.refresh(ticket)
+    return {
+        "id": ticket.id,
+        "status": ticket.status,
+        "priority": ticket.priority,
+        "assigned_to": ticket.assigned_to,
+        "resolution": ticket.resolution,
+        "resolved_at": ticket.resolved_at.isoformat() if ticket.resolved_at else None,
+    }
+
+
+@router.get("/support-tickets/{ticket_id}")
+def get_support_ticket(
+    ticket_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role(*TICKET_STAFF)),
+):
+    ticket = db.get(SupportTicket, ticket_id)
+    if ticket is None:
+        raise HTTPException(status_code=404, detail="Support ticket not found")
+    return {
+        "id": ticket.id,
+        "subject": ticket.subject,
+        "description": ticket.description,
+        "customer_name": ticket.customer_name,
+        "customer_email": ticket.customer_email,
+        "status": ticket.status,
+        "priority": ticket.priority,
+        "assigned_to": ticket.assigned_to,
+        "resolution": ticket.resolution,
+        "resolved_at": ticket.resolved_at.isoformat() if ticket.resolved_at else None,
+        "created_at": ticket.created_at.isoformat() if ticket.created_at else None,
+        "updated_at": ticket.updated_at.isoformat() if ticket.updated_at else None,
+    }
