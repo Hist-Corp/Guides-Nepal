@@ -7,6 +7,7 @@ import {
   ShieldCheck, MessageCircle, ArrowLeft 
 } from 'lucide-react';
 import { commonGuides } from '../data/kathmanduRichData';
+import { sendGuideRequest } from '../services/publicApi';
 
 const ContactGuidePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +26,26 @@ const ContactGuidePage: React.FC = () => {
     const foundGuide = commonGuides.find(g => g.id === guideId) || commonGuides[0];
     setGuide(foundGuide);
   }, [id]);
+
+  // Personalization request submission
+  const [sendingRequest, setSendingRequest] = useState(false);
+  const [requestSent, setRequestSent] = useState(false);
+
+  const handleRequest = async () => {
+    setSendingRequest(true);
+    try {
+      await sendGuideRequest({
+        name: 'Traveler',
+        email: 'traveler@example.com',
+        subject: `Personalization request for ${guide.name}`,
+        message: `Interested in ${duration}h tour with ${adults} adult(s), ${children} child(ren)${selectedDate ? ` on Jan ${selectedDate}` : ''} at ${selectedTime.hour}:${selectedTime.minute} ${selectedTime.period}.`,
+      });
+      setRequestSent(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } finally {
+      setSendingRequest(false);
+    }
+  };
 
   // Calendar generation helper
   const renderCalendar = () => {
@@ -239,9 +260,22 @@ const ContactGuidePage: React.FC = () => {
           </div>
 
           {/* Submit Button */}
-          <button className="w-full bg-brand-yellow hover:bg-yellow-600 text-white font-bold py-4 rounded-full text-lg shadow-lg shadow-primary/20 transition-all transform hover:-translate-y-0.5">
-            Send your personalization request
-          </button>
+          {requestSent ? (
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+              <div className="font-bold text-green-700 text-sm mb-1">Request sent!</div>
+              <p className="text-sm text-green-600">
+                {guide.name} will get back to you{selectedDate ? ` about Jan ${selectedDate}` : ''} shortly.
+              </p>
+            </div>
+          ) : (
+            <button
+              onClick={handleRequest}
+              disabled={sendingRequest}
+              className="w-full bg-brand-yellow hover:bg-yellow-600 text-white font-bold py-4 rounded-full text-lg shadow-lg shadow-primary/20 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
+            >
+              {sendingRequest ? 'Sending…' : 'Send your personalization request'}
+            </button>
+          )}
 
           {/* Safety Notice */}
           <div className="bg-[#FFF8E6] border border-[#FFE0B2] rounded-xl p-4 flex items-start gap-3">

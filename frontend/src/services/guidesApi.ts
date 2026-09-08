@@ -22,6 +22,8 @@ export interface Experience {
   id: number;
   slug: string;
   title: string;
+  city: string;
+  category?: string;
   heroImage: string;
   description: string;
   price?: number;

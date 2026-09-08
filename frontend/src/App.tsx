@@ -4,6 +4,10 @@ import CmsEditMode from './components/common/CmsEditMode';
 import { GlobalImageFallback } from './components/common/GlobalImageFallback';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { CartProvider } from './contexts/CartContext';
+import { flushPendingSubmissions } from './services/publicApi';
+
+// Re-deliver any form submissions queued while the backend was offline.
+flushPendingSubmissions();
 import Cart from './components/common/Cart';
 import { useState } from 'react';
 import HomePage from './pages/HomePage';

@@ -1,14 +1,73 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.models.guide import Guide
+from app.models.host_application import HostApplication
+from app.models.support_ticket import SupportTicket
 from app.schemas.public import ExperienceResponse, GuideResponse
 from app.services.guide_service import GuideService
 
 router = APIRouter()
+
+
+# ---------------- Public inquiry / application forms ----------------
+
+
+class InquiryCreate(BaseModel):
+    name: str
+    email: str
+    subject: str
+    message: str
+    category: Optional[str] = "general"
+
+
+@router.post("/inquiries", status_code=status.HTTP_201_CREATED)
+def create_inquiry(payload: InquiryCreate, db: Session = Depends(get_db)):
+    """Public contact / guide-request form. Stored as a support ticket so
+    the support team can triage it from the dashboard."""
+    ticket = SupportTicket(
+        subject=f"[{payload.category}] {payload.subject}",
+        description=payload.message,
+        customer_name=payload.name,
+        customer_email=payload.email,
+        priority="medium",
+        status="open",
+    )
+    db.add(ticket)
+    db.commit()
+    db.refresh(ticket)
+    return {"status": "ok", "id": ticket.id, "message": "Inquiry received"}
+
+
+class PublicHostApplicationCreate(BaseModel):
+    full_name: str
+    email: str
+    phone: Optional[str] = None
+    city: Optional[str] = None
+    documents: Optional[str] = None  # names of uploaded documents
+
+
+@router.post("/host-applications", status_code=status.HTTP_201_CREATED)
+def submit_host_application(payload: PublicHostApplicationCreate, db: Session = Depends(get_db)):
+    """Public guide/host registration form from the marketing website."""
+    application = HostApplication(
+        host_name=payload.full_name,
+        email=payload.email,
+        city=payload.city,
+        region=payload.city,
+        phone=payload.phone,
+        experience=payload.documents or "Guide registration via website",
+        status="pending",
+    )
+    db.add(application)
+    db.commit()
+    db.refresh(application)
+    return {"status": "ok", "id": application.id, "message": "Application received"}
+
 
 # Mock Data to match frontend types exactly
 MOCK_GUIDES = [

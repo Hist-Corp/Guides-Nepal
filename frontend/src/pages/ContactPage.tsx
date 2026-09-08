@@ -3,6 +3,7 @@ import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { Mail, Phone, MapPin, MessageCircle } from 'lucide-react';
 import { useCmsSection, useSeoMeta } from '../hooks/useCms';
+import { sendContactMessage } from '../services/publicApi';
 
 const ContactPage: React.FC = () => {
   useSeoMeta('contact', 'Contact Us | Guides Nepal');
@@ -10,8 +11,28 @@ const ContactPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState<string | null>(null);
   const cmsHero = useCmsSection('contact', 'contact-hero');
   const cmsInfo = useCmsSection('contact', 'contact-info');
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !email.trim() || !message.trim()) return;
+    setSending(true);
+    setSent(null);
+    try {
+      const result = await sendContactMessage({ name, email, subject: subject || 'General inquiry', message });
+      setSent(
+        result.synced
+          ? "Message sent! We'll get back to you within 24 hours."
+          : "Message saved — it will be delivered once the connection is restored."
+      );
+      setName(''); setEmail(''); setSubject(''); setMessage('');
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -78,7 +99,7 @@ const ContactPage: React.FC = () => {
 
                 <div>
                   <h2 className="text-2xl font-bold text-slate-900 mb-6">Send a Message</h2>
-                  <form className="space-y-4">
+                  <form onSubmit={handleContactSubmit} className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
                       <input type="text" value={name} onChange={(e) => setName(e.target.value)}
@@ -99,8 +120,11 @@ const ContactPage: React.FC = () => {
                       <textarea value={message} onChange={(e) => setMessage(e.target.value)}
                         className="w-full border border-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary h-32 resize-none" placeholder="Tell us more..." />
                     </div>
-                    <button type="submit" className="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary-hover transition-colors">
-                      Send Message
+                    {sent && (
+                      <p className="text-sm bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-3">{sent}</p>
+                    )}
+                    <button type="submit" disabled={sending} className="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary-hover transition-colors disabled:opacity-50">
+                      {sending ? 'Sending…' : 'Send Message'}
                     </button>
                   </form>
                 </div>

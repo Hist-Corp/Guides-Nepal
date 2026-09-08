@@ -4,6 +4,7 @@ import { Footer } from '../../components/common/Footer';
 import { Button } from '../../components/common/Button';
 import { ArrowLeft, CheckCircle2, Upload, Shield, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { submitHostApplication } from '../../services/publicApi';
 
 const HostApplicationPage: React.FC = () => {
   const navigate = useNavigate();
@@ -34,13 +35,32 @@ const HostApplicationPage: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate API call
-    setTimeout(() => {
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const result = await submitHostApplication({
+        full_name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone || undefined,
+        city: undefined,
+        documents: Object.entries(files)
+          .filter(([, f]) => f)
+          .map(([k, f]) => `${k}: ${(f as File).name}`)
+          .join(', ') || undefined,
+      });
+      if (!result.ok) throw new Error('failed');
       setIsSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 1000);
+    } catch {
+      setSubmitError('Something went wrong while submitting. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (isSubmitted) {
@@ -344,11 +364,15 @@ const HostApplicationPage: React.FC = () => {
 
               <Button 
                 type="submit"
-                className="w-full bg-brand-yellow hover:bg-[#E5A800] text-[#213448] font-bold py-4 rounded-xl text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+                disabled={submitting}
+                className="w-full bg-brand-yellow hover:bg-[#E5A800] text-[#213448] font-bold py-4 rounded-xl text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:hover:translate-y-0"
               >
-                Submit Application
+                {submitting ? 'Submitting…' : 'Submit Application'}
               </Button>
-              
+              {submitError && (
+                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-center">{submitError}</p>
+              )}
+
               <p className="text-center text-xs text-gray-500 mt-4">
                 By submitting this form, you agree to our Terms of Service and Privacy Policy.
               </p>

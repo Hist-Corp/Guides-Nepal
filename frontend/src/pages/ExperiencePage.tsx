@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
@@ -7,6 +7,7 @@ import { Star, Clock, User, ShieldCheck, MapPin, CheckCircle, Calendar, ArrowLef
 import { useBookingStore } from '../store/bookingStore';
 import { useAuthStore } from '../store/authStore';
 import { useProfileStore } from '../store/profileStore';
+import guidesApi from '../services/guidesApi';
 import { convertCurrency, formatCurrency } from '../utils/currencyConverter';
 import { CurrencyConverterModal } from '../components/common/CurrencyConverterModal';
 
@@ -203,11 +204,51 @@ const experiencesData: Record<string, Experience> = {
 const ExperiencePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const experience = id ? experiencesData[id] : undefined;
-  
-  console.log('ExperiencePage rendered with id:', id);
-  console.log('Experience found:', experience);
-  
+  const [staticExperience] = useState(id ? experiencesData[id] : undefined);
+  const [apiExperience, setApiExperience] = useState<Experience | undefined>(undefined);
+  const [loading, setLoading] = useState(!staticExperience);
+  const experience = staticExperience ?? apiExperience;
+
+  // If the id is not in the static map (e.g. it comes from the backend
+  // catalog surfaced via Search), resolve it from the API.
+  useEffect(() => {
+    if (staticExperience || !id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const list = await guidesApi.getExperiences();
+        if (cancelled) return;
+        const match = list.find((e) => String(e.id) === id || e.slug === id);
+        if (match) {
+          setApiExperience({
+            ...match,
+            city: match.city ?? 'Kathmandu',
+            images: [match.heroImage],
+            highlights: [],
+            rating: match.rating ?? 4.5,
+            reviews: match.reviews ?? 0,
+            price: match.price ?? 0,
+            duration: match.duration ?? '3 hours',
+            host: (match.host
+              ? { ...match.host, about: (match.host as any).about ?? 'A passionate local guide ready to show you the best of Nepal.' }
+              : {
+                  name: 'Local guide',
+                  image: '/images/placeholder.svg',
+                  rating: 4.5,
+                  reviews: 0,
+                  about: 'A passionate local guide ready to show you the best of Nepal.',
+                }) as Host,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load experience:', error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [id, staticExperience]);
+
   const { addBooking } = useBookingStore();
   const { isAuthenticated } = useAuthStore();
   const [isBooked, setIsBooked] = useState(false);
@@ -215,6 +256,13 @@ const ExperiencePage: React.FC = () => {
 
   // Currency converter modal state
   const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
+
+  // Booking form state (date + guests)
+  const [selectedDate, setSelectedDate] = useState('');
+  const [guests, setGuests] = useState(2);
+  const [showGuestsPicker, setShowGuestsPicker] = useState(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
+  const [bookmarkSaved, setBookmarkSaved] = useState(false);
 
   // Inline currency converter state
   const [fromCurrency, setFromCurrency] = useState('EUR');
@@ -240,14 +288,20 @@ const ExperiencePage: React.FC = () => {
       return;
     }
 
+    if (!selectedDate) {
+      setBookingError('Please select a date before booking.');
+      return;
+    }
+
     if (experience) {
+      setBookingError(null);
       addBooking({
         id: Math.random().toString(36).substr(2, 9),
         experienceId: experience.id,
         experienceTitle: experience.title,
         city: experience.city,
-        date: new Date().toISOString(), // In real app, this would be selected date
-        guests: 2, // Defaulting to 2 for now
+        date: selectedDate,
+        guests: guests,
         price: experience.price,
         image: experience.images[0],
         status: 'upcoming'
@@ -267,8 +321,21 @@ const ExperiencePage: React.FC = () => {
       createdAt: new Date().toISOString(),
       link: `/experience/${experience.id}`,
     });
-    alert('Saved to bookmarks');
+    setBookmarkSaved(true);
+    setTimeout(() => setBookmarkSaved(false), 2500);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col font-sans">
+        <Header />
+        <div className="flex-grow flex items-center justify-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!experience) {
     return (
@@ -276,11 +343,16 @@ const ExperiencePage: React.FC = () => {
         <Header />
         <div className="flex-grow flex items-center justify-center">
           <div className="text-center">
-             <h1 className="text-4xl font-bold text-primary mb-4">Experience not found (ID: {id})</h1>
-             <p className="text-gray-600 mb-4">Available experiences: {Object.keys(experiencesData).join(', ')}</p>
-             <Link to="/">
-               <Button>Go Home</Button>
-             </Link>
+             <h1 className="text-4xl font-bold text-primary mb-4">Experience not found</h1>
+             <p className="text-gray-600 mb-6">It may have been removed, or the link is incorrect.</p>
+             <div className="flex items-center justify-center gap-3">
+               <Link to="/search">
+                 <Button>Back to Search</Button>
+               </Link>
+               <Link to="/">
+                 <Button variant="outline">Go Home</Button>
+               </Link>
+             </div>
           </div>
         </div>
         <Footer />
@@ -507,7 +579,7 @@ const ExperiencePage: React.FC = () => {
                        </div>
                        <div>
                           <p className="italic text-slate-600 mb-4">"{experience.host.about}"</p>
-                          <Button variant="outline" size="sm" className="rounded-full">Contact Host</Button>
+                          <Button variant="outline" size="sm" className="rounded-full" onClick={() => navigate(`/local/${experience.id}/contact`)}>Contact Host</Button>
                        </div>
                     </div>
                  </div>
@@ -532,20 +604,71 @@ const ExperiencePage: React.FC = () => {
                     </div>
 
                     <div className="space-y-4 mb-6">
-                       <div className="border border-slate-200 rounded-lg p-3 flex items-center justify-between cursor-pointer hover:border-primary transition-colors">
-                          <div className="flex items-center gap-3">
-                             <Calendar className="w-5 h-5 text-slate-400" />
-                             <span className="font-medium text-slate-700">Select Date</span>
-                          </div>
-                          <span className="text-primary font-bold text-sm">Change</span>
+                       <div>
+                         <label className="border border-slate-200 rounded-lg p-3 flex items-center justify-between cursor-pointer hover:border-primary transition-colors">
+                            <div className="flex items-center gap-3">
+                               <Calendar className="w-5 h-5 text-slate-400" />
+                               <span className="font-medium text-slate-700">
+                                 {selectedDate || 'Select Date'}
+                               </span>
+                            </div>
+                            <span className="text-primary font-bold text-sm">Change</span>
+                            <input
+                              type="date"
+                              value={selectedDate}
+                              min={new Date().toISOString().split('T')[0]}
+                              onChange={(e) => { setSelectedDate(e.target.value); setBookingError(null); }}
+                              className="sr-only"
+                            />
+                         </label>
                        </div>
-                       <div className="border border-slate-200 rounded-lg p-3 flex items-center justify-between cursor-pointer hover:border-primary transition-colors">
-                          <div className="flex items-center gap-3">
-                             <User className="w-5 h-5 text-slate-400" />
-                             <span className="font-medium text-slate-700">2 Adults</span>
-                          </div>
-                          <span className="text-primary font-bold text-sm">Change</span>
+                       <div className="relative">
+                         <div
+                           onClick={() => setShowGuestsPicker((v) => !v)}
+                           className="border border-slate-200 rounded-lg p-3 flex items-center justify-between cursor-pointer hover:border-primary transition-colors"
+                         >
+                            <div className="flex items-center gap-3">
+                               <User className="w-5 h-5 text-slate-400" />
+                               <span className="font-medium text-slate-700">
+                                 {guests} {guests === 1 ? 'Adult' : 'Adults'}
+                               </span>
+                            </div>
+                            <span className="text-primary font-bold text-sm">Change</span>
+                         </div>
+                         {showGuestsPicker && (
+                           <div className="absolute z-10 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg p-3 space-y-2">
+                             <div className="flex items-center justify-between">
+                               <span className="text-sm text-slate-700">Adults</span>
+                               <div className="flex items-center gap-3">
+                                 <button type="button" onClick={() => setGuests((g) => Math.max(1, g - 1))} className="h-8 w-8 rounded-full border border-slate-300 font-bold text-slate-700 hover:border-primary">−</button>
+                                 <span className="w-6 text-center font-semibold">{guests}</span>
+                                 <button type="button" onClick={() => setGuests((g) => Math.min(20, g + 1))} className="h-8 w-8 rounded-full border border-slate-300 font-bold text-slate-700 hover:border-primary">+</button>
+                               </div>
+                             </div>
+                             <button
+                               type="button"
+                               onClick={() => setShowGuestsPicker(false)}
+                               className="w-full text-sm font-semibold text-white bg-primary rounded-lg py-1.5 hover:bg-primary-hover"
+                             >
+                               Done
+                             </button>
+                           </div>
+                         )}
                        </div>
+                       {guests > 1 && experience && (
+                         <div className="flex justify-between text-sm text-slate-600 border-t border-slate-100 pt-3">
+                           <span>€{experience.price} × {guests} guests</span>
+                           <span className="font-bold text-secondary">€{experience.price * guests}</span>
+                         </div>
+                       )}
+                       {bookingError && (
+                         <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{bookingError}</p>
+                       )}
+                       {isBooked && (
+                         <p className="text-sm text-green-700 bg-green-50 border border-green-100 rounded-lg px-3 py-2">
+                           Booking confirmed! Taking you to your bookings…
+                         </p>
+                       )}
                     </div>
 
                     <Button 
