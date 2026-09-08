@@ -133,6 +133,20 @@ API endpoints
 
 ---
 
+## Recent changes (summary)
+
+These are the most recent notable updates to the repository (September 2026). For the full commit history see: https://github.com/Hist-Corp/Guides-Nepal/commits
+
+- 2026-09-08 — Rewrite of README for clarity and developer onboarding. (Commit: https://github.com/Hist-Corp/Guides-Nepal/commit/40d61256b24b3deb18f1b1aac16e7918273ae1d7)
+- 2026-09-08 — Role-based operations system: added new roles, host application flows, support tickets, and regional head / superadmin / support dashboards; updated end-to-end tests. (Commit: https://github.com/Hist-Corp/Guides-Nepal/commit/b4b6fbbf24080905bfdae87adb7a5a5ed2e0608f)
+- 2026-09-07 — UI/ux and tooling: switched typography to SF Pro, fixed header profile dropdown behavior, and fixed lint-staged pre-commit configuration. (Commit: https://github.com/Hist-Corp/Guides-Nepal/commit/71e3c118e4536bc4c7aaec74a44194eb69387ce6)
+- 2026-09-06 — Account & security: added Account Settings page, change-password endpoint (POST /auth/change-password), avatar upload and profile UI improvements, and rebranded to Guides Nepal across the codebase. (Commit: https://github.com/Hist-Corp/Guides-Nepal/commit/e08a929994d55a71a8e96b930082b86a418dcba9)
+- 2026-09-06 — CMS & dashboard: implemented a comprehensive CMS with role-based access control, synced live frontend pages with dashboard edits, added content-writer UX and shared UI components, fixed LivePageEditor parsing issues and placeholder behavior. (Representative commits: https://github.com/Hist-Corp/Guides-Nepal/commit/710d40a89153612277b96a30277c251db88c51c4, https://github.com/Hist-Corp/Guides-Nepal/commit/fbda4d47eb69da9201753be6c14ac206e0377af4)
+
+There are more commits than listed here — view the full history at: https://github.com/Hist-Corp/Guides-Nepal/commits
+
+---
+
 ## Deployment
 
 Frontend: configure Vercel with build `npm run build` and output `dist`.
@@ -167,4 +181,4 @@ This project is licensed under MIT. See the LICENSE file for details.
 ---
 
 Last updated: 2026-09-08
-Version: 1.0.0
+Version: 1.0.1
