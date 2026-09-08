@@ -1,13 +1,17 @@
 import { useAuthStore } from "../state/authStore"
 
 export default function HeroGreeting() {
-  const { user } = useAuthStore()
+  const { user, role } = useAuthStore()
   const name = user ? `${user.firstName ?? ""}`.trim() || "there" : "there"
+  const area = role
+    ? role.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
+    : "Dashboard"
   return (
-    <div className="rounded-2xl bg-lightBlue/50 p-6 border shadow-sm">
-      <div className="text-sm text-gray-600">Today</div>
-      <div className="text-2xl font-bold text-darkBlue mt-1">Hello, {name}! 👋</div>
-      <div className="text-sm text-gray-600 mt-1">Track & manage your latest progress here</div>
+    <div className="h-full bg-darkBlue text-white p-6 flex flex-col justify-center">
+      <div className="text-xs uppercase tracking-wider text-white/60">{area}</div>
+      <div className="mt-1 text-2xl font-semibold">Welcome back, {name}</div>
+      <div className="mt-1 text-sm text-white/70">Here's what's happening across your workspace today.</div>
     </div>
   )
 }
+

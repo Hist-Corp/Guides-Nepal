@@ -21,9 +21,9 @@ export default function PageShell({
     <div className={cn("space-y-6", className)}>
       <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-darkBlue">{title}</h1>
+          <h1 className="text-xl font-semibold text-darkBlue">{title}</h1>
           {description ? (
-            <p className="mt-1 text-sm text-gray-600">{description}</p>
+            <p className="mt-0.5 text-sm text-gray-500">{description}</p>
           ) : null}
         </div>
         {action ? <div className="flex items-center gap-2">{action}</div> : null}

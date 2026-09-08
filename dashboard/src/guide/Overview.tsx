@@ -1,5 +1,7 @@
 import useFetch from "../hooks/useFetch"
 import { getBookings } from "../services/api"
+import PageShell from "../components/PageShell"
+import SectionCard from "../components/SectionCard"
 import StatCard from "../components/StatCard"
 import KPICard from "../components/KPICard"
 import HeroGreeting from "../components/HeroGreeting"
@@ -16,8 +18,11 @@ export default function GuideOverview() {
   const earningsTotal = bookings.reduce((sum: number, x: any) => sum + (x.price ?? 0), 0)
   const series = (mockB ?? []).map((bk) => ({ label: bk.date, value: bk.price }))
   return (
-    <div className="space-y-6">
-      <div className="text-2xl font-bold text-darkBlue">Guide Overview</div>
+    <PageShell
+      title="Guide Overview"
+      description="Your tours, bookings, schedule, and earnings."
+      noCard
+    >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-2">
           <HeroGreeting />
@@ -27,12 +32,14 @@ export default function GuideOverview() {
         <KPICard title="Earnings" value={loading ? "…" : `$${earningsTotal}`} delta={{ value: "+1%", positive: true }} />
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="rounded-2xl bg-white p-4 border space-y-2 lg:col-span-2">
-          <div className="font-semibold text-darkBlue">Bookings trend</div>
+        <SectionCard
+          title="Bookings trend"
+          subtitle="Earnings across recent bookings"
+          className="lg:col-span-2"
+        >
           <BarChart series={series} />
-        </div>
-        <div className="rounded-2xl bg-white p-4 border space-y-2">
-          <div className="font-semibold text-darkBlue">Tasks</div>
+        </SectionCard>
+        <SectionCard title="Tasks" subtitle="Your to-do list">
           <ul className="space-y-2">
             {mockGuideTasks.map((t) => (
               <li key={t.id} className="flex items-center justify-between">
@@ -41,28 +48,32 @@ export default function GuideOverview() {
               </li>
             ))}
           </ul>
-        </div>
+        </SectionCard>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="rounded-2xl bg-white p-4 border space-y-2 lg:col-span-2">
-          <div className="font-semibold text-darkBlue">Assigned Experiences</div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {mockExperiences.map((e) => (
-              <div key={e.id} className="rounded-2xl border p-3 bg-white">
-                <div className="font-semibold text-darkBlue">{e.title}</div>
-                <div className="text-xs text-gray-600">{e.city}</div>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge text={e.duration} />
-                  <Badge text={e.status} />
-                </div>
+        <SectionCard
+          title="Assigned Experiences"
+          subtitle="Tours you are guiding"
+          className="lg:col-span-2"
+          bodyClassName="grid grid-cols-1 md:grid-cols-3 gap-3"
+        >
+          {mockExperiences.map((e) => (
+            <div key={e.id} className="rounded-lg border border-gray-200 p-3 bg-white">
+              <div className="font-semibold text-darkBlue">{e.title}</div>
+              <div className="text-xs text-gray-600">{e.city}</div>
+              <div className="flex items-center gap-2 mt-2">
+                <Badge text={e.duration} />
+                <Badge text={e.status} />
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+          ))}
+        </SectionCard>
         <SchedulePanel items={mockGuideScheduleItems} />
       </div>
-      <div className="rounded-2xl bg-white p-4 border space-y-2">
-        <div className="font-semibold text-darkBlue">Recent Bookings</div>
+      <SectionCard
+        title="Recent Bookings"
+        subtitle="Your latest guest reservations"
+      >
         <Table
           columns={[
             { key: "experienceTitle", label: "Experience" },
@@ -73,7 +84,7 @@ export default function GuideOverview() {
           ]}
           rows={mockB}
         />
-      </div>
-    </div>
+      </SectionCard>
+    </PageShell>
   )
 }

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react"
 import { getHostApplications } from "../services/api"
+import PageShell from "../components/PageShell"
+import SectionCard from "../components/SectionCard"
 import HeroGreeting from "../components/HeroGreeting"
 import KPICard from "../components/KPICard"
 
@@ -19,8 +21,11 @@ export default function RegionalHeadOverview() {
   const regions = [...new Set(apps.map((a) => a.region).filter(Boolean))]
 
   return (
-    <div className="space-y-6">
-      <div className="text-2xl font-bold text-darkBlue">Regional Head</div>
+    <PageShell
+      title="Regional Head"
+      description="Manage host applications and operations in your region."
+      noCard
+    >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-2">
           <HeroGreeting />
@@ -29,12 +34,18 @@ export default function RegionalHeadOverview() {
         <KPICard title="Pending" value={loading ? "…" : pending} sub="Awaiting your review" />
         <KPICard title="Approved Hosts" value={loading ? "…" : approved} sub="Approved applications" />
       </div>
-      <div className="rounded-2xl bg-white p-4 border">
-        <div className="font-semibold text-darkBlue mb-2">Regions covered</div>
-        <div className="text-sm text-gray-600">
-          {regions.length ? regions.join(", ") : "No regional data yet"}
+      <SectionCard
+        title="Regions covered"
+        subtitle="Areas represented in current applications"
+      >
+        <div className="flex flex-wrap gap-2">
+          {regions.length ? regions.map((r) => (
+            <span key={r} className="rounded-full bg-lightBlue/60 px-3 py-1 text-sm text-darkBlue font-medium">{r}</span>
+          )) : (
+            <div className="text-sm text-gray-600">No regional data yet</div>
+          )}
         </div>
-      </div>
-    </div>
+      </SectionCard>
+    </PageShell>
   )
 }

@@ -6,12 +6,23 @@ import HostLayout from "./layouts/HostLayout"
 import GuideLayout from "./layouts/GuideLayout"
 import RequireAuth from "./guards/RequireAuth"
 import RequireRole from "./guards/RequireRole"
+import PublicLayout from "./public/components/PublicLayout"
+import PublicHome from "./public/Home"
+import PublicExplore from "./public/Explore"
+import PublicSearch from "./public/Search"
+import CategoryPage from "./public/CategoryPage"
+import ExperienceDetail from "./public/ExperienceDetail"
+import CityPage from "./public/CityPage"
+import CityExperiences from "./public/CityExperiences"
+import LocalProfile from "./public/LocalProfile"
+import NotFound from "./public/NotFound"
 import AdminOverview from "./admin/Overview"
 import AdminHosts from "./admin/Hosts"
 import AdminGuides from "./admin/Guides"
 import AdminAnalytics from "./admin/Analytics"
 import AdminRevenue from "./admin/Revenue"
 import AdminSettings from "./admin/Settings"
+import WebsiteContentManager from "./components/WebsiteContentManager"
 import AdminContent from "./admin/Content"
 import WriterLayout from "./layouts/WriterLayout"
 import WriterOverview from "./writer/Overview"
@@ -45,6 +56,27 @@ import GuideProfile from "./guide/Profile"
 export default function App() {
   return (
     <Routes>
+      {/* Public traveler-facing site */}
+      <Route path="/" element={<PublicLayout />}>
+        <Route index element={<PublicHome />} />
+        <Route path="explore" element={<PublicExplore />} />
+        <Route path="search" element={<PublicSearch />} />
+        <Route path="most-popular" element={<CategoryPage slugKey="most-popular" />} />
+        <Route path="most-delicious" element={<CategoryPage slugKey="most-delicious" />} />
+        <Route path="real-good-travel" element={<CategoryPage slugKey="real-good-travel" />} />
+        <Route path="food-tours" element={<CategoryPage slugKey="food-tours" />} />
+        <Route path="food-tours/culture/:slug" element={<ExperienceDetail />} />
+        <Route path="cultural-tours" element={<CategoryPage slugKey="cultural-tours" />} />
+        <Route path="outdoor-activities" element={<CategoryPage slugKey="outdoor-activities" />} />
+        <Route path="cooking-classes" element={<CategoryPage slugKey="cooking-classes" />} />
+        <Route path="experience/:id" element={<ExperienceDetail />} />
+        <Route path="experience/seo/:slug" element={<ExperienceDetail />} />
+        <Route path="city/:cityId" element={<CityPage />} />
+        <Route path="city/:cityId/experiences" element={<CityExperiences />} />
+        <Route path="city/:cityId/experience/:slug" element={<ExperienceDetail />} />
+        <Route path="local/:id" element={<LocalProfile />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
       <Route path="/dashboard" element={<DashboardLayout />}>
         <Route index element={<Navigate to="/dashboard/login" replace />} />
         <Route path="login" element={<LoginPage />} />
@@ -62,6 +94,7 @@ export default function App() {
           <Route path="hosts" element={<AdminHosts />} />
           <Route path="guides" element={<AdminGuides />} />
           <Route path="content" element={<AdminContent />} />
+          <Route path="website-content" element={<WebsiteContentManager area="admin" />} />
           <Route path="analytics" element={<AdminAnalytics />} />
           <Route path="revenue" element={<AdminRevenue />} />
           <Route path="settings" element={<AdminSettings />} />
@@ -79,6 +112,7 @@ export default function App() {
           <Route index element={<SuperAdminOverview />} />
           <Route path="host-applications" element={<SuperAdminHostApplications />} />
           <Route path="support-tickets" element={<SuperAdminSupportTickets />} />
+          <Route path="website-content" element={<WebsiteContentManager area="super-admin" />} />
         </Route>
         <Route
           path="regional-head/*"
@@ -159,9 +193,9 @@ export default function App() {
           <Route path="earnings" element={<GuideEarnings />} />
           <Route path="profile" element={<GuideProfile />} />
         </Route>
-        <Route path="*" element={<Navigate to="/dashboard/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
-      <Route path="*" element={<Navigate to="/dashboard/login" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

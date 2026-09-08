@@ -5,9 +5,10 @@ type Props = {
 
 export default function StatCard({ label, value }: Props) {
   return (
-    <div className="rounded-2xl bg-white p-4 border">
-      <div className="text-sm text-gray-600">{label}</div>
-      <div className="text-2xl font-bold text-darkBlue">{value}</div>
+    <div className="bg-white p-4 border border-gray-200">
+      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</div>
+      <div className="mt-1 text-2xl font-semibold tabular-nums text-darkBlue">{value}</div>
     </div>
   )
 }
+

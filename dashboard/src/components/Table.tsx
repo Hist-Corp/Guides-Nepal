@@ -25,17 +25,17 @@ export default function Table<T extends Record<string, any>>({
   return (
     <div
       className={cn(
-        "overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm",
+        "overflow-x-auto rounded-lg border border-gray-200 bg-white",
         className
       )}
     >
       <table className="min-w-full text-sm">
-        <thead className="bg-lightBlue/40">
+        <thead className="bg-gray-50 border-b border-gray-200">
           <tr>
             {columns.map((c, ci) => (
               <th
                 key={`${String(c.key)}-${ci}`}
-                className="text-left px-3 py-2 text-xs font-semibold uppercase text-darkBlue"
+                className="text-left px-3 py-2.5 text-xs font-medium uppercase tracking-wide text-gray-500"
               >
                 {c.label}
               </th>

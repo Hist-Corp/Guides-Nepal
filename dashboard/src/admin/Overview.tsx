@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react"
 import { getAdminStats, getAdminExperiences, getAdminGuides, getAdminBookings } from "../services/api"
+import PageShell from "../components/PageShell"
+import SectionCard from "../components/SectionCard"
 import StatCard from "../components/StatCard"
 import KPICard from "../components/KPICard"
 import HeroGreeting from "../components/HeroGreeting"
@@ -40,8 +42,11 @@ export default function AdminOverview() {
   }, [])
 
   return (
-    <div className="space-y-6">
-      <div className="text-2xl font-bold text-darkBlue">Dashboard</div>
+    <PageShell
+      title="Dashboard"
+      description="Platform health at a glance — people, bookings, and content."
+      noCard
+    >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-2">
           <HeroGreeting />
@@ -50,13 +55,16 @@ export default function AdminOverview() {
         <KPICard title="Total Guides" value={loading ? "…" : (stats.total_guides || 0)} sub={`${stats.verified_guides || 0} verified`} />
         <KPICard title="Bookings" value={loading ? "…" : (stats.total_bookings || 0)} sub="Total bookings" />
       </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="rounded-2xl bg-white p-4 border space-y-2 lg:col-span-2">
-          <div className="font-semibold text-darkBlue">Average KPIs</div>
+        <SectionCard
+          title="Average KPIs"
+          subtitle="Performance trends across the platform"
+          className="lg:col-span-2"
+        >
           <BarChart series={mockAnalyticsSeries} />
-        </div>
-        <div className="rounded-2xl bg-white p-4 border space-y-2">
-          <div className="font-semibold text-darkBlue">Tasks</div>
+        </SectionCard>
+        <SectionCard title="Tasks" subtitle="Items needing attention">
           <ul className="space-y-2">
             {mockTasks.map((t) => (
               <li key={t.id} className="flex items-center justify-between">
@@ -65,11 +73,15 @@ export default function AdminOverview() {
               </li>
             ))}
           </ul>
-        </div>
+        </SectionCard>
       </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="rounded-2xl bg-white p-4 border space-y-2 lg:col-span-2">
-          <div className="font-semibold text-darkBlue">Employees</div>
+        <SectionCard
+          title="Employees"
+          subtitle="Team members and their roles"
+          className="lg:col-span-2"
+        >
           <Table
             columns={[
               { key: "name", label: "Name" },
@@ -80,9 +92,8 @@ export default function AdminOverview() {
             ]}
             rows={mockEmployees}
           />
-        </div>
-        <div className="rounded-2xl bg-white p-4 border space-y-2">
-          <div className="font-semibold text-darkBlue">Recent Activity</div>
+        </SectionCard>
+        <SectionCard title="Recent Activity" subtitle="Latest platform events">
           <ul className="space-y-2">
             {mockActivity.map((a, idx) => (
               <li key={idx} className="flex items-center justify-between">
@@ -91,33 +102,36 @@ export default function AdminOverview() {
               </li>
             ))}
           </ul>
-        </div>
+        </SectionCard>
       </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="rounded-2xl bg-white p-4 border space-y-2">
-          <div className="font-semibold text-darkBlue">Application Resources</div>
+        <SectionCard title="Application Resources" subtitle="Where signups come from">
           <DonutChart segments={mockSources} />
-        </div>
-        <div className="rounded-2xl bg-white p-4 border space-y-2 lg:col-span-2">
-          <div className="font-semibold text-darkBlue">Current Experiences</div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {experiences.length > 0 ? experiences.slice(0, 6).map((e: any) => (
-              <div key={e.id} className="rounded-2xl border p-3 bg-white">
-                <div className="font-semibold text-darkBlue">{e.title}</div>
-                <div className="text-xs text-gray-600">{e.city || e.host?.name}</div>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge text={`$${e.price || 0}`} />
-                  <Badge text={e.duration || "N/A"} />
-                  <Badge text={e.status || "active"} />
-                </div>
+        </SectionCard>
+        <SectionCard
+          title="Current Experiences"
+          subtitle="Latest listings on the platform"
+          className="lg:col-span-2"
+          bodyClassName="grid grid-cols-1 md:grid-cols-3 gap-3"
+        >
+          {experiences.length > 0 ? experiences.slice(0, 6).map((e: any) => (
+            <div key={e.id} className="rounded-lg border border-gray-200 p-3 bg-white">
+              <div className="font-semibold text-darkBlue">{e.title}</div>
+              <div className="text-xs text-gray-600">{e.city || e.host?.name}</div>
+              <div className="flex items-center gap-2 mt-2">
+                <Badge text={`$${e.price || 0}`} />
+                <Badge text={e.duration || "N/A"} />
+                <Badge text={e.status || "active"} />
               </div>
-            )) : (
-              <div className="col-span-3 text-center text-gray-500 py-4">No experiences found</div>
-            )}
-          </div>
-        </div>
+            </div>
+          )) : (
+            <div className="col-span-3 text-center text-gray-500 py-4">No experiences found</div>
+          )}
+        </SectionCard>
       </div>
+
       <SchedulePanel items={mockScheduleItems} />
-    </div>
+    </PageShell>
   )
 }

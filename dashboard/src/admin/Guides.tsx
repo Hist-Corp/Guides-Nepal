@@ -87,7 +87,7 @@ export default function AdminGuides() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="text-2xl font-bold text-darkBlue">Guides</div>
+        <div className="text-xl font-semibold text-darkBlue">Guides</div>
         <button className="rounded-lg px-3 py-2 bg-brand-yellow text-darkBlue font-semibold" onClick={() => setOpenAdd(true)}>
           Add guide
         </button>
@@ -130,7 +130,7 @@ export default function AdminGuides() {
       <Modal open={openEdit !== null} title="Edit guide" onClose={() => setOpenEdit(null)}>
         {openEdit !== null && (
           <GuideForm
-            initial={{ name: rows[openEdit.idx].name, level: rows[openEdit.idx].role, status: rows[openEdit.idx].verified ? "verified" : "pending" }}
+            initial={{ name: rows[openEdit.idx].name, languages: (rows[openEdit.idx].languages ?? []).join(", "), verified: !!rows[openEdit.idx].verified }}
             onSubmit={(v) => handleEdit(v, openEdit.idx)}
           />
         )}

@@ -19,10 +19,10 @@ export default function SupportFaq() {
   ]
   return (
     <div className="space-y-4">
-      <div className="text-2xl font-bold text-darkBlue">FAQ / Solutions</div>
+      <div className="text-xl font-semibold text-darkBlue">FAQ / Solutions</div>
       <div className="space-y-3">
         {solutions.map((s) => (
-          <div key={s.q} className="rounded-2xl bg-white p-4 border">
+          <div key={s.q} className="rounded-lg bg-white p-4 border border-gray-200">
             <div className="font-semibold text-darkBlue">{s.q}</div>
             <div className="text-sm text-gray-600 mt-1">{s.a}</div>
           </div>

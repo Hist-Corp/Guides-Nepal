@@ -36,7 +36,7 @@ export default function HostApplicationsPanel() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="text-2xl font-bold text-darkBlue">Host Applications</div>
+        <div className="text-xl font-semibold text-darkBlue">Host Applications</div>
         <select
           className="rounded-lg border px-3 py-2 text-sm"
           value={filter}

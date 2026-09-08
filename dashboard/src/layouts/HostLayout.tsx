@@ -8,7 +8,7 @@ export default function HostLayout() {
       <Topbar />
       <div className="flex flex-1">
         <NavSidebar />
-        <main className="flex-1 p-6 bg-gray-50">
+        <main className="flex-1 p-6 lg:p-8 bg-[#f5f7fa]">
           <Outlet />
         </main>
       </div>

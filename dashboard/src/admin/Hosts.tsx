@@ -11,7 +11,7 @@ export default function AdminHosts() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="text-2xl font-bold text-darkBlue">Hosts</div>
+        <div className="text-xl font-semibold text-darkBlue">Hosts</div>
         <button className="rounded-lg px-3 py-2 bg-brand-yellow text-darkBlue font-semibold" onClick={() => setOpenAdd(true)}>
           Add host
         </button>

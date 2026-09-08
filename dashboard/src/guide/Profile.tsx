@@ -1,8 +1,8 @@
 export default function GuideProfile() {
   return (
     <div className="space-y-6">
-      <div className="text-2xl font-bold text-darkBlue">Profile (limited edit)</div>
-      <form className="rounded-2xl bg-white p-4 border space-y-3">
+      <div className="text-xl font-semibold text-darkBlue">Profile (limited edit)</div>
+      <form className="rounded-lg bg-white p-4 border border-gray-200 space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm text-gray-700">First name</label>
@@ -27,7 +27,7 @@ export default function GuideProfile() {
           <button type="button" className="rounded-lg px-3 py-2 border">Cancel</button>
         </div>
       </form>
-      <div className="rounded-2xl bg-white p-4 border space-y-2">
+      <div className="rounded-lg bg-white p-4 border border-gray-200 space-y-2">
         <div className="font-semibold text-darkBlue">Documents</div>
         <ul className="space-y-2">
           <li className="flex items-center justify-between">

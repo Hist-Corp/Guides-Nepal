@@ -4,7 +4,7 @@ import { mockPayouts } from "../mock/data"
 export default function AdminRevenue() {
   return (
     <div className="space-y-4">
-      <div className="text-2xl font-bold text-darkBlue">Revenue & payouts</div>
+      <div className="text-xl font-semibold text-darkBlue">Revenue & payouts</div>
       <Table
         columns={[
           { key: "id", label: "Run ID" },

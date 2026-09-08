@@ -4,7 +4,7 @@ export default function SchedulePanel({
   items: { time: string; title: string; tag?: string }[]
 }) {
   return (
-    <div className="rounded-2xl bg-white p-4 border shadow-sm space-y-2">
+    <div className="rounded-lg bg-white p-4 border border-gray-200 space-y-2">
       <div className="font-semibold text-darkBlue">Schedule</div>
       <ul className="space-y-2">
         {items.map((it, idx) => (

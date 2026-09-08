@@ -4,7 +4,7 @@ import { mockExperiences } from "../mock/data"
 export default function GuideMyTours() {
   return (
     <div className="space-y-4">
-      <div className="text-2xl font-bold text-darkBlue">My tours</div>
+      <div className="text-xl font-semibold text-darkBlue">My tours</div>
       <Table
         columns={[
           { key: "title", label: "Title" },

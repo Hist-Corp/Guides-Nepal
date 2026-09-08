@@ -11,28 +11,28 @@ export default function AdminContent() {
   const [openEdit, setOpenEdit] = useState<{ idx: number } | null>(null)
   return (
     <div className="space-y-6">
-      <div className="text-2xl font-bold text-darkBlue">Content Management</div>
+      <div className="text-xl font-semibold text-darkBlue">Content Management</div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="rounded-2xl bg-white p-4 border">
+        <div className="rounded-lg bg-white p-4 border border-gray-200">
           <NavLink to="/dashboard/content-writer/pages" className="block text-center py-4">
             <div className="font-semibold text-darkBlue">Pages</div>
             <div className="text-sm text-gray-600">Static pages and SEO metadata</div>
           </NavLink>
         </div>
-        <div className="rounded-2xl bg-white p-4 border">
+        <div className="rounded-lg bg-white p-4 border border-gray-200">
           <NavLink to="/dashboard/content-writer/blog" className="block text-center py-4">
             <div className="font-semibold text-darkBlue">Blog</div>
             <div className="text-sm text-gray-600">Articles and editorial content</div>
           </NavLink>
         </div>
-        <div className="rounded-2xl bg-white p-4 border">
+        <div className="rounded-lg bg-white p-4 border border-gray-200">
           <NavLink to="/dashboard/content-writer/guides-content" className="block text-center py-4">
             <div className="font-semibold text-darkBlue">Guides Content</div>
             <div className="text-sm text-gray-600">Experience descriptions and profiles</div>
           </NavLink>
         </div>
       </div>
-      <div className="rounded-2xl bg-white p-4 border space-y-2">
+      <div className="rounded-lg bg-white p-4 border border-gray-200 space-y-2">
         <div className="font-semibold text-darkBlue">Recent drafts</div>
         <ul className="space-y-2">
           <li className="flex items-center justify-between">
@@ -45,7 +45,7 @@ export default function AdminContent() {
           </li>
         </ul>
       </div>
-      <div className="rounded-2xl bg-white p-4 border space-y-3">
+      <div className="rounded-lg bg-white p-4 border border-gray-200 space-y-3">
         <div className="flex items-center justify-between">
           <div className="font-semibold text-darkBlue">Content Writers</div>
           <button className="rounded-lg px-3 py-2 bg-brand-yellow text-darkBlue font-semibold" onClick={() => setOpenAdd(true)}>

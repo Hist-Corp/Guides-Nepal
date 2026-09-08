@@ -5,8 +5,8 @@ export default function HostBookings() {
   const { data, loading, error } = useFetch(getBookings)
   return (
     <div className="space-y-4">
-      <div className="text-2xl font-bold text-darkBlue">Bookings</div>
-      <div className="rounded-2xl bg-white p-4 border">
+      <div className="text-xl font-semibold text-darkBlue">Bookings</div>
+      <div className="rounded-lg bg-white p-4 border border-gray-200">
         {loading && "Loading..."}
         {error && <span className="text-red-600">{error}</span>}
         {!loading && !error && Array.isArray(data) && (
