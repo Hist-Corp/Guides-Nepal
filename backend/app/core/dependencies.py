@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.security import get_user_id_from_token
+from app.core.roles import has_access
 from app.models.user import User
 
 
@@ -24,7 +25,7 @@ def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
 
 def require_role(*allowed_roles: str):
     def checker(current_user: User = Depends(get_current_user)) -> User:
-        if current_user.role not in allowed_roles:
+        if not has_access(current_user.role, *allowed_roles):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Role '{current_user.role}' not allowed. Required: {', '.join(allowed_roles)}",

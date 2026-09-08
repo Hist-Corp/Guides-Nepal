@@ -13,6 +13,7 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     phone = Column(String, nullable=True)
     role = Column(String, default="traveler")
+    region = Column(String, nullable=True)  # for regional heads
     bio = Column(String, nullable=True)
     avatar_url = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)

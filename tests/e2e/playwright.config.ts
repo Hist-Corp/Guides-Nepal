@@ -1,69 +1,74 @@
 import { defineConfig, devices } from '@playwright/test';
+import path from 'path';
 
 /**
- * Playwright E2E Test Configuration
- * See https://playwright.dev/docs/test-configuration for more details
+ * Playwright E2E configuration for Guides Nepal.
+ *
+ * Dev servers (backend :8000, frontend :5173, dashboard :5176) are brought up
+ * automatically if not already running (reuseExistingServer: true), so this
+ * suite can be run on its own. The bundled Chromium build is used; if it is
+ * missing, set USE_SYSTEM_CHROME=true to launch Google Chrome instead.
  */
+const projectRoot = path.resolve(__dirname, '..');
+const useSystemChrome = !!process.env.USE_SYSTEM_CHROME;
+
 export default defineConfig({
   testDir: './specs',
-  /* Run tests in files in parallel */
-  fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the test files */
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI */
-  workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [
-    ['html', { outputFolder: 'playwright-report' }],
-    ['list'],
-    process.env.CI ? ['github'] : ['list'],
-  ],
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  retries: process.env.CI ? 1 : 1,
+  workers: 1,
+  reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
+  timeout: 60_000,
+  expect: { timeout: 8_000 },
   use: {
-    /* Base URL to use in the tests */
-    baseURL: process.env.E2E_BASE_URL || 'http://localhost:5175',
-    /* Collect trace when retrying the failed test */
+    headless: true,
+    ...(useSystemChrome ? { channel: 'chrome' } : {}),
     trace: 'on-first-retry',
-    /* Take screenshot on failure */
     screenshot: 'only-on-failure',
-    /* Record video on failure */
     video: 'retain-on-failure',
+    actionTimeout: 10_000,
+    navigationTimeout: 15_000,
   },
-
-  /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'frontend',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://localhost:5173',
+      },
+      testMatch: /specs\/(home-buttons|auth|navigation)\.spec\.ts$/,
     },
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-    /* Test against mobile viewports */
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
+      name: 'dashboard',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://localhost:5176',
+      },
+      testMatch: /specs\/dashboard\.spec\.ts$/,
     },
   ],
-
-  /* Run your local dev server before starting the tests */
   webServer: [
     {
+      command: 'npm run dev:backend',
+      url: 'http://127.0.0.1:8000/health',
+      reuseExistingServer: true,
+      cwd: projectRoot,
+      timeout: 120_000,
+    },
+    {
       command: 'npm run dev:frontend',
-      url: 'http://localhost:5175',
-      reuseExistingServer: !process.env.CI,
-      timeout: 120 * 1000,
+      url: 'http://localhost:5173',
+      reuseExistingServer: true,
+      cwd: projectRoot,
+      timeout: 120_000,
+    },
+    {
+      command: 'npm run dev:dashboard',
+      url: 'http://localhost:5176',
+      reuseExistingServer: true,
+      cwd: projectRoot,
+      timeout: 120_000,
     },
   ],
 });

@@ -20,6 +20,15 @@ import WriterBlog from "./writer/Blog"
 import WriterGuidesContent from "./writer/GuidesContent"
 import WriterMedia from "./writer/Media"
 import WriterSeo from "./writer/Seo"
+import SuperAdminOverview from "./superadmin/Overview"
+import SuperAdminHostApplications from "./superadmin/HostApplications"
+import SuperAdminSupportTickets from "./superadmin/SupportTickets"
+import RegionalHeadOverview from "./regionalhead/Overview"
+import RegionalApplications from "./regionalhead/Applications"
+import RegionalInfo from "./regionalhead/Region"
+import SupportOverview from "./support/Overview"
+import SupportTickets from "./support/Tickets"
+import SupportFaq from "./support/Faq"
 import HostOverview from "./host/Overview"
 import HostGuides from "./host/Guides"
 import HostTours from "./host/Tours"
@@ -56,6 +65,48 @@ export default function App() {
           <Route path="analytics" element={<AdminAnalytics />} />
           <Route path="revenue" element={<AdminRevenue />} />
           <Route path="settings" element={<AdminSettings />} />
+        </Route>
+        <Route
+          path="super-admin/*"
+          element={
+            <RequireAuth>
+              <RequireRole role="super-admin">
+                <AdminLayout />
+              </RequireRole>
+            </RequireAuth>
+          }
+        >
+          <Route index element={<SuperAdminOverview />} />
+          <Route path="host-applications" element={<SuperAdminHostApplications />} />
+          <Route path="support-tickets" element={<SuperAdminSupportTickets />} />
+        </Route>
+        <Route
+          path="regional-head/*"
+          element={
+            <RequireAuth>
+              <RequireRole role="regional-head">
+                <AdminLayout />
+              </RequireRole>
+            </RequireAuth>
+          }
+        >
+          <Route index element={<RegionalHeadOverview />} />
+          <Route path="applications" element={<RegionalApplications />} />
+          <Route path="region" element={<RegionalInfo />} />
+        </Route>
+        <Route
+          path="customer-support/*"
+          element={
+            <RequireAuth>
+              <RequireRole role="customer-support">
+                <AdminLayout />
+              </RequireRole>
+            </RequireAuth>
+          }
+        >
+          <Route index element={<SupportOverview />} />
+          <Route path="tickets" element={<SupportTickets />} />
+          <Route path="faq" element={<SupportFaq />} />
         </Route>
         <Route
           path="content-writer/*"

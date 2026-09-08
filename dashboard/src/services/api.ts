@@ -94,6 +94,30 @@ export async function resetPassword(payload: {
   return res.data
 }
 
+// --- Operations API (host applications & support tickets) ---
+export async function getHostApplications(params?: { status?: string; region?: string }) {
+  const res = await http.get("/operations/host-applications", { params })
+  return res.data
+}
+
+export async function reviewHostApplication(id: number, status: "approved" | "rejected" | "pending") {
+  const res = await http.patch(`/operations/host-applications/${id}`, { status })
+  return res.data
+}
+
+export async function getSupportTickets(params?: { status?: string }) {
+  const res = await http.get("/operations/support-tickets", { params })
+  return res.data
+}
+
+export async function updateSupportTicket(
+  id: number,
+  payload: { status?: string; priority?: string; assigned_to?: string }
+) {
+  const res = await http.patch(`/operations/support-tickets/${id}`, payload)
+  return res.data
+}
+
 // --- Admin API functions ---
 export async function getAdminStats() {
   const res = await http.get("/admin/stats")

@@ -5,7 +5,19 @@ export default function NavSidebar() {
   const { role } = useAuthStore()
   const base = role ? `/dashboard/${role}` : "/dashboard/login"
   const items =
-    role === "admin"
+    role === "super-admin"
+      ? [
+          { to: `${base}`, label: "Overview" },
+          { to: `${base}/host-applications`, label: "Host Applications" },
+          { to: `${base}/support-tickets`, label: "Support Tickets" },
+          { to: "/dashboard/admin", label: "→ Admin area" },
+          { to: "/dashboard/content-writer", label: "→ Content Writer area" },
+          { to: "/dashboard/regional-head", label: "→ Regional Head area" },
+          { to: "/dashboard/customer-support", label: "→ Customer Support area" },
+          { to: "/dashboard/host", label: "→ Host area" },
+          { to: "/dashboard/guide", label: "→ Guide area" }
+        ]
+      : role === "admin"
       ? [
           { to: `${base}`, label: "Overview" },
           { to: `${base}/hosts`, label: "Hosts" },
@@ -32,6 +44,18 @@ export default function NavSidebar() {
           { to: `${base}/schedule`, label: "Schedule" },
           { to: `${base}/earnings`, label: "Earnings" },
           { to: `${base}/profile`, label: "Profile" }
+        ]
+      : role === "regional-head"
+      ? [
+          { to: `${base}`, label: "Overview" },
+          { to: `${base}/applications`, label: "Host Applications" },
+          { to: `${base}/region`, label: "My Region" }
+        ]
+      : role === "customer-support"
+      ? [
+          { to: `${base}`, label: "Overview" },
+          { to: `${base}/tickets`, label: "Support Tickets" },
+          { to: `${base}/faq`, label: "FAQ / Solutions" }
         ]
       : role === "content-writer"
       ? [

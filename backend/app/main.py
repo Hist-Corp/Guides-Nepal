@@ -11,7 +11,7 @@ from app.core.middleware import (
     InputValidationMiddleware,
     HTTPSEnforcementMiddleware,
 )
-from app.api.v1 import auth, bookings, public, ai, profile, admin, content
+from app.api.v1 import auth, bookings, public, ai, profile, admin, content, operations
 import os
 import logging
 
@@ -62,6 +62,9 @@ app.include_router(
 )
 app.include_router(
     content.router, prefix=f"{settings.API_V1_STR}/content", tags=["content"]
+)
+app.include_router(
+    operations.router, prefix=f"{settings.API_V1_STR}/operations", tags=["operations"]
 )
 
 # Static file mounting with restrictions

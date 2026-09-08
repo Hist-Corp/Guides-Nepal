@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from app.core.database import get_db
 from app.core.dependencies import require_role
 from app.models.user import User
 from app.models.guide import Guide
 from app.models.booking import Booking
+from app.services.auth_service import AuthService
 
 router = APIRouter()
 
@@ -214,6 +215,103 @@ def cancel_booking(booking_id: int, db: Session = Depends(get_db), current_user:
     booking.status = "cancelled"
     db.commit()
     return {"status": "ok", "message": "Booking cancelled"}
+
+
+# --- Sync Check and Fix Endpoints ---
+@router.get("/sync/check")
+def sync_check(
+    limit: int = 100,
+    offset: int = 0,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(ADMIN_ONLY)
+) -> Dict[str, Any]:
+    """
+    Check synchronization status between backend DB and Supabase Auth.
+    Returns users that exist in backend but may not be properly synced to Supabase.
+    """
+    auth_service = AuthService(db)
+    
+    # Get users from backend
+    users_query = db.query(User).offset(offset).limit(limit)
+    users = users_query.all()
+    
+    results = []
+    for user in users:
+        supabase_check = auth_service.check_supabase_user_exists(str(user.email))
+        user_result = {
+            "id": user.id,
+            "email": user.email,
+            "firstName": user.firstName,
+            "lastName": user.lastName,
+            "role": user.role,
+            "is_active": user.is_active,
+            "sync_status": "synced" if supabase_check.get("exists") else "not_synced",
+            "supabase_check": supabase_check
+        }
+        results.append(user_result)
+    
+    out_of_sync = sum(1 for r in results if r["sync_status"] == "not_synced")
+    
+    return {
+        "total_checked": len(results),
+        "out_of_sync": out_of_sync,
+        "offset": offset,
+        "limit": limit,
+        "users": results
+    }
+
+
+@router.post("/sync/fix")
+def sync_fix(
+    user_ids: Optional[List[int]] = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(ADMIN_ONLY)
+) -> Dict[str, Any]:
+    """
+    Fix synchronization issues for specific users or all users.
+    Ensures users exist in Supabase Auth.
+    """
+    auth_service = AuthService(db)
+    
+    if user_ids:
+        # Fix specific users
+        users = db.query(User).filter(User.id.in_(user_ids)).all()
+    else:
+        # Fix all users
+        users = db.query(User).all()
+    
+    fixed_count = 0
+    errors = []
+    
+    for user in users:
+        try:
+            # We need the plaintext password to create the Supabase user.
+            # Since we only store hashes, we can't recreate the exact password.
+            # For OAuth users (random password), we just need to ensure they exist.
+            # For regular users, we would need them to log in first.
+            # Here we just check if they exist and log the result.
+            supabase_check = auth_service.check_supabase_user_exists(str(user.email))
+            if not supabase_check.get("exists"):
+                # Can't actually fix without password, but we can report
+                errors.append({
+                    "user_id": user.id,
+                    "email": user.email,
+                    "error": "User not in Supabase; needs login or manual sync"
+                })
+            else:
+                fixed_count += 1
+        except Exception as e:
+            errors.append({
+                "user_id": user.id,
+                "email": user.email,
+                "error": str(e)
+            })
+    
+    return {
+        "processed": len(users),
+        "already_synced": fixed_count,
+        "errors": errors
+    }
 
 
 # --- Dashboard Stats ---

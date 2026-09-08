@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Dict, Any
 import secrets
 import logging
 import httpx
@@ -23,6 +23,51 @@ class AuthService:
 
     def get_user_by_email(self, email: str) -> Optional[User]:
         return self.db.query(User).filter(User.email == email).first()
+
+    def check_supabase_user_exists(self, email: str) -> Dict[str, Any]:
+        """
+        Check whether a user exists in Supabase Auth.
+
+        Returns a dict with:
+            - email: the email checked
+            - exists: True if the user exists in Supabase Auth
+            - user_id: the Supabase user ID (or None)
+            - email_confirmed: whether the email is confirmed (or None)
+        """
+        result: Dict[str, Any] = {
+            "email": email,
+            "exists": False,
+            "user_id": None,
+            "email_confirmed": None,
+        }
+        if not settings.SUPABASE_URL or not settings.SUPABASE_SERVICE_ROLE_KEY:
+            result["error"] = "Supabase not configured on backend"
+            return result
+
+        headers = {
+            "Authorization": f"Bearer {settings.SUPABASE_SERVICE_ROLE_KEY}",
+            "apikey": settings.SUPABASE_SERVICE_ROLE_KEY,
+            "Content-Type": "application/json",
+        }
+        try:
+            resp = httpx.get(
+                f"{settings.SUPABASE_URL}/auth/v1/admin/users",
+                params={"email": email},
+                headers=headers,
+                timeout=15.0,
+            )
+            if resp.status_code == 200:
+                users = resp.json().get("users", [])
+                if users:
+                    user = users[0]
+                    result["exists"] = True
+                    result["user_id"] = user.get("id")
+                    result["email_confirmed"] = user.get("email_confirmed_at") is not None
+            else:
+                result["error"] = f"Supabase returned status {resp.status_code}: {resp.text}"
+        except httpx.HTTPError as e:
+            result["error"] = str(e)
+        return result
 
     def _create_supabase_user(self, email: str, password: str) -> None:
         """Create a user in Supabase Auth via the Admin API.

@@ -11,9 +11,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
-  const [selectRole, setSelectRole] = useState<'admin' | 'host' | 'guide' | 'content-writer'>(
-    'admin'
-  );
+  const [selectRole, setSelectRole] = useState<
+    'super-admin' | 'admin' | 'content-writer' | 'regional-head' | 'customer-support' | 'host' | 'guide'
+  >('admin');
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { token, role, setToken, setRole, setUser, setError, setLoading, error } = useAuthStore();
   const navigate = useNavigate();
@@ -93,10 +93,13 @@ export default function LoginPage() {
             value={selectRole}
             onChange={(e) => setSelectRole(e.target.value as any)}
           >
+            <option value="super-admin">Super Admin</option>
             <option value="admin">Admin</option>
+            <option value="content-writer">Content Writer</option>
+            <option value="regional-head">Regional Head</option>
+            <option value="customer-support">Customer Support</option>
             <option value="host">Host</option>
             <option value="guide">Guide</option>
-            <option value="content-writer">Contant Writer</option>
           </select>
         </div>
         <div className="space-y-2">
