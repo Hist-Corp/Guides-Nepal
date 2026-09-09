@@ -1,406 +1,169 @@
 # Development Setup Guide
 
-## Quick Start
-Get the Guides Nepal application running locally in under 10 minutes.
+Get the Guides Nepal platform running locally in under 10 minutes.
 
 ## Prerequisites
 
-### Required Software
-- **Node.js** 18+ and npm
-- **Python** 3.11+ and pip
-- **PostgreSQL** 15+
+- **Node.js** 18+ and npm (frontend, dashboard, tooling)
+- **Python** 3.11+ and pip (backend; developed against 3.13)
+- **PostgreSQL** 15+ locally, **or** a Supabase project (production database)
 - **Git**
+- Optional: **Docker**/Docker Compose, **Ollama** (local AI chat), **Playwright** browsers for E2E tests
 
-### Optional Software
-- **Docker** and Docker Compose (for containerized setup)
-- **Ollama** (for local AI chat)
+## Quick Start (automated)
 
-## Setup Methods
-
-### Method 1: Local Development (Recommended)
-
-#### 1. Clone Repository
 ```bash
-git clone https://github.com/your-username/guides-nepal.git
-cd guides-nepal
+git clone https://github.com/Hist-Corp/Guides-Nepal.git
+cd "Guides Nepal"
+npm run setup        # node scripts/setup.js — checks prerequisites, creates .env files, installs all deps
+npm run prepare      # installs husky git hooks
 ```
 
-#### 2. Frontend Setup
+## Manual Setup
+
+### 1. Frontend (public website — Vite + React)
+
 ```bash
-# Install dependencies
 cd frontend
 npm install
-
-# Start development server
-npm run dev
+cp .env.example .env   # see Environment section below
+npm run dev            # http://localhost:5175
 ```
 
-The frontend will be available at `http://localhost:5173` by default.
+### 2. Backend (FastAPI)
 
-#### 3. Backend Setup
 ```bash
-# Navigate to backend directory
 cd backend
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
+python -m venv .venv
+.venv\Scripts\activate          # Windows (bash: source .venv/bin/activate)
 pip install -r requirements.txt
-
-# Copy environment variables
 cp .env.example .env
+uvicorn app.main:app --reload    # http://localhost:8000
 ```
 
-#### 4. Database Setup
-```bash
-# Create database (PostgreSQL must be running)
-createdb guides_nepal
+The backend auto-creates missing tables on startup (`Base.metadata.create_all`).
+For managed migrations use Alembic: `alembic upgrade head` (see `backend/migrations/`).
+OpenAPI docs are available at `http://localhost:8000/api/v1/docs` when `ENV=development`.
 
-# Run migrations
-alembic upgrade head
+### 3. Dashboard (RBAC app — separate Vite app)
 
-# Seed initial data (optional)
-python scripts/seed_guides.py
-```
-
-#### 5. Start Backend Server
-```bash
-# Start FastAPI server (venv active)
-uvicorn app.main:app --reload
-```
-
-The backend will be available at `http://localhost:8000`.
-
-#### 6. Dashboard Setup (Optional)
 ```bash
 cd dashboard
 npm install
-npm run dev
+cp .env.example .env
+npm run dev            # http://localhost:5176
 ```
 
-The dashboard will typically run at `http://localhost:5174` or the next available port.
+### 4. Run everything at once
 
-### Method 2: Docker Setup
+From the repo root:
 
-#### 1. Clone Repository
 ```bash
-git clone https://github.com/your-username/guides-nepal.git
-cd guides-nepal
+npm run dev            # frontend + backend + dashboard via concurrently
 ```
 
-#### 2. Start with Docker Compose
+Also available: `start-all.bat` / `start-frontend.bat` / `start-backend.bat` / `start-dashboard.bat`, `run-project.ps1`, and a `Makefile`.
+
+### 5. Docker Compose (alternative)
+
 ```bash
-# Start all services
 docker compose up --build
 ```
 
-This will start:
-- Frontend: `http://localhost:5173`
-- Backend: `http://localhost:8000`
-- PostgreSQL: `localhost:5432`
+Starts: frontend http://localhost:5175, dashboard http://localhost:5176, backend http://localhost:8000, PostgreSQL http://localhost:5432 (user `postgres`, db `guides_nepal`).
 
-#### 3. Run Migrations
-```bash
-# In another terminal
-docker compose exec backend alembic upgrade head
-```
+## Environment Variables
 
-## Environment Configuration
+### backend/.env (see backend/.env.example)
 
-### Frontend (.env)
-```bash
-# Create .env file in frontend root
-cat > frontend/.env << EOF
-VITE_API_URL=http://localhost:8000
-EOF
-```
-
-### Backend (.env)
-```bash
-cat > backend/.env << EOF
-DATABASE_URL=postgresql://postgres:password@localhost:5432/guides_nepal
-SECRET_KEY=your-development-secret-key-minimum-32-characters
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/guides_nepal
+SECRET_KEY=your-development-secret-key
 ENV=development
-AI_PROVIDER=auto
+BACKEND_CORS_ORIGINS=http://localhost:5175,http://localhost:5176
+# AI chat (Maila Dai)
+AI_PROVIDER=auto            # auto | ollama | openai
 OLLAMA_URL=http://localhost:11434
 OLLAMA_MODEL=llama3.2:latest
-BACKEND_CORS_ORIGINS=http://localhost:5173,http://localhost:4173
-EOF
+OPENAI_API_KEY=
+# OAuth (optional)
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+FACEBOOK_CLIENT_ID=
+FACEBOOK_CLIENT_SECRET=
+# Supabase (password-reset email verification on the backend)
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+RESET_PASSWORD_REDIRECT_URL=http://localhost:5175/reset-password
 ```
 
-## Development Workflow
+Note: in production the backend refuses to start if `SECRET_KEY` is the dev placeholder, rejects non-HTTPS CORS origins, and disables the API docs. See [SECURITY.md](../SECURITY.md).
 
-### Frontend Development
+### frontend/.env (see frontend/.env.example)
+
+```env
+VITE_API_URL=http://localhost:8000
+FRONTEND_OAUTH_REDIRECT=http://localhost:5175/auth/callback
+VITE_GOOGLE_OAUTH_URL=http://localhost:8000/api/v1/auth/oauth/google/start
+VITE_FACEBOOK_OAUTH_URL=http://localhost:8000/api/v1/auth/oauth/facebook/start
+VITE_ENABLE_AI=true
+```
+
+### dashboard/.env (see dashboard/.env.example)
+
+```env
+VITE_SUPABASE_URL=https://your-supabase-url.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=your-supabase-publishable-key
+# VITE_API_BASE_URL=http://localhost:8000/api/v1
+# VITE_DEV_FAKE_LOGIN=0   # dev-only fake login; never enable in production
+```
+
+## Development Workflow (root scripts)
+
+The root `package.json` orchestrates all three packages:
+
 ```bash
-cd frontend
-
-# Start development server with hot reload
-npm run dev
-
-# Run linting
-npm run lint
-
-# Type checking
-npm run check
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+npm run dev                 # all services
+npm run build               # build frontend + dashboard + backend docker image
+npm run test                # vitest (frontend, dashboard) + pytest (backend)
+npm run test:e2e            # Playwright E2E suite (tests/e2e)
+npm run lint                # ESLint (frontend, dashboard) + ruff (backend)
+npm run format              # Prettier (frontend, dashboard) + black/ruff (backend)
+npm run typecheck           # tsc (frontend, dashboard) + mypy (backend)
+npm run clean               # remove dist/node_modules/venv caches
 ```
 
-### Dashboard Development
+Per-package testing:
+
 ```bash
-cd dashboard
-
-npm run dev       # Start dev server
-npm run lint      # Lint
-npm run typecheck # TypeScript type checking
-npm run build     # Production build
+cd frontend  && npm run test         # vitest
+cd dashboard && npm run test         # vitest
+cd backend   && pytest --cov=app     # pytest + coverage
 ```
 
-### Backend Development
-```bash
-cd backend
-source venv/bin/activate
-
-# Run all quality checks
-./scripts/run_checks.sh
-
-# Individual commands (venv active)
-black .                    # Code formatting
-ruff check .               # Linting
-mypy .                     # Type checking
-PYTHONPATH=. pytest        # Run tests
-
-# Start server with auto-reload
-uvicorn app.main:app --reload
-
-# Access API documentation
-open http://localhost:8000/docs
-```
-
-## Database Management
-
-### Create New Migration
-```bash
-cd backend
-alembic revision --autogenerate -m "Add new feature"
-```
-
-### Apply Migrations
-```bash
-alembic upgrade head
-```
-
-### Rollback Migration
-```bash
-alembic downgrade -1
-```
-
-### Database Reset (Development Only)
-```bash
-# Drop and recreate database
-dropdb guides_nepal
-createdb guides_nepal
-alembic upgrade head
-```
-
-## AI Chat Setup (Optional)
-
-### Local Ollama Setup
-```bash
-# Install Ollama (macOS)
-brew install ollama
-
-# Start Ollama
-ollama serve
-
-# Pull a model
-ollama pull llama3.2
-
-# Test the model
-ollama run llama3.2 "What is the capital of Nepal?"
-```
-
-### Verify AI Integration
-```bash
-# Test AI endpoint
-curl -X POST http://localhost:8000/api/v1/ai/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "What are the best places to visit in Kathmandu?"}'
-```
-
-## Testing
-
-### Frontend Testing
-```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run tests with coverage
-npm run test:coverage
-```
-
-### Backend Testing
-```bash
-cd backend
-
-# Run all tests
-pytest
-
-# Run specific test file
-pytest tests/test_main.py
-
-# Run with coverage
-pytest --cov=app
-```
-
-## Debugging
-
-### Frontend Debugging
-1. **Browser DevTools**: F12 → Console/Network tabs
-2. **React DevTools**: Install browser extension
-3. **Vite HMR Issues**: Check terminal for errors
-
-### Backend Debugging
-1. **API Errors**: Check terminal output
-2. **Database Issues**: Check PostgreSQL logs
-3. **Migration Errors**: Check Alembic output
-
-### Common Issues and Solutions
-
-#### Port Already in Use
-```bash
-# Find process using port 8000
-lsof -ti:8000
-
-# Kill the process
-kill -9 <PID>
-```
-
-#### Database Connection Issues
-```bash
-# Check PostgreSQL status
-brew services list | grep postgresql
-
-# Start PostgreSQL
-brew services start postgresql
-
-# Check connection
-psql -h localhost -U postgres -d guides_nepal
-```
-
-#### Node Modules Issues
-```bash
-# Clear cache and reinstall
-rm -rf node_modules package-lock.json
-npm install
-```
-
-#### Python Environment Issues
-```bash
-# Recreate virtual environment
-rm -rf backend/venv
-cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
+E2E specs live in `tests/e2e/specs/` (auth, dashboard, home-buttons, navigation) and run with Playwright.
 
 ## Code Quality
 
-### Frontend
-- **ESLint**: Enforces code style
-- **TypeScript**: Type safety
-- **Prettier**: Code formatting
+- **Frontend/Dashboard**: TypeScript strict, ESLint, Prettier (root `.prettierrc` + lint-staged via husky).
+- **Backend**: Black (format), Ruff (lint), Mypy (types), Bandit (security scan), pytest.
+- CI workflows in `.github/workflows/`: `frontend-ci.yml`, `dashboard-ci.yml`, `backend-ci.yml`.
+- Pre-commit hooks via husky + lint-staged run on staged files.
 
-### Backend
-- **Black**: Code formatting
-- **Ruff**: Linting
-- **MyPy**: Type checking
-- **Bandit**: Security analysis
+## Common Issues
 
-### Pre-commit Hooks
-```bash
-# Install pre-commit
-pip install pre-commit
+| Issue | Fix |
+|-------|-----|
+| Port already in use | Kill the process, or change the port in the respective `vite.config.ts` |
+| DB connection fails | Check `DATABASE_URL`; ensure PostgreSQL is running or use Supabase |
+| AI chat unavailable | Install Ollama and pull `llama3.2`, or set `OPENAI_API_KEY` |
+| Node modules broken | `rm -rf node_modules package-lock.json && npm install` |
+| Python env broken | Delete `backend/.venv` and recreate |
 
-# Install hooks
-pre-commit install
+## Documentation Map
 
-# Run manually
-pre-commit run --all-files
-```
-
-## Performance Optimization
-
-### Frontend
-- Use React.memo for expensive components
-- Implement lazy loading for routes
-- Optimize images with proper sizing
-- Use production builds for testing
-
-### Backend
-- Enable connection pooling
-- Use database indexes
-- Implement caching strategies
-- Monitor query performance
-
-## Security Best Practices
-
-### Development
-- Never commit secrets to repository
-- Use environment variables for sensitive data
-- Validate all inputs
-- Use HTTPS in production
-
-### Testing Security
-```bash
-# Backend security scan
-cd backend
-bandit -r app/
-
-# Check for secrets
-git secrets --scan
-```
-
-## Contributing Guidelines
-
-### Git Workflow
-1. Create feature branch: `git checkout -b feature/your-feature`
-2. Make changes with descriptive commits
-3. Run tests and quality checks
-4. Create pull request
-5. Code review and merge
-
-### Commit Message Format
-```
-type(scope): description
-
-feat(auth): add OAuth login
-fix(booking): resolve date validation issue
-docs(readme): update setup instructions
-```
-
-## Getting Help
-
-### Documentation
-- [Frontend README](../README.md)
-- [Backend Documentation](backend/docs/)
-- [API Documentation](API_DOCUMENTATION.md)
-
-### Community
-- Create GitHub issues for bugs
-- Join development discussions
-- Submit feature requests
-
----
-
-Happy coding! 🚀
+- [README.md](../README.md) — project overview, roles, API endpoints
+- [DEPLOYMENT.md](../DEPLOYMENT.md) — Vercel/Render/Supabase/Docker deployment
+- [SECURITY.md](../SECURITY.md) — security implementation and checklist
+- [ARCHITECTURE.md](./ARCHITECTURE.md), [FOLDER_STRUCTURE.md](./FOLDER_STRUCTURE.md) — codebase layout
+- `backend/docs/`, `dashboard/docs/`, `documents/` — deeper design docs

@@ -319,7 +319,8 @@ Guides Nepal/
 
 - Frontend: TypeScript strict mode, ESLint and Prettier configured
 - Backend: Use Black, Ruff, and Mypy for formatting and type checks
-- Run tests with pytest and frontend checks with `npm run check`
+- Run tests with pytest and frontend checks with 
+pm run check`
 
 ### AI Chat Providers
 - **Ollama** (recommended for local, privacy-friendly usage)
@@ -362,17 +363,14 @@ The users table includes the following fields:
 
 ## Deployment
 
-### Frontend
-Configure Vercel with build `npm run build` and output `dist`.
+Full instructions live in [DEPLOYMENT.md](./DEPLOYMENT.md).
 
-### Backend
-Render blueprint provided (render.yaml) — set environment variables and database.
-
-### Docker
-Containerized deployment supported:
-```bash
-docker-compose up -d
-```
+- **Frontend**: Vercel — root directory `frontend`, build 
+pm run build`, output `dist`.
+- **Dashboard**: Vercel (separate project) — root directory `dashboard`.
+- **Backend**: Render blueprint (`render.yaml`, Dockerfile at `backend/Dockerfile`), health check `/health`.
+- **Database**: Supabase PostgreSQL via `DATABASE_URL`.
+- **Docker**: `docker-compose up -d` starts db + backend + frontend + dashboard locally.
 
 ---
 
@@ -383,18 +381,30 @@ docker-compose up -d
 3. Commit changes with conventional commits
 4. Push and open a Pull Request
 
-Code quality: run `npm run check` and `npm run lint` (frontend). Backend checks: `cd backend && ./scripts/run_checks.sh`.
+Code quality: run 
+pm run check` and 
+pm run lint` (frontend). Backend checks: `cd backend && ./scripts/run_checks.sh`.
 
 ---
 
 ## Security
 
+The complete security guide and pre-deployment checklist live in [SECURITY.md](./SECURITY.md).
+
 - Do not commit secrets or .env files
-- Prefer HTTP-only secure cookies for JWT storage
-- Run security scans (Bandit) before production deploy
-- Default credentials are for development only - change them in production!
-- The system uses password hashing (bcrypt) for all user passwords
+- Password hashing (bcrypt) for all user passwords
 - JWT tokens with configurable expiration (default: 30 min access, 7 days refresh)
+- Production hard-fails: default `SECRET_KEY`, non-HTTPS CORS origins, dev seeding
+- Default credentials are for development only — change them in production!
+
+## Documentation Map
+
+- [DEPLOYMENT.md](./DEPLOYMENT.md) — Vercel/Render/Supabase/Docker deployment
+- [SECURITY.md](./SECURITY.md) — security implementation and checklist
+- [docs/](./docs/) — architecture, folder structure, development setup, API docs
+- [dashboard/docs/](./dashboard/docs/) — dashboard roles, routing, permissions, UX
+- [backend/docs/](./backend/docs/) — backend guides and API contract
+- [documents/](./documents/) — PRD and technical architecture
 
 ---
 
@@ -405,4 +415,4 @@ This project is licensed under MIT. See the LICENSE file for details.
 ---
 
 **Last updated:** 2026-09-09  
-**Version:** 1.0.1
+**Version:** 1.1.0

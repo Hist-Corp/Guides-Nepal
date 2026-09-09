@@ -10,6 +10,7 @@ Automated setup script for the development environment.
 
 ```bash
 node scripts/setup.js
+# or: npm run setup
 ```
 
 This script will:
@@ -20,6 +21,10 @@ This script will:
 5. Set up Python virtual environment and install backend dependencies
 6. Optionally set up the database
 7. Install git hooks
+
+### run-eslint.js
+
+Helper used to run ESLint consistently across workspace packages (used by lint tooling).
 
 ## Usage
 

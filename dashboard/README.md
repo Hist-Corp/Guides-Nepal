@@ -1,97 +1,76 @@
 # Guides Nepal — Dashboard
 
-Production-ready RBAC dashboard for Admin, Host, Guide, and Content Writer. The dashboard is isolated from the public website and consumes the existing backend APIs.
-
-This README documents local setup, development scripts, routing/roles, and next steps for wiring the UI to backend endpoints.
+RBAC dashboard for the staff roles of Guides Nepal: **Super Admin, Admin, Regional Head,
+Customer Support, Content Writer, Host, and Guide**. It is a separate Vite + React 18 + TypeScript
+app, isolated from the public website, and consumes the FastAPI backend (`/api/v1`).
 
 ## Quick start
 
-1. Install dependencies
-
 ```bash
 npm install
+cp .env.example .env     # set VITE_API_BASE_URL / Supabase values as needed
+npm run dev              # http://localhost:5176
 ```
 
-2. Run in development mode
+From the repo root you can also run 
+pm run dev:dashboard` (or 
+pm run dev` for all services).
 
-```bash
-npm run dev
-```
+## Environment (see .env.example)
 
-3. Open the app
+- `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`
+- `VITE_API_BASE_URL` — backend API base (defaults to `http://localhost:8000/api/v1` in dev)
+- `VITE_DEV_FAKE_LOGIN` — dev-only fake login toggle; never enable in production
 
-Visit: http://localhost:5174/dashboard
+## Roles & routing
 
-## Environment
+Each role has a dedicated area under `src/` with its own routes and guards:
 
-- Copy from `.env.example` (if present) to `.env` and provide any API URL or keys required for local development.
-- For local seeding of an admin user (development only) the repo contains a seeding script — see Scripts below. Do NOT commit real credentials.
+| Role | Area folder | Route prefix |
+|------|-------------|--------------|
+| Super Admin | `src/superadmin/` | `/super-admin/*` |
+| Admin | `src/admin/` | `/admin/*` |
+| Regional Head | `src/regionalhead/` | `/regional-head/*` |
+| Customer Support | `src/support/` | `/customer-support/*` |
+| Content Writer | `src/writer/` | `/content-writer/*` |
+| Host | `src/host/` | `/host/*` |
+| Guide | `src/guide/` | `/guide/*` |
 
-## Roles and routing
+Role definitions mirror the backend (`backend/app/core/roles.py`); route protection lives in
+`src/guards/`. Details: [docs/ROLES.md](./docs/ROLES.md), [docs/ROUTING.md](./docs/ROUTING.md),
+[docs/PERMISSIONS.md](./docs/PERMISSIONS.md), [docs/IA.md](./docs/IA.md),
+[docs/UX.md](./docs/UX.md), [docs/SCALABILITY.md](./docs/SCALABILITY.md).
 
-- Admin: `/dashboard/admin/*`
-- Host: `/dashboard/host/*`
-- Guide: `/dashboard/guide/*`
-- Content Writer: `/dashboard/content-writer/*`
+## Architecture
 
-See docs for details: [ROLES.md](./docs/ROLES.md), [ROUTING.md](./docs/ROUTING.md), [PERMISSIONS.md](./docs/PERMISSIONS.md)
-
-## Visual design & components
-
-Design intent:
-
-- Reference-style dashboard: hero greeting, KPI cards with deltas, charts, tasks, schedule
-- Reusable components: KPICard, Table, BarChart, DonutChart, Badge, SchedulePanel, Modal
-- Theme colors and tokens are defined in the Tailwind config
-
-See [UX.md](./docs/UX.md) and [IA.md](./docs/IA.md) for layout and information architecture.
-
-## Admin actions (UI-level)
-
-- Hosts: Add, Edit, Suspend, Promote, Remove
-- Guides: Add, Edit, Verify, Promote, Suspend, Remove
-- Content Writers: Add, Edit, Suspend, Remove
-
-All actions are implemented in the UI with modals and forms; they are currently wired to local UI state and mock data. The next step is to connect them to backend endpoints with proper RBAC.
-
-## Mock data
-
-Realistic datasets populate tables and charts to aid development and design. Mock data location:
-
-- `dashboard/src/mock/data.ts`
-
-If you need to extend the mock dataset, add entries there and update the UI fixtures.
+- `src/auth/`, `src/guards/` — authentication flows and per-role route protection
+- `src/components/`, `src/components/forms/` — reusable UI (KPICard, Table, BarChart, DonutChart, Badge, SchedulePanel, Modal) and form primitives
+- `src/layouts/` — dashboard shells
+- `src/services/` — typed API clients for the backend
+- `src/state/` — auth/role stores (Zustand)
+- `src/mock/` — development fixtures for tables and charts (`src/mock/data.ts`)
 
 ## Scripts
 
-- Typecheck: `npm run typecheck`
-- Dev: `npm run dev`
-- Seed admin (dev-only): `npm run seed:admin`
-
-Note: `scripts/seed-admin.js` contains a dev password for local seeding. Do not use this in production; keep `.env` secrets safe.
-
-## Testing & type-safety
-
-- The project includes TypeScript types for components and APIs. Run the type checker before opening a PR: `npm run typecheck`.
-
-## Contribution and workflow
-
-- Use feature branches and create pull requests against the repository default branch.
-- Keep UI changes confined to the `dashboard` package when possible.
-- Add unit tests or component storybook entries for new shared components.
+```bash
+npm run dev          # dev server on port 5176
+npm run build        # type-check + production build
+npm run typecheck    # tsc --noEmit
+npm run lint         # ESLint
+npm run test         # Vitest
+npm run test:coverage
+npm run seed:admin   # dev-only admin seeding (scripts/seed-admin.js) — never run against production
+```
 
 ## Security & secrets
 
 - Never commit production credentials or `.env` files.
-- Local seed scripts are only for development and must not run against production systems.
+- The seed script contains a dev password for local seeding only.
+- The backend enforces the same role model server-side; dashboard guards are UX, not the security boundary.
 
-## Next steps
+## Contribution
 
-- Wire Admin actions to backend endpoints with RBAC enforcement
-- Add filters, search, and pagination on data tables
-- Add export and bulk actions with confirmation modals
-- Add E2E tests for core admin flows
-
----
-
-If you want any specific content added (installation with Docker, CI steps, or sample screenshots), tell me what to include and I will update this file.
+- Feature branches + PRs against the default branch; keep UI changes in the `dashboard` package.
+- Run 
+pm run typecheck && npm run lint && npm run test` before opening a PR.
+- Add/extend Vitest tests in `src/test/` for new shared components.
