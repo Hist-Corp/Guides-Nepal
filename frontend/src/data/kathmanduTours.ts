@@ -9,7 +9,7 @@ export const kathmanduTours = [
     type: "Food tours",
     price: 46.19,
     description: "Ready to taste the best food in Kathmandu? Satisfy your cravings for local food and culture with highlights along the way, together with a foodie host. Enjoy 10 delicious and typical tastings that range from sweet to savory as well as drinks on a tasty food tour in Kathmandu.",
-    image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=1740&q=80",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Momo_nepal.jpg/960px-Momo_nepal.jpg",
     locals: ["Apicha", "Nok"]
   },
   {
@@ -22,7 +22,7 @@ export const kathmanduTours = [
     type: "Food tours",
     price: 35.00,
     description: "Want to get a real local taste of Kathmandu? Give it a taste and find out on this street food private tour in Kathmandu! Join a local host expert in food and culture on a tour that will satisfy your cultural cravings for street food with tastings, history, and highlights.",
-    image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=1740&q=80",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Momo_nepal.jpg/960px-Momo_nepal.jpg",
     locals: ["Jojo", "Araya"]
   },
   {
@@ -35,7 +35,7 @@ export const kathmanduTours = [
     type: "City highlight tours",
     price: 49.21,
     description: "Want to see the best of Kathmandu? We got you covered. But as you can expect from a Guides Nepal experience, the real excitement is its hidden gems. Join your favorite local and get a feeling of the city's real vibe on a tour that has it all, so you can say: I experienced the real Kathmandu!",
-    image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=1740&q=80",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Three_saddhus_at_Kathmandu_Durbar_Square.jpg/960px-Three_saddhus_at_Kathmandu_Durbar_Square.jpg",
     locals: ["Artty", "Sammy"]
   },
   {
@@ -48,7 +48,7 @@ export const kathmanduTours = [
     type: "City highlight tours",
     price: 37.50,
     description: "You've probably heard that Kathmandu is well-known for Buddhism and its monks, but do you know the stories and origin behind it? Or how much influence it has on the locals daily life? On this private city tour, you are in for a cultural treat!",
-    image: "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Boudha_Stupa_2018_04.jpg/960px-Boudha_Stupa_2018_04.jpg",
     locals: ["Piyawee", "Jida"]
   },
   {
@@ -61,7 +61,7 @@ export const kathmanduTours = [
     type: "Food tours",
     price: 41.50,
     description: "Picture this, a night out in Kathmandu hopping from hot spot to hot spot, discovering local nightlife while tasting typical local drinks perfectly paired with delicious local bites. Sounds like a fun night? Join a local nightlife expert and discover how the locals unwind in Kathmandu.",
-    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1740&q=80",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Dal_bhat.jpg/960px-Dal_bhat.jpg",
     locals: ["Apicha", "Nok"]
   },
   {
@@ -87,7 +87,7 @@ export const kathmanduTours = [
     type: "Day trips",
     price: 112.00,
     description: "Embark on a Ancient city of Bhaktapur day trip outside of Kathmandu where many treasures, insights, and stories are waiting. Let a local host show you around and experience this cultural attraction from a local perspective. Give yourself the gift of a Bhaktapur day trip with a local - it's a must-do!",
-    image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1740&q=80",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Historic_Pagoda_Style_Architecture_in_Kathmandu_Durbar_Square-IMG_4069.jpg/960px-Historic_Pagoda_Style_Architecture_in_Kathmandu_Durbar_Square-IMG_4069.jpg",
     locals: ["Natcha", "Jojo"]
   },
   {
@@ -100,7 +100,7 @@ export const kathmanduTours = [
     type: "Food tours",
     price: 28.39,
     description: "The way to a city's heart it's through its food! And on this private food tour, you'll get to know Kathmandu through its cuisine and the tastings favorite of the locals. A local food expert is ready to give you a taste of the real Kathmandu satisfying your cravings for local food and city highlights.",
-    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1740&q=80",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Dal_bhat.jpg/960px-Dal_bhat.jpg",
     locals: ["Nakarin", "Jojo"]
   },
   {
@@ -113,7 +113,7 @@ export const kathmanduTours = [
     type: "City highlight tours",
     price: 75.71,
     description: "Ready for a jam-packed tour, full of history, culture, stories, and sights? Checkmark from your travel bucket list all your must-sees of Kathmandu, because if there's a Guides Nepal tour that shows you all the city's ins and outs, it's this complete and personalized tour of Kathmandu.",
-    image: "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1740&q=80",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Kathmandu_Durbar_Square%2C_Shiva_Parvati_Temple%2C_Nepal_%28edit%29.jpg/960px-Kathmandu_Durbar_Square%2C_Shiva_Parvati_Temple%2C_Nepal_%28edit%29.jpg",
     locals: ["Agrindra", "Araya"]
   },
   {

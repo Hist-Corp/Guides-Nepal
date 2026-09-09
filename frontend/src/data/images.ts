@@ -1,4 +1,4 @@
-// Central place for frontend imagery.
+﻿// Central place for frontend imagery.
 //
 // Every image is a real, verified (HTTP 200) Unsplash photo URL with
 // Nepal-relevant subject matter (Himalayas, temples, lakes, trekking,
@@ -53,13 +53,38 @@ export const NEPAL_IMAGES = {
   placeholder: '/images/placeholder.svg',
 };
 
+
+const W = 'https://upload.wikimedia.org/wikipedia/commons';
+const T = (p: string, f: string) => `${W}/thumb/${p}/${f}/960px-${f}`;
+
+// Real photos of the actual landmarks (Wikimedia Commons, free licenses).
+// NOTE: Wikimedia rate-limits rapid automated requests (HTTP 429) but these
+// load fine in a browser.
+export const WIKI_IMAGES = {
+  // Kathmandu landmarks
+  kathmanduDurbar: T('c/ce', 'Three_saddhus_at_Kathmandu_Durbar_Square.jpg'),
+  shivaParvatiTemple: T('c/c4', 'Kathmandu_Durbar_Square%2C_Shiva_Parvati_Temple%2C_Nepal_%28edit%29.jpg'),
+  pagodaArchitecture: T('6/69', 'Historic_Pagoda_Style_Architecture_in_Kathmandu_Durbar_Square-IMG_4069.jpg'),
+  swayambhu: T('4/4d', 'Swayambhu%2C_Kathmandu%2C_Nepal.jpg'),
+  boudhanath: T('4/44', 'Boudha_Stupa_2018_04.jpg'),
+  thamel: T('2/2c', 'Thamel_Kathmandu_Nepal.jpg'),
+  momos: T('a/a1', 'Momo_nepal.jpg'),
+  dalBhat: T('c/cd', 'Dal_bhat.jpg'),
+  // Lalitpur (Patan) landmarks
+  patanDurbarSquare: T('1/1f', 'Nepal_Patan_Durbar_Square_10_%28full_res%29.jpg'),
+  patanEvening: T('1/17', 'Patan_Durbar_Square-2644.jpg'),
+  patanBhimsen: T('5/59', 'Patan_Bhimsen_Temple_Patan_Durbar_Square_Patan_Lalitpur_Nepal_Rajesh_Dhungana_%283%29.jpg'),
+  patanBhimsen8: T('b/b8', 'Patan_Bhimsen_Temple_Patan_Durbar_Square_Patan_Lalitpur_Nepal_Rajesh_Dhungana_%288%29.jpg'),
+  patanBhimsen7: T('d/de', 'Patan_Bhimsen_Temple_Patan_Durbar_Square_Patan_Lalitpur_Nepal_Rajesh_Dhungana_%287%29.jpg'),
+};
+
 export const CITY_IMAGES: Record<string, string[]> = {
-  kathmandu: [NEPAL_IMAGES.oldTown, NEPAL_IMAGES.temples, NEPAL_IMAGES.boudhanath, NEPAL_IMAGES.heritage, NEPAL_IMAGES.streetFood],
+  kathmandu: [WIKI_IMAGES.kathmanduDurbar, WIKI_IMAGES.shivaParvatiTemple, WIKI_IMAGES.pagodaArchitecture, WIKI_IMAGES.swayambhu, WIKI_IMAGES.boudhanath, WIKI_IMAGES.thamel],
+  lalitpur: [WIKI_IMAGES.patanDurbarSquare, WIKI_IMAGES.patanEvening, WIKI_IMAGES.patanBhimsen, WIKI_IMAGES.patanBhimsen8, WIKI_IMAGES.patanBhimsen7],
   pokhara: [NEPAL_IMAGES.phewaLake, NEPAL_IMAGES.annapurna, NEPAL_IMAGES.mountainLake, NEPAL_IMAGES.paragliding, NEPAL_IMAGES.hero],
-  lalitpur: [NEPAL_IMAGES.heritage, NEPAL_IMAGES.temples, NEPAL_IMAGES.oldTown, NEPAL_IMAGES.newariFeast, NEPAL_IMAGES.cookingClass],
-  bhaktapur: [NEPAL_IMAGES.oldTown, NEPAL_IMAGES.heritage, NEPAL_IMAGES.streetFood, NEPAL_IMAGES.foodSpread, NEPAL_IMAGES.temples],
+  bhaktapur: [WIKI_IMAGES.pagodaArchitecture, NEPAL_IMAGES.oldTown, NEPAL_IMAGES.heritage, WIKI_IMAGES.momos, NEPAL_IMAGES.foodSpread],
   bharatpur: [NEPAL_IMAGES.forestHills, NEPAL_IMAGES.mistyHills, NEPAL_IMAGES.portraitGirl, NEPAL_IMAGES.trekking, NEPAL_IMAGES.everest],
-  default: [NEPAL_IMAGES.hero, NEPAL_IMAGES.annapurna, NEPAL_IMAGES.everest, NEPAL_IMAGES.phewaLake, NEPAL_IMAGES.boudhanath],
+  default: [NEPAL_IMAGES.hero, NEPAL_IMAGES.annapurna, NEPAL_IMAGES.everest, NEPAL_IMAGES.phewaLake, WIKI_IMAGES.boudhanath],
 };
 
 export const img = (file: string) => `/images/nepal/${file}`;
@@ -70,3 +95,4 @@ export const cityImages = (city: string): string[] => {
 };
 
 export default NEPAL_IMAGES;
+

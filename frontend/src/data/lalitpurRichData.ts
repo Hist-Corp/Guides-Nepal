@@ -6,10 +6,10 @@ export const lalitpurRichData: RichExperienceData[] = [
     id: 201,
     slug: 'patans-hidden-courtyards',
     title: "Patan's Hidden Courtyards & Arts",
-    heroImage: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400",
+    heroImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Nepal_Patan_Durbar_Square_10_%28full_res%29.jpg/960px-Nepal_Patan_Durbar_Square_10_%28full_res%29.jpg",
     host: {
       name: "Sujal",
-      image: "https://images.unsplash.com/photo-1516594798947-e65505dbb29d?w=400",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
       type: "History & Culture Buff"
     },
     guides: [allGuides[1], allGuides[0]], // Sujal & Apicha
@@ -41,10 +41,10 @@ export const lalitpurRichData: RichExperienceData[] = [
     id: 202,
     slug: 'authentic-newari-feast-lalitpur',
     title: "Authentic Newari Feast in Lalitpur",
-    heroImage: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400",
+    heroImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Momo_nepal.jpg/960px-Momo_nepal.jpg",
     host: {
       name: "Apicha",
-      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400",
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
       type: "Foodie & Local Expert"
     },
     guides: [allGuides[0], allGuides[3]], // Apicha & Rohan
