@@ -2,6 +2,7 @@ import React from 'react';
 import { Card } from '../common/Card';
 import { SafeImage } from '../common/SafeImage';
 import { NEPAL_IMAGES } from '../../data/images';
+import { useCmsSection } from '../../hooks/useCms';
 
 // Nepal cities with reasonable, verified imagery:
 // Kathmandu/Bhaktapur/Lalitpur -> heritage temples & old towns
@@ -31,11 +32,14 @@ const testimonials = [
 ];
 
 export const Testimonials: React.FC = () => {
+  const cms = useCmsSection('home', 'home-testimonials');
+  const heading = cms?.content?.heading || 'Travelers love our locals';
+  const subtitle = cms?.content?.subtitle || 'Real reviews from real travelers in Nepal';
   return (
-    <section className="py-16 bg-[#E0F2FE]">
+    <section data-cms-id="home-testimonials" data-cms-label="Testimonials" className="py-16 bg-[#E0F2FE]">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-primary text-center mb-2">Travelers love our locals</h2>
-        <p className="text-center text-slate-600 mb-12">Real reviews from real travelers in Nepal</p>
+        <h2 className="text-3xl font-bold text-primary text-center mb-2">{heading}</h2>
+        <p className="text-center text-slate-600 mb-12">{subtitle}</p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {testimonials.map((testimonial) => (

@@ -9,6 +9,8 @@ import {
 import { lalitpurRichData } from '../../data/lalitpurRichData';
 import { Guide } from '../../data/types';
 
+import { ExperienceCurrencyConverter } from '../../components/common/ExperienceCurrencyConverter';
+
 const ReadMoreText = ({ 
   text, 
   limit = 150, 
@@ -441,6 +443,7 @@ const LalitpurExperiencePage: React.FC = () => {
                     </button>
                     <p id="booking-info-message" className="text-center text-xs font-medium hidden transition-all duration-300"></p>
                     <p className="text-center text-xs text-gray-500 font-medium">You won't be charged yet</p>
+                    <ExperienceCurrencyConverter price={pricePerPerson} />
                   </div>
 
                   <div className="space-y-3 pt-6">

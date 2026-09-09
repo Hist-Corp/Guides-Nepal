@@ -7,6 +7,7 @@ import {
   Globe, X, Heart, User 
 } from 'lucide-react';
 import { kathmanduRichData, Guide } from '../../data/kathmanduRichData';
+import { ExperienceCurrencyConverter } from '../../components/common/ExperienceCurrencyConverter';
 
 const ReadMoreText = ({ 
   text, 
@@ -463,6 +464,7 @@ const KathmanduExperiencePage: React.FC = () => {
                     </button>
                     <p id="booking-info-message" className="text-center text-xs font-medium hidden transition-all duration-300"></p>
                     <p className="text-center text-xs text-gray-500 font-medium">You won't be charged yet</p>
+                    <ExperienceCurrencyConverter price={pricePerPerson} />
                   </div>
 
                   {/* Price Breakdown */}

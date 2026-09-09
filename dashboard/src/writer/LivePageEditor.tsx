@@ -40,6 +40,7 @@ const FIELD_GROUPS: Record<string, { key: string; label: string; type: string }[
   text: [
     { key: 'image', label: 'Section Image', type: 'image' },
     { key: 'heading', label: 'Heading', type: 'text' },
+    { key: 'subtitle', label: 'Subtitle', type: 'textarea' },
     { key: 'body', label: 'Body Text', type: 'textarea' },
   ],
   contact: [
@@ -48,13 +49,43 @@ const FIELD_GROUPS: Record<string, { key: string; label: string; type: string }[
     { key: 'phone', label: 'Phone', type: 'text' },
     { key: 'address', label: 'Address', type: 'text' },
   ],
+  // --- Granular element types (auto-adopted from the live preview) ---
+  heading: [{ key: 'heading', label: 'Text', type: 'text' }],
+  paragraph: [{ key: 'body', label: 'Text', type: 'textarea' }],
+  listitem: [{ key: 'body', label: 'Text', type: 'textarea' }],
+  quote: [{ key: 'body', label: 'Text', type: 'textarea' }],
+  image: [
+    { key: 'image', label: 'Image', type: 'image' },
+    { key: 'alt', label: 'Alt Text', type: 'text' },
+  ],
+  button: [
+    { key: 'buttonText', label: 'Button Text', type: 'text' },
+    { key: 'link', label: 'Link URL', type: 'text' },
+  ],
+  link: [
+    { key: 'buttonText', label: 'Link Text', type: 'text' },
+    { key: 'link', label: 'Link URL', type: 'text' },
+  ],
 };
+
+// Element kinds selectable in the live preview map 1:1 to these types.
+const ELEMENT_KIND_TYPES = ['heading', 'paragraph', 'listitem', 'quote', 'image', 'button', 'link'];
+
+// Only page-level section types are offered in the "+ Add Section" dropdown.
+const PAGE_SECTION_TYPES = ['hero', 'featured', 'promo', 'categories', 'testimonials', 'values', 'footer', 'text', 'contact'];
 const STYLE_FIELDS = [
   { key: 'backgroundColor', label: 'Background Color', type: 'color' },
   { key: 'textColor', label: 'Text Color', type: 'color' },
   { key: 'accentColor', label: 'Accent Color', type: 'color' },
   { key: 'alignment', label: 'Alignment', type: 'select', options: ['left', 'center', 'right'] },
   { key: 'headingSize', label: 'Heading Size', type: 'text' },
+  { key: 'fontSize', label: 'Font Size', type: 'text' },
+  {
+    key: 'fontWeight',
+    label: 'Font Weight',
+    type: 'select',
+    options: ['', 'normal', '500', '600', '700', '800', 'bold'],
+  },
   { key: 'padding', label: 'Padding', type: 'text' },
 ];
 
@@ -227,10 +258,12 @@ export default function LivePageEditor({
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [toast, setToast] = useState('');
+  const pendingAdoptions = useRef<Set<string>>(new Set());
   const [newType, setNewType] = useState('hero');
   // When the real frontend page path is known, preview the exact real page
   // inside an iframe (click-to-edit); otherwise fall back to the replica.
   const [previewMode, setPreviewMode] = useState<'real' | 'replica'>(path ? 'real' : 'replica');
+  const [realPageStatus, setRealPageStatus] = useState<'loading' | 'ready' | 'failed'>('loading');
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const previewUrl = `${FRONTEND_URL}${path || '/'}?cms_edit=1&cms_slug=${encodeURIComponent(slug)}`;
 
@@ -242,18 +275,41 @@ export default function LivePageEditor({
   useEffect(() => {
     const onMessage = (e: MessageEvent) => {
       const data = e.data || {};
+      if (data.type === 'cms-page-loaded') {
+        setRealPageStatus('ready');
+      }
       if (data.type === 'cms-section-click') {
         const match = sections.find((s) => s.id === data.id);
+        showToast(`Selected: ${data.label || data.id}`);
         if (match) {
-          setSelected(match);
-        } else {
-          showToast(`Section "${data.label || data.id}" is not part of this page template yet`);
+          handleSelect(match);
+        } else if (data.id) {
+          adoptUnknownSection(data.id, data.label, data.kind);
         }
       }
     };
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
   }, [sections]);
+
+  // If the real page does not announce itself (frontend not running, deploy
+  // without the edit bridge, etc.), fall back to the replica automatically
+  // instead of showing an eternal blank preview.
+  useEffect(() => {
+    if (previewMode !== 'real') return;
+    setRealPageStatus('loading');
+    const timeout = setTimeout(() => {
+      setRealPageStatus((status) => {
+        if (status !== 'ready') {
+          setPreviewMode('replica');
+          showToast('Real page preview unavailable — switched to replica preview');
+          return 'failed';
+        }
+        return status;
+      });
+    }, 7000);
+    return () => clearTimeout(timeout);
+  }, [previewMode, previewUrl]);
 
   // Tell the embedded real page to re-fetch CMS content after a save
   const refreshRealPreview = () => {
@@ -309,6 +365,55 @@ export default function LivePageEditor({
       content: { ...section.content },
       style: { ...(section.style || {}) },
     });
+  };
+
+  /**
+   * Any section clicked in the live preview that is not yet part of the
+   * saved page template is adopted automatically: a matching editable
+   * section is created, persisted, and opened in the editor, so every
+   * section of the real page is fully editable via the dashboard.
+   */
+  const adoptUnknownSection = (id: string, label?: string, kind?: string) => {
+    // Never block selection on the network: adopt optimistically, persist in
+    // the background, and only skip if this exact element is already being
+    // adopted (prevents duplicate sections from double clicks).
+    if (pendingAdoptions.current.has(id)) return;
+    pendingAdoptions.current.add(id);
+    const title = label || 'Element';
+    // Granular elements (headings, paragraphs, images, buttons, links,
+    // list items, quotes) get a kind-specific editor; anything else falls
+    // back to the generic text section editor.
+    const type =
+      kind && ELEMENT_KIND_TYPES.includes(kind) ? kind : 'text';
+    const contentByType: Record<string, any> = {
+      heading: { heading: title },
+      paragraph: { body: title },
+      listitem: { body: title },
+      quote: { body: title },
+      image: { image: '', alt: title },
+      button: { buttonText: title, link: '' },
+      link: { buttonText: title, link: '' },
+      text: { heading: title, subtitle: '', body: '' },
+    };
+    const newSection: any = {
+      id,
+      title,
+      type,
+      content: contentByType[type] || contentByType.text,
+      style: {
+        backgroundColor: SECTION_BG[type] || '#ffffff',
+        textColor: '#213448',
+        alignment: 'center',
+      },
+    };
+    const next = [...sections, newSection];
+    setSections(next);
+    handleSelect(newSection);
+    setDirty(true);
+    updateAllSections(slug, next)
+      .then(() => showToast(`"${title}" added — edit it and press Save Changes`))
+      .catch(() => showToast('Section selected — press Save Changes to keep it'))
+      .finally(() => pendingAdoptions.current.delete(id));
   };
 
   const addItem = (field: string) => {
@@ -415,7 +520,7 @@ export default function LivePageEditor({
             onChange={(e) => setNewType(e.target.value)}
             className="text-sm text-darkBlue rounded-lg px-2 py-1.5"
           >
-            {Object.keys(FIELD_GROUPS).map((t) => (
+            {PAGE_SECTION_TYPES.map((t) => (
               <option key={t} value={t}>
                 {t}
               </option>
@@ -478,12 +583,20 @@ export default function LivePageEditor({
               )}
             </div>
             {previewMode === 'real' && path ? (
-              <iframe
-                ref={iframeRef}
-                src={previewUrl}
-                title={`Live preview of ${title}`}
-                className="flex-1 w-full border-0"
-              />
+              <div className="relative flex-1">
+                <iframe
+                  ref={iframeRef}
+                  src={previewUrl}
+                  title={`Live preview of ${title}`}
+                  className="flex-1 w-full border-0 h-full"
+                />
+                {realPageStatus === 'loading' && (
+                  <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center gap-3">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-darkBlue"></div>
+                    <p className="text-xs text-gray-500">Loading real page preview…</p>
+                  </div>
+                )}
+              </div>
             ) : sections.length === 0 ? (
               <div className="text-center text-gray-400 py-16">
                 No sections yet. Add one with the button above.
@@ -653,6 +766,7 @@ export default function LivePageEditor({
 
 function getStylePlaceholder(key: string): string {
   if (key === 'headingSize') return '2rem (e.g., 1.5rem, 2em)';
+  if (key === 'fontSize') return '1rem (e.g., 0.875rem, 1.25em)';
   if (key === 'padding') return '2.5rem (e.g., 1rem 2rem)';
   return '';
 }

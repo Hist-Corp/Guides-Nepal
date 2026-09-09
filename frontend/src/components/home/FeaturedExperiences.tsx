@@ -5,6 +5,7 @@ import { Button } from '../common/Button';
 import { SafeImage } from '../common/SafeImage';
 import { NEPAL_IMAGES } from '../../data/images';
 import { Star } from 'lucide-react';
+import { useCmsSection } from '../../hooks/useCms';
 
 const experiences = [
   {
@@ -51,6 +52,9 @@ const experiences = [
 
 export const FeaturedExperiences: React.FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const cms = useCmsSection('home', 'home-featured');
+  const heading = cms?.content?.heading || 'Go local in Charming Cities';
+  const subtitle = cms?.content?.subtitle || 'Find unforgettable experiences with locals';
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -66,12 +70,12 @@ export const FeaturedExperiences: React.FC = () => {
   };
 
   return (
-    <section id="featured-experiences" className="py-16 bg-white">
+    <section id="featured-experiences" data-cms-id="home-featured" data-cms-label="Featured" className="py-16 bg-white">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-end mb-8">
            <div>
-              <h2 className="text-xl font-bold text-primary mb-1">Go local in Charming Cities</h2>
-              <p className="text-slate-500 text-sm">Find unforgettable experiences with locals</p>
+              <h2 className="text-xl font-bold text-primary mb-1">{heading}</h2>
+              <p className="text-slate-500 text-sm">{subtitle}</p>
            </div>
            <div className="flex gap-2">
               <button 

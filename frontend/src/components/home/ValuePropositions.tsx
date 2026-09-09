@@ -1,5 +1,6 @@
 import React from 'react';
 import { UserCheck, Sliders, Heart } from 'lucide-react';
+import { useCmsSection } from '../../hooks/useCms';
 
 const features = [
   {
@@ -20,11 +21,13 @@ const features = [
 ];
 
 export const ValuePropositions: React.FC = () => {
+  const cms = useCmsSection('home', 'home-values');
+  const heading = cms?.content?.heading || 'Why guides-nepal?';
   return (
-    <section className="py-20 bg-white">
+    <section data-cms-id="home-values" data-cms-label="Why us" className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-xl font-bold text-primary mb-2">Why guides-nepal?</h2>
+          <h2 className="text-xl font-bold text-primary mb-2">{heading}</h2>
           <h3 className="text-3xl font-bold text-slate-800">The best way to travel is like a local.</h3>
         </div>
 

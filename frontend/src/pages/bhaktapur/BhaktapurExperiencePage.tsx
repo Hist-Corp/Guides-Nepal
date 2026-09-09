@@ -9,6 +9,8 @@ import {
 import { bhaktapurRichData } from '../../data/bhaktapurRichData';
 import { Guide } from '../../data/kathmanduRichData'; // Reuse Guide type or import from shared types if available
 
+import { ExperienceCurrencyConverter } from '../../components/common/ExperienceCurrencyConverter';
+
 const ReadMoreText = ({ 
   text, 
   limit = 150, 
@@ -463,6 +465,7 @@ const BhaktapurExperiencePage: React.FC = () => {
                     </button>
                     <p id="booking-info-message" className="text-center text-xs font-medium hidden transition-all duration-300"></p>
                     <p className="text-center text-xs text-gray-500 font-medium">You won't be charged yet</p>
+                    <ExperienceCurrencyConverter price={pricePerPerson} />
                   </div>
 
                   {/* Price Breakdown */}

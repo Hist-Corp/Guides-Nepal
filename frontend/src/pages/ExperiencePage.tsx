@@ -8,7 +8,6 @@ import { useBookingStore } from '../store/bookingStore';
 import { useAuthStore } from '../store/authStore';
 import { useProfileStore } from '../store/profileStore';
 import guidesApi from '../services/guidesApi';
-import { convertCurrency, formatCurrency } from '../utils/currencyConverter';
 import { CurrencyConverterModal } from '../components/common/CurrencyConverterModal';
 
 interface Host {
@@ -264,24 +263,6 @@ const ExperiencePage: React.FC = () => {
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [bookmarkSaved, setBookmarkSaved] = useState(false);
 
-  // Inline currency converter state
-  const [fromCurrency, setFromCurrency] = useState('EUR');
-  const [toCurrency, setToCurrency] = useState('USD');
-  const [amount, setAmount] = useState('');
-  const [convertedAmount, setConvertedAmount] = useState('');
-
-  const handleCurrencyConvert = () => {
-    if (!amount || isNaN(Number(amount))) return;
-    
-    try {
-      const result = convertCurrency(Number(amount), fromCurrency, toCurrency);
-      const formattedResult = formatCurrency(result, toCurrency);
-      setConvertedAmount(formattedResult);
-    } catch {
-      setConvertedAmount('Conversion failed');
-    }
-  };
-
   const handleBooking = () => {
     if (!isAuthenticated) {
       alert('Please log in to book an experience');
@@ -446,100 +427,6 @@ const ExperiencePage: React.FC = () => {
                           </li>
                        ))}
                     </ul>
-                 </div>
-
-                 {/* Inline Currency Converter Section */}
-                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border-2 border-blue-300 shadow-lg mt-8 mb-8">
-                    <div className="flex items-center gap-3 mb-6">
-                       <DollarSign className="w-8 h-8 text-blue-600" />
-                       <div>
-                          <h2 className="text-2xl font-bold text-blue-900">Currency Converter</h2>
-                          <p className="text-blue-700 text-sm">Convert prices to your preferred currency</p>
-                       </div>
-                       <span className="bg-blue-600 text-white text-xs px-3 py-1 rounded-full ml-auto">NEW</span>
-                    </div>
-                    
-                    <div className="bg-white p-4 rounded-xl border border-blue-200 mb-4">
-                       <div className="grid grid-cols-2 gap-3 mb-3">
-                          <div>
-                             <label className="block text-xs font-medium text-gray-700 mb-1">From</label>
-                             <select 
-                                value={fromCurrency}
-                                onChange={(e) => setFromCurrency(e.target.value)}
-                                className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                             >
-                                <option value="EUR">EUR €</option>
-                                <option value="USD">USD $</option>
-                                <option value="GBP">GBP £</option>
-                                <option value="NPR">NPR ₨</option>
-                             </select>
-                          </div>
-                          <div>
-                             <label className="block text-xs font-medium text-gray-700 mb-1">To</label>
-                             <select 
-                                value={toCurrency}
-                                onChange={(e) => setToCurrency(e.target.value)}
-                                className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                             >
-                                <option value="USD">USD $</option>
-                                <option value="EUR">EUR €</option>
-                                <option value="GBP">GBP £</option>
-                                <option value="NPR">NPR ₨</option>
-                             </select>
-                          </div>
-                       </div>
-                       <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">Amount</label>
-                          <input 
-                             type="number" 
-                             value={amount}
-                             onChange={(e) => setAmount(e.target.value)}
-                             placeholder="Enter amount" 
-                             className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          />
-                       </div>
-                    </div>
-
-                    {convertedAmount && (
-                        <div className="bg-blue-100 p-4 rounded-lg mb-4 border border-blue-200">
-                           <p className="text-blue-800 font-bold text-lg">{convertedAmount}</p>
-                           <p className="text-blue-600 text-xs">Exchange rate may vary</p>
-                        </div>
-                     )}
-
-                     <div className="grid grid-cols-2 gap-2 mb-4">
-                        <button 
-                           onClick={() => { setAmount(experience.price.toString()); setFromCurrency('EUR'); setToCurrency('USD'); }}
-                           className="bg-white hover:bg-blue-50 text-blue-700 py-2 px-3 rounded-lg transition-colors text-sm font-medium border border-blue-200"
-                        >
-                           € → $
-                        </button>
-                        <button 
-                           onClick={() => { setAmount(experience.price.toString()); setFromCurrency('USD'); setToCurrency('EUR'); }}
-                           className="bg-white hover:bg-blue-50 text-blue-700 py-2 px-3 rounded-lg transition-colors text-sm font-medium border border-blue-200"
-                        >
-                           $ → €
-                        </button>
-                        <button 
-                           onClick={() => { setAmount(experience.price.toString()); setFromCurrency('EUR'); setToCurrency('GBP'); }}
-                           className="bg-white hover:bg-blue-50 text-blue-700 py-2 px-3 rounded-lg transition-colors text-sm font-medium border border-blue-200"
-                        >
-                           € → £
-                        </button>
-                        <button 
-                           onClick={() => { setAmount(experience.price.toString()); setFromCurrency('GBP'); setToCurrency('EUR'); }}
-                           className="bg-white hover:bg-blue-50 text-blue-700 py-2 px-3 rounded-lg transition-colors text-sm font-medium border border-blue-200"
-                        >
-                           £ → €
-                        </button>
-                     </div>
-
-                    <button 
-                        onClick={handleCurrencyConvert}
-                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 px-4 rounded-lg transition-all text-base font-bold shadow-lg shadow-blue-500/25 transform hover:scale-[1.02]"
-                     >
-                        Convert Currency
-                     </button>
                  </div>
 
                  {/* Currency Converter Button */}

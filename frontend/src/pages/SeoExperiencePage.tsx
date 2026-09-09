@@ -9,6 +9,7 @@ import {
   Gift, Globe, X, ArrowLeft, User
 } from 'lucide-react';
 import { seoExperiences, Guide } from '../data/seoExperiences';
+import { ExperienceCurrencyConverter } from '../components/common/ExperienceCurrencyConverter';
 
 const ReadMoreText = ({ 
   text, 
@@ -556,6 +557,7 @@ const SeoExperiencePage: React.FC = () => {
 
                   <div className="text-center">
                     <p className="text-sm text-gray-500 mb-4">You won't be charged yet</p>
+                    <ExperienceCurrencyConverter price={data.price} />
                     <div className="flex justify-between text-gray-600 mb-3 text-sm">
                       <span className="underline decoration-gray-300">€{data.price} x {guests} guests</span>
                       <span>€{data.price * guests}</span>
