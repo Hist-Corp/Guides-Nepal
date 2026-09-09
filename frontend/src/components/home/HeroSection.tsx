@@ -9,18 +9,18 @@ const destinations = [
     name: 'Kathmandu',
     images: {
       desktop: [
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=happy%20tourist%20girl%20riding%20bicycle%20nepal%20street&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepal%20people%20fountain%20plaza%20laughing&image_size=square',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=couple%20looking%20up%20at%20architecture%20nepal&image_size=square',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Kathmandu%20Durbar%20Square%20temples%20sunny&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20thali%20food%20top%20view&image_size=square'
+        'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400',
+        'https://images.unsplash.com/photo-1528181304800-259b08848526?w=400',
+        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+        'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',
+        'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400'
       ],
       mobile: [
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=lisbon%20rooftops%20city%20view&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepal%20street%20market%20colorful&image_size=square',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=happy%20tourist%20couple%20laughing%20street&image_size=landscape_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=people%20eating%20outdoors%20cheers&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepal%20temple%20prayer%20flags&image_size=square'
+        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
+        'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400',
+        'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400',
+        'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400',
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400'
       ]
     }
   },
@@ -28,18 +28,18 @@ const destinations = [
     name: 'Pokhara',
     images: {
       desktop: [
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=tourist%20boat%20phewa%20lake%20pokhara%20reflection&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=paragliding%20pokhara%20sky%20view&image_size=square',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=himalayas%20annapurna%20range%20sunrise&image_size=square',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=world%20peace%20pagoda%20pokhara&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=coffee%20lakeside%20pokhara%20relax&image_size=square'
+        'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400',
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
+        'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
+        'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=400',
+        'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=400'
       ],
       mobile: [
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=phewa%20lake%20boat%20colorful&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=mountain%20view%20pokhara%20fishtail&image_size=square',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=tourist%20relaxing%20lakeside%20pokhara&image_size=landscape_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=hiking%20sarangkot%20trail&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20tea%20garden%20view&image_size=square'
+        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
+        'https://images.unsplash.com/photo-1516594798947-e65505dbb29d?w=400',
+        'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400',
+        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
+        'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400'
       ]
     }
   },
@@ -47,18 +47,18 @@ const destinations = [
     name: 'Lalitpur',
     images: {
       desktop: [
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=patan%20durbar%20square%20museum%20courtyard&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=golden%20temple%20patan%20details&image_size=square',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=wood%20carving%20artisan%20nepal&image_size=square',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=krishna%20mandir%20patan%20stone&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=newari%20food%20bara%20wo&image_size=square'
+        'https://images.unsplash.com/photo-1534351590666-13e3e96c5017?w=400',
+        'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400',
+        'https://images.unsplash.com/photo-1528181304800-259b08848526?w=400',
+        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+        'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400'
       ],
       mobile: [
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=patan%20streets%20old%20houses&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=metal%20statue%20craft%20patan&image_size=square',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=local%20guide%20explaining%20history%20patan&image_size=landscape_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=patan%20durbar%20square%20night&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=traditional%20lamp%20oil%20nepal&image_size=square'
+        'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400',
+        'https://images.unsplash.com/photo-1528181304800-259b08848526?w=400',
+        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+        'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',
+        'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400'
       ]
     }
   },
@@ -66,18 +66,18 @@ const destinations = [
     name: 'Bhaktapur',
     images: {
       desktop: [
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nyatapola%20temple%20bhaktapur%20tall&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=pottery%20square%20drying%20pots&image_size=square',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=peacock%20window%20wood%20carving&image_size=square',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=bhaktapur%20durbar%20square%20gate&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=juju%20dhau%20curd%20clay%20pot&image_size=square'
+        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
+        'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400',
+        'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400',
+        'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400',
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400'
       ],
       mobile: [
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=potter%20spinning%20wheel%20clay&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=bhaktapur%20narrow%20alley%20brick&image_size=square',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=tourist%20trying%20pottery%20nepal&image_size=landscape_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=dattatreya%20temple%20square&image_size=portrait_4_3',
-        'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=newari%20mask%20dance&image_size=square'
+        'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400',
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
+        'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
+        'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=400',
+        'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=400'
       ]
     }
   }
@@ -159,7 +159,7 @@ export const HeroSection: React.FC = () => {
                  <span className="text-sm font-medium text-[#555555]">Need help planning your trip?</span>
                  <Link to="/maila-dai" className="bg-[#F4B400]/20 hover:bg-[#F4B400]/30 text-[#333333] text-sm font-bold pl-4 pr-1 py-1 rounded-full flex items-center gap-2 transition-colors shadow-sm border border-[#F4B400]/50">
                    Ask Maila Dai!
-                   <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=cartoon%20avatar%20face%20smile&image_size=square" alt="Maila Dai" className="w-8 h-8 rounded-full" />
+                   <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400" alt="Maila Dai" className="w-8 h-8 rounded-full" />
                  </Link>
                </div>
             </div>

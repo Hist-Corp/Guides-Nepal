@@ -15,6 +15,7 @@ import {
   updateContentBlog,
   deleteContentBlog,
 } from "../services/api";
+import ImagePicker from "../components/forms/ImagePicker";
 
 type BlogPost = {
   id: number;
@@ -24,6 +25,7 @@ type BlogPost = {
   date?: string;
   status?: string;
   content?: string;
+  featuredImage?: string;
 };
 
 function slugify(value: string) {
@@ -39,7 +41,7 @@ export default function WriterBlog() {
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState<BlogPost | null>(null);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
-  const [form, setForm] = useState({ title: "", slug: "" });
+  const [form, setForm] = useState({ title: "", slug: "", featuredImage: "" });
   const [liveEdit, setLiveEdit] = useState<BlogPost | null>(null);
 
   const fetchBlog = async () => {
@@ -58,7 +60,9 @@ export default function WriterBlog() {
     fetchBlog();
   }, []);
 
-  const resetForm = () => setForm({ title: "", slug: "" });
+  const resetForm = () => {
+    setForm({ title: "", slug: "", featuredImage: "" });
+  };
 
   const handleCreate = async () => {
     if (!form.title.trim()) return;
@@ -67,6 +71,7 @@ export default function WriterBlog() {
       await createContentBlog({
         title: form.title,
         slug: form.slug || slugify(form.title),
+        featuredImage: form.featuredImage || undefined,
       });
       setOpenCreate(false);
       resetForm();
@@ -86,6 +91,7 @@ export default function WriterBlog() {
       await updateContentBlog(openEdit.id, {
         title: form.title,
         slug: form.slug || slugify(form.title),
+        featuredImage: form.featuredImage || undefined,
       });
       setOpenEdit(null);
       resetForm();
@@ -114,7 +120,7 @@ export default function WriterBlog() {
 
   const openEditModal = (post: BlogPost) => {
     setOpenEdit(post);
-    setForm({ title: post.title, slug: post.slug });
+    setForm({ title: post.title, slug: post.slug, featuredImage: post.featuredImage || "" });
   };
 
   const columns: Column<BlogPost>[] = [
@@ -201,6 +207,20 @@ export default function WriterBlog() {
             placeholder="auto-generated"
             value={form.slug}
             onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm({ ...form, slug: e.target.value })}
+          />
+          <ImagePicker
+            label="Featured Image (optional)"
+            value={form.featuredImage}
+            onImageReady={(url) => {
+              setForm({ ...form, featuredImage: url });
+              setFeaturedPreview(url);
+            }}
+            onClear={() => {
+              setForm({ ...form, featuredImage: "" });
+              setFeaturedPreview("");
+              setFeaturedImageFile(null);
+            }}
+            currentImageUrl={form.featuredImage}
           />
           <Button
             variant="primary"

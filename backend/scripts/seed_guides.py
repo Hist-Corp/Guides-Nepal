@@ -17,7 +17,7 @@ guides_data = [
     {
         "id": 1,
         "name": "Apicha",
-        "image": "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
         "role": "Cultural Expert",
         "rating": 4.9,
         "reviews": 120,
@@ -27,8 +27,8 @@ guides_data = [
         "livesIn": "Kathmandu",
         "cities": ["Kathmandu", "Bhaktapur"],
         "gallery": [
-            "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-            "https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+            "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
             "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
         ],
     },
@@ -52,7 +52,7 @@ guides_data = [
     {
         "id": 3,
         "name": "Priya",
-        "image": "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
         "role": "Food & Culture Guide",
         "rating": 4.95,
         "reviews": 156,
@@ -63,7 +63,7 @@ guides_data = [
         "cities": ["Kathmandu", "Pokhara", "Lalitpur"],
         "gallery": [
             "https://images.unsplash.com/photo-1556909114-f6e7a7a97c0e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-            "https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+            "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
             "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
         ],
     },
@@ -80,7 +80,7 @@ guides_data = [
         "livesIn": "Pokhara",
         "cities": ["Pokhara", "Kathmandu", "Lalitpur"],
         "gallery": [
-            "https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
             "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
         ],
     },

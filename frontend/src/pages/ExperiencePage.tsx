@@ -45,9 +45,9 @@ const experiencesData: Record<string, Experience> = {
     price: 25,
     duration: '3 hours',
     images: [
-      'https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
-      'https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
-      'https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'
     ],
     description: "Discover the secret side of Kathmandu that tourists often miss. We'll navigate through narrow alleys, visit hidden stupas in private courtyards, and taste the best local tea. This tour is perfect for those who want to see the authentic daily life of the city.",
     highlights: [
@@ -73,8 +73,8 @@ const experiencesData: Record<string, Experience> = {
     price: 35,
     duration: '4 hours',
     images: [
-      'https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
-      'https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'
     ],
     description: "Embark on a culinary journey through the flavors of the Newari people. We will visit local eateries and try dishes like Bara, Chatamari, and the famous Yomari.",
     highlights: ['Taste 5 different Newari dishes', 'Visit a traditional kitchen', 'Learn about spices used in Nepali cooking'],
@@ -95,8 +95,8 @@ const experiencesData: Record<string, Experience> = {
     price: 20,
     duration: '2.5 hours',
     images: [
-      'https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
-      'https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'
     ],
     description: "Start your day with peace and spirituality at the Monkey Temple. Watch the sunrise over the valley and observe the morning rituals of the monks and locals.",
     highlights: ['Sunrise view of Kathmandu Valley', 'Observe morning Buddhist rituals', 'Feed the monkeys (carefully!)'],
@@ -163,8 +163,8 @@ const experiencesData: Record<string, Experience> = {
     price: 28,
     duration: '2.5 hours',
     images: [
-      'https://images.unsplash.com/photo-1547292283-7c664a092534?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
-      'https://images.unsplash.com/photo-1547292283-7c664a092534?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'
+      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'
     ],
     description: "Explore the architectural marvels of Patan Durbar Square. Visit the museum, the Krishna Mandir, and learn about the history of the Malla kings.",
     highlights: ['Visit the Patan Museum', 'Admire the Krishna Mandir', 'Explore hidden courtyards'],
@@ -186,8 +186,8 @@ const experiencesData: Record<string, Experience> = {
     price: 35,
     duration: '3.5 hours',
     images: [
-      'https://images.unsplash.com/photo-1547292283-7c664a092534?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
-      'https://images.unsplash.com/photo-1547292283-7c664a092534?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'
+      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'
     ],
     description: "Walk through the living museum of Bhaktapur. See the 55-Window Palace, the Nyatapola Temple, and witness pottery making in the streets.",
     highlights: ['Visit the tallest temple in Nepal', 'See the 55-Window Palace', 'Watch potters at work'],

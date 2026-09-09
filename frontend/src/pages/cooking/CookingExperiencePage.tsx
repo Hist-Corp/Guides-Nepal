@@ -54,7 +54,7 @@ const cookingExperiencesData: CookingExperience[] = [
     id: 1,
     title: "Authentic Nepali Cooking Class with Market Visit",
     slug: "nepali-cooking-class-market-visit",
-    heroImage: "https://images.unsplash.com/photo-1556909114-f6e7a7a97c0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    heroImage: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     rating: 4.9,
     reviews: 892,
     price: 65,

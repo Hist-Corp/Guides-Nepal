@@ -9,10 +9,10 @@ export const bhaktapurRichData: RichExperienceData[] = [
     id: 1,
     slug: 'bhaktapur-heritage-walk',
     title: "Bhaktapur Heritage Walk",
-    heroImage: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=bhaktapur%20durbar%20square%20golden%20gate&image_size=landscape_16_9",
+    heroImage: "https://images.unsplash.com/photo-1516594798947-e65505dbb29d?w=400",
     host: {
       name: "Krishna",
-      image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20man%20guide%20dhaka%20topi&image_size=square",
+      image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400",
       type: "Heritage Expert"
     },
     guides: [
@@ -51,10 +51,10 @@ export const bhaktapurRichData: RichExperienceData[] = [
     id: 2,
     slug: 'pottery-making-class',
     title: "Pottery Making Class",
-    heroImage: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=bhaktapur%20pottery%20square%20making&image_size=landscape_16_9",
+    heroImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400",
     host: {
       name: "Radha",
-      image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20woman%20guide%20smiling&image_size=square",
+      image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400",
       type: "Artisan Guide"
     },
     guides: [
@@ -93,10 +93,10 @@ export const bhaktapurRichData: RichExperienceData[] = [
     id: 3,
     slug: 'taste-juju-dhau',
     title: "Taste Juju Dhau (King Curd)",
-    heroImage: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=juju%20dhau%20bhaktapur%20yogurt&image_size=landscape_16_9",
+    heroImage: "https://images.unsplash.com/photo-1534351590666-13e3e96c5017?w=400",
     host: {
       name: "Prakash",
-      image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20guide%20man%20beard&image_size=square",
+      image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400",
       type: "Foodie Guide"
     },
     guides: [
@@ -135,10 +135,10 @@ export const bhaktapurRichData: RichExperienceData[] = [
     id: 4,
     slug: 'changu-narayan-hike',
     title: "Changu Narayan Temple Hike",
-    heroImage: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=changu%20narayan%20temple%20nepal&image_size=landscape_16_9",
+    heroImage: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=400",
     host: {
       name: "Laxmi",
-      image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20woman%20guide%20glasses&image_size=square",
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
       type: "Nature Guide"
     },
     guides: [
@@ -177,10 +177,10 @@ export const bhaktapurRichData: RichExperienceData[] = [
     id: 5,
     slug: 'bhaktapur-night-tour',
     title: "Bhaktapur Night Tour",
-    heroImage: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=bhaktapur%20night%20lights&image_size=landscape_16_9",
+    heroImage: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400",
     host: {
       name: "Krishna",
-      image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20man%20guide%20dhaka%20topi&image_size=square",
+      image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400",
       type: "Night Guide"
     },
     guides: [
@@ -219,10 +219,10 @@ export const bhaktapurRichData: RichExperienceData[] = [
     id: 6,
     slug: 'thangka-painting-workshop-bhaktapur',
     title: "Thangka Painting Workshop",
-    heroImage: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=thangka%20painting%20bhaktapur&image_size=landscape_16_9",
+    heroImage: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=400",
     host: {
       name: "Radha",
-      image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20woman%20guide%20smiling&image_size=square",
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
       type: "Art Guide"
     },
     guides: [

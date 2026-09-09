@@ -53,6 +53,7 @@ export async function flushPendingSubmissions() {
 
 function pathFor(kind: string) {
   if (kind === 'host-application') return '/host-applications';
+  if (kind === 'support-ticket') return '/operations/support-tickets';
   return '/inquiries';
 }
 
@@ -72,6 +73,16 @@ export function sendGuideRequest(payload: {
   message: string;
 }) {
   return submit('guide-request', '/inquiries', { ...payload, category: 'guide-request' });
+}
+
+export function submitSupportTicket(payload: {
+  customer_name: string;
+  customer_email: string;
+  subject: string;
+  description: string;
+  priority?: string;
+}) {
+  return submit('support-ticket', '/operations/support-tickets', payload);
 }
 
 export function submitHostApplication(payload: {

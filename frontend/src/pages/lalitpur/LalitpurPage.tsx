@@ -64,7 +64,7 @@ export const LalitpurPage: React.FC = () => {
                 <div className="space-y-4 translate-y-8">
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
                     <img 
-                      src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=patan%20durbar%20square%20art&image_size=portrait_3_4" 
+                      src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400" 
                       alt="Patan Art"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -79,14 +79,14 @@ export const LalitpurPage: React.FC = () => {
                 <div className="space-y-4">
                   <div className="aspect-square rounded-2xl overflow-hidden shadow-lg">
                     <img 
-                      src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=golden%20temple%20patan&image_size=square" 
+                      src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400" 
                       alt="Golden Temple"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
                   </div>
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg rounded-bl-[4rem]">
                     <img 
-                      src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20artisan%20working&image_size=portrait_3_4" 
+                      src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400" 
                       alt="Local Artisan"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -359,7 +359,7 @@ export const LalitpurPage: React.FC = () => {
         {/* SEO / Articles Section */}
         <div className="mb-24">
            <div className="relative h-[400px] rounded-3xl overflow-hidden mb-16 group cursor-pointer">
-              <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Patan%20Durbar%20Square%20sunset&image_size=landscape_16_9" className="w-full h-full object-cover brightness-[0.6] group-hover:scale-105 transition-transform duration-700" />
+              <img src="https://images.unsplash.com/photo-1534351590666-13e3e96c5017?w=400" className="w-full h-full object-cover brightness-[0.6] group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 flex flex-col justify-center p-8 md:p-16">
                  <div className="bg-[#213448] w-16 h-1 mb-6"></div>
                  <h2 className="text-4xl md:text-6xl font-bold text-white mb-4 max-w-2xl leading-tight">
@@ -381,7 +381,7 @@ export const LalitpurPage: React.FC = () => {
               {/* Article 1: Art */}
               <div className="flex flex-col md:flex-row gap-12 items-center">
                  <div className="md:w-1/2">
-                    <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20artisan%20carving%20wood&image_size=landscape_4_3" className="rounded-3xl shadow-xl w-full aspect-[4/3] object-cover" />
+                    <img src="https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400" className="rounded-3xl shadow-xl w-full aspect-[4/3] object-cover" />
                  </div>
                  <div className="md:w-1/2">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Discover the City of Arts</h3>
@@ -397,7 +397,7 @@ export const LalitpurPage: React.FC = () => {
               {/* Article 2: Food */}
               <div className="flex flex-col md:flex-row-reverse gap-12 items-center">
                  <div className="md:w-1/2">
-                    <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=newari%20food%20feast%20nepal&image_size=landscape_4_3" className="rounded-3xl shadow-xl w-full" />
+                    <img src="https://images.unsplash.com/photo-1528181304800-259b08848526?w=400" className="rounded-3xl shadow-xl w-full" />
                  </div>
                  <div className="md:w-1/2">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Savor Authentic Newari Cuisine</h3>

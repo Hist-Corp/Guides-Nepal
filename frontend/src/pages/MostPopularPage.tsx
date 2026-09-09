@@ -14,7 +14,7 @@ const experiencesData = {
     rating: 4.8,
     reviews: 210,
     price: 20,
-    images: ['https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'],
+    images: ['https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'],
     description: "Start your day with peace and spirituality at the Monkey Temple."
   },
   '401': {
@@ -24,7 +24,7 @@ const experiencesData = {
     rating: 4.9,
     reviews: 245,
     price: 35,
-    images: ['https://images.unsplash.com/photo-1547292283-7c664a092534?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'],
+    images: ['https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'],
     description: "Walk through the living museum of Bhaktapur."
   },
   '201': {
@@ -34,7 +34,7 @@ const experiencesData = {
     rating: 4.9,
     reviews: 350,
     price: 90,
-    images: ['https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'],
+    images: ['https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80'],
     description: "Experience the thrill of flying over the beautiful Phewa Lake."
   }
 };

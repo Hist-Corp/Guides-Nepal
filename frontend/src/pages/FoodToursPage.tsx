@@ -24,9 +24,9 @@ export const FoodToursPage: React.FC = () => {
         console.error('Error fetching guides:', error);
         // Fallback to mock data if API fails
         setGuides([
-          { id: 1, name: "Apicha", image: "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80", role: "Street Food Specialist", rating: 4.9, reviews: 120, bio: "Expert in Kathmandu Valley street food.", languages: ["English", "Nepali"], verified: true, livesIn: "Kathmandu", cities: ["Kathmandu"], gallery: [], is_active: true },
+          { id: 1, name: "Apicha", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80", role: "Street Food Specialist", rating: 4.9, reviews: 120, bio: "Expert in Kathmandu Valley street food.", languages: ["English", "Nepali"], verified: true, livesIn: "Kathmandu", cities: ["Kathmandu"], gallery: [], is_active: true },
           { id: 2, name: "Sujal", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80", role: "Newari Cuisine Expert", rating: 4.8, reviews: 89, bio: "Specialist in traditional Newari cuisine.", languages: ["English", "Nepali", "Newari"], verified: true, livesIn: "Kathmandu", cities: ["Kathmandu", "Bhaktapur"], gallery: [], is_active: true },
-          { id: 3, name: "Priya", image: "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80", role: "Himalayan Flavors Guide", rating: 4.95, reviews: 156, bio: "Expert in Himalayan regional cuisine.", languages: ["English", "Nepali"], verified: true, livesIn: "Pokhara", cities: ["Pokhara", "Kathmandu"], gallery: [], is_active: true },
+          { id: 3, name: "Priya", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80", role: "Himalayan Flavors Guide", rating: 4.95, reviews: 156, bio: "Expert in Himalayan regional cuisine.", languages: ["English", "Nepali"], verified: true, livesIn: "Pokhara", cities: ["Pokhara", "Kathmandu"], gallery: [], is_active: true },
           { id: 4, name: "Rohan", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80", role: "Terai Traditions Keeper", rating: 4.92, reviews: 78, bio: "Specialist in Terai region traditions and cuisine.", languages: ["English", "Nepali", "Hindi"], verified: true, livesIn: "Bharatpur", cities: ["Bharatpur", "Kathmandu"], gallery: [], is_active: true }
         ]);
       } finally {
@@ -42,56 +42,56 @@ export const FoodToursPage: React.FC = () => {
       title: 'Newari Heritage Bites',
       subtitle: 'Kathmandu Valley classics and festival foods',
       image:
-        'https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+        'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
     },
     {
       slug: 'sherpa',
       title: 'Sherpa Mountain Flavors',
       subtitle: 'High‑altitude hearty dishes from the Himalaya',
       image:
-        'https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+        'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
     },
     {
       slug: 'tharu',
       title: 'Tharu Terai Traditions',
       subtitle: 'Forest‑foraged and riverland flavors',
       image:
-        'https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+        'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
     },
     {
       slug: 'tamang',
       title: 'Tamang Hearth & Homestyle',
       subtitle: 'Hillside comfort cuisine',
       image:
-        'https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+        'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
     },
     {
       slug: 'gurung',
       title: 'Gurung Village Plates',
       subtitle: 'Highland soups and smoked meats',
       image:
-        'https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+        'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
     },
     {
       slug: 'tibetan',
       title: 'Tibetan‑Nepali Fusion',
       subtitle: 'Momos, thenthuk, and butter tea',
       image:
-        'https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+        'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
     },
     {
       slug: 'maithil',
       title: 'Maithil Mithila Feasts',
       subtitle: 'Plains’ vegetarian delicacies',
       image:
-        'https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+        'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
     },
     {
       slug: 'thakali',
       title: 'Thakali Spice Trail',
       subtitle: 'Legendary dal‑bhat and achars',
       image:
-        'https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+        'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
     },
   ];
 
@@ -139,7 +139,7 @@ export const FoodToursPage: React.FC = () => {
                 <div className="space-y-4 translate-y-8">
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
                     <img 
-                      src="https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+                      src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
                       alt="Local food guide in Kathmandu"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -154,14 +154,14 @@ export const FoodToursPage: React.FC = () => {
                 <div className="space-y-4">
                   <div className="aspect-square rounded-2xl overflow-hidden shadow-lg">
                     <img 
-                      src="https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+                      src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
                       alt="Momo tasting"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
                   </div>
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg rounded-bl-[4rem]">
                     <img 
-                      src="https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+                      src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
                       alt="Newari feast tasting"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -278,7 +278,7 @@ export const FoodToursPage: React.FC = () => {
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Card 1: Street Food Safari */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Street Food Safari" className="w-full h-64 object-cover" />
+              <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Street Food Safari" className="w-full h-64 object-cover" />
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Street Food Safari</h3>
                 <p className="text-gray-600 mb-4">Dive into the heart of Kathmandu's vibrant street food scene. A private food tour is the best way to discover the most delicious and authentic local snacks, from savory samosas and momos to sweet jalebis and sel roti.</p>
@@ -287,7 +287,7 @@ export const FoodToursPage: React.FC = () => {
             </div>
             {/* Card 2: Momo Mania */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Momo Mania" className="w-full h-64 object-cover" />
+              <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Momo Mania" className="w-full h-64 object-cover" />
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Momo Mania: A Dumpling Quest</h3>
                 <p className="text-gray-600 mb-4">Embark on a quest to find the best momos in Kathmandu! These delicious dumplings, often filled with spiced meat or vegetables, are a Nepali obsession, and every local has their favorite spot. Join a food tour to sample a variety of momos, from traditional to modern twists.</p>
@@ -301,7 +301,7 @@ export const FoodToursPage: React.FC = () => {
             </div>
             {/* Card 3: The Legendary Dal Bhat */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Dal Bhat Thali" className="w-full h-64 object-cover" />
+              <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Dal Bhat Thali" className="w-full h-64 object-cover" />
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">The Legendary Dal Bhat</h3>
                 <p className="text-gray-600 mb-4">Taste the heart and soul of Nepali cuisine: Dal Bhat. This staple meal, consisting of lentil soup, steamed rice, and various side dishes, is eaten daily by millions. A food tour can introduce you to regional variations, from the rich Thakali thali to simple homestyle versions.</p>
@@ -313,7 +313,7 @@ export const FoodToursPage: React.FC = () => {
             </div>
             {/* Card 4: Newari Culinary Journey */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Newari Culinary Journey" className="w-full h-64 object-cover" />
+              <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Newari Culinary Journey" className="w-full h-64 object-cover" />
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Newari Culinary Journey</h3>
                 <p className="text-gray-600 mb-4">Explore the unique and flavorful cuisine of the Newar people, the indigenous inhabitants of the Kathmandu Valley. A Newari food tour will take you to traditional eateries to sample a wide array of dishes, from savory lentil pancakes (wo) and sweet yomari dumplings to spicy buffalo meat (choila).</p>
@@ -325,7 +325,7 @@ export const FoodToursPage: React.FC = () => {
             </div>
             {/* Card 5: Thakali Thali Trail */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Thakali Thali Trail" className="w-full h-64 object-cover" />
+              <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Thakali Thali Trail" className="w-full h-64 object-cover" />
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Thakali Thali Trail</h3>
                 <p className="text-gray-600 mb-4">Taste why Thakali dal‑bhat became famous across Nepal: clean, balanced flavors, comforting lentils, fluffy rice, seasonal greens, and a bright lineup of achars that wake up every bite.</p>
@@ -337,7 +337,7 @@ export const FoodToursPage: React.FC = () => {
             </div>
             {/* Card 6: Himalayan Noodle Bowls */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Himalayan Noodle Bowls" className="w-full h-64 object-cover" />
+              <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Himalayan Noodle Bowls" className="w-full h-64 object-cover" />
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Himalayan Noodle Bowls</h3>
                 <p className="text-gray-600 mb-4">Warm up with Sherpa and Tibetan‑Nepali comfort food: thukpa and thenthuk broths, dumplings, and teahouse bites that reflect trade routes, altitude life, and mountain hospitality.</p>

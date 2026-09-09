@@ -7,7 +7,7 @@ const testimonials = [
     quote: "A must do tour in Bangkok! We learned so much about the city and its history. Our guide was fantastic and made the experience truly special.",
     author: "Sarah J.",
     location: "Bangkok",
-    image: "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ const testimonials = [
     quote: "Our guide was amazing! She was so knowledgeable and friendly. It felt like exploring the city with an old friend. Best part of our trip!",
     author: "Emily R.",
     location: "Paris",
-    image: "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
   },
 ];
 

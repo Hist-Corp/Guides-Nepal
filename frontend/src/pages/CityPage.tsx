@@ -35,7 +35,7 @@ interface CityData {
 const cityData: Record<string, CityData> = {
   bangkok: {
     name: 'Bangkok',
-    heroImage: 'https://images.unsplash.com/photo-1563492065599-3520ff735c9d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+    heroImage: 'https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
     description: 'Immerse yourself in the vibrant energy of Bangkok. From ancient temples to bustling street markets, experience the City of Angels.',
     topThings: [
       { id: 1001, title: 'A Taste Of Bangkok: Street Food Tour', rating: 4.9, reviews: 312, price: 45, image: 'https://images.unsplash.com/photo-1559314809-0d155014e29e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80' },
@@ -44,7 +44,7 @@ const cityData: Record<string, CityData> = {
     ],
     guides: [
       { id: 20, name: 'Somsak', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 5.0, reviews: 89 },
-      { id: 21, name: 'Noy', image: 'https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 120 },
+      { id: 21, name: 'Noy', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 120 },
       { id: 22, name: 'Lek', image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.8, reviews: 45 },
       { id: 23, name: 'Joy', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 5.0, reviews: 67 },
     ]
@@ -54,13 +54,13 @@ const cityData: Record<string, CityData> = {
     heroImage: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
     description: 'Discover the Emerald Island of Greece. Explore Venetian fortresses, crystal clear beaches, and olive groves.',
     topThings: [
-      { id: 2001, title: 'Corfu Old Town Walking Tour', rating: 4.9, reviews: 180, price: 40, image: 'https://images.unsplash.com/photo-1588666307439-72709724a876?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80' },
+      { id: 2001, title: 'Corfu Old Town Walking Tour', rating: 4.9, reviews: 180, price: 40, image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80' },
       { id: 2002, title: 'Achilleion Palace Visit', rating: 4.8, reviews: 150, price: 50, image: 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80' },
-      { id: 2003, title: 'Paleokastritsa Boat Trip', rating: 5.0, reviews: 230, price: 60, image: 'https://images.unsplash.com/photo-1543051932-613084a7a374?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80' },
+      { id: 2003, title: 'Paleokastritsa Boat Trip', rating: 5.0, reviews: 230, price: 60, image: 'https://images.unsplash.com/photo-1518684079-3c830dcef090?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80' },
     ],
     guides: [
       { id: 30, name: 'Nikos', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 5.0, reviews: 90 },
-      { id: 31, name: 'Eleni', image: 'https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 75 },
+      { id: 31, name: 'Eleni', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 75 },
       { id: 32, name: 'Giorgos', image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.8, reviews: 55 },
       { id: 33, name: 'Maria', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 5.0, reviews: 40 },
     ]
@@ -76,7 +76,7 @@ const cityData: Record<string, CityData> = {
     ],
     guides: [
       { id: 40, name: 'Javier', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 5.0, reviews: 150 },
-      { id: 41, name: 'Carmen', image: 'https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 200 },
+      { id: 41, name: 'Carmen', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 200 },
       { id: 42, name: 'Pablo', image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.8, reviews: 80 },
       { id: 43, name: 'Lucia', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 5.0, reviews: 110 },
     ]
@@ -92,7 +92,7 @@ const cityData: Record<string, CityData> = {
     ],
     guides: [
       { id: 1, name: 'Rajesh', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 5.0, reviews: 45 },
-      { id: 2, name: 'Sita', image: 'https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 32 },
+      { id: 2, name: 'Sita', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 32 },
       { id: 3, name: 'Nima', image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 67 },
       { id: 4, name: 'Binod', image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.8, reviews: 15 },
     ]
@@ -104,11 +104,11 @@ const cityData: Record<string, CityData> = {
     topThings: [
       { id: 201, title: 'Sunrise at Sarangkot', rating: 4.9, reviews: 312, price: 30, image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80' },
       { id: 202, title: 'Phewa Lake Boat Ride & Hike', rating: 4.8, reviews: 156, price: 40, image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80' },
-      { id: 203, title: 'Tibetan Culture Tour', rating: 4.9, reviews: 98, price: 35, image: 'https://images.unsplash.com/photo-1576092762791-d02d21c89954?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80' },
+      { id: 203, title: 'Tibetan Culture Tour', rating: 4.9, reviews: 98, price: 35, image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80' },
     ],
     guides: [
       { id: 5, name: 'Karma', image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 5.0, reviews: 55 },
-      { id: 6, name: 'Anjali', image: 'https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 42 },
+      { id: 6, name: 'Anjali', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 42 },
       { id: 7, name: 'Deepak', image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.8, reviews: 88 },
       { id: 8, name: 'Maya', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 5.0, reviews: 21 },
     ]
@@ -124,7 +124,7 @@ const cityData: Record<string, CityData> = {
     ],
     guides: [
       { id: 9, name: 'Suresh', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 76 },
-      { id: 10, name: 'Rina', image: 'https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.8, reviews: 34 },
+      { id: 10, name: 'Rina', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.8, reviews: 34 },
       { id: 11, name: 'Bikash', image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 5.0, reviews: 29 },
       { id: 12, name: 'Sarita', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 52 },
     ]
@@ -136,11 +136,11 @@ const cityData: Record<string, CityData> = {
     topThings: [
       { id: 401, title: 'Bhaktapur Heritage Walk', rating: 4.9, reviews: 245, price: 35, image: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80' },
       { id: 402, title: 'Pottery Making Class', rating: 4.8, reviews: 134, price: 30, image: 'https://images.unsplash.com/photo-1559314809-0d155014e29e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80' },
-      { id: 403, title: 'Taste Juju Dhau (King Curd)', rating: 5.0, reviews: 320, price: 15, image: 'https://images.unsplash.com/photo-1576092762791-d02d21c89954?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80' },
+      { id: 403, title: 'Taste Juju Dhau (King Curd)', rating: 5.0, reviews: 320, price: 15, image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80' },
     ],
     guides: [
       { id: 13, name: 'Krishna', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 5.0, reviews: 98 },
-      { id: 14, name: 'Radha', image: 'https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 45 },
+      { id: 14, name: 'Radha', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 45 },
       { id: 15, name: 'Prakash', image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.8, reviews: 62 },
       { id: 16, name: 'Laxmi', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80', rating: 4.9, reviews: 38 },
     ]

@@ -80,19 +80,19 @@ export const seoExperiences: Record<string, SeoExperienceData> = {
     rating: 4.9,
     reviewsCount: 124,
     price: 45,
-    heroImage: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Amsterdam%20canal%20hidden%20gem%20bike&image_size=landscape_16_9',
-    secondaryImage: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Amsterdam%20locals%20eating%20cheese&image_size=landscape_16_9',
-    mapImage: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=amsterdam%20city%20map%20vector%20simple&image_size=landscape_16_9',
+    heroImage: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=400',
+    secondaryImage: 'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=400',
+    mapImage: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
     images: [
-      'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Amsterdam%20canal%20hidden%20gem%20bike&image_size=landscape_16_9',
-      'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Amsterdam%20street%20flower%20market&image_size=landscape_16_9',
-      'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Amsterdam%20cozy%20cafe%20interior&image_size=landscape_16_9',
-      'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Amsterdam%20museum%20district&image_size=landscape_16_9',
+      'https://images.unsplash.com/photo-1516594798947-e65505dbb29d?w=400',
+      'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400',
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
+      'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400',
     ],
     author: {
       name: 'Anne Betancourt',
       role: 'Senior Local Guide',
-      image: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=dutch%20guide%20woman%20smiling&image_size=square',
+      image: 'https://images.unsplash.com/photo-1534351590666-13e3e96c5017?w=400',
       email: 'anne.b@guides-nepal.com',
       responseRate: 100,
       responseTime: 'within an hour',
@@ -104,7 +104,7 @@ export const seoExperiences: Record<string, SeoExperienceData> = {
         id: 'anne',
         name: 'Anne', 
         role: 'Main Guide', 
-        image: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=dutch%20guide%20woman%20smiling&image_size=square',
+        image: 'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400',
         bio: 'Passionate about Amsterdam history and architecture. I love showing guests the hidden courtyards.',
         languages: ['English', 'Dutch', 'German'],
         rating: 4.98,
@@ -114,7 +114,7 @@ export const seoExperiences: Record<string, SeoExperienceData> = {
         id: 'mark',
         name: 'Mark', 
         role: 'Co-host', 
-        image: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=dutch%20man%20guide%20young&image_size=square',
+        image: 'https://images.unsplash.com/photo-1528181304800-259b08848526?w=400',
         bio: 'Local foodie and night owl. I know the best spots for bitterballen and craft beer.',
         languages: ['English', 'Dutch'],
         rating: 4.92,
@@ -124,7 +124,7 @@ export const seoExperiences: Record<string, SeoExperienceData> = {
         id: 'sophie',
         name: 'Sophie', 
         role: 'Food Expert', 
-        image: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=woman%20chef%20portrait&image_size=square',
+        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
         bio: 'Culinary arts graduate who loves exploring the multicultural food scene of the city.',
         languages: ['English', 'French', 'Spanish'],
         rating: 4.95,
@@ -134,7 +134,7 @@ export const seoExperiences: Record<string, SeoExperienceData> = {
         id: 'lars',
         name: 'Lars', 
         role: 'History Buff', 
-        image: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=older%20man%20glasses%20portrait&image_size=square',
+        image: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',
         bio: 'Retired history teacher specializing in the Golden Age and WWII history of Amsterdam.',
         languages: ['English', 'German'],
         rating: 5.0,
@@ -204,7 +204,7 @@ export const seoExperiences: Record<string, SeoExperienceData> = {
       {
         id: 1,
         author: "Sarah Jenkins",
-        avatar: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=woman%20avatar%20smiling&image_size=square",
+        avatar: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400",
         date: "October 2023",
         rating: 5,
         content: "Great location and amazing guide! Anne was very helpful and showed us parts of the city we would never have found on our own. Very clean and organized tour. The hidden courtyards were absolutely magical, and the history Anne shared brought them to life. \n\nWe also stopped at a small local bakery that I would have walked right past. The apple pie there was the best I've ever had! Highly recommend this tour for anyone wanting to see the real Amsterdam."
@@ -212,7 +212,7 @@ export const seoExperiences: Record<string, SeoExperienceData> = {
       {
         id: 2,
         author: "Michael Chen",
-        avatar: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=man%20avatar%20glasses&image_size=square",
+        avatar: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=400",
         date: "September 2023",
         rating: 5,
         content: "Would stay again! The experience was authentic and the food stops were delicious. Highly recommended. \n\nThe guide was knowledgeable not just about the food, but about the cultural significance of each dish. We tried herring, stroopwafel, and bitterballen. Everything was fresh and tasty. It was a great way to spend an afternoon."
@@ -220,16 +220,16 @@ export const seoExperiences: Record<string, SeoExperienceData> = {
       {
         id: 3,
         author: "Emma Wilson",
-        avatar: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=woman%20avatar%20blonde&image_size=square",
+        avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
         date: "August 2023",
         rating: 4,
         content: "Very informative. A bit of noise at night in the busy areas, but that's Amsterdam! Host was wonderful. \n\nShe gave us great tips for the rest of our trip, including restaurant recommendations and how to use the public transport system efficiently. The group size was small, which made it feel very personal."
       }
     ],
     similarListings: [
-      { title: "7 Biggest Red Light District Myths", image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=amsterdam%20red%20light%20street&image_size=landscape_4_3", price: 30, rating: 4.8, location: "Amsterdam" },
-      { title: "7 Ways to Live Like a Local in Amsterdam", image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=amsterdam%20bike%20local&image_size=landscape_4_3", price: 25, rating: 4.9, location: "Amsterdam" },
-      { title: "Museums and Gems: How to Avoid Crowds", image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=rijksmuseum%20interior&image_size=landscape_4_3", price: 40, rating: 4.7, location: "Amsterdam" }
+      { title: "7 Biggest Red Light District Myths", image: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400", price: 30, rating: 4.8, location: "Amsterdam" },
+      { title: "7 Ways to Live Like a Local in Amsterdam", image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400", price: 25, rating: 4.9, location: "Amsterdam" },
+      { title: "Museums and Gems: How to Avoid Crowds", image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400", price: 40, rating: 4.7, location: "Amsterdam" }
     ]
   },
   'bangkok-food': {
@@ -240,15 +240,15 @@ export const seoExperiences: Record<string, SeoExperienceData> = {
     rating: 4.9,
     reviewsCount: 312,
     price: 45,
-    heroImage: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Bangkok%20street%20food%20night%20market&image_size=landscape_16_9',
+    heroImage: 'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400',
     images: [
-      'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Bangkok%20street%20food%20night%20market&image_size=landscape_16_9',
-      'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=pad%20thai%20cooking&image_size=landscape_16_9'
+      'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400',
+      'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400'
     ],
     author: {
       name: 'Somsak',
       role: 'Local Food Expert',
-      image: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=thai%20man%20guide%20smiling&image_size=square',
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
       email: 'somsak@guides-nepal.com',
       responseRate: 98,
       responseTime: 'within a few hours',
@@ -289,15 +289,15 @@ export const seoExperiences: Record<string, SeoExperienceData> = {
     rating: 4.8,
     reviewsCount: 540,
     price: 55,
-    heroImage: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Bangkok%20Grand%20Palace&image_size=landscape_16_9',
+    heroImage: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400',
     images: [
-      'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Bangkok%20Grand%20Palace&image_size=landscape_16_9',
-      'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Wat%20Arun%20sunset&image_size=landscape_16_9'
+      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
+      'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400'
     ],
     author: {
       name: 'Noy',
       role: 'Certified City Guide',
-      image: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=thai%20woman%20guide%20traditional%20dress&image_size=square',
+      image: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=400',
       email: 'noy@guides-nepal.com',
       responseRate: 100,
       responseTime: 'within an hour',
@@ -309,7 +309,7 @@ export const seoExperiences: Record<string, SeoExperienceData> = {
         id: 'noy',
         name: 'Noy',
         role: 'History Expert',
-        image: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=thai%20woman%20guide%20traditional%20dress&image_size=square',
+        image: 'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=400',
         bio: 'Specializing in Royal history and Buddhist philosophy.',
         languages: ['English', 'Thai'],
         rating: 4.85,
@@ -319,7 +319,7 @@ export const seoExperiences: Record<string, SeoExperienceData> = {
         id: 'chai',
         name: 'Chai',
         role: 'Local Insider',
-        image: 'https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=thai%20man%20casual%20shirt&image_size=square',
+        image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
         bio: 'I show you the Bangkok that guidebooks miss - the canals and local communities.',
         languages: ['English', 'Thai'],
         rating: 4.8,

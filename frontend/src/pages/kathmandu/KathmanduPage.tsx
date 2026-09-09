@@ -74,7 +74,7 @@ export const KathmanduPage: React.FC = () => {
                 <div className="space-y-4 translate-y-8">
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
                     <img 
-                      src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Kathmandu%20Durbar%20Square%20temple%20architecture%20detail&image_size=portrait_3_4" 
+                      src="https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400" 
                       alt="Kathmandu Temple"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -89,14 +89,14 @@ export const KathmanduPage: React.FC = () => {
                 <div className="space-y-4">
                   <div className="aspect-square rounded-2xl overflow-hidden shadow-lg">
                     <img 
-                      src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Happy%20tourist%20eating%20momo%20dumplings%20in%20Kathmandu%20street&image_size=square" 
+                      src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400" 
                       alt="Food Tour"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
                   </div>
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg rounded-bl-[4rem]">
                     <img 
-                      src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Nepali%20local%20guide%20explaining%20history%20smiling&image_size=portrait_3_4" 
+                      src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400" 
                       alt="Local Guide"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -187,7 +187,7 @@ export const KathmanduPage: React.FC = () => {
                        <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                              <div className="flex -space-x-3">
-                                <img src={`https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20local%20portrait%20${tour.locals[0]}&image_size=square`} className="w-10 h-10 rounded-full border-2 border-white object-cover" />
+                                <img src={`https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400`} className="w-10 h-10 rounded-full border-2 border-white object-cover" />
                                 <div className="w-10 h-10 rounded-full border-2 border-white bg-white/20 backdrop-blur-md flex items-center justify-center text-xs font-bold">+12</div>
                              </div>
                              <span className="text-sm font-bold">Choose your local</span>
@@ -272,7 +272,7 @@ export const KathmanduPage: React.FC = () => {
                  >
                     <div className="relative w-32 h-32 mb-4">
                        <img 
-                         src={`https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20local%20portrait%20${local.name}&image_size=square`} 
+                         src={`https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400`} 
                          alt={local.name} 
                          className="w-full h-full rounded-full object-cover border-4 border-white shadow-md group-hover:border-brand-yellow transition-all duration-300"
                        />
@@ -343,7 +343,7 @@ export const KathmanduPage: React.FC = () => {
                   <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
                      <div className="flex -space-x-2">
                         {tour.locals.map((l, i) => (
-                           <img key={i} src={`https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20local%20portrait%20${l}&image_size=square`} className="w-8 h-8 rounded-full border-2 border-white object-cover" />
+                           <img key={i} src={`https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400`} className="w-8 h-8 rounded-full border-2 border-white object-cover" />
                         ))}
                      </div>
                      <div className="text-right">
@@ -387,7 +387,7 @@ export const KathmanduPage: React.FC = () => {
         {/* SEO / Articles Section */}
         <div className="mb-24">
            <div className="relative h-[400px] rounded-3xl overflow-hidden mb-16 group cursor-pointer">
-              <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Kathmandu%20street%20scene%20motorcycles&image_size=landscape_16_9" className="w-full h-full object-cover brightness-[0.6] group-hover:scale-105 transition-transform duration-700" />
+              <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400" className="w-full h-full object-cover brightness-[0.6] group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 flex flex-col justify-center p-8 md:p-16">
                  <div className="bg-[#213448] w-16 h-1 mb-6"></div>
                  <h2 className="text-4xl md:text-6xl font-bold text-white mb-4 max-w-2xl leading-tight">
@@ -409,7 +409,7 @@ export const KathmanduPage: React.FC = () => {
               {/* Article 1: Cycle */}
               <div className="flex flex-col md:flex-row gap-12 items-center">
                  <div className="md:w-1/2">
-                    <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=cycling%20kathmandu%20valley%20rice%20fields&image_size=landscape_4_3" className="rounded-3xl shadow-xl w-full aspect-[4/3] object-cover" />
+                    <img src="https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=400" className="rounded-3xl shadow-xl w-full aspect-[4/3] object-cover" />
                  </div>
                  <div className="md:w-1/2">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Cycle on the off roads</h3>
@@ -425,7 +425,7 @@ export const KathmanduPage: React.FC = () => {
               {/* Article 2: Dine */}
               <div className="flex flex-col md:flex-row-reverse gap-12 items-center">
                  <div className="md:w-1/2">
-                    <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20home%20dinner%20family&image_size=landscape_4_3" className="rounded-3xl shadow-xl w-full" />
+                    <img src="https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=400" className="rounded-3xl shadow-xl w-full" />
                  </div>
                  <div className="md:w-1/2">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Dine with enthusiastic locals</h3>
@@ -442,7 +442,7 @@ export const KathmanduPage: React.FC = () => {
               {/* Article 3: Markets */}
               <div className="flex flex-col md:flex-row gap-12 items-center">
                  <div className="md:w-1/2">
-                    <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=asan%20market%20kathmandu%20spices&image_size=landscape_4_3" className="rounded-3xl shadow-xl w-full" />
+                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400" className="rounded-3xl shadow-xl w-full" />
                  </div>
                  <div className="md:w-1/2">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Enjoy the fun Local Markets</h3>
@@ -458,7 +458,7 @@ export const KathmanduPage: React.FC = () => {
               {/* Article 4: Temples */}
               <div className="flex flex-col md:flex-row-reverse gap-12 items-center">
                  <div className="md:w-1/2">
-                    <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=swayambhunath%20monkey%20temple%20kathmandu&image_size=landscape_4_3" className="rounded-3xl shadow-xl w-full aspect-[4/3] object-cover" />
+                    <img src="https://images.unsplash.com/photo-1516594798947-e65505dbb29d?w=400" className="rounded-3xl shadow-xl w-full aspect-[4/3] object-cover" />
                  </div>
                  <div className="md:w-1/2">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Visit Kathmandu Durbar Square & Swayambhunath</h3>

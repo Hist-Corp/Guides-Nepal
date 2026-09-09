@@ -5,6 +5,7 @@ import { Clock, User, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getCmsBlogPosts } from '../services/cms';
+import { useImagePlacement } from '../hooks/useCms';
 
 const staticBlogPosts = [
   {
@@ -13,7 +14,7 @@ const staticBlogPosts = [
     excerpt: 'Discover the secret spots that only locals know about. From hidden temples to underground cafes.',
     author: 'Ram Bahadur',
     date: '2026-01-15',
-    image: 'https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     category: 'Travel Tips'
   },
   {
@@ -22,7 +23,7 @@ const staticBlogPosts = [
     excerpt: 'Explore the rich flavors of traditional Newari dishes and where to find the best ones.',
     author: 'Priya Sharma',
     date: '2026-01-10',
-    image: 'https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     category: 'Food & Culture'
   },
   {
@@ -40,7 +41,7 @@ const staticBlogPosts = [
     excerpt: 'Learn how to travel responsibly and support local communities while exploring Nepal.',
     author: 'Rohan KC',
     date: '2025-12-28',
-    image: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     category: 'Sustainability'
   },
   {
@@ -65,6 +66,8 @@ const staticBlogPosts = [
 
 const BlogPage: React.FC = () => {
   const [cmsPosts, setCmsPosts] = useState<any[]>([]);
+  // Dashboard-placed blog post images (slots blog-post-1 .. blog-post-6)
+  const placedImages = Array.from({ length: 6 }, (_, i) => useImagePlacement(`blog-post-${i + 1}`));
 
   useEffect(() => {
     getCmsBlogPosts().then(setCmsPosts);
@@ -110,11 +113,11 @@ const BlogPage: React.FC = () => {
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {blogPosts.map((post) => (
+              {blogPosts.map((post, index) => (
                 <article key={post.id} className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow group">
                   <div className="h-48 overflow-hidden">
                     <img
-                      src={post.image}
+                      src={placedImages[index] || post.image}
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />

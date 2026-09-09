@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getPageSections, getCmsSeoEntries, type CmsSection } from '../services/cms'
+import { getPageSections, getCmsSeoEntries, getPlacements, type CmsSection } from '../services/cms'
 
 /**
  * Returns the CMS section with the given id for the given page slug,
@@ -20,6 +20,27 @@ export function useCmsSection(slug: string, id: string): CmsSection | null {
   }, [slug, id])
 
   return section
+}
+
+/**
+ * Returns the image URL placed into the given slot from the dashboard
+ * Media Library ("Place" action), or null when no image is placed there.
+ * Components fall back to their hardcoded image when null.
+ */
+export function useImagePlacement(key: string): string | null {
+  const [url, setUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    let alive = true
+    getPlacements().then((map) => {
+      if (alive) setUrl(map[key] || null)
+    })
+    return () => {
+      alive = false
+    }
+  }, [key])
+
+  return url
 }
 
 /**

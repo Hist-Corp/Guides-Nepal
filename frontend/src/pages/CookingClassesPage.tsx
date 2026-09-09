@@ -23,7 +23,7 @@ const cookingTours = [
     id: 1,
     title: "Authentic Nepali Cooking Class with Market Visit",
     slug: "nepali-cooking-class-market-visit",
-    image: "https://images.unsplash.com/photo-1506368246289-816d25204333?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     rating: 4.9,
     reviews: 892,
     type: "Cooking Class",
@@ -47,7 +47,7 @@ const cookingTours = [
     id: 3,
     title: "Traditional Newari Feast Cooking Experience",
     slug: "newari-feast-cooking",
-    image: "https://images.unsplash.com/photo-1528218264285-1a7f0a454c59?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1466637574441-749b8f19452f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     rating: 4.9,
     reviews: 445,
     type: "Cultural Cooking",
@@ -59,7 +59,7 @@ const cookingTours = [
     id: 4,
     title: "Organic Farm Visit & Farm-to-Table Cooking",
     slug: "organic-farm-cooking",
-    image: "https://images.unsplash.com/photo-1567320032334-337b414cee40?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     rating: 4.7,
     reviews: 334,
     type: "Farm Experience",
@@ -71,7 +71,7 @@ const cookingTours = [
     id: 5,
     title: "Dal Bhat Cooking: Nepal's National Dish",
     slug: "dal-bhat-cooking-class",
-    image: "https://images.unsplash.com/photo-1542636434-7338f835865c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1495521821757-a1efb6729352?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     rating: 4.8,
     reviews: 723,
     type: "Traditional Cooking",
@@ -170,7 +170,7 @@ export const CookingClassesPage: React.FC = () => {
                   </div>
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg rounded-bl-[4rem]">
                     <img 
-                      src="https://images.unsplash.com/photo-1604559421956-d7dbd9ddcc3d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+                      src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
                       alt="Nepali Chef"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -226,7 +226,7 @@ export const CookingClassesPage: React.FC = () => {
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Card 1: Dal Bhat */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1542636434-7338f835865c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Dal Bhat" className="w-full h-64 object-cover" />
+              <img src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Dal Bhat" className="w-full h-64 object-cover" />
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Master the Art of Dal Bhat</h3>
                 <p className="text-gray-600 mb-4">A private cooking class in Kathmandu is the easiest and most authentic way to learn Nepal's national dish. Dal Bhat isn't just food—it's a cultural experience that brings families together every day.</p>
@@ -249,7 +249,7 @@ export const CookingClassesPage: React.FC = () => {
             </div>
             {/* Card 3: Spice Markets */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1599529453692-26a482a8c1a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Spice Market" className="w-full h-64 object-cover" />
+              <img src="https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Spice Market" className="w-full h-64 object-cover" />
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Explore Aromatic Spice Markets</h3>
                 <p className="text-gray-600 mb-4">The Local Spice Markets are a joy for the senses and essential for authentic Nepali cooking! Add them to your cooking class experience and you won't regret it! You will find everything from fresh turmeric to aromatic cardamom.</p>
@@ -258,7 +258,7 @@ export const CookingClassesPage: React.FC = () => {
             </div>
             {/* Card 4: Newari Recipes */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1528218264285-1a7f0a454c59?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Newari Food" className="w-full h-64 object-cover" />
+              <img src="https://images.unsplash.com/photo-1466637574441-749b8f19452f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Newari Food" className="w-full h-64 object-cover" />
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Discover Ancient Newari Recipes</h3>
                 <p className="text-gray-600 mb-4">There are quite a few culinary highlights worth learning in Kathmandu, but Newari cuisine is surely a must-try! These ancient recipes have been passed down through generations and represent the rich cultural heritage of the Kathmandu Valley.</p>
@@ -563,7 +563,7 @@ export const CookingClassesPage: React.FC = () => {
         <div className="mb-24">
            <div className="relative rounded-2xl overflow-hidden shadow-lg group cursor-pointer">
               <img 
-                src="https://images.unsplash.com/photo-1600210494498-3167e7d67e8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+                src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
                 alt="Nepali Family Cooking" 
                 className="w-full h-[500px] object-cover transition-transform duration-500 group-hover:scale-105" 
               />
@@ -619,7 +619,7 @@ export const CookingClassesPage: React.FC = () => {
               {/* Article 3: Spice Markets */}
               <div className="flex flex-col md:flex-row gap-12 items-center">
                  <div className="md:w-1/2">
-                    <img src="https://images.unsplash.com/photo-1587049352846-4a222e784ba4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" className="rounded-3xl shadow-xl w-full" />
+                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" className="rounded-3xl shadow-xl w-full" />
                  </div>
                  <div className="md:w-1/2">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Explore Aromatic Spice Markets</h3>

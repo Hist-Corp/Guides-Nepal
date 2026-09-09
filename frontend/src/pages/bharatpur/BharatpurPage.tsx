@@ -66,7 +66,7 @@ export const BharatpurPage: React.FC = () => {
                 <div className="space-y-4 translate-y-8">
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
                     <img 
-                      src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=one%20horned%20rhino%20chitwan&image_size=portrait_3_4" 
+                      src="https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400" 
                       alt="Rhino"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -81,14 +81,14 @@ export const BharatpurPage: React.FC = () => {
                 <div className="space-y-4">
                   <div className="aspect-square rounded-2xl overflow-hidden shadow-lg">
                     <img 
-                      src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=tharu%20stick%20dance%20nepal&image_size=square" 
+                      src="https://images.unsplash.com/photo-1528181304800-259b08848526?w=400" 
                       alt="Tharu Dance"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
                   </div>
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg rounded-bl-[4rem]">
                     <img 
-                      src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20tharu%20guide%20jungle&image_size=portrait_3_4" 
+                      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400" 
                       alt="Local Guide"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -361,7 +361,7 @@ export const BharatpurPage: React.FC = () => {
         {/* SEO / Articles Section */}
         <div className="mb-24">
            <div className="relative h-[400px] rounded-3xl overflow-hidden mb-16 group cursor-pointer">
-              <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Chitwan%20National%20Park%20sunset&image_size=landscape_16_9" className="w-full h-full object-cover brightness-[0.6] group-hover:scale-105 transition-transform duration-700" />
+              <img src="https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400" className="w-full h-full object-cover brightness-[0.6] group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 flex flex-col justify-center p-8 md:p-16">
                  <div className="bg-[#213448] w-16 h-1 mb-6"></div>
                  <h2 className="text-4xl md:text-6xl font-bold text-white mb-4 max-w-2xl leading-tight">
@@ -383,7 +383,7 @@ export const BharatpurPage: React.FC = () => {
               {/* Article 1: Safari */}
               <div className="flex flex-col md:flex-row gap-12 items-center">
                  <div className="md:w-1/2">
-                    <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=jeep%20safari%20chitwan%20tiger&image_size=landscape_4_3" className="rounded-3xl shadow-xl w-full aspect-[4/3] object-cover" />
+                    <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400" className="rounded-3xl shadow-xl w-full aspect-[4/3] object-cover" />
                  </div>
                  <div className="md:w-1/2">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Go on a Jungle Safari</h3>
@@ -399,7 +399,7 @@ export const BharatpurPage: React.FC = () => {
               {/* Article 2: Culture */}
               <div className="flex flex-col md:flex-row-reverse gap-12 items-center">
                  <div className="md:w-1/2">
-                    <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=tharu%20culture%20dance%20nepal&image_size=landscape_4_3" className="rounded-3xl shadow-xl w-full" />
+                    <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400" className="rounded-3xl shadow-xl w-full" />
                  </div>
                  <div className="md:w-1/2">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Experience Tharu Culture</h3>

@@ -9,6 +9,9 @@ export default defineConfig({
     chunkSizeWarningLimit: 3000,
   },
   server: {
+    port: 5175,
+    strictPort: true,
+    host: '0.0.0.0',
     proxy: {
       '/api/v1': {
         target: 'http://localhost:8000',
@@ -17,13 +20,7 @@ export default defineConfig({
     },
   },
   plugins: [
-    react({
-      babel: {
-        plugins: [
-          'react-dev-locator',
-        ],
-      },
-    }),
+    react(),
     tsconfigPaths()
   ],
 })

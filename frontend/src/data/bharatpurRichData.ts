@@ -9,10 +9,10 @@ export const bharatpurRichData: RichExperienceData[] = [
     id: 1,
     slug: 'chitwan-jungle-safari',
     title: "Chitwan Jungle Safari",
-    heroImage: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=chitwan%20jungle%20safari%20jeep%20rhino&image_size=landscape_16_9",
+    heroImage: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400",
     host: {
       name: "Ram",
-      image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=tharu%20guide%20man&image_size=square",
+      image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400",
       type: "Wildlife Expert"
     },
     guides: [
@@ -51,10 +51,10 @@ export const bharatpurRichData: RichExperienceData[] = [
     id: 2,
     slug: 'tharu-village-culture-tour',
     title: "Tharu Village Culture Tour",
-    heroImage: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=tharu%20village%20culture%20dance&image_size=landscape_16_9",
+    heroImage: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400",
     host: {
       name: "Sita",
-      image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=tharu%20woman%20traditional%20dress&image_size=square",
+      image: "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400",
       type: "Cultural Guide"
     },
     guides: [
@@ -93,10 +93,10 @@ export const bharatpurRichData: RichExperienceData[] = [
     id: 3,
     slug: 'canoe-ride-rapti-river',
     title: "Canoe Ride on Rapti River",
-    heroImage: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=canoe%20ride%20rapti%20river%20chitwan&image_size=landscape_16_9",
+    heroImage: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400",
     host: {
       name: "Bishnu",
-      image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20boatman%20guide&image_size=square",
+      image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400",
       type: "River Guide"
     },
     guides: [
@@ -135,10 +135,10 @@ export const bharatpurRichData: RichExperienceData[] = [
     id: 4,
     slug: 'elephant-breeding-center',
     title: "Elephant Breeding Center Visit",
-    heroImage: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=baby%20elephant%20chitwan&image_size=landscape_16_9",
+    heroImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
     host: {
       name: "Kumar",
-      image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20nature%20guide&image_size=square",
+      image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400",
       type: "Animal Expert"
     },
     guides: [
@@ -177,10 +177,10 @@ export const bharatpurRichData: RichExperienceData[] = [
     id: 5,
     slug: 'bishazari-tal-bird-watching',
     title: "20,000 Lake Bird Watching",
-    heroImage: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=bishazari%20tal%20chitwan%20birds&image_size=landscape_16_9",
+    heroImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400",
     host: {
       name: "Ramesh",
-      image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20bird%20guide%20binoculars&image_size=square",
+      image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400",
       type: "Ornithologist"
     },
     guides: [
@@ -219,10 +219,10 @@ export const bharatpurRichData: RichExperienceData[] = [
     id: 6,
     slug: 'devghat-spiritual-tour',
     title: "Devghat Spiritual Tour",
-    heroImage: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=devghat%20dham%20river%20confluence&image_size=landscape_16_9",
+    heroImage: "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=400",
     host: {
       name: "Pandit",
-      image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepali%20priest%20guide&image_size=square",
+      image: "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=400",
       type: "Spiritual Guide"
     },
     guides: [

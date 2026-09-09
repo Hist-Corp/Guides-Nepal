@@ -72,7 +72,7 @@ const GalleryPage: React.FC = () => {
                 className="break-inside-avoid rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative"
               >
                 <img 
-                  src={`https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepal%20travel%20photography%20${i}&image_size=${i % 2 === 0 ? 'portrait_3_4' : 'landscape_16_9'}`}
+                  src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400"
                   alt={`Extra Gallery ${i}`}
                   className="w-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />

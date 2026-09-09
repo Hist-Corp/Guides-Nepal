@@ -69,6 +69,31 @@ export async function getCmsSeoEntries(): Promise<CmsSeoEntry[]> {
   }
 }
 
+export interface CmsPlacement {
+  slots: { key: string; label: string }[]
+  placements: Record<string, string>
+}
+
+// Placements cache — refreshed on each page load of useImagePlacement
+let placementsCache: Record<string, string> | null = null
+
+export async function getPlacements(): Promise<Record<string, string>> {
+  if (placementsCache) return placementsCache
+  try {
+    const res = await axios.get<CmsPlacement>(`${API_BASE_URL}/content/placements`)
+    placementsCache = res.data?.placements || {}
+    return placementsCache
+  } catch {
+    placementsCache = {}
+    return {}
+  }
+}
+
+/** Clears the placements cache (e.g. after the dashboard saves changes). */
+export function clearPlacementsCache() {
+  placementsCache = null
+}
+
 /**
  * Clears the cached sections (optionally for one slug) so the next
  * getPageSections call re-fetches fresh data from the CMS. Used by the

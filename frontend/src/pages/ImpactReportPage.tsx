@@ -80,7 +80,7 @@ const ImpactReportPage: React.FC = () => {
         <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
              <img 
-               src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=diverse%20travelers%20in%20nepal%20market%20happy%20authentic&image_size=landscape_16_9" 
+               src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400" 
                alt="Impact Travel" 
                className="w-full h-full object-cover"
              />
@@ -127,7 +127,7 @@ const ImpactReportPage: React.FC = () => {
                  {/* Card 1 */}
                  <div className="bg-[#FFF8F0] rounded-3xl overflow-hidden shadow-xl flex flex-col md:flex-row">
                     <div className="md:w-1/2 h-64 md:h-auto relative">
-                       <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=himalayan%20glacier%20landscape%20nepal&image_size=landscape_4_3" alt="Climate Change" className="w-full h-full object-cover" />
+                       <img src="https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400" alt="Climate Change" className="w-full h-full object-cover" />
                     </div>
                     <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
                        <h3 className="text-3xl font-bold text-slate-900 mb-4">Reduce the Impact of Tourism on Climate Change.</h3>
@@ -148,7 +148,7 @@ const ImpactReportPage: React.FC = () => {
                  {/* Card 2 */}
                  <div className="bg-[#FFF8F0] rounded-3xl overflow-hidden shadow-xl flex flex-col md:flex-row-reverse">
                     <div className="md:w-1/2 h-64 md:h-auto relative">
-                       <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepal%20tea%20fields%20green%20lush&image_size=landscape_4_3" alt="Local Benefits" className="w-full h-full object-cover" />
+                       <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400" alt="Local Benefits" className="w-full h-full object-cover" />
                     </div>
                     <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
                        <h3 className="text-3xl font-bold text-slate-900 mb-4">Maximize Local Benefits.</h3>
@@ -169,7 +169,7 @@ const ImpactReportPage: React.FC = () => {
                  {/* Card 3 */}
                  <div className="bg-[#FFF8F0] rounded-3xl overflow-hidden shadow-xl flex flex-col md:flex-row">
                     <div className="md:w-1/2 h-64 md:h-auto relative">
-                       <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=mustard%20field%20nepal%20person%20walking&image_size=landscape_4_3" alt="Respect and Protect" className="w-full h-full object-cover" />
+                       <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400" alt="Respect and Protect" className="w-full h-full object-cover" />
                     </div>
                     <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
                        <h3 className="text-3xl font-bold text-slate-900 mb-4">Respect & Protect.</h3>
@@ -270,7 +270,7 @@ const ImpactReportPage: React.FC = () => {
                        <p className="text-slate-500 text-sm mb-4 px-2 line-clamp-2">Immerse yourself in the authentic traditions and history.</p>
                        <div className="flex-grow rounded-t-xl overflow-hidden mt-auto">
                           <img 
-                             src={`https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=nepal%20travel%20experience%20${item}&image_size=portrait_4_3`} 
+                             src={`https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400`} 
                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                              alt="Experience" 
                           />

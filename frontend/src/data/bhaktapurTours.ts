@@ -35,7 +35,7 @@ export const bhaktapurTours = [
     type: "Food Tour",
     price: 15.00,
     description: "You can't leave Bhaktapur without trying the King of Yogurt. Discover the secrets behind this creamy, delicious dessert.",
-    image: "https://images.unsplash.com/photo-1576092762791-d02d21c89954?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
     locals: ["Prakash", "Krishna"]
   },
   {
@@ -61,7 +61,7 @@ export const bhaktapurTours = [
     type: "Night Tour",
     price: 45.00,
     description: "Experience the magic of Bhaktapur after dark. The temples are beautifully lit, and the streets are quiet and atmospheric.",
-    image: "https://images.unsplash.com/photo-1563492065599-3520ff735c9d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
     locals: ["Krishna", "Radha"]
   },
   {
@@ -74,7 +74,7 @@ export const bhaktapurTours = [
     type: "Workshop",
     price: 50.00,
     description: "Learn the intricate art of Thangka painting from a master artist. A spiritual and artistic experience.",
-    image: "https://images.unsplash.com/photo-1576092762791-d02d21c89954?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
     locals: ["Radha", "Prakash"]
   }
 ];

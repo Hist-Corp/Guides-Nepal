@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { getPageSections, updateAllSections } from '../services/api';
 import { FRONTEND_URL } from '../config/api';
+import ImagePicker from '../components/forms/ImagePicker';
 
 const FIELD_GROUPS: Record<string, { key: string; label: string; type: string }[]> = {
   hero: [
+    { key: 'image', label: 'Background Image', type: 'image' },
     { key: 'heading', label: 'Heading', type: 'text' },
     { key: 'subtitle', label: 'Subtitle', type: 'textarea' },
     { key: 'buttonText', label: 'Button Text', type: 'text' },
@@ -11,11 +13,13 @@ const FIELD_GROUPS: Record<string, { key: string; label: string; type: string }[
     { key: 'primaryText', label: 'Primary Brand Text', type: 'text' },
   ],
   featured: [
+    { key: 'image', label: 'Section Image', type: 'image' },
     { key: 'heading', label: 'Heading', type: 'text' },
     { key: 'subtitle', label: 'Subtitle', type: 'textarea' },
     { key: 'buttonText', label: 'Button Text', type: 'text' },
   ],
   promo: [
+    { key: 'image', label: 'Background Image', type: 'image' },
     { key: 'heading', label: 'Heading', type: 'text' },
     { key: 'subtitle', label: 'Subtitle', type: 'textarea' },
     { key: 'buttonText', label: 'Button Text', type: 'text' },
@@ -34,6 +38,7 @@ const FIELD_GROUPS: Record<string, { key: string; label: string; type: string }[
     { key: 'copyright', label: 'Copyright Text', type: 'text' },
   ],
   text: [
+    { key: 'image', label: 'Section Image', type: 'image' },
     { key: 'heading', label: 'Heading', type: 'text' },
     { key: 'body', label: 'Body Text', type: 'textarea' },
   ],
@@ -530,21 +535,32 @@ export default function LivePageEditor({
                   )}
                   {fields.map((f) => (
                     <div key={f.key} className="mb-3">
-                      <label className="block text-xs font-medium text-gray-600 mb-1">
-                        {f.label}
-                      </label>
-                      {f.type === 'textarea' ? (
-                        <textarea
-                          value={selected.content[f.key] || ''}
-                          onChange={(e) => updateField(f.key, e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary h-20 resize-none"
+                      {f.type === 'image' ? (
+                        <ImagePicker
+                          label={f.label}
+                          currentImageUrl={selected.content[f.key] || ''}
+                          onImageSelected={(url) => updateField(f.key, url)}
+                          onCancel={() => updateField(f.key, '')}
                         />
                       ) : (
-                        <input
-                          value={selected.content[f.key] || ''}
-                          onChange={(e) => updateField(f.key, e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                        />
+                        <>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">
+                            {f.label}
+                          </label>
+                          {f.type === 'textarea' ? (
+                            <textarea
+                              value={selected.content[f.key] || ''}
+                              onChange={(e) => updateField(f.key, e.target.value)}
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary h-20 resize-none"
+                            />
+                          ) : (
+                            <input
+                              value={selected.content[f.key] || ''}
+                              onChange={(e) => updateField(f.key, e.target.value)}
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                            />
+                          )}
+                        </>
                       )}
                     </div>
                   ))}

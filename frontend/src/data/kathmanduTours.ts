@@ -35,7 +35,7 @@ export const kathmanduTours = [
     type: "City highlight tours",
     price: 49.21,
     description: "Want to see the best of Kathmandu? We got you covered. But as you can expect from a Guides Nepal experience, the real excitement is its hidden gems. Join your favorite local and get a feeling of the city's real vibe on a tour that has it all, so you can say: I experienced the real Kathmandu!",
-    image: "https://images.unsplash.com/photo-1547292283-7c664a092534?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Artty", "Sammy"]
   },
   {
@@ -48,7 +48,7 @@ export const kathmanduTours = [
     type: "City highlight tours",
     price: 37.50,
     description: "You've probably heard that Kathmandu is well-known for Buddhism and its monks, but do you know the stories and origin behind it? Or how much influence it has on the locals daily life? On this private city tour, you are in for a cultural treat!",
-    image: "https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Piyawee", "Jida"]
   },
   {
@@ -61,7 +61,7 @@ export const kathmanduTours = [
     type: "Food tours",
     price: 41.50,
     description: "Picture this, a night out in Kathmandu hopping from hot spot to hot spot, discovering local nightlife while tasting typical local drinks perfectly paired with delicious local bites. Sounds like a fun night? Join a local nightlife expert and discover how the locals unwind in Kathmandu.",
-    image: "https://images.unsplash.com/photo-1551024709-8f232a5a0e53?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Apicha", "Nok"]
   },
   {
@@ -74,7 +74,7 @@ export const kathmanduTours = [
     type: "Day trips",
     price: 137.00,
     description: "Imagine this: a scenic road trip from Kathmandu to explore Nagarkot with stops along the way to discover viewpoints, villages, incredible nature, and cultural gems. Sounds like a dream? No, it's possible on a Guides Nepal day trip with a local host leading the way!",
-    image: "https://images.unsplash.com/photo-1542347589-8c225e9c8a73?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1518684079-3c830dcef090?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Chef Hnoi", "Jida"]
   },
   {
@@ -87,7 +87,7 @@ export const kathmanduTours = [
     type: "Day trips",
     price: 112.00,
     description: "Embark on a Ancient city of Bhaktapur day trip outside of Kathmandu where many treasures, insights, and stories are waiting. Let a local host show you around and experience this cultural attraction from a local perspective. Give yourself the gift of a Bhaktapur day trip with a local - it's a must-do!",
-    image: "https://images.unsplash.com/photo-1547292283-7c664a092534?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Natcha", "Jojo"]
   },
   {
@@ -100,7 +100,7 @@ export const kathmanduTours = [
     type: "Food tours",
     price: 28.39,
     description: "The way to a city's heart it's through its food! And on this private food tour, you'll get to know Kathmandu through its cuisine and the tastings favorite of the locals. A local food expert is ready to give you a taste of the real Kathmandu satisfying your cravings for local food and city highlights.",
-    image: "https://images.unsplash.com/photo-1604542052539-b8c13b852152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Nakarin", "Jojo"]
   },
   {
@@ -113,7 +113,7 @@ export const kathmanduTours = [
     type: "City highlight tours",
     price: 75.71,
     description: "Ready for a jam-packed tour, full of history, culture, stories, and sights? Checkmark from your travel bucket list all your must-sees of Kathmandu, because if there's a Guides Nepal tour that shows you all the city's ins and outs, it's this complete and personalized tour of Kathmandu.",
-    image: "https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Agrindra", "Araya"]
   },
   {
@@ -126,7 +126,7 @@ export const kathmanduTours = [
     type: "Day trips",
     price: 98.81,
     description: "Embark on a Chandragiri Hills day trip outside of Kathmandu where many treasures, insights, and stories are waiting. Let a local host show you around and experience this cultural attraction from a local perspective. Give yourself the gift of a Chandragiri day trip with a local - it's a must-do!",
-    image: "https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Sammy", "Sudarat"]
   }
 ];

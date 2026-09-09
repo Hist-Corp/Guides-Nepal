@@ -44,7 +44,7 @@ const cultures: Record<string, CultureConfig> = {
       {
         title: 'Sapu Mhicha: Bone Marrow Delight',
         image:
-          'https://images.unsplash.com/photo-1623689046710-1786bd25cc5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+          'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
         description:
           'A true Newari delicacy, Sapu Mhicha is bone marrow enclosed in a buffalo leaf intestine pouch. When fried, the outer layer becomes crispy while the inside melts. It’s a unique burst of rich, savory flavor, often enjoyed with a glass of local aila (rice spirit).',
       },
@@ -72,12 +72,12 @@ const cultures: Record<string, CultureConfig> = {
     summary:
       'Warm, nourishing plates shaped by altitude and adventure. Taste thukpa, rildok, and yak butter tea in cozy teahouses.',
     heroImage:
-      'https://images.unsplash.com/photo-1544738078-1c3e6b8b4b9f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
     experiences: [
       {
         title: 'Teahouse Soup Crawl',
         image:
-          'https://images.unsplash.com/photo-1544738078-1c3e6b8b4b9f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+          'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
         description:
           'Embark on a warming journey through Himalayan teahouses where thukpa, a hearty noodle soup enriched with vegetables, meat, and aromatic spices, has sustained mountaineers for generations. This Tibetan-origin dish features hand-pulled wheat noodles swimming in a rich bone broth infused with ginger, garlic, and mountain herbs. Thenthuk, its hand-torn noodle cousin, offers a more rustic texture that perfectly captures the essence of high-altitude comfort food. Each sip tells stories of Sherpa hospitality, where these soups serve as both nourishment and social glue in communities living above 3,000 meters. The warming spices help combat the thin mountain air while providing essential calories for trekkers and locals alike.',
       },
@@ -222,7 +222,7 @@ const cultures: Record<string, CultureConfig> = {
     headline: 'Momos, thenthuk, and butter tea',
     summary:
       'Follow the diaspora’s flavors across noodles, dumplings, and comforting teahouse fare.',
-    heroImage: 'https://images.unsplash.com/photo-1596570222950-8014a0459582?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+    heroImage: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
     experiences: [
       {
         title: 'Momo Master Trail',
@@ -232,21 +232,21 @@ const cultures: Record<string, CultureConfig> = {
       },
       {
         title: 'Thenthuk Noodle House',
-        image: 'https://images.unsplash.com/photo-1555126634-78d6283779b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+        image: 'https://images.unsplash.com/photo-1552611052-33e04de081de?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
         description:
           'Step into a traditional Tibetan noodle house and witness the mesmerizing art of thenthuk preparation, where skilled artisans transform a simple dough of flour and water into rustic, hand-pulled noodles with a satisfyingly chewy texture. The magic lies in the technique: the dough is kneaded, stretched, and flattened before being expertly pulled and torn directly into a simmering broth, ensuring that each noodle absorbs the rich flavors of the soup. The broth itself is a masterpiece of simplicity, a clear and fragrant concoction of bone broth, seasonal vegetables, and tender meat, seasoned with ginger, garlic, and a hint of star anise. This one-bowl meal, born from the nomadic traditions of the Tibetan plateau, is a testament to the beauty of simplicity, where the quality of ingredients and the skill of the maker shine through in every comforting bite.',
       },
       {
         title: 'Butter Tea Stop',
         image:
-          'https://images.unsplash.com/photo-1576092762791-d02d21c89954?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+          'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
         description:
           'Immerse yourself in the ancient Tibetan tea ceremony at a traditional teahouse, where the ritual of preparing po cha (butter tea) becomes a meditation on patience, precision, and cultural preservation. Watch as skilled tea masters churn the tea in wooden dongmo cylinders, creating a frothy, pinkish beverage that is both nourishing and spiritually significant. The tea itself is a complex blend of fermented tea leaves, yak butter, and salt, creating a savory, slightly sweet flavor profile that challenges Western palates but quickly becomes addictive. Learn about the cultural significance of this drink, which is served to guests as a sign of respect and consumed by monks during long meditation sessions for its energizing properties. The accompanying breads—tingmo (steamed bread) and balep (flatbread)—provide the perfect vehicle for soaking up the rich, buttery tea, creating a complete meal that has sustained Tibetan communities for centuries.',
       },
       {
         title: 'Neighborhood Fusion Tour',
         image:
-          'https://images.unsplash.com/photo-1596570222950-8014a0459582?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+          'https://images.unsplash.com/photo-1533105079780-92b9be482077?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
         description:
           'Wander through the vibrant Tibetan neighborhoods of Kathmandu, where the aromas of traditional cuisine mingle with the sounds of prayer wheels and the colorful flutter of prayer flags, creating an immersive cultural experience that engages all the senses. Discover hidden gems where Tibetan refugees have preserved their culinary traditions while adapting to local ingredients and Nepali influences, creating a unique fusion cuisine that tells the story of diaspora and resilience. Learn how momos evolved from simple Tibetan dumplings to become a beloved Nepali street food, or how thukpa transformed from a high-altitude survival food to a comforting urban meal. Meet local cooks who share stories of their journey from Tibet to Nepal, and how food became a way to preserve their identity while building new lives. This neighborhood tour is not just about tasting food; it is about understanding how cuisine becomes a bridge between cultures, a way to honor the past while embracing the future.',
       },
@@ -259,12 +259,12 @@ const cultures: Record<string, CultureConfig> = {
     summary:
       'Vegetable‑forward plates, delicate sweets, and ceremonial foods from the eastern plains.',
     heroImage:
-      'https://images.unsplash.com/photo-1617022344324-cce34c9a792d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
     experiences: [
       {
         title: 'Mithila Sweet Trail',
         image:
-          'https://images.unsplash.com/photo-1604467707610-df6835737569?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+          'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
         description:
           'Journey through the sacred land of Mithila, where sweets are not merely desserts but edible poetry that celebrates life\'s milestones, from birth to marriage, from harvest to religious festivals. Discover the intricate artistry of thekua, a deep-fried biscuit made from whole wheat flour, jaggery, and coconut, traditionally prepared during the Chhath festival as an offering to the Sun God. Each piece is handcrafted with geometric patterns that tell stories of devotion and gratitude, creating a perfect balance of crispy exterior and soft, sweet interior. Learn the secrets of malpua, a fermented rice pancake soaked in cardamom-scented syrup, where the fermentation process creates complex flavors that dance between tangy and sweet, with hints of tropical fruit from the coconut milk base. Experience the ritual of making anarsa, where rice flour and jaggery are transformed into delicate, moon-shaped sweets that melt on the tongue, leaving behind the warm embrace of cinnamon and the subtle crunch of sesame seeds.',
       },
@@ -282,7 +282,7 @@ const cultures: Record<string, CultureConfig> = {
       },
       {
         title: 'Courtyard Lunch',
-        image: 'https://images.unsplash.com/photo-1559329022-e1a785773e3a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+        image: 'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
         description:
           'Step into the sacred space of a traditional Mithila courtyard, where the walls are adorned with vibrant Madhubani paintings that tell stories of gods, goddesses, and daily life, creating an artistic backdrop for a meal that is both nourishment and cultural celebration. Experience the ritual of serving, where food is placed on fresh banana leaves that impart a subtle, earthy flavor while maintaining the perfect temperature for each dish. Learn the significance of sitting cross-legged on the floor, a position that aids digestion and creates equality among diners, regardless of social status. Discover the philosophy of eating with hands, where the five fingers represent the five elements—earth, water, fire, air, and space—creating a holistic connection between the diner and the food. Participate in conversations that flow as naturally as the rice beer (handia) served in earthen cups, discussing everything from agricultural cycles to family histories, creating bonds that extend beyond the meal itself.',
       },
@@ -298,19 +298,19 @@ const cultures: Record<string, CultureConfig> = {
     experiences: [
       {
         title: 'Dal‑Bhat Masterclass',
-        image: 'https://images.unsplash.com/photo-1604152165673-4e0e0a412198?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+        image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
         description:
           'Immerse yourself in the ancient wisdom of Thakali cuisine, where the humble dal-bhat transcends mere sustenance to become a complete nutritional philosophy that has sustained Himalayan communities for centuries. Discover the alchemy of transforming simple lentils into a complex, aromatic dal through the precise layering of spices—first the tempering of cumin and mustard seeds in ghee until they release their nutty aroma, then the addition of turmeric for its earthy depth, and finally the subtle heat of dried red chilies. Learn how the rice is not just a neutral base but an active participant in the flavor symphony, its fluffy grains absorbing the dal\'s richness while providing the perfect textural contrast to the accompanying dishes. Experience the ritual of assembly, where each component—whether it\'s the crispy papadum, the cooling raita, or the fiery achar—is positioned with intention, creating a visual and gustatory harmony that reflects the Thakali understanding of balance in all aspects of life.',
       },
       {
         title: 'Achar Bar',
-        image: 'https://images.unsplash.com/photo-1584279136918-b40695d43f25?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+        image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
         description:
           'Embark on a sensory journey through the vibrant world of Thakali pickles, where each variety tells a story of preservation, patience, and the alchemical transformation of simple ingredients into complex flavor bombs that elevate every meal from ordinary to extraordinary. Discover the subtle art of balancing the five essential elements—sweet, sour, salty, bitter, and umami—through the careful selection and combination of ingredients, from the fiery heat of green chilies to the tangy brightness of raw mangoes, from the earthy depth of roasted cumin to the floral notes of mustard seeds. Learn how the timing of preparation is as crucial as the ingredients themselves, with summer pickles capturing the sun\'s warmth in their golden hues, while winter varieties develop their complex flavors through slow fermentation in cool, dark cellars. Experience the ritual of tasting, where each pickle is paired with specific dishes to create harmonious flavor combinations that dance on the palate and linger in the memory.',
       },
       {
         title: 'Spice Pantry',
-        image: 'https://images.unsplash.com/photo-1599529453692-26a482a8c1a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+        image: 'https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
         description:
           'Step into the sacred space of a Thakali spice pantry, where rows of glass jars and brass containers hold the aromatic treasures that transform simple ingredients into culinary masterpieces, each spice carrying centuries of cultural knowledge and medicinal wisdom. Discover the meticulous organization system that separates spices by their primary function—aromatics like cardamom and cloves that perfume dishes, coloring agents like turmeric and saffron that paint plates with golden hues, and heat providers like dried chilies and black pepper that awaken the palate with their fiery kiss. Learn the ancient techniques of spice preparation, from dry-roasting whole spices to release their essential oils to grinding them in traditional stone mortars that preserve their volatile compounds better than modern appliances. Experience the sensory education of identifying spices through sight, smell, and touch, understanding how the quality of a spice can be determined by its color intensity, aromatic complexity, and textural characteristics.',
       },

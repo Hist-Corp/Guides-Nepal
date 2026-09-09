@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
+from sqlalchemy import inspect
 from app.core.config import settings
 from app.core.database import Base, engine
 from app import models  # noqa: F401  (registers all models on Base.metadata)

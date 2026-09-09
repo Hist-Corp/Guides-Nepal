@@ -16,7 +16,7 @@ export const kathmanduRichData: RichExperienceData[] = [
     heroImage: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
     host: {
       name: "Apicha",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
       type: "Foodie & Local Expert"
     },
     guides: [commonGuides[0], commonGuides[1], commonGuides[2]],
@@ -95,7 +95,7 @@ export const kathmanduRichData: RichExperienceData[] = [
     heroImage: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
     host: {
       name: "Artty",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
       type: "Storyteller"
     },
     guides: [

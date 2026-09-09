@@ -1,0 +1,21 @@
+{
+  "items": [
+    {
+      "id": 1002,
+      "filename": "ce0ed5e5-photo-1506905925346-21bda4d32df4",
+      "original_name": "photo-1506905925346-21bda4d32df4",
+      "type": "image/jpeg",
+      "size": 352305,
+      "source_url": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920"
+    },
+    {
+      "id": 1001,
+      "filename": "c247cdf4-photo-1563492065599-3520f775eeed",
+      "original_name": "photo-1563492065599-3520f775eeed",
+      "type": "image/jpeg",
+      "size": 30816,
+      "source_url": "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400"
+    }
+  ],
+  "placements": {}
+}

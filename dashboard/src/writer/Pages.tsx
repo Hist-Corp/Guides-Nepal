@@ -11,12 +11,16 @@ import { statusVariant } from "../utils/statusVariant";
 import LivePageEditor from "./LivePageEditor";
 import { FRONTEND_PAGES } from "../config/frontendPages";
 import { getContentPages, createContentPage, updateContentPage, deleteContentPage } from "../services/api";
+import { uploadMedia } from "../services/api";
+import { compressImage, generatePreview } from "../utils/imageCompressor";
+import ImagePicker from "../components/ImagePicker";
 
 export type NewPagePayload = {
   title: string;
   slug: string;
   status?: string;
   content?: string;
+  featuredImage?: string;
 };
 
 export type PageRecord = {
@@ -26,6 +30,7 @@ export type PageRecord = {
   status?: string;
   content?: string;
   path?: string;
+  featuredImage?: string;
 };
 
 function slugify(value: string) {
@@ -48,6 +53,9 @@ export default function WriterPages() {
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [form, setForm] = useState<NewPagePayload>({ title: "", slug: "" });
   const [liveEdit, setLiveEdit] = useState<PageRecord | null>(null);
+  const [featuredImageFile, setFeaturedImageFile] = useState<File | null>(null);
+  const [featuredImagePreview, setFeaturedImagePreview] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const fetchPages = async () => {
     setLoading(true);
@@ -65,13 +73,28 @@ export default function WriterPages() {
     fetchPages();
   }, []);
 
-  const resetForm = () => setForm({ title: "", slug: "" });
+  const resetForm = () => {
+    setForm({ title: "", slug: "" });
+    setFeaturedImageFile(null);
+    setFeaturedImagePreview("");
+  };
 
   const handleCreate = async () => {
     if (!form.title.trim()) return;
     setActionLoading(-1);
     try {
-      await createContentPage({ title: form.title, slug: form.slug || slugify(form.title), status: "draft" });
+      let imageUrl = "";
+      if (featuredImageFile) {
+        const compressed = await compressImage(featuredImageFile);
+        const result = await uploadMedia(compressed);
+        imageUrl = result?.url || "";
+      }
+      await createContentPage({
+        title: form.title,
+        slug: form.slug || slugify(form.title),
+        status: "draft",
+        featuredImage: imageUrl,
+      });
       setOpenCreate(false);
       resetForm();
       fetchPages();
@@ -87,7 +110,17 @@ export default function WriterPages() {
     if (!form.title.trim() || !openEdit) return;
     setActionLoading(openEdit.id);
     try {
-      await updateContentPage(openEdit.id, { title: form.title, slug: form.slug });
+      let imageUrl = form.featuredImage;
+      if (featuredImageFile) {
+        const compressed = await compressImage(featuredImageFile);
+        const result = await uploadMedia(compressed);
+        imageUrl = result?.url || "";
+      }
+      await updateContentPage(openEdit.id, {
+        title: form.title,
+        slug: form.slug,
+        featuredImage: imageUrl,
+      });
       setOpenEdit(null);
       resetForm();
       fetchPages();
@@ -128,7 +161,9 @@ export default function WriterPages() {
 
   const openEditModal = (page: PageRecord) => {
     setOpenEdit(page);
-    setForm({ title: page.title, slug: page.slug, content: page.content });
+    setForm({ title: page.title, slug: page.slug, content: page.content, featuredImage: page.featuredImage });
+    setFeaturedImagePreview(page.featuredImage || "");
+    setFeaturedImageFile(null);
   };
 
   const columns: Column<PageRecord>[] = [
@@ -136,6 +171,16 @@ export default function WriterPages() {
       key: "icon",
       label: "",
       render: (r) => <PageIcon slug={r.slug} />,
+    },
+    {
+      key: "featuredImage",
+      label: "Image",
+      render: (r) =>
+        r.featuredImage ? (
+          <img src={r.featuredImage} alt="" className="w-12 h-8 object-cover rounded" />
+        ) : (
+          <span className="text-xs text-gray-400">None</span>
+        ),
     },
     { key: "title", label: "Title" },
     { key: "slug", label: "Slug" },
@@ -200,7 +245,23 @@ export default function WriterPages() {
         <div className="space-y-4">
           <Field label="Page Title" placeholder="Enter page title" value={form.title} onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm({ ...form, title: e.target.value })} />
           <Field label="Slug" placeholder="page-slug" value={form.slug} onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm({ ...form, slug: e.target.value })} />
-          <Button variant="primary" className="w-full" onClick={handleCreate} disabled={!form.title.trim() || actionLoading === -1}>
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-1.5">Featured Image</p>
+            <ImagePicker
+              buttonText="Upload featured image"
+              previewUrl={featuredImagePreview}
+              onSelect={async (file) => {
+                setFeaturedImageFile(file);
+                const preview = await generatePreview(file);
+                setFeaturedImagePreview(preview);
+              }}
+              onClear={() => {
+                setFeaturedImageFile(null);
+                setFeaturedImagePreview("");
+              }}
+            />
+          </div>
+          <Button variant="primary" className="w-full" onClick={handleCreate} disabled={!form.title.trim() || actionLoading === -1 || uploadingImage}>
             {actionLoading === -1 ? "Adding…" : "Add Page"}
           </Button>
         </div>
@@ -210,7 +271,23 @@ export default function WriterPages() {
         <div className="space-y-4">
           <Field label="Page Title" placeholder="Enter page title" value={form.title} onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm({ ...form, title: e.target.value })} />
           <Field label="Slug" placeholder="page-slug" value={form.slug} onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm({ ...form, slug: e.target.value })} />
-          <Button variant="primary" className="w-full" onClick={handleEdit} disabled={!form.title.trim() || actionLoading === openEdit?.id}>
+          <div>
+            <p className="text-sm font-medium text-gray-700 mb-1.5">Featured Image</p>
+            <ImagePicker
+              buttonText="Change featured image"
+              previewUrl={featuredImagePreview}
+              onSelect={async (file) => {
+                setFeaturedImageFile(file);
+                const preview = await generatePreview(file);
+                setFeaturedImagePreview(preview);
+              }}
+              onClear={() => {
+                setFeaturedImageFile(null);
+                setFeaturedImagePreview("");
+              }}
+            />
+          </div>
+          <Button variant="primary" className="w-full" onClick={handleEdit} disabled={!form.title.trim() || actionLoading === openEdit?.id || uploadingImage}>
             Save Changes
           </Button>
         </div>

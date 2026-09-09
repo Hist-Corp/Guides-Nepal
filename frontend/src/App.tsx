@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
 import ScrollToTop from './components/common/ScrollToTop';
+import SupportWidget from './components/common/SupportWidget';
 import CmsEditMode from './components/common/CmsEditMode';
 import { GlobalImageFallback } from './components/common/GlobalImageFallback';
 import { CurrencyProvider } from './contexts/CurrencyContext';
@@ -9,7 +11,6 @@ import { flushPendingSubmissions } from './services/publicApi';
 // Re-deliver any form submissions queued while the backend was offline.
 flushPendingSubmissions();
 import Cart from './components/common/Cart';
-import { useState } from 'react';
 import HomePage from './pages/HomePage';
 import SearchPage from './pages/SearchPage';
 import ExperiencePage from './pages/ExperiencePage';
@@ -166,6 +167,7 @@ function App() {
           
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
+        <SupportWidget />
       </Router>
     </CartProvider>
   </CurrencyProvider>

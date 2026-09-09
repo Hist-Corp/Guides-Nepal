@@ -50,7 +50,7 @@ const outdoorActivities = [
     type: "Wildlife Safari",
     duration: "3 days",
     price: 299,
-    image: "https://images.unsplash.com/photo-1589952283733-8383b3939522?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1549366021-9f761d450615?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Dorje", "Nima"],
     slug: "chitwan-jungle-safari"
   },
@@ -62,7 +62,7 @@ const outdoorActivities = [
     type: "Adventure Sports",
     duration: "1 day",
     price: 149,
-    image: "https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Ang", "Tashi"],
     slug: "pokhara-paragliding"
   },
@@ -74,7 +74,7 @@ const outdoorActivities = [
     type: "Water Sports",
     duration: "1 day",
     price: 89,
-    image: "https://images.unsplash.com/photo-1508854374393-011e085f9363?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Pasang", "Tashi"],
     slug: "trishuli-river-rafting"
   },
@@ -86,7 +86,7 @@ const outdoorActivities = [
     type: "Hiking",
     duration: "1 day",
     price: 59,
-    image: "https://images.unsplash.com/photo-1542382257-80ded562c86d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Mingma", "Pema"],
     slug: "nagarkot-sunrise-hiking"
   }
@@ -177,14 +177,14 @@ export const OutdoorActivitiesPage: React.FC = () => {
                 <div className="space-y-4">
                   <div className="aspect-square rounded-2xl overflow-hidden shadow-lg">
                     <img 
-                      src="https://images.unsplash.com/photo-1589952283733-8383b3939522?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+                      src="https://images.unsplash.com/photo-1549366021-9f761d450615?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
                       alt="Jungle Safari"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
                   </div>
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg rounded-bl-[4rem]">
                     <img 
-                      src="https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+                      src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
                       alt="Adventure Guide"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />

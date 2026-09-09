@@ -4,7 +4,7 @@ export const allGuides: Guide[] = [
   {
     id: 1,
     name: "Apicha",
-    image: "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
     role: "Foodie & Local Expert",
     rating: 4.98,
     reviews: 124,
@@ -16,7 +16,7 @@ export const allGuides: Guide[] = [
     cities: ["Kathmandu", "Lalitpur"],
     gallery: [
        "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-       "https://images.unsplash.com/photo-1576092762791-d02d21c89954?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
        "https://images.unsplash.com/photo-1516594798947-e65505dbb29d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80"
     ]
   },
@@ -41,7 +41,7 @@ export const allGuides: Guide[] = [
   {
     id: 3,
     name: "Priya",
-    image: "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
     role: "Art & Lifestyle Host",
     rating: 5.0,
     reviews: 42,
@@ -53,7 +53,7 @@ export const allGuides: Guide[] = [
     cities: ["Kathmandu", "Pokhara"],
     gallery: [
         "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-        "https://images.unsplash.com/photo-1559329022-e1a785773e3a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80"
+        "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80"
     ]
   },
   {
@@ -70,7 +70,7 @@ export const allGuides: Guide[] = [
     livesIn: "Kathmandu",
     cities: ["Kathmandu", "Pokhara", "Lalitpur"],
     gallery: [
-        "https://images.unsplash.com/photo-1589923188900-85688317b96e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
         "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80"
     ]
   }
