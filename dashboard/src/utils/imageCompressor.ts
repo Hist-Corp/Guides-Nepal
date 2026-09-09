@@ -88,3 +88,30 @@ export function formatBytes(bytes: number): string {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
+/**
+ * Fetch an image from a remote URL and return it as a File object.
+ * Used by ImagePicker's "upload from URL" flow. Throws if the fetch fails
+ * or the response isn't an image.
+ */
+export async function fetchImageAsFile(url: string, filename = "remote-image"): Promise<File> {
+  const res = await fetch(url, { mode: "cors" });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const blob = await res.blob();
+  const type = blob.type && blob.type.startsWith("image/") ? blob.type : "image/jpeg";
+  const ext = type.includes("png") ? "png" : "jpg";
+  const base = filename.replace(/\.(jpg|jpeg|png|webp|gif)$/i, "");
+  return new File([blob], `${base}.${ext}`, { type });
+}
+
+/**
+ * Build a local preview (object URL) for a File, or its blobFile when given
+ * a CompressionResult. Returns an empty string on failure.
+ */
+export function generatePreview(source: File | { file: File }): string {
+  try {
+    const file = source instanceof File ? source : (source as { file: File }).file;
+    return file ? URL.createObjectURL(file) : "";
+  } catch {
+    return "";
+  }
+}

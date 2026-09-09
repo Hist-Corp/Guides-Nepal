@@ -177,10 +177,10 @@ export const bharatpurRichData: RichExperienceData[] = [
     id: 5,
     slug: 'bishazari-tal-bird-watching',
     title: "20,000 Lake Bird Watching",
-    heroImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80",
+    heroImage: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1740&q=80",
     host: {
       name: "Ramesh",
-      image: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=400&q=80",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
       type: "Ornithologist"
     },
     guides: [

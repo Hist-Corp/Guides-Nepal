@@ -60,10 +60,10 @@ export default function ExperienceDetail() {
       <div className="bg-gradient-to-br from-lightBlue/60 to-peach/40">
         <div className="max-w-6xl mx-auto px-4 py-14">
           <div className="text-7xl">{exp.image}</div>
-          <div className="mt-3 text-xs uppercase tracking-wide text-gray-600">{exp.category} · {exp.city}</div>
+          <div className="mt-3 text-xs uppercase tracking-wide text-gray-600">{exp.category} Â· {exp.city}</div>
           <h1 className="text-3xl md:text-4xl font-bold text-darkBlue mt-1">{exp.title}</h1>
           <div className="mt-2 text-sm text-gray-600">
-            <span className="text-amber-500">? {exp.rating.toFixed(1)}</span> ({exp.reviews} reviews) · {exp.duration} · from <span className="font-bold text-darkBlue">${exp.price}</span> / person
+            <span className="text-amber-500">? {exp.rating.toFixed(1)}</span> ({exp.reviews} reviews) ï¿½ {exp.duration} ï¿½ from <span className="font-bold text-darkBlue">${exp.price}</span> / person
           </div>
         </div>
       </div>
@@ -104,7 +104,7 @@ export default function ExperienceDetail() {
               {[1, 2, 3, 4, 5, 6, 8, 10].map((n) => <option key={n} value={n}>{n}</option>)}
             </select>
             <div className="flex justify-between text-sm text-gray-600 mt-4 border-t pt-4">
-              <span>${exp.price} × {guests} guests</span>
+              <span>${exp.price} ï¿½ {guests} guests</span>
               <span className="font-bold text-darkBlue">${exp.price * guests}</span>
             </div>
             <button
@@ -115,7 +115,7 @@ export default function ExperienceDetail() {
               {booking ? "Booking..." : token ? "Book now" : "Sign in to book"}
             </button>
             {message && <p className="mt-3 text-sm text-center text-darkBlue bg-lightBlue/50 rounded-lg px-3 py-2">{message}</p>}
-            <p className="text-xs text-gray-400 text-center mt-3">You won't be charged yet — the host confirms availability.</p>
+            <p className="text-xs text-gray-400 text-center mt-3">You won't be charged yet ï¿½ the host confirms availability.</p>
           </div>
         </aside>
       </div>

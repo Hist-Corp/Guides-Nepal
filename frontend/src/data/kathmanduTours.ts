@@ -35,7 +35,7 @@ export const kathmanduTours = [
     type: "City highlight tours",
     price: 49.21,
     description: "Want to see the best of Kathmandu? We got you covered. But as you can expect from a Guides Nepal experience, the real excitement is its hidden gems. Join your favorite local and get a feeling of the city's real vibe on a tour that has it all, so you can say: I experienced the real Kathmandu!",
-    image: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=1740&q=80",
     locals: ["Artty", "Sammy"]
   },
   {
@@ -48,7 +48,7 @@ export const kathmanduTours = [
     type: "City highlight tours",
     price: 37.50,
     description: "You've probably heard that Kathmandu is well-known for Buddhism and its monks, but do you know the stories and origin behind it? Or how much influence it has on the locals daily life? On this private city tour, you are in for a cultural treat!",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80",
     locals: ["Piyawee", "Jida"]
   },
   {
@@ -74,7 +74,7 @@ export const kathmanduTours = [
     type: "Day trips",
     price: 137.00,
     description: "Imagine this: a scenic road trip from Kathmandu to explore Nagarkot with stops along the way to discover viewpoints, villages, incredible nature, and cultural gems. Sounds like a dream? No, it's possible on a Guides Nepal day trip with a local host leading the way!",
-    image: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1740&q=80",
     locals: ["Chef Hnoi", "Jida"]
   },
   {
@@ -87,7 +87,7 @@ export const kathmanduTours = [
     type: "Day trips",
     price: 112.00,
     description: "Embark on a Ancient city of Bhaktapur day trip outside of Kathmandu where many treasures, insights, and stories are waiting. Let a local host show you around and experience this cultural attraction from a local perspective. Give yourself the gift of a Bhaktapur day trip with a local - it's a must-do!",
-    image: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1740&q=80",
     locals: ["Natcha", "Jojo"]
   },
   {
@@ -113,7 +113,7 @@ export const kathmanduTours = [
     type: "City highlight tours",
     price: 75.71,
     description: "Ready for a jam-packed tour, full of history, culture, stories, and sights? Checkmark from your travel bucket list all your must-sees of Kathmandu, because if there's a Guides Nepal tour that shows you all the city's ins and outs, it's this complete and personalized tour of Kathmandu.",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1740&q=80",
     locals: ["Agrindra", "Araya"]
   },
   {
@@ -126,7 +126,7 @@ export const kathmanduTours = [
     type: "Day trips",
     price: 98.81,
     description: "Embark on a Chandragiri Hills day trip outside of Kathmandu where many treasures, insights, and stories are waiting. Let a local host show you around and experience this cultural attraction from a local perspective. Give yourself the gift of a Chandragiri day trip with a local - it's a must-do!",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1740&q=80",
     locals: ["Sammy", "Sudarat"]
   }
 ];

@@ -13,7 +13,7 @@ export const kathmanduRichData: RichExperienceData[] = [
     id: 1,
     slug: '10-tastings-kathmandu-street-food',
     title: "The 10 Tastings of Kathmandu: Street Food",
-    heroImage: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
+    heroImage: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1740&q=80",
     host: {
       name: "Apicha",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80",
@@ -52,7 +52,7 @@ export const kathmanduRichData: RichExperienceData[] = [
     id: 2,
     slug: 'taste-of-kathmandu-street-food',
     title: "A Taste of Kathmandu: Street Food Tour",
-    heroImage: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
+    heroImage: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=1740&q=80",
     host: {
       name: "Jojo",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80",
@@ -92,7 +92,7 @@ export const kathmanduRichData: RichExperienceData[] = [
     id: 3,
     slug: 'highlights-hidden-gems-kathmandu',
     title: "Highlights & Hidden Gems of Kathmandu",
-    heroImage: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
+    heroImage: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=1740&q=80",
     host: {
       name: "Artty",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80",
@@ -132,7 +132,7 @@ export const kathmanduRichData: RichExperienceData[] = [
     id: 4,
     slug: 'treasures-of-kathmandu-buddhism',
     title: "Treasures of Kathmandu: Buddhism and Monks Tour",
-    heroImage: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
+    heroImage: "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80",
     host: {
       name: "Piyawee",
       image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=128&q=80",
@@ -172,7 +172,7 @@ export const kathmanduRichData: RichExperienceData[] = [
     id: 5,
     slug: 'drinks-bites-kathmandu',
     title: "Drinks & Bites in Kathmandu Tour",
-    heroImage: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
+    heroImage: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1740&q=80",
     host: {
       name: "Nok",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80",
@@ -212,7 +212,7 @@ export const kathmanduRichData: RichExperienceData[] = [
     id: 6,
     slug: 'nagarkot-day-trip',
     title: "City Escape: Nagarkot Day Trip",
-    heroImage: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
+    heroImage: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1740&q=80",
     host: {
       name: "Chef Hnoi",
       image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=128&q=80",
@@ -252,7 +252,7 @@ export const kathmanduRichData: RichExperienceData[] = [
     id: 7,
     slug: 'bhaktapur-day-trip',
     title: "The Ultimate Ancient City of Bhaktapur Day Trip",
-    heroImage: "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80",
+    heroImage: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1740&q=80",
     host: {
       name: "Natcha",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80",
@@ -292,7 +292,7 @@ export const kathmanduRichData: RichExperienceData[] = [
     id: 8,
     slug: 'culinary-kickstart-kathmandu',
     title: "Culinary Kickstart Tour: Kathmandu",
-    heroImage: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
+    heroImage: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=1740&q=80",
     host: {
       name: "Nakarin",
       image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=128&q=80",
@@ -332,7 +332,7 @@ export const kathmanduRichData: RichExperienceData[] = [
     id: 9,
     slug: 'full-coverage-kathmandu',
     title: "Full Coverage Kathmandu City Tour",
-    heroImage: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
+    heroImage: "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=1740&q=80",
     host: {
       name: "Agrindra",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80",
@@ -372,7 +372,7 @@ export const kathmanduRichData: RichExperienceData[] = [
     id: 10,
     slug: 'chandragiri-hills-day-trip',
     title: "Chandragiri Hills & Cable Car Day Trip",
-    heroImage: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
+    heroImage: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1740&q=80",
     host: {
       name: "Sudarat",
       image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=128&q=80",

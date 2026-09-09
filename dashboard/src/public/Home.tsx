@@ -19,7 +19,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 py-20 text-center">
           <h1 className="text-4xl md:text-5xl font-bold">Experience Nepal like a local</h1>
           <p className="mt-4 text-white/80 max-w-2xl mx-auto">
-            Heritage walks, food tours, cooking classes and mountain adventures — hosted by licensed local guides.
+            Heritage walks, food tours, cooking classes and mountain adventures â€” hosted by licensed local guides.
           </p>
           <form action="/search" className="mt-8 max-w-xl mx-auto flex gap-2">
             <input
@@ -96,7 +96,7 @@ export default function Home() {
                 <div className="h-14 w-14 rounded-full bg-lightBlue flex items-center justify-center text-2xl">??</div>
                 <div>
                   <div className="font-semibold text-darkBlue">{g.name}</div>
-                  <div className="text-xs text-gray-500">{g.city} · {g.languages.join(", ")}</div>
+                  <div className="text-xs text-gray-500">{g.city} ï¿½ {g.languages.join(", ")}</div>
                   <div className="text-sm text-amber-500 mt-1">? {g.rating.toFixed(1)} <span className="text-gray-400">({g.reviews} reviews)</span></div>
                 </div>
               </Link>
