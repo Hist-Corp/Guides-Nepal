@@ -39,7 +39,7 @@ const LocalProfilePage: React.FC = () => {
         setGuide({
           id: 1,
           name: "Apicha",
-          image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+          image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80",
           role: "Cultural Expert",
           rating: 4.9,
           reviews: 120,
@@ -49,9 +49,9 @@ const LocalProfilePage: React.FC = () => {
           livesIn: "Kathmandu",
           cities: ["Kathmandu", "Bhaktapur"],
           gallery: [
-            "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-            "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80"
+            "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=1740&q=80",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1740&q=80",
+            "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80"
           ],
           is_active: true
         });
@@ -69,21 +69,21 @@ const LocalProfilePage: React.FC = () => {
       title: "Everest Base Camp Expedition 2023",
       role: "Lead Guide",
       date: "April 2023",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1740&q=80",
       description: "Led a group of 12 trekkers to EBC. Successfully managed altitude acclimatization for all members. 100% summit success rate for Kalapatthar."
     },
     {
       title: "National Geographic Documentary Fixer",
       role: "Local Coordinator",
       date: "Nov 2022",
-      image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+      image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1740&q=80",
       description: "Assisted a film crew in locating authentic cultural spots in Bhaktapur and Patan. Managed logistics and translation for interviews with local artisans."
     },
     {
       title: "Sustainable Tourism Workshop",
       role: "Speaker",
       date: "Jan 2024",
-      image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+      image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1740&q=80",
       description: "Conducted a workshop for new guides on sustainable trekking practices and waste management in the Himalayas."
     }
   ];
@@ -487,7 +487,7 @@ const LocalProfilePage: React.FC = () => {
                 <h2 className="text-2xl font-bold text-gray-900">This is Guides Nepal</h2>
                 <div className="rounded-2xl overflow-hidden relative aspect-video group cursor-pointer">
                    <img 
-                     src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+                     src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1740&q=80" 
                      alt="This is Guides Nepal" 
                      className="w-full h-full object-cover brightness-75 group-hover:scale-105 transition-transform duration-700"
                    />
@@ -526,7 +526,7 @@ const LocalProfilePage: React.FC = () => {
                  </div>
                  <div className="relative z-10 w-64 md:w-80 shrink-0">
                     <img 
-                      src="https://images.unsplash.com/photo-1607252650355-f7fd0460ccdb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                      src="https://images.unsplash.com/photo-1607252650355-f7fd0460ccdb?auto=format&fit=crop&w=800&q=80" 
                       alt="App Preview" 
                       className="w-full rounded-2xl shadow-2xl border-4 border-white/10 rotate-6 hover:rotate-0 transition-transform duration-500"
                     />

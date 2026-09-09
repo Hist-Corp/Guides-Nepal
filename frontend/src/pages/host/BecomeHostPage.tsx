@@ -34,7 +34,7 @@ const BecomeHostPage: React.FC = () => {
          {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1531572753322-ad063cecc140?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+            src="https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1740&q=80" 
             alt="Become a host" 
             className="w-full h-full object-cover object-top"
           />
@@ -125,17 +125,17 @@ const BecomeHostPage: React.FC = () => {
               {
                 name: "Mina Gloria",
                 quote: "When I host with Guides Nepal, I feel like I'm traveling the world right from my own city. I've made friends from everywhere!",
-                img: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80"
+                img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80"
               },
               {
                 name: "Jaafar",
                 quote: "Guides Nepal allows me to show the real side of my city. I'm proud to be part of it and share my culture.",
-                img: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80"
+                img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80"
               },
               {
                 name: "Zsofia",
                 quote: "Hosting with Guides Nepal feels like doing what I love, not just a job. The flexibility is amazing for my lifestyle.",
-                img: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80"
+                img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80"
               }
             ].map((host, i) => (
               <div key={i} className="relative group overflow-hidden rounded-3xl h-96 shadow-lg cursor-pointer">
@@ -167,17 +167,17 @@ const BecomeHostPage: React.FC = () => {
               {
                 category: "Food & Drinks",
                 title: "The 10 Tastings Tour",
-                img: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+                img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=1740&q=80"
               },
               {
                 category: "History & Culture",
                 title: "Highlights & Hidden Gems",
-                img: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+                img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=1740&q=80"
               },
               {
                 category: "Off the Beaten Track",
                 title: "City Unscripted",
-                img: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+                img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1740&q=80"
               }
             ].map((card, i) => (
               <div key={i} className="bg-white rounded-3xl overflow-hidden shadow-xl hover:-translate-y-2 transition-transform duration-300 flex flex-col">
@@ -240,7 +240,7 @@ const BecomeHostPage: React.FC = () => {
       {/* CTA Banner */}
       <section id="apply-form" className="py-24 bg-slate-900 relative overflow-hidden">
         <div className="absolute inset-0 opacity-40">
-           <img src="https://images.unsplash.com/photo-1533104816931-20fa691ff6ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" className="w-full h-full object-cover" alt="Background" />
+           <img src="https://images.unsplash.com/photo-1533105079780-92b9be482077777?auto=format&fit=crop&w=1740&q=80" className="w-full h-full object-cover" alt="Background" />
         </div>
         <div className="container mx-auto px-4 relative z-10 text-center text-white">
           <span className="text-brand-yellow font-bold border-b-2 border-brand-yellow pb-1 uppercase tracking-wider text-sm">Become a host</span>

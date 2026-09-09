@@ -58,7 +58,7 @@ const experiencesData: Record<string, Experience> = {
     ],
     host: {
       name: 'Rajesh',
-      image: 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
+      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
       rating: 5.0,
       reviews: 45,
       about: "Namaste! I'm Rajesh, born and raised in the heart of Kathmandu. I love sharing stories about my city's history and culture that you won't find in guidebooks."
@@ -80,7 +80,7 @@ const experiencesData: Record<string, Experience> = {
     highlights: ['Taste 5 different Newari dishes', 'Visit a traditional kitchen', 'Learn about spices used in Nepali cooking'],
     host: {
       name: 'Sita',
-      image: 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
+      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
       rating: 4.9,
       reviews: 32,
       about: "I am a food enthusiast and love cooking traditional meals for my family. Join me to explore the delicious side of Kathmandu!"
@@ -102,7 +102,7 @@ const experiencesData: Record<string, Experience> = {
     highlights: ['Sunrise view of Kathmandu Valley', 'Observe morning Buddhist rituals', 'Feed the monkeys (carefully!)'],
     host: {
       name: 'Nima',
-      image: 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
+      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
       rating: 4.9,
       reviews: 67,
       about: "I grew up in a Buddhist family and Swayambhunath has always been a special place for me. I'd love to share its spiritual significance with you."
@@ -125,7 +125,7 @@ const experiencesData: Record<string, Experience> = {
     highlights: ['Breathtaking sunrise views', 'See Mt. Machhapuchhre up close', 'Morning tea with a view'],
     host: {
       name: 'Karma',
-      image: 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
+      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
       rating: 5.0,
       reviews: 55,
       about: "The mountains are my home. I love showing visitors the beauty of the Himalayas from the best vantage points."
@@ -147,7 +147,7 @@ const experiencesData: Record<string, Experience> = {
     highlights: ['Traditional boat ride', 'Hike through lush forest', 'Visit the World Peace Pagoda'],
     host: {
       name: 'Anjali',
-      image: 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
+      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
       rating: 4.9,
       reviews: 42,
       about: "I am a nature lover and hiking enthusiast. This trail is my favorite way to disconnect and enjoy nature."
@@ -170,7 +170,7 @@ const experiencesData: Record<string, Experience> = {
     highlights: ['Visit the Patan Museum', 'Admire the Krishna Mandir', 'Explore hidden courtyards'],
     host: {
       name: 'Suresh',
-      image: 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
+      image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
       rating: 4.9,
       reviews: 76,
       about: "History and art are my passions. I can tell you stories about every stone and statue in this square."
@@ -193,7 +193,7 @@ const experiencesData: Record<string, Experience> = {
     highlights: ['Visit the tallest temple in Nepal', 'See the 55-Window Palace', 'Watch potters at work'],
     host: {
       name: 'Krishna',
-      image: 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
+      image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
       rating: 5.0,
       reviews: 98,
       about: "Bhaktapur is not just a city, it's a lifestyle. I want to show you the traditions that have been kept alive for centuries."

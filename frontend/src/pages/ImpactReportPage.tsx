@@ -148,7 +148,7 @@ const ImpactReportPage: React.FC = () => {
                  {/* Card 2 */}
                  <div className="bg-[#FFF8F0] rounded-3xl overflow-hidden shadow-xl flex flex-col md:flex-row-reverse">
                     <div className="md:w-1/2 h-64 md:h-auto relative">
-                       <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400" alt="Local Benefits" className="w-full h-full object-cover" />
+                       <img src="https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=400" alt="Local Benefits" className="w-full h-full object-cover" />
                     </div>
                     <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
                        <h3 className="text-3xl font-bold text-slate-900 mb-4">Maximize Local Benefits.</h3>
@@ -169,7 +169,7 @@ const ImpactReportPage: React.FC = () => {
                  {/* Card 3 */}
                  <div className="bg-[#FFF8F0] rounded-3xl overflow-hidden shadow-xl flex flex-col md:flex-row">
                     <div className="md:w-1/2 h-64 md:h-auto relative">
-                       <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400" alt="Respect and Protect" className="w-full h-full object-cover" />
+                       <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400" alt="Respect and Protect" className="w-full h-full object-cover" />
                     </div>
                     <div className="md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
                        <h3 className="text-3xl font-bold text-slate-900 mb-4">Respect & Protect.</h3>

@@ -64,7 +64,7 @@ export const BhaktapurPage: React.FC = () => {
                 <div className="space-y-4 translate-y-8">
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
                     <img 
-                      src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400" 
+                      src="https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=400&q=80" 
                       alt="Nyatapola Temple"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -79,14 +79,14 @@ export const BhaktapurPage: React.FC = () => {
                 <div className="space-y-4">
                   <div className="aspect-square rounded-2xl overflow-hidden shadow-lg">
                     <img 
-                      src="https://images.unsplash.com/photo-1534351590666-13e3e96c5017?w=400" 
+                      src="https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=400&q=80" 
                       alt="Pottery Making"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
                   </div>
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg rounded-bl-[4rem]">
                     <img 
-                      src="https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400" 
+                      src="https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=400&q=80" 
                       alt="Local Guide"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -359,7 +359,7 @@ export const BhaktapurPage: React.FC = () => {
         {/* SEO / Articles Section */}
         <div className="mb-24">
            <div className="relative h-[400px] rounded-3xl overflow-hidden mb-16 group cursor-pointer">
-              <img src="https://images.unsplash.com/photo-1528181304800-259b08848526?w=400" className="w-full h-full object-cover brightness-[0.6] group-hover:scale-105 transition-transform duration-700" />
+              <img src="https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=400&q=80" className="w-full h-full object-cover brightness-[0.6] group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 flex flex-col justify-center p-8 md:p-16">
                  <div className="bg-[#213448] w-16 h-1 mb-6"></div>
                  <h2 className="text-4xl md:text-6xl font-bold text-white mb-4 max-w-2xl leading-tight">
@@ -381,7 +381,7 @@ export const BhaktapurPage: React.FC = () => {
               {/* Article 1: Pottery */}
               <div className="flex flex-col md:flex-row gap-12 items-center">
                  <div className="md:w-1/2">
-                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400" className="rounded-3xl shadow-xl w-full aspect-[4/3] object-cover" />
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80" className="rounded-3xl shadow-xl w-full aspect-[4/3] object-cover" />
                  </div>
                  <div className="md:w-1/2">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Spin the Wheel at Pottery Square</h3>
@@ -397,7 +397,7 @@ export const BhaktapurPage: React.FC = () => {
               {/* Article 2: Curd */}
               <div className="flex flex-col md:flex-row-reverse gap-12 items-center">
                  <div className="md:w-1/2">
-                    <img src="https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400" className="rounded-3xl shadow-xl w-full" />
+                    <img src="https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=400&q=80" className="rounded-3xl shadow-xl w-full" />
                  </div>
                  <div className="md:w-1/2">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Taste the King of Curd</h3>

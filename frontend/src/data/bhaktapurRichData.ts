@@ -9,10 +9,10 @@ export const bhaktapurRichData: RichExperienceData[] = [
     id: 1,
     slug: 'bhaktapur-heritage-walk',
     title: "Bhaktapur Heritage Walk",
-    heroImage: "https://images.unsplash.com/photo-1516594798947-e65505dbb29d?w=400",
+    heroImage: "https://images.unsplash.com/photo-1516594798947-e65505dbb29d?auto=format&fit=crop&w=400&q=80",
     host: {
       name: "Krishna",
-      image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400",
+      image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=400&q=80",
       type: "Heritage Expert"
     },
     guides: [
@@ -51,10 +51,10 @@ export const bhaktapurRichData: RichExperienceData[] = [
     id: 2,
     slug: 'pottery-making-class',
     title: "Pottery Making Class",
-    heroImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400",
+    heroImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=400&q=80",
     host: {
       name: "Radha",
-      image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400",
+      image: "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=400&q=80",
       type: "Artisan Guide"
     },
     guides: [
@@ -93,10 +93,10 @@ export const bhaktapurRichData: RichExperienceData[] = [
     id: 3,
     slug: 'taste-juju-dhau',
     title: "Taste Juju Dhau (King Curd)",
-    heroImage: "https://images.unsplash.com/photo-1534351590666-13e3e96c5017?w=400",
+    heroImage: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=400&q=80",
     host: {
       name: "Prakash",
-      image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400",
+      image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=400&q=80",
       type: "Foodie Guide"
     },
     guides: [
@@ -135,10 +135,10 @@ export const bhaktapurRichData: RichExperienceData[] = [
     id: 4,
     slug: 'changu-narayan-hike',
     title: "Changu Narayan Temple Hike",
-    heroImage: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=400",
+    heroImage: "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=400&q=80",
     host: {
       name: "Laxmi",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
       type: "Nature Guide"
     },
     guides: [
@@ -177,10 +177,10 @@ export const bhaktapurRichData: RichExperienceData[] = [
     id: 5,
     slug: 'bhaktapur-night-tour',
     title: "Bhaktapur Night Tour",
-    heroImage: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400",
+    heroImage: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=400&q=80",
     host: {
       name: "Krishna",
-      image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400",
+      image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=400&q=80",
       type: "Night Guide"
     },
     guides: [
@@ -219,10 +219,10 @@ export const bhaktapurRichData: RichExperienceData[] = [
     id: 6,
     slug: 'thangka-painting-workshop-bhaktapur',
     title: "Thangka Painting Workshop",
-    heroImage: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=400",
+    heroImage: "https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=400&q=80",
     host: {
       name: "Radha",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
       type: "Art Guide"
     },
     guides: [

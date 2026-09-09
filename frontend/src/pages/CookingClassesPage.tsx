@@ -23,7 +23,7 @@ const cookingTours = [
     id: 1,
     title: "Authentic Nepali Cooking Class with Market Visit",
     slug: "nepali-cooking-class-market-visit",
-    image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1740&q=80",
     rating: 4.9,
     reviews: 892,
     type: "Cooking Class",
@@ -35,7 +35,7 @@ const cookingTours = [
     id: 2,
     title: "Momo Making Workshop: Nepal's Famous Dumplings",
     slug: "momo-making-workshop",
-    image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=1740&q=80",
     rating: 4.8,
     reviews: 567,
     type: "Cooking Workshop",
@@ -47,7 +47,7 @@ const cookingTours = [
     id: 3,
     title: "Traditional Newari Feast Cooking Experience",
     slug: "newari-feast-cooking",
-    image: "https://images.unsplash.com/photo-1466637574441-749b8f19452f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1740&q=80",
     rating: 4.9,
     reviews: 445,
     type: "Cultural Cooking",
@@ -59,7 +59,7 @@ const cookingTours = [
     id: 4,
     title: "Organic Farm Visit & Farm-to-Table Cooking",
     slug: "organic-farm-cooking",
-    image: "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1740&q=80",
     rating: 4.7,
     reviews: 334,
     type: "Farm Experience",
@@ -71,7 +71,7 @@ const cookingTours = [
     id: 5,
     title: "Dal Bhat Cooking: Nepal's National Dish",
     slug: "dal-bhat-cooking-class",
-    image: "https://images.unsplash.com/photo-1495521821757-a1efb6729352?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1740&q=80",
     rating: 4.8,
     reviews: 723,
     type: "Traditional Cooking",
@@ -83,7 +83,7 @@ const cookingTours = [
     id: 6,
     title: "Vegetarian Nepali Cuisine Masterclass",
     slug: "vegetarian-nepali-cooking",
-    image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=1740&q=80",
     rating: 4.6,
     reviews: 278,
     type: "Vegetarian Cooking",
@@ -148,7 +148,7 @@ export const CookingClassesPage: React.FC = () => {
                 <div className="space-y-4 translate-y-8">
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
                     <img 
-                      src="https://images.unsplash.com/photo-1556911220-bff31c812dba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+                      src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1740&q=80" 
                       alt="Nepali Cooking Class"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -163,14 +163,14 @@ export const CookingClassesPage: React.FC = () => {
                 <div className="space-y-4">
                   <div className="aspect-square rounded-2xl overflow-hidden shadow-lg">
                     <img 
-                      src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+                      src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=1740&q=80" 
                       alt="Momo Making"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
                   </div>
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg rounded-bl-[4rem]">
                     <img 
-                      src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+                      src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1740&q=80" 
                       alt="Nepali Chef"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -226,7 +226,7 @@ export const CookingClassesPage: React.FC = () => {
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Card 1: Dal Bhat */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Dal Bhat" className="w-full h-64 object-cover" />
+              <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1740&q=80" alt="Dal Bhat" className="w-full h-64 object-cover" />
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Master the Art of Dal Bhat</h3>
                 <p className="text-gray-600 mb-4">A private cooking class in Kathmandu is the easiest and most authentic way to learn Nepal's national dish. Dal Bhat isn't just food—it's a cultural experience that brings families together every day.</p>
@@ -235,7 +235,7 @@ export const CookingClassesPage: React.FC = () => {
             </div>
             {/* Card 2: Momo */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Momo Making" className="w-full h-64 object-cover" />
+              <img src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=1740&q=80" alt="Momo Making" className="w-full h-64 object-cover" />
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Perfect the Momo Folding Technique</h3>
                 <p className="text-gray-600 mb-4">The most fun thing to learn in Kathmandu is the art of momo making. These delicious dumplings are a staple of Nepali cuisine, and mastering the folding technique is both challenging and rewarding.</p>
@@ -249,7 +249,7 @@ export const CookingClassesPage: React.FC = () => {
             </div>
             {/* Card 3: Spice Markets */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Spice Market" className="w-full h-64 object-cover" />
+              <img src="https://images.unsplash.com/photo-1552058544-f2b08422138a?auto=format&fit=crop&w=1740&q=80" alt="Spice Market" className="w-full h-64 object-cover" />
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Explore Aromatic Spice Markets</h3>
                 <p className="text-gray-600 mb-4">The Local Spice Markets are a joy for the senses and essential for authentic Nepali cooking! Add them to your cooking class experience and you won't regret it! You will find everything from fresh turmeric to aromatic cardamom.</p>
@@ -258,7 +258,7 @@ export const CookingClassesPage: React.FC = () => {
             </div>
             {/* Card 4: Newari Recipes */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1466637574441-749b8f19452f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Newari Food" className="w-full h-64 object-cover" />
+              <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1740&q=80" alt="Newari Food" className="w-full h-64 object-cover" />
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Discover Ancient Newari Recipes</h3>
                 <p className="text-gray-600 mb-4">There are quite a few culinary highlights worth learning in Kathmandu, but Newari cuisine is surely a must-try! These ancient recipes have been passed down through generations and represent the rich cultural heritage of the Kathmandu Valley.</p>
@@ -380,7 +380,7 @@ export const CookingClassesPage: React.FC = () => {
                        <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                              <div className="flex -space-x-3">
-                                <img src={`https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80`} className="w-10 h-10 rounded-full border-2 border-white object-cover" />
+                                <img src={`https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80`} className="w-10 h-10 rounded-full border-2 border-white object-cover" />
                                 <div className="w-10 h-10 rounded-full border-2 border-white bg-white/20 backdrop-blur-md flex items-center justify-center text-xs font-bold">+12</div>
                              </div>
                              <span className="text-sm font-bold">Choose your local</span>
@@ -465,7 +465,7 @@ export const CookingClassesPage: React.FC = () => {
                  >
                     <div className="relative w-32 h-32 mb-4">
                        <img 
-                         src={`https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80`} 
+                         src={`https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=128&q=80`} 
                          alt={local.name} 
                          className="w-full h-full rounded-full object-cover border-4 border-white shadow-md group-hover:border-brand-yellow transition-all duration-300"
                        />
@@ -536,7 +536,7 @@ export const CookingClassesPage: React.FC = () => {
                   <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
                      <div className="flex -space-x-2">
                         {tour.locals.map((l, i) => (
-                           <img key={i} src={`https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80`} className="w-8 h-8 rounded-full border-2 border-white object-cover" />
+                           <img key={i} src={`https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=128&q=80`} className="w-8 h-8 rounded-full border-2 border-white object-cover" />
                         ))}
                      </div>
                      <div className="text-right">
@@ -563,7 +563,7 @@ export const CookingClassesPage: React.FC = () => {
         <div className="mb-24">
            <div className="relative rounded-2xl overflow-hidden shadow-lg group cursor-pointer">
               <img 
-                src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+                src="https://images.unsplash.com/photo-1533105079780-92b9be482077777?auto=format&fit=crop&w=1740&q=80" 
                 alt="Nepali Family Cooking" 
                 className="w-full h-[500px] object-cover transition-transform duration-500 group-hover:scale-105" 
               />
@@ -586,7 +586,7 @@ export const CookingClassesPage: React.FC = () => {
               {/* Article 1: Dal Bhat */}
               <div className="flex flex-col md:flex-row gap-12 items-center">
                  <div className="md:w-1/2">
-                    <img src="https://images.unsplash.com/photo-1609501676725-7186f017a4b7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" className="rounded-3xl shadow-xl w-full aspect-[4/3] object-cover" />
+                    <img src="https://images.unsplash.com/photo-1609501676725-7186f017a4b7?auto=format&fit=crop&w=1740&q=80" className="rounded-3xl shadow-xl w-full aspect-[4/3] object-cover" />
                  </div>
                  <div className="md:w-1/2">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Master the Art of Dal Bhat</h3>
@@ -602,7 +602,7 @@ export const CookingClassesPage: React.FC = () => {
               {/* Article 2: Momo Making */}
               <div className="flex flex-col md:flex-row-reverse gap-12 items-center">
                  <div className="md:w-1/2">
-                    <img src="https://images.unsplash.com/photo-1617093727343-374698b1b08d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" className="rounded-3xl shadow-xl w-full" />
+                    <img src="https://images.unsplash.com/photo-1617093727343-374698b1b08d?auto=format&fit=crop&w=1740&q=80" className="rounded-3xl shadow-xl w-full" />
                  </div>
                  <div className="md:w-1/2">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Perfect the Momo Folding Technique</h3>
@@ -619,7 +619,7 @@ export const CookingClassesPage: React.FC = () => {
               {/* Article 3: Spice Markets */}
               <div className="flex flex-col md:flex-row gap-12 items-center">
                  <div className="md:w-1/2">
-                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" className="rounded-3xl shadow-xl w-full" />
+                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1740&q=80" className="rounded-3xl shadow-xl w-full" />
                  </div>
                  <div className="md:w-1/2">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Explore Aromatic Spice Markets</h3>
@@ -635,7 +635,7 @@ export const CookingClassesPage: React.FC = () => {
               {/* Article 4: Newari Cuisine */}
               <div className="flex flex-col md:flex-row-reverse gap-12 items-center">
                  <div className="md:w-1/2">
-                    <img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" className="rounded-3xl shadow-xl w-full aspect-[4/3] object-cover" />
+                    <img src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=1740&q=80" className="rounded-3xl shadow-xl w-full aspect-[4/3] object-cover" />
                  </div>
                  <div className="md:w-1/2">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Discover Ancient Newari Recipes</h3>

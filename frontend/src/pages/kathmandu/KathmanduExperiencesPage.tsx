@@ -61,7 +61,7 @@ const KathmanduExperiencesPage: React.FC = () => {
                 <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
                    <div className="flex -space-x-2">
                       {tour.locals.map((l, i) => (
-                         <img key={i} src={`https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80`} className="w-8 h-8 rounded-full border-2 border-white object-cover" />
+                         <img key={i} src={`https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80`} className="w-8 h-8 rounded-full border-2 border-white object-cover" />
                       ))}
                    </div>
                    <div className="text-right">

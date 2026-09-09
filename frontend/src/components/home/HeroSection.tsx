@@ -3,84 +3,14 @@ import { Search, MapPin, ChevronRight } from 'lucide-react';
 import { useUIStore } from '../../store/uiStore';
 import { Link } from 'react-router-dom';
 import { useCmsSection } from '../../hooks/useCms';
+import { cityImages, NEPAL_IMAGES } from '../../data/images';
+import { SafeImage } from '../common/SafeImage';
 
 const destinations = [
-  {
-    name: 'Kathmandu',
-    images: {
-      desktop: [
-        'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400',
-        'https://images.unsplash.com/photo-1528181304800-259b08848526?w=400',
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-        'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',
-        'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400'
-      ],
-      mobile: [
-        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
-        'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400',
-        'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400',
-        'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400',
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400'
-      ]
-    }
-  },
-  {
-    name: 'Pokhara',
-    images: {
-      desktop: [
-        'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400',
-        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
-        'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
-        'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=400',
-        'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=400'
-      ],
-      mobile: [
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
-        'https://images.unsplash.com/photo-1516594798947-e65505dbb29d?w=400',
-        'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400',
-        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
-        'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400'
-      ]
-    }
-  },
-  {
-    name: 'Lalitpur',
-    images: {
-      desktop: [
-        'https://images.unsplash.com/photo-1534351590666-13e3e96c5017?w=400',
-        'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400',
-        'https://images.unsplash.com/photo-1528181304800-259b08848526?w=400',
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-        'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400'
-      ],
-      mobile: [
-        'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400',
-        'https://images.unsplash.com/photo-1528181304800-259b08848526?w=400',
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-        'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',
-        'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400'
-      ]
-    }
-  },
-  {
-    name: 'Bhaktapur',
-    images: {
-      desktop: [
-        'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
-        'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400',
-        'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400',
-        'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400',
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400'
-      ],
-      mobile: [
-        'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400',
-        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
-        'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
-        'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=400',
-        'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=400'
-      ]
-    }
-  }
+  { name: 'Kathmandu' },
+  { name: 'Pokhara' },
+  { name: 'Lalitpur' },
+  { name: 'Bhaktapur' },
 ];
 
 export const HeroSection: React.FC = () => {
@@ -100,6 +30,7 @@ export const HeroSection: React.FC = () => {
   };
 
   const currentCity = destinations[currentDestIndex];
+  const currentImages = cityImages(currentCity.name);
 
   return (
     <section data-cms-id="home-hero" data-cms-label="Hero" className="bg-peach py-12 md:py-20 relative overflow-hidden">
@@ -159,7 +90,7 @@ export const HeroSection: React.FC = () => {
                  <span className="text-sm font-medium text-[#555555]">Need help planning your trip?</span>
                  <Link to="/maila-dai" className="bg-[#F4B400]/20 hover:bg-[#F4B400]/30 text-[#333333] text-sm font-bold pl-4 pr-1 py-1 rounded-full flex items-center gap-2 transition-colors shadow-sm border border-[#F4B400]/50">
                    Ask Maila Dai!
-                   <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400" alt="Maila Dai" className="w-8 h-8 rounded-full" />
+                    <SafeImage src={NEPAL_IMAGES.guideMale} alt="Maila Dai" className="w-8 h-8 rounded-full object-cover" />
                  </Link>
                </div>
             </div>
@@ -173,9 +104,9 @@ export const HeroSection: React.FC = () => {
               {/* Column 1: Left Tall Image */}
               <div className="col-span-1 h-full flex flex-col justify-center items-center relative">
                 <div className="h-[65%] w-full relative overflow-hidden rounded-[2rem] shadow-xl group cursor-pointer mb-6 transition-all duration-500 ease-in-out">
-                  <img 
+                  <SafeImage 
                     key={`d1-${currentCity.name}`}
-                    src={currentCity.images.desktop[0]} 
+                    src={currentImages[0]} 
                     alt={`${currentCity.name} Highlights`} 
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 animate-in fade-in zoom-in duration-500"
                   />
@@ -196,17 +127,17 @@ export const HeroSection: React.FC = () => {
               {/* Column 2: Middle Stacked */}
               <div className="col-span-1 flex flex-col justify-center gap-4 h-full">
                 <div className="h-[40%] relative overflow-hidden rounded-[2rem] shadow-xl group cursor-pointer transition-all duration-500 ease-in-out">
-                    <img 
+                    <SafeImage 
                       key={`d2-${currentCity.name}`}
-                      src={currentCity.images.desktop[1]} 
+                      src={currentImages[1]} 
                       alt={`${currentCity.name} Scene 1`} 
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 animate-in fade-in zoom-in duration-500 delay-75"
                     />
                 </div>
                 <div className="h-[40%] relative overflow-hidden rounded-[2rem] shadow-xl group cursor-pointer transition-all duration-500 ease-in-out">
-                    <img 
+                    <SafeImage 
                       key={`d3-${currentCity.name}`}
-                      src={currentCity.images.desktop[2]} 
+                      src={currentImages[2]} 
                       alt={`${currentCity.name} Scene 2`} 
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 animate-in fade-in zoom-in duration-500 delay-100"
                     />
@@ -216,17 +147,17 @@ export const HeroSection: React.FC = () => {
               {/* Column 3: Right Stacked */}
               <div className="col-span-1 flex flex-col justify-center gap-4 h-full">
                  <div className="h-[50%] relative overflow-hidden rounded-[2rem] shadow-xl group cursor-pointer transition-all duration-500 ease-in-out">
-                    <img 
+                    <SafeImage 
                       key={`d4-${currentCity.name}`}
-                      src={currentCity.images.desktop[3]} 
+                      src={currentImages[3]} 
                       alt={`${currentCity.name} Scene 3`} 
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 animate-in fade-in zoom-in duration-500 delay-150"
                     />
                  </div>
                  <div className="h-[45%] relative overflow-hidden rounded-[2rem] shadow-xl group cursor-pointer transition-all duration-500 ease-in-out">
-                    <img 
+                    <SafeImage 
                       key={`d5-${currentCity.name}`}
-                      src={currentCity.images.desktop[4]} 
+                      src={currentImages[4]} 
                       alt={`${currentCity.name} Scene 4`} 
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 animate-in fade-in zoom-in duration-500 delay-200"
                     />
@@ -239,9 +170,9 @@ export const HeroSection: React.FC = () => {
                {/* Left Column: 2 Stacked Images */}
                <div className="col-span-1 flex flex-col gap-2 h-[300px] justify-center">
                  <div className="h-1/2 relative overflow-hidden rounded-[1rem] shadow-lg">
-                   <img 
+                   <SafeImage 
                      key={`m1-${currentCity.name}`}
-                     src={currentCity.images.mobile[0]} 
+                     src={currentImages[0]} 
                      alt={`${currentCity.name} Mobile 1`} 
                      className="w-full h-full object-cover animate-in fade-in zoom-in duration-500"
                    />
@@ -253,9 +184,9 @@ export const HeroSection: React.FC = () => {
                    </div>
                  </div>
                  <div className="h-1/2 relative overflow-hidden rounded-[1rem] shadow-lg">
-                   <img 
+                   <SafeImage 
                      key={`m2-${currentCity.name}`}
-                     src={currentCity.images.mobile[1]} 
+                     src={currentImages[1]} 
                      alt={`${currentCity.name} Mobile 2`} 
                      className="w-full h-full object-cover animate-in fade-in zoom-in duration-500 delay-75"
                    />
@@ -265,9 +196,9 @@ export const HeroSection: React.FC = () => {
                {/* Middle Column: 1 Centered Image */}
                <div className="col-span-1 flex flex-col items-center justify-center gap-4 h-full">
                  <div className="h-[160px] w-full relative overflow-hidden rounded-[1rem] shadow-lg">
-                   <img 
+                   <SafeImage 
                      key={`m3-${currentCity.name}`}
-                     src={currentCity.images.mobile[2]} 
+                     src={currentImages[2]} 
                      alt={`${currentCity.name} Mobile 3`} 
                      className="w-full h-full object-cover animate-in fade-in zoom-in duration-500 delay-100"
                    />
@@ -289,17 +220,17 @@ export const HeroSection: React.FC = () => {
                {/* Right Column: 2 Stacked Images */}
                <div className="col-span-1 flex flex-col gap-2 h-[300px] justify-center">
                  <div className="h-1/2 relative overflow-hidden rounded-[1rem] shadow-lg">
-                   <img 
+                   <SafeImage 
                      key={`m4-${currentCity.name}`}
-                     src={currentCity.images.mobile[3]} 
+                     src={currentImages[3]} 
                      alt={`${currentCity.name} Mobile 4`} 
                      className="w-full h-full object-cover animate-in fade-in zoom-in duration-500 delay-150"
                    />
                  </div>
                  <div className="h-1/2 relative overflow-hidden rounded-[1rem] shadow-lg">
-                   <img 
+                   <SafeImage 
                      key={`m5-${currentCity.name}`}
-                     src={currentCity.images.mobile[4]} 
+                     src={currentImages[4]} 
                      alt={`${currentCity.name} Mobile 5`} 
                      className="w-full h-full object-cover animate-in fade-in zoom-in duration-500 delay-200"
                    />

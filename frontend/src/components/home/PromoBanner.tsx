@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../common/Button';
+import { SafeImage } from '../common/SafeImage';
+import { NEPAL_IMAGES } from '../../data/images';
 import { useCmsSection } from '../../hooks/useCms';
 
 export const PromoBanner: React.FC = () => {
@@ -53,10 +55,10 @@ export const PromoBanner: React.FC = () => {
                      <div className="absolute inset-0 bg-white rounded-xl shadow-xl transform -rotate-6 -translate-x-3 translate-y-2 transition-transform duration-500 group-hover:rotate-[-12deg] group-hover:-translate-x-8 z-0">
                         <div className="p-4 opacity-40">
                            <div className="grid grid-cols-2 gap-2 mb-4">
-                              <img src="https://images.unsplash.com/photo-1516594798947-e65505dbb29d?w=400" className="rounded-lg w-full h-24 object-cover grayscale" />
-                              <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400" className="rounded-lg w-full h-24 object-cover grayscale" />
-                              <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400" className="rounded-lg w-full h-24 object-cover grayscale" />
-                              <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400" className="rounded-lg w-full h-24 object-cover grayscale" />
+                              <SafeImage src={NEPAL_IMAGES.temples} alt="Nepal temples" className="rounded-lg w-full h-24 object-cover grayscale" />
+                              <SafeImage src={NEPAL_IMAGES.everest} alt="Everest" className="rounded-lg w-full h-24 object-cover grayscale" />
+                              <SafeImage src={NEPAL_IMAGES.annapurna} alt="Annapurna" className="rounded-lg w-full h-24 object-cover grayscale" />
+                              <SafeImage src={NEPAL_IMAGES.phewaLake} alt="Phewa Lake" className="rounded-lg w-full h-24 object-cover grayscale" />
                            </div>
                            <div className="text-center">
                               <h4 className="font-bold text-xl mb-1 text-gray-800">Impact Report</h4>
@@ -68,10 +70,10 @@ export const PromoBanner: React.FC = () => {
                      {/* Front Card */}
                      <div className="relative z-10 bg-background-cream text-slate-800 p-4 rounded-xl shadow-2xl rotate-3 max-w-xs transform group-hover:rotate-0 transition-transform duration-500">
                         <div className="grid grid-cols-2 gap-2 mb-4">
-                           <img src="https://images.unsplash.com/photo-1534351590666-13e3e96c5017?w=400" className="rounded-lg w-full h-24 object-cover" />
-                           <img src="https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400" className="rounded-lg w-full h-24 object-cover" />
-                           <img src="https://images.unsplash.com/photo-1528181304800-259b08848526?w=400" className="rounded-lg w-full h-24 object-cover" />
-                           <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400" className="rounded-lg w-full h-24 object-cover" />
+                           <SafeImage src={NEPAL_IMAGES.heritage} alt="Heritage" className="rounded-lg w-full h-24 object-cover" />
+                           <SafeImage src={NEPAL_IMAGES.oldTown} alt="Old town" className="rounded-lg w-full h-24 object-cover" />
+                           <SafeImage src={NEPAL_IMAGES.boudhanath} alt="Boudhanath" className="rounded-lg w-full h-24 object-cover" />
+                           <SafeImage src={NEPAL_IMAGES.guideFemale} alt="Local guide" className="rounded-lg w-full h-24 object-cover" />
                         </div>
                         <div className="text-center">
                            <h4 className="font-bold text-xl mb-1">Impact Report</h4>

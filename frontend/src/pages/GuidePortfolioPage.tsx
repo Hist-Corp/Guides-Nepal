@@ -28,21 +28,21 @@ const GuidePortfolioPage: React.FC = () => {
       title: "Everest Base Camp Expedition 2023",
       role: "Lead Guide",
       date: "April 2023",
-      image: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
       description: "Led a group of 12 trekkers to EBC. Successfully managed altitude acclimatization for all members. 100% summit success rate for Kalapatthar."
     },
     {
       title: "National Geographic Documentary Fixer",
       role: "Local Coordinator",
       date: "Nov 2022",
-      image: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
       description: "Assisted a film crew in locating authentic cultural spots in Bhaktapur and Patan. Managed logistics and translation for interviews with local artisans."
     },
     {
       title: "Sustainable Tourism Workshop",
       role: "Speaker",
       date: "Jan 2024",
-      image: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
       description: "Conducted a workshop for new guides on sustainable trekking practices and waste management in the Himalayas."
     }
   ];

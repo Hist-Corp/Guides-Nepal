@@ -72,7 +72,7 @@ const GalleryPage: React.FC = () => {
                 className="break-inside-avoid rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative"
               >
                 <img 
-                  src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400"
+                  src="https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=400&q=80"
                   alt={`Extra Gallery ${i}`}
                   className="w-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />

@@ -1,6 +1,6 @@
 import { Link, NavLink, Outlet } from "react-router-dom"
 import { CITIES, CATEGORIES } from "../data/catalog"
-import SupportWidget from "./components/SupportWidget"
+import SupportWidget from "./SupportWidget"
 
 function categoryPath(category: string) {
   return "/" + category.toLowerCase().replace(/[^a-z0-9]+/g, "-")

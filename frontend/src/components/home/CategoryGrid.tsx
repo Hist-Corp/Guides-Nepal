@@ -1,13 +1,15 @@
 import { Utensils, Landmark, Mountain, Soup } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '../common/Button';
+import { SafeImage } from '../common/SafeImage';
+import { NEPAL_IMAGES } from '../../data/images';
 
 const categories = [
   {
     id: 1,
     title: 'Food tours',
     icon: <Utensils className="w-6 h-6 text-white" />,
-    image: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',
+    image: NEPAL_IMAGES.momos,
     description: 'Taste the local culture',
     path: '/food-tours',
   },
@@ -15,7 +17,7 @@ const categories = [
     id: 2,
     title: 'Cultural tours',
     icon: <Landmark className="w-6 h-6 text-white" />,
-    image: 'https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=400',
+    image: NEPAL_IMAGES.heritage,
     description: 'Discover history & heritage',
     path: '/cultural-tours',
   },
@@ -23,7 +25,7 @@ const categories = [
     id: 3,
     title: 'Outdoor activities',
     icon: <Mountain className="w-6 h-6 text-white" />,
-    image: 'https://images.unsplash.com/photo-1528181304800-259b08848526?w=400',
+    image: NEPAL_IMAGES.trekking,
     description: 'Explore nature & adventure',
     path: '/outdoor-activities',
   },
@@ -31,7 +33,7 @@ const categories = [
     id: 4,
     title: 'Cooking classes',
     icon: <Soup className="w-6 h-6 text-white" />,
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+    image: NEPAL_IMAGES.cookingClass,
     description: 'Learn to cook local dishes',
     path: '/cooking-classes',
   },
@@ -66,7 +68,7 @@ export const CategoryGrid: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((cat) => (
             <Link to={cat.path} key={cat.id} className="group relative rounded-xl overflow-hidden h-80 block">
-              <img
+              <SafeImage
                 src={cat.image}
                 alt={cat.title}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"

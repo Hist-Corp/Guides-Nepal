@@ -14,7 +14,7 @@ const staticBlogPosts = [
     excerpt: 'Discover the secret spots that only locals know about. From hidden temples to underground cafes.',
     author: 'Ram Bahadur',
     date: '2026-01-15',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80',
     category: 'Travel Tips'
   },
   {
@@ -23,7 +23,7 @@ const staticBlogPosts = [
     excerpt: 'Explore the rich flavors of traditional Newari dishes and where to find the best ones.',
     author: 'Priya Sharma',
     date: '2026-01-10',
-    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80',
     category: 'Food & Culture'
   },
   {
@@ -32,7 +32,7 @@ const staticBlogPosts = [
     excerpt: 'Go beyond Phewa Lake and discover what makes Pokhara truly special.',
     author: 'Sujal Thapa',
     date: '2026-01-05',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80',
     category: 'Adventure'
   },
   {
@@ -41,7 +41,7 @@ const staticBlogPosts = [
     excerpt: 'Learn how to travel responsibly and support local communities while exploring Nepal.',
     author: 'Rohan KC',
     date: '2025-12-28',
-    image: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=800&q=80',
     category: 'Sustainability'
   },
   {
@@ -50,7 +50,7 @@ const staticBlogPosts = [
     excerpt: 'Experience the medieval charm of Bhaktapur and its preserved Newari architecture.',
     author: 'Apicha Maharjan',
     date: '2025-12-20',
-    image: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=800&q=80',
     category: 'Culture'
   },
   {
@@ -59,7 +59,7 @@ const staticBlogPosts = [
     excerpt: 'Interested in sharing your culture? Here\'s everything you need to know about becoming a guide.',
     author: 'Guides Nepal Team',
     date: '2025-12-15',
-    image: 'https://images.unsplash.com/photo-1531572753322-ad063cecc140?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=800&q=80',
     category: 'Community'
   }
 ];
@@ -92,7 +92,7 @@ const BlogPage: React.FC = () => {
         excerpt: (c.content || '').slice(0, 140),
         author: c.author || 'Guides Nepal Team',
         date: c.date || '',
-        image: 'https://images.unsplash.com/photo-1531572753322-ad063cecc140?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+        image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=800&q=80',
         category: 'Community',
       }))
   );

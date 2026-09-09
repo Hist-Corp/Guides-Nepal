@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-const FALLBACK_SRC = 'https://placehold.co/600x400?text=Image';
+const FALLBACK_SRC = '/images/placeholder.svg';
 
 export const GlobalImageFallback = () => {
   useEffect(() => {

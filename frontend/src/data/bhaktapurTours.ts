@@ -9,7 +9,7 @@ export const bhaktapurTours = [
     type: "City Highlight",
     price: 35.00,
     description: "Step back in time in the 'City of Devotees'. Walk through medieval streets, admire the 55-Window Palace, and discover the Golden Gate.",
-    image: "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80",
     locals: ["Krishna", "Radha"]
   },
   {
@@ -22,7 +22,7 @@ export const bhaktapurTours = [
     type: "Workshop",
     price: 30.00,
     description: "Get your hands dirty! Learn the ancient art of pottery in Bhaktapur's famous Pottery Square from a master craftsman.",
-    image: "https://images.unsplash.com/photo-1559314809-0d155014e29e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1740&q=80",
     locals: ["Radha", "Prakash"]
   },
   {
@@ -35,7 +35,7 @@ export const bhaktapurTours = [
     type: "Food Tour",
     price: 15.00,
     description: "You can't leave Bhaktapur without trying the King of Yogurt. Discover the secrets behind this creamy, delicious dessert.",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=1740&q=80",
     locals: ["Prakash", "Krishna"]
   },
   {
@@ -48,7 +48,7 @@ export const bhaktapurTours = [
     type: "Hiking",
     price: 40.00,
     description: "Hike through pine forests and villages to reach the oldest temple in Nepal, Changu Narayan, a UNESCO World Heritage site.",
-    image: "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80",
     locals: ["Laxmi", "Krishna"]
   },
   {
@@ -61,7 +61,7 @@ export const bhaktapurTours = [
     type: "Night Tour",
     price: 45.00,
     description: "Experience the magic of Bhaktapur after dark. The temples are beautifully lit, and the streets are quiet and atmospheric.",
-    image: "https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=1740&q=80",
     locals: ["Krishna", "Radha"]
   },
   {
@@ -74,7 +74,7 @@ export const bhaktapurTours = [
     type: "Workshop",
     price: 50.00,
     description: "Learn the intricate art of Thangka painting from a master artist. A spiritual and artistic experience.",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=1740&q=80",
     locals: ["Radha", "Prakash"]
   }
 ];

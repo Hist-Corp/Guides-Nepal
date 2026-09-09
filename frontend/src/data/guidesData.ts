@@ -4,7 +4,7 @@ export const allGuides: Guide[] = [
   {
     id: 1,
     name: "Apicha",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80",
     role: "Foodie & Local Expert",
     rating: 4.98,
     reviews: 124,
@@ -15,15 +15,15 @@ export const allGuides: Guide[] = [
     livesIn: "Kathmandu",
     cities: ["Kathmandu", "Lalitpur"],
     gallery: [
-       "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-       "https://images.unsplash.com/photo-1516594798947-e65505dbb29d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80"
+       "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
+       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=1740&q=80",
+       "https://images.unsplash.com/photo-1516594798947-e65505dbb29d?auto=format&fit=crop&w=1740&q=80"
     ]
   },
   {
     id: 2,
     name: "Sujal",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80",
     role: "History & Culture Buff",
     rating: 4.95,
     reviews: 89,
@@ -34,14 +34,14 @@ export const allGuides: Guide[] = [
     livesIn: "Patan",
     cities: ["Kathmandu", "Lalitpur", "Pokhara"],
     gallery: [
-        "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-        "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80"
+        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
+        "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80"
     ]
   },
   {
     id: 3,
     name: "Priya",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80",
     role: "Art & Lifestyle Host",
     rating: 5.0,
     reviews: 42,
@@ -52,14 +52,14 @@ export const allGuides: Guide[] = [
     livesIn: "Kathmandu",
     cities: ["Kathmandu", "Pokhara"],
     gallery: [
-        "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-        "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80"
+        "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80",
+        "https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=1740&q=80"
     ]
   },
   {
     id: 4,
     name: "Rohan",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80",
     role: "Adventure Enthusiast",
     rating: 4.92,
     reviews: 156,
@@ -70,8 +70,8 @@ export const allGuides: Guide[] = [
     livesIn: "Kathmandu",
     cities: ["Kathmandu", "Pokhara", "Lalitpur"],
     gallery: [
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-        "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80"
+        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1740&q=80",
+        "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80"
     ]
   }
 ];

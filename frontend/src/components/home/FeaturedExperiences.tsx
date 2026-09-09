@@ -2,6 +2,8 @@ import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
+import { SafeImage } from '../common/SafeImage';
+import { NEPAL_IMAGES } from '../../data/images';
 import { Star } from 'lucide-react';
 
 const experiences = [
@@ -9,45 +11,40 @@ const experiences = [
     id: 1,
     title: 'Kathmandu',
     description: 'Explore the ancient temples and vibrant streets of Thamel',
-    image: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400',
-    rating: 4.9,
-    guide: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400',
+    image: NEPAL_IMAGES.oldTown,
+    guide: NEPAL_IMAGES.guideMale,
     price: 'From €25 pp',
   },
   {
     id: 2,
     title: 'Pokhara',
     description: 'Boating on Phewa Lake with mountain views',
-    image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
-    rating: 4.9,
-    guide: 'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400',
+    image: NEPAL_IMAGES.phewaLake,
+    guide: NEPAL_IMAGES.guideFemale,
     price: 'From €30 pp',
   },
   {
     id: 3,
     title: 'Lalitpur',
     description: 'Discover the art and heritage of Patan',
-    image: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400',
-    rating: 4.8,
-    guide: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400',
+    image: NEPAL_IMAGES.heritage,
+    guide: NEPAL_IMAGES.portraitWoman,
     price: 'From €28 pp',
   },
   {
     id: 4,
     title: 'Bhaktapur',
     description: 'Step back in time in the City of Devotees',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-    rating: 4.9,
-    guide: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400',
+    image: NEPAL_IMAGES.boudhanath,
+    guide: NEPAL_IMAGES.traveler1,
     price: 'From €26 pp',
   },
   {
     id: 5,
     title: 'Bharatpur',
     description: 'Gateway to Chitwan National Park and wildlife',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400',
-    rating: 4.7,
-    guide: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400',
+    image: NEPAL_IMAGES.forestHills,
+    guide: NEPAL_IMAGES.traveler2,
     price: 'From €35 pp',
   },
 ];
@@ -112,7 +109,7 @@ export const FeaturedExperiences: React.FC = () => {
                   />
                   <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-slate-800 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
                     <Star className="w-3 h-3 text-brand-yellow fill-current" />
-                    {exp.rating}
+                    4.9
                   </div>
                 </div>
                 <div className="p-4 flex-1 flex flex-col">

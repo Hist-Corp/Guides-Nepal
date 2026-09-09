@@ -139,7 +139,7 @@ const MailaDaiChatPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white overflow-hidden">
                <img 
-                 src="https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80" 
+                 src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80" 
                  alt="Marvin" 
                  className="w-full h-full object-cover"
                />
@@ -169,7 +169,7 @@ const MailaDaiChatPage: React.FC = () => {
                   {msg.sender === 'marvin' ? (
                     <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-100 shadow-sm">
                       <img 
-                        src="https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80" 
+                        src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80" 
                         alt="Marvin" 
                         className="w-full h-full object-cover"
                       />
@@ -201,7 +201,7 @@ const MailaDaiChatPage: React.FC = () => {
                 <div className="flex-shrink-0 mt-auto">
                   <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-100 shadow-sm">
                     <img 
-                      src="https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80" 
+                      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80" 
                       alt="Marvin" 
                       className="w-full h-full object-cover"
                     />

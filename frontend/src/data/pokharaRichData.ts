@@ -6,10 +6,10 @@ export const pokharaRichData: RichExperienceData[] = [
     id: 101,
     slug: 'pokhara-lakeside-food-tour',
     title: "Pokhara Lakeside Food Tour",
-    heroImage: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+    heroImage: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
     host: {
       name: "Sujal",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80",
       type: "History & Culture Buff"
     },
     guides: [allGuides[1], allGuides[3]], // Sujal & Rohan
@@ -41,10 +41,10 @@ export const pokharaRichData: RichExperienceData[] = [
     id: 102,
     slug: 'sarangkot-sunrise-hike',
     title: "Sarangkot Sunrise Hike & Breakfast",
-    heroImage: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+    heroImage: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1740&q=80",
     host: {
       name: "Rohan",
-      image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+      image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=128&q=80",
       type: "Adventure Enthusiast"
     },
     guides: [allGuides[3], allGuides[2]], // Rohan & Priya

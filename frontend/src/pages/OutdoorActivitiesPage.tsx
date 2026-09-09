@@ -26,7 +26,7 @@ const outdoorActivities = [
     type: "Trekking",
     duration: "12 days",
     price: 899,
-    image: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Tenzin", "Lhakpa", "Pema"],
     slug: "everest-base-camp-trek"
   },
@@ -50,7 +50,7 @@ const outdoorActivities = [
     type: "Wildlife Safari",
     duration: "3 days",
     price: 299,
-    image: "https://images.unsplash.com/photo-1549366021-9f761d450615?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
     locals: ["Dorje", "Nima"],
     slug: "chitwan-jungle-safari"
   },
@@ -162,7 +162,7 @@ export const OutdoorActivitiesPage: React.FC = () => {
                 <div className="space-y-4 translate-y-8">
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
                     <img 
-                      src="https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+                      src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
                       alt="Mountain Guide"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -177,7 +177,7 @@ export const OutdoorActivitiesPage: React.FC = () => {
                 <div className="space-y-4">
                   <div className="aspect-square rounded-2xl overflow-hidden shadow-lg">
                     <img 
-                      src="https://images.unsplash.com/photo-1549366021-9f761d450615?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
+                      src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" 
                       alt="Jungle Safari"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -275,7 +275,7 @@ export const OutdoorActivitiesPage: React.FC = () => {
                        <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                              <div className="flex -space-x-3">
-                                <img src={`https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80`} className="w-10 h-10 rounded-full border-2 border-white object-cover" />
+                                <img src={`https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80`} className="w-10 h-10 rounded-full border-2 border-white object-cover" />
                                 <div className="w-10 h-10 rounded-full border-2 border-white bg-white/20 backdrop-blur-md flex items-center justify-center text-xs font-bold">+12</div>
                              </div>
                              <span className="text-sm font-bold">Choose your local</span>
@@ -358,7 +358,7 @@ export const OutdoorActivitiesPage: React.FC = () => {
                  >
                     <div className="relative w-32 h-32 mb-4">
                        <img 
-                        src={`https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80`} 
+                        src={`https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80`} 
                          alt={local.name} 
                          className="w-full h-full rounded-full object-cover border-4 border-white shadow-md group-hover:border-brand-yellow transition-all duration-300"
                        />
@@ -429,7 +429,7 @@ export const OutdoorActivitiesPage: React.FC = () => {
                   <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
                      <div className="flex -space-x-2">
                         {activity.locals.map((l, i) => (
-                          <img key={i} src={`https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80`} className="w-8 h-8 rounded-full border-2 border-white object-cover" />
+                          <img key={i} src={`https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80`} className="w-8 h-8 rounded-full border-2 border-white object-cover" />
                         ))}
                      </div>
                      <div className="text-right">

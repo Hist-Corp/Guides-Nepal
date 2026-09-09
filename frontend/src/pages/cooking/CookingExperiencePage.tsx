@@ -62,14 +62,14 @@ const cookingExperiencesData: CookingExperience[] = [
     host: {
       name: "Chef Sita",
       type: "Cooking Class",
-      image: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80"
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80"
     },
     guides: [
       {
         id: 1,
         name: "Chef Sita",
         role: "Traditional Newari Cooking Expert",
-        image: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80",
+        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80",
         rating: 4.9,
         reviews: 892,
         bio: "Namaste! I'm Chef Sita, a third-generation Newari cook with over 15 years of experience. I learned traditional cooking techniques from my grandmother and have been sharing the secrets of Nepali cuisine with visitors for the past 8 years. I believe food is the best way to understand a culture!",
@@ -79,7 +79,7 @@ const cookingExperiencesData: CookingExperience[] = [
         id: 2,
         name: "Chef Maya",
         role: "Organic Farm to Table Specialist",
-        image: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80",
+        image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80",
         rating: 4.8,
         reviews: 567,
         bio: "Hello! I'm Chef Maya, passionate about organic farming and sustainable cooking. I grow my own herbs and vegetables and love teaching visitors about the connection between fresh ingredients and delicious food.",
@@ -121,14 +121,14 @@ const cookingExperiencesData: CookingExperience[] = [
     host: {
       name: "Raju",
       type: "Cooking Workshop",
-      image: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80"
+      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80"
     },
     guides: [
       {
         id: 3,
         name: "Raju",
         role: "Momo Master & Street Food Guide",
-        image: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80",
+        image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80",
         rating: 4.8,
         reviews: 567,
         bio: "I'm Raju, Kathmandu-born and raised! I've been making momos since I was 12 years old, learning from my mother who had a small street food stall. Momos are my passion - I know over 20 different filling variations!",

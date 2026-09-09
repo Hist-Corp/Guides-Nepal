@@ -9,10 +9,10 @@ export const bharatpurRichData: RichExperienceData[] = [
     id: 1,
     slug: 'chitwan-jungle-safari',
     title: "Chitwan Jungle Safari",
-    heroImage: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=400",
+    heroImage: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=400&q=80",
     host: {
       name: "Ram",
-      image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400",
+      image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=400&q=80",
       type: "Wildlife Expert"
     },
     guides: [
@@ -51,10 +51,10 @@ export const bharatpurRichData: RichExperienceData[] = [
     id: 2,
     slug: 'tharu-village-culture-tour',
     title: "Tharu Village Culture Tour",
-    heroImage: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400",
+    heroImage: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=400&q=80",
     host: {
       name: "Sita",
-      image: "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400",
+      image: "https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=400&q=80",
       type: "Cultural Guide"
     },
     guides: [
@@ -93,10 +93,10 @@ export const bharatpurRichData: RichExperienceData[] = [
     id: 3,
     slug: 'canoe-ride-rapti-river',
     title: "Canoe Ride on Rapti River",
-    heroImage: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400",
+    heroImage: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=400&q=80",
     host: {
       name: "Bishnu",
-      image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400",
+      image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=400&q=80",
       type: "River Guide"
     },
     guides: [
@@ -135,10 +135,10 @@ export const bharatpurRichData: RichExperienceData[] = [
     id: 4,
     slug: 'elephant-breeding-center',
     title: "Elephant Breeding Center Visit",
-    heroImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+    heroImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
     host: {
       name: "Kumar",
-      image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400",
+      image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=400&q=80",
       type: "Animal Expert"
     },
     guides: [
@@ -177,10 +177,10 @@ export const bharatpurRichData: RichExperienceData[] = [
     id: 5,
     slug: 'bishazari-tal-bird-watching',
     title: "20,000 Lake Bird Watching",
-    heroImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400",
+    heroImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80",
     host: {
       name: "Ramesh",
-      image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400",
+      image: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=400&q=80",
       type: "Ornithologist"
     },
     guides: [
@@ -219,10 +219,10 @@ export const bharatpurRichData: RichExperienceData[] = [
     id: 6,
     slug: 'devghat-spiritual-tour',
     title: "Devghat Spiritual Tour",
-    heroImage: "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=400",
+    heroImage: "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=400&q=80",
     host: {
       name: "Pandit",
-      image: "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=400",
+      image: "https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=400&q=80",
       type: "Spiritual Guide"
     },
     guides: [

@@ -9,7 +9,7 @@ const destinations = [
   {
     id: 'kathmandu',
     name: 'Kathmandu',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80',
     description: 'The capital city filled with ancient temples, vibrant markets, and rich Newari culture.',
     guides: 45,
     experiences: 120,
@@ -18,7 +18,7 @@ const destinations = [
   {
     id: 'pokhara',
     name: 'Pokhara',
-    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80',
     description: 'The adventure capital with stunning lake views and the Annapurna mountain range.',
     guides: 35,
     experiences: 85,
@@ -27,7 +27,7 @@ const destinations = [
   {
     id: 'lalitpur',
     name: 'Lalitpur',
-    image: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80',
     description: 'The city of fine arts, known for its ancient craftsmen and stunning Durbar Square.',
     guides: 25,
     experiences: 60,
@@ -36,7 +36,7 @@ const destinations = [
   {
     id: 'bhaktapur',
     name: 'Bhaktapur',
-    image: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=800&q=80',
     description: 'A living medieval city with preserved architecture and traditional pottery.',
     guides: 20,
     experiences: 45,
@@ -45,7 +45,7 @@ const destinations = [
   {
     id: 'bharatpur',
     name: 'Bharatpur',
-    image: 'https://images.unsplash.com/photo-1549366021-9f761d450615?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80',
     description: 'Gateway to Chitwan National Park and its incredible wildlife experiences.',
     guides: 15,
     experiences: 35,
