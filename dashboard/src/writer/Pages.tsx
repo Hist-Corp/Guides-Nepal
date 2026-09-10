@@ -348,7 +348,7 @@ onSaved={async (sections) => {
               }
             }
           }}
-          onClose={fetchPages}
+                    onClose={() => { setLiveEdit(null); fetchPages(); }}
         />
       )}
     </PageShell>
