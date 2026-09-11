@@ -3,23 +3,15 @@ import PageShell from "./PageShell";
 import SectionCard from "./SectionCard";
 import Button from "./Button";
 import Loading from "./Loading";
-import LivePageEditor from "../writer/LivePageEditor";
+import LivePageEditor, { type Section } from "../writer/LivePageEditor";
 import { FRONTEND_PAGES, FrontendPage } from "../config/frontendPages";
 import { updateAllSections } from "../services/api";
-
-type Section = {
-  id: string;
-  title: string;
-  type: string;
-  content: Record<string, any>;
-  style: Record<string, any>;
-};
 
 function buildSections(page: FrontendPage): Section[] {
   const sections: Section[] = [
     {
       id: "hero",
-      title: "Hero Section",
+      label: "Hero Section",
       type: "hero",
       content: {
         heading: page.title,
@@ -36,10 +28,11 @@ function buildSections(page: FrontendPage): Section[] {
         headingSize: "2.5rem",
         padding: "3rem",
       },
+      format: {},
     },
     {
       id: "body",
-      title: "Content Section",
+      label: "Content Section",
       type: "text",
       content: {
         heading: "",
@@ -51,6 +44,7 @@ function buildSections(page: FrontendPage): Section[] {
         alignment: "left",
         padding: "2.5rem",
       },
+      format: {},
     },
   ];
   // Extra, page-type-specific sections
@@ -58,7 +52,7 @@ function buildSections(page: FrontendPage): Section[] {
     sections.push(
       {
         id: "featured",
-        title: "Featured Experiences",
+        label: "Featured Experiences",
         type: "featured",
         content: {
           heading: "Featured Experiences",
@@ -66,10 +60,11 @@ function buildSections(page: FrontendPage): Section[] {
           buttonText: "View all",
         },
         style: { backgroundColor: "#ffffff", textColor: "#213448", alignment: "center" },
+        format: {},
       },
       {
         id: "promo",
-        title: "Promo Banner",
+        label: "Promo Banner",
         type: "promo",
         content: {
           heading: "Travel, taste & explore Nepal",
@@ -77,30 +72,33 @@ function buildSections(page: FrontendPage): Section[] {
           buttonText: "Start exploring",
         },
         style: { backgroundColor: "#9A2143", textColor: "#ffffff", alignment: "center" },
+        format: {},
       },
     );
   }
   if (page.path === "/explore" || page.path.startsWith("/most-") || ["food-tours", "cultural-tours", "outdoor-activities", "cooking-classes"].includes(page.path.replace("/", ""))) {
     sections.push({
       id: "categories",
-      title: "Categories Strip",
+      label: "Categories Strip",
       type: "categories",
       content: {
         heading: "Browse by category",
         subtitle: "Food, culture, outdoor adventures and more",
       },
       style: { backgroundColor: "#ffffff", textColor: "#213448", alignment: "center" },
+      format: {},
     });
   }
   sections.push({
     id: "footer",
-    title: "Footer",
+    label: "Footer",
     type: "footer",
     content: {
       supportEmail: "support@guidesnepal.com",
       copyright: `© ${new Date().getFullYear()} Guides Nepal — ${page.title}`,
     },
     style: { backgroundColor: "#9A2143", textColor: "#ffffff", alignment: "left", padding: "1.5rem" },
+    format: {},
   });
   return sections;
 }
@@ -116,7 +114,7 @@ export default function WebsiteContentManager({ area }: { area: "admin" | "super
         slug={editing.slug}
         title={editing.title}
         path={editing.path}
-        initialSections={buildSections(editing)}
+        
         onSaved={async (sections) => {
           setSavingSlug(editing.slug);
           try {
