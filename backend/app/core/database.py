@@ -9,11 +9,20 @@ from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 def _normalize_db_url(url: str) -> str:
     """For managed Postgres (Supabase/Render), force SSL and a bounded
     connect timeout so a bad/misconfigured DATABASE_URL fails fast with a
-    clear error instead of hanging the request thread indefinitely."""
+    clear error instead of hanging the request thread indefinitely.
+
+    Local Postgres servers (localhost/127.0.0.1) typically run without SSL,
+    so we must NOT force sslmode=require there — otherwise every connection
+    fails with "server does not support SSL, but SSL was required".
+    """
     if url.startswith(("postgresql", "postgres")):
         parsed = urlparse(url)
         qs = parse_qs(parsed.query)
-        qs.setdefault("sslmode", ["require"])
+        is_local = parsed.hostname in ("localhost", "127.0.0.1", "::1")
+        if is_local:
+            qs.setdefault("sslmode", ["disable"])
+        else:
+            qs.setdefault("sslmode", ["require"])
         qs.setdefault("connect_timeout", ["10"])
         new_query = urlencode(qs, doseq=True)
         return urlunparse(parsed._replace(query=new_query))

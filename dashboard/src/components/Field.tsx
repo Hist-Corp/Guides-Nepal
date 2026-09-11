@@ -16,14 +16,14 @@ export default function Field({
   children?: ReactNode;
 } & Record<string, any>) {
   const inputCls = cn(
-    "w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-darkBlue placeholder-gray-400 focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/40 disabled:cursor-not-allowed disabled:bg-gray-100",
+    "w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-main placeholder:text-soft focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/40 disabled:cursor-not-allowed disabled:bg-surface-3",
     className
   );
 
   return (
     <div className="flex flex-col gap-1.5">
       {label ? (
-        <label className="text-sm font-medium text-gray-700">{label}</label>
+        <label className="text-sm font-medium text-main">{label}</label>
       ) : null}
       {as === "textarea" ? (
         <textarea className={inputCls} {...props} />

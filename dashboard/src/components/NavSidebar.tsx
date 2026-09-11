@@ -1,4 +1,6 @@
 import { NavLink } from "react-router-dom"
+import { Moon, Sun } from "lucide-react"
+import { useTheme } from "../hooks/useTheme"
 import { useAuthStore } from "../state/authStore"
 
 type IconName =
@@ -112,88 +114,103 @@ function Icon({ name, className = "h-4 w-4" }: { name: IconName; className?: str
 }
 export default function NavSidebar() {
   const { role } = useAuthStore()
+  const { theme, toggleTheme } = useTheme()
   const base = role ? `/dashboard/${role}` : "/dashboard/login"
   const groups: NavGroup[] =
     role === "super-admin"
       ? [
+          { heading: "Overview", items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }] },
           {
-            heading: "Platform",
+            heading: "Governance",
             items: [
-              { to: `${base}`, label: "Overview", icon: "grid" },
-              { to: `${base}/host-applications`, label: "Host Applications", icon: "mail" },
-              { to: `${base}/support-tickets`, label: "Support Tickets", icon: "ticket" },
-              { to: `${base}/website-content`, label: "Website Content", icon: "globe" },
+              { to: `${base}/hierarchy`, label: "Role Hierarchy", icon: "shield" },
+              { to: `${base}/administration`, label: "Administration", icon: "settings" },
             ],
           },
           {
-            heading: "Areas",
+            heading: "Operations",
             items: [
-              { to: "/dashboard/admin", label: "Admin area", icon: "shield" },
-              { to: "/dashboard/content-writer", label: "Content Writer", icon: "pen" },
-              { to: "/dashboard/regional-head", label: "Regional Head", icon: "map" },
-              { to: "/dashboard/customer-support", label: "Customer Support", icon: "chat" },
-              { to: "/dashboard/host", label: "Host", icon: "home" },
-              { to: "/dashboard/guide", label: "Guide", icon: "compass" },
+              { to: `${base}/host-applications`, label: "Host Applications", icon: "mail" },
+              { to: `${base}/support-tickets`, label: "Support Tickets", icon: "ticket" },
+              { to: `${base}/customers`, label: "Customers", icon: "user" },
+            ],
+          },
+          {
+            heading: "Content & Growth",
+            items: [
+              { to: `${base}/website-content`, label: "Website Content", icon: "globe" },
+              { to: `${base}/pages`, label: "Pages", icon: "map" },
+              { to: `${base}/blog`, label: "Blog", icon: "pen" },
+              { to: `${base}/guides-content`, label: "Guides Content", icon: "compass" },
+              { to: `${base}/media`, label: "Media Library", icon: "photo" },
+              { to: `${base}/seo`, label: "SEO Settings", icon: "search" },
+              { to: `${base}/intelligence`, label: "Intelligence", icon: "chart" },
             ],
           },
         ]
       : role === "admin"
       ? [
+          { heading: "Overview", items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }] },
           {
-            heading: "Overview",
-            items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }],
-          },
-          {
-            heading: "People",
+            heading: "Marketplace",
             items: [
               { to: `${base}/hosts`, label: "Hosts", icon: "home" },
               { to: `${base}/guides`, label: "Guides", icon: "compass" },
-              { to: `${base}/content`, label: "Content Writer", icon: "pen" },
+              { to: `${base}/customers`, label: "Customers", icon: "user" },
             ],
           },
           {
-            heading: "Business",
+            heading: "Growth",
             items: [
               { to: `${base}/analytics`, label: "Analytics", icon: "chart" },
-              { to: `${base}/revenue`, label: "Revenue & Payouts", icon: "wallet" },
-              { to: `${base}/website-content`, label: "Website Content", icon: "globe" },
+              { to: `${base}/revenue`, label: "Revenue", icon: "wallet" },
             ],
           },
           {
-            heading: "System",
-            items: [{ to: `${base}/settings`, label: "System Settings", icon: "settings" }],
+            heading: "Content & CMS",
+            items: [
+              { to: `${base}/pages`, label: "Pages", icon: "map" },
+              { to: `${base}/blog`, label: "Blog", icon: "pen" },
+              { to: `${base}/guides-content`, label: "Guides Content", icon: "compass" },
+              { to: `${base}/media`, label: "Media Library", icon: "photo" },
+              { to: `${base}/seo`, label: "SEO Settings", icon: "search" },
+            ],
+          },
+          {
+            heading: "Platform",
+            items: [
+              { to: `${base}/content`, label: "Content", icon: "pen" },
+              { to: `${base}/website-content`, label: "Website Content", icon: "globe" },
+              { to: `${base}/administration`, label: "Administration", icon: "settings" },
+              { to: `${base}/settings`, label: "Settings", icon: "settings" },
+            ],
           },
         ]
       : role === "host"
       ? [
+          { heading: "Overview", items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }] },
           {
-            heading: "Overview",
-            items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }],
-          },
-          {
-            heading: "Operations",
+            heading: "Business",
             items: [
-              { to: `${base}/guides`, label: "Guides", icon: "compass" },
               { to: `${base}/tours`, label: "Tours", icon: "map" },
               { to: `${base}/bookings`, label: "Bookings", icon: "calendar" },
+              { to: `${base}/guides`, label: "My Guides", icon: "compass" },
             ],
           },
           {
-            heading: "Performance",
+            heading: "Money",
             items: [
               { to: `${base}/earnings`, label: "Earnings", icon: "wallet" },
               { to: `${base}/performance`, label: "Performance", icon: "chart" },
+              { to: `${base}/customers`, label: "Customers", icon: "user" },
             ],
           },
         ]
       : role === "guide"
       ? [
+          { heading: "Overview", items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }] },
           {
-            heading: "Overview",
-            items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }],
-          },
-          {
-            heading: "My Work",
+            heading: "Work",
             items: [
               { to: `${base}/my-tours`, label: "My Tours", icon: "map" },
               { to: `${base}/my-bookings`, label: "My Bookings", icon: "calendar" },
@@ -201,71 +218,66 @@ export default function NavSidebar() {
             ],
           },
           {
-            heading: "Account",
+            heading: "You",
             items: [
               { to: `${base}/earnings`, label: "Earnings", icon: "wallet" },
+              { to: `${base}/customers`, label: "Customers", icon: "user" },
               { to: `${base}/profile`, label: "Profile", icon: "user" },
             ],
           },
         ]
       : role === "regional-head"
       ? [
+          { heading: "Overview", items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }] },
           {
-            heading: "Overview",
-            items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }],
-          },
-          {
-            heading: "Region",
+            heading: "Regional ops",
             items: [
-              { to: `${base}/applications`, label: "Host Applications", icon: "mail" },
+              { to: `${base}/applications`, label: "Applications", icon: "mail" },
               { to: `${base}/region`, label: "My Region", icon: "map" },
+              { to: `${base}/customers`, label: "Customers", icon: "user" },
             ],
           },
         ]
       : role === "customer-support"
       ? [
+          { heading: "Overview", items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }] },
           {
-            heading: "Overview",
-            items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }],
-          },
-          {
-            heading: "Tickets",
+            heading: "Support",
             items: [
-              { to: `${base}/tickets`, label: "Support Tickets", icon: "ticket" },
-              { to: `${base}/faq`, label: "FAQ & Solutions", icon: "help" },
+              { to: `${base}/tickets`, label: "Tickets", icon: "ticket" },
+              { to: `${base}/customers`, label: "Customers", icon: "user" },
+              { to: `${base}/faq`, label: "FAQ Manager", icon: "help" },
             ],
           },
         ]
       : role === "content-writer"
       ? [
-          {
-            heading: "Overview",
-            items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }],
-          },
+          { heading: "Overview", items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }] },
           {
             heading: "Content",
             items: [
+              { to: `${base}/website-content`, label: "Website Content", icon: "globe" },
               { to: `${base}/pages`, label: "Pages", icon: "map" },
               { to: `${base}/blog`, label: "Blog", icon: "pen" },
               { to: `${base}/guides-content`, label: "Guides Content", icon: "compass" },
             ],
           },
           {
-            heading: "Library",
+            heading: "Assets & SEO",
             items: [
               { to: `${base}/media`, label: "Media Library", icon: "photo" },
-              { to: `${base}/seo`, label: "SEO Management", icon: "search" },
+              { to: `${base}/seo`, label: "SEO Settings", icon: "search" },
             ],
           },
         ]
       : []
 
   return (
-    <aside className="w-60 shrink-0 bg-white border-r border-gray-200 overflow-y-auto">
+    <aside className="gn-scroll flex w-60 shrink-0 flex-col bg-ink-900 overflow-y-auto">
       <nav className="p-3 space-y-5">
         {groups.map((group) => (
           <div key={group.heading}>
-            <div className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+            <div className="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400">
               {group.heading}
             </div>
             <div className="space-y-0.5">
@@ -274,10 +286,10 @@ export default function NavSidebar() {
                   key={item.to}
                   to={item.to}
                   className={({ isActive }) =>
-                    `flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
+                    `flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-all ${
                       isActive
-                        ? "bg-darkBlue text-white font-medium"
-                        : "text-gray-600 hover:bg-gray-100 hover:text-darkBlue"
+                        ? "bg-brand-500/15 text-brand-300 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.25)]"
+                        : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
                     }`
                   }
                   end
@@ -290,6 +302,20 @@ export default function NavSidebar() {
           </div>
         ))}
       </nav>
+
+      {/* Theme toggle (light/dark) */}
+      <div className="mt-auto border-t border-white/10 pt-3">
+        <button
+          onClick={toggleTheme}
+          className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-slate-300 transition hover:bg-white/5"
+        >
+          <span className="flex items-center gap-2">
+            {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
+            {theme === "dark" ? "Light mode" : "Dark mode"}
+          </span>
+          <span aria-hidden>{theme === "dark" ? "☀️" : "🌙"}</span>
+        </button>
+      </div>
     </aside>
   )
 }

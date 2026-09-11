@@ -41,11 +41,99 @@ export const mockAnalyticsSeries = [
   { label: "Bookings", value: 29 }
 ]
 
+/* ---------------- Visual analytics datasets ---------------- */
+
+/** Platform growth — bookings · users · tours across the last 8 weeks. */
+export const growthSeries = [
+  { week: "W1", bookings: 120, users: 210, tours: 24 },
+  { week: "W2", bookings: 145, users: 246, tours: 26 },
+  { week: "W3", bookings: 138, users: 252, tours: 27 },
+  { week: "W4", bookings: 172, users: 289, tours: 29 },
+  { week: "W5", bookings: 168, users: 305, tours: 30 },
+  { week: "W6", bookings: 210, users: 358, tours: 33 },
+  { week: "W7", bookings: 248, users: 402, tours: 35 },
+  { week: "W8", bookings: 265, users: 437, tours: 38 },
+];
+
+/** Bookings per weekday (weekly rhythm). */
+export const weeklyBookings = [
+  { day: "Mon", value: 22 },
+  { day: "Tue", value: 28 },
+  { day: "Wed", value: 25 },
+  { day: "Thu", value: 31 },
+  { day: "Fri", value: 29 },
+  { day: "Sat", value: 42 },
+  { day: "Sun", value: 38 },
+];
+
+/** Booking heatmap — weekday × time-slot intensity (7 × 6). */
+export const bookingHeatmap = {
+  slots: ["6a", "9a", "12p", "3p", "6p", "9p"],
+  matrix: [
+    [2, 8, 14, 11, 18, 6],
+    [3, 10, 16, 13, 20, 7],
+    [2, 9, 15, 12, 22, 9],
+    [4, 12, 18, 15, 24, 10],
+    [5, 14, 21, 18, 28, 14],
+    [9, 22, 30, 27, 34, 20],
+    [7, 19, 26, 23, 30, 17],
+  ],
+};
+
+/** Review-score distribution histogram. */
+export const ratingHistogram = [
+  { label: "1★", value: 8, color: "#f87171" },
+  { label: "2★", value: 15, color: "#fb923c" },
+  { label: "3★", value: 64, color: "#fbbf24" },
+  { label: "4★", value: 186, color: "#60a5fa" },
+  { label: "5★", value: 412, color: "#2563eb" },
+];
+
+/** Average review score by city. */
+export const cityRatings = [
+  { label: "Kathmandu", value: 4.8 },
+  { label: "Pokhara", value: 4.9 },
+  { label: "Lalitpur", value: 4.7 },
+  { label: "Bhaktapur", value: 4.6 },
+  { label: "Bharatpur", value: 4.5 },
+];
+
+/** Bookings by city (horizontal bars). */
+export const bookingsByCity = [
+  { label: "Kathmandu", value: 640 },
+  { label: "Pokhara", value: 512 },
+  { label: "Lalitpur", value: 348 },
+  { label: "Bhaktapur", value: 296 },
+  { label: "Bharatpur", value: 184 },
+];
+
+/** Where travelers come from — travel-relevant traffic mix. */
+export const mockSources = [
+  { label: "Direct search", value: 350, color: "#2563eb" },
+  { label: "Social media", value: 300, color: "#ff8a5c" },
+  { label: "Referrals", value: 200, color: "#34d399" },
+  { label: "Travel partners", value: 150, color: "#38bdf8" },
+];
+
+/** Support ticket mix by priority. */
+export const ticketsByPriority = [
+  { label: "Urgent", value: 12 },
+  { label: "High", value: 24 },
+  { label: "Normal", value: 58 },
+  { label: "Low", value: 21 },
+];
+
 export const mockEarningsHistory = [
-  { date: "2026-01-10", amount: 85 },
-  { date: "2026-01-12", amount: 120 },
-  { date: "2026-01-18", amount: 60 },
-  { date: "2026-01-24", amount: 200 }
+  { date: "Jan 10", amount: 340 },
+  { date: "Jan 12", amount: 420 },
+  { date: "Jan 15", amount: 380 },
+  { date: "Jan 18", amount: 510 },
+  { date: "Jan 20", amount: 465 },
+  { date: "Jan 22", amount: 590 },
+  { date: "Jan 24", amount: 545 },
+  { date: "Jan 27", amount: 660 },
+  { date: "Jan 29", amount: 615 },
+  { date: "Jan 31", amount: 720 },
 ]
 
 export const mockSchedule = [
@@ -79,13 +167,6 @@ export const mockEmployees = [
   { name: "Sarah B.", email: "sarah@company.com", department: "Marketing", role: "Content Strategist", status: "active" },
   { name: "Angela P.", email: "angela@company.com", department: "IT", role: "Data Specialist", status: "on leave" },
   { name: "Dawa J.", email: "dawa@company.com", department: "Finance", role: "Finance Analyst", status: "active" }
-]
-
-export const mockSources = [
-  { label: "Job Boards", value: 350, color: "#8ecae6" },
-  { label: "Employee Referrals", value: 200, color: "#ffc4d6" },
-  { label: "Social Media Campaigns", value: 300, color: "#bde0fe" },
-  { label: "Recruitment Agencies", value: 150, color: "#ffd166" }
 ]
 
 export const mockScheduleItems = [

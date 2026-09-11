@@ -11,7 +11,7 @@ describe('Badge Component', () => {
   it('applies variant classes', () => {
     const { container } = render(<Badge variant="success">Success</Badge>);
     const badge = container.querySelector('span');
-    expect(badge).toHaveClass('bg-green-100');
+    expect(badge).toHaveClass('bg-emerald-50');
   });
 
   it('renders with different sizes', () => {

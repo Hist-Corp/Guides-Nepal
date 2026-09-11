@@ -8,12 +8,231 @@ html, body, #root {
 
 @layer base {
   html {
-    font-family: "SF Pro", "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    font-family: "Graphik", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  body {
-    background-color: #f5f7fa;
-    color: #213448;
+}
+
+/* ------------------------------------------------------------------
+   Guides Nepal design system — ported from the reference design
+   (guides nepal dashboard design architect): soft SaaS look with
+   glass cards, pastel wash, BLUE primary, sky data-viz and a warm
+   tangerine accent. Light/dark theming is driven by CSS variables
+   so every shell and inner page stays legible when toggling.
+   ------------------------------------------------------------------ */
+
+/* ---------- Light / dark theming (CSS variables) ---------- */
+:root {
+  color-scheme: light;
+  --surface: 255 255 255;
+  --surface-2: 246 249 252;
+  --surface-3: 240 245 250;
+  --line: 226 232 240;
+  --text: 30 41 59;
+  --text-soft: 100 116 139;
+  --header: 255 255 255;
+  --hero-a: #eff6ff;
+  --hero-b: #dbeafe;
+  --panel-a: #1d4ed8;
+  --panel-b: #3b82f6;
+}
+
+.dark {
+  color-scheme: dark;
+  --surface: 15 23 42;
+  --surface-2: 30 41 59;
+  --surface-3: 51 65 85;
+  --line: 71 85 105;
+  --text: 241 245 249;
+  --text-soft: 148 163 184;
+  --header: 15 23 42;
+  --hero-a: #0b1120;
+  --hero-b: #1e293b;
+  --panel-a: #0f172a;
+  --panel-b: #1e293b;
+}
+
+@layer utilities {
+  .bg-surface { background-color: rgb(var(--surface)); }
+  .bg-surface-2 { background-color: rgb(var(--surface-2)); }
+  .bg-surface-3 { background-color: rgb(var(--surface-3)); }
+  .border-line { border-color: rgb(var(--line)); }
+  .text-main { color: rgb(var(--text)); }
+  .text-soft { color: rgb(var(--text-soft)); }
+  .bg-header { background-color: rgb(var(--header)); }
+  .bg-hero-grad { background-image: linear-gradient(135deg, var(--hero-a), var(--hero-b)); }
+  .bg-panel-grad { background-image: linear-gradient(150deg, var(--panel-a), var(--panel-b)); }
+  .divide-line > :not([hidden]) ~ :not([hidden]) { border-color: rgb(var(--line)); }
+}
+
+html, body {
+  background-color: rgb(var(--surface));
+}
+
+body {
+  color: rgb(var(--text));
+  @apply antialiased;
+}
+
+/* Soft app backdrop wash (reference-style pastel gradient behind everything) */
+.dash-backdrop::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 8% -10%, #dbeafe 0%, transparent 60%),
+    radial-gradient(50rem 32rem at 100% 0%, #e0f2fe 0%, transparent 55%),
+    radial-gradient(46rem 30rem at 50% 115%, #ede9fe 0%, transparent 60%);
+  opacity: 0.9;
+}
+
+@layer components {
+  /* Glass card — used across all shells via the Card component */
+  .gn-card {
+    background-color: rgb(var(--surface) / 0.86);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 1px 2px rgba(30, 41, 59, 0.04), 0 12px 32px -16px rgba(37, 99, 235, 0.16);
+  }
+
+  /* Sticky glass header */
+  .gn-topbar {
+    background-color: rgb(var(--header) / 0.85);
+    backdrop-filter: blur(12px);
+  }
+
+  .gn-scroll::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .gn-scroll::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.25);
+  }
+  .gn-scroll-light::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .gn-scroll-light::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+    background: #bfdbfe;
   }
 }
+
+/* ------------------------------------------------------------------
+   Dark mode (class-based — html.dark). Beyond the shell-level
+   surfaces above, every component authored with light-only utilities
+   (slate grays, darkBlue ink, white panels) is remapped here so the
+   whole console follows the theme automatically — the same approach
+   the reference design uses to keep legacy pages legible.
+   ------------------------------------------------------------------ */
+.dark body {
+  background-color: rgb(var(--surface));
+  color: rgb(var(--text));
+}
+
+.dark .gn-card {
+  background-color: rgba(15, 23, 42, 0.88);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 16px 40px -16px rgba(37, 99, 235, 0.25);
+}
+.dark .gn-topbar {
+  background-color: rgba(15, 23, 42, 0.85);
+}
+.dark .dash-backdrop::before {
+  background:
+    radial-gradient(60rem 40rem at 8% -10%, #1e3a5f 0%, transparent 60%),
+    radial-gradient(50rem 32rem at 100% 0%, #16283f 0%, transparent 55%),
+    radial-gradient(46rem 30rem at 50% 115%, #0f1f38 0%, transparent 60%);
+  opacity: 1;
+}
+.dark .gn-scroll-light::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+/* ---------- Text remaps ---------- */
+.dark .text-darkBlue, .dark .text-ink-800, .dark .text-ink-900,
+.dark .text-slate-900, .dark .text-slate-800,
+.dark .text-gray-900, .dark .text-gray-800 { color: rgb(var(--text)) !important; }
+
+.dark .text-ink-700, .dark .text-slate-700, .dark .text-gray-700 { color: #cbd5e1 !important; }
+
+.dark .text-slate-600, .dark .text-slate-500,
+.dark .text-gray-600, .dark .text-gray-500 { color: rgb(var(--text-soft)) !important; }
+
+.dark .text-slate-400, .dark .text-slate-300,
+.dark .text-gray-400, .dark .text-gray-300 { color: #94a3b8 !important; }
+
+/* Brand hues switch to lighter tints for dark backgrounds */
+.dark .text-brand-900, .dark .text-brand-800, .dark .text-brand-700 { color: #93c5fd !important; }
+.dark .text-brand-600 { color: #60a5fa !important; }
+.dark .text-brand-yellow { color: #fbbf24 !important; }
+.dark .text-accent-600, .dark .text-accent-700 { color: #ffb27a !important; }
+.dark .text-flame-600 { color: #f9a8d4 !important; }
+.dark .text-leaf-600 { color: #34d399 !important; }
+
+/* ---------- Background remaps ---------- */
+.dark .bg-white { background-color: rgb(var(--surface-2)) !important; }
+.dark .bg-white\/95 { background-color: rgb(var(--surface-2) / 0.95) !important; }
+.dark .bg-white\/85, .dark .bg-white\/80 { background-color: rgb(var(--header) / 0.85) !important; }
+.dark .bg-white\/70, .dark .bg-white\/60 { background-color: rgb(var(--header) / 0.72) !important; }
+.dark .bg-white\/50 { background-color: rgb(255 255 255 / 0.08) !important; }
+.dark .bg-white\/20, .dark .bg-white\/10 { background-color: rgb(255 255 255 / 0.1) !important; }
+.dark .bg-white\/5 { background-color: rgb(255 255 255 / 0.04) !important; }
+
+.dark .bg-gray-50, .dark .bg-gray-100,
+.dark .bg-slate-50, .dark .bg-slate-100,
+.dark .bg-brand-50, .dark .bg-brand-100 { background-color: rgb(var(--surface-3)) !important; }
+.dark .bg-brand-200 { background-color: rgb(71 85 105) !important; }
+.dark .bg-gray-200, .dark .bg-slate-200 { background-color: rgb(71 85 105) !important; }
+.dark .bg-darkBlue { background-color: rgb(51 65 85) !important; }
+
+.dark .hover\:bg-gray-50:hover, .dark .hover\:bg-gray-100:hover,
+.dark .hover\:bg-slate-50:hover, .dark .hover\:bg-slate-100:hover,
+.dark .hover\:bg-brand-50:hover { background-color: rgb(var(--surface-3)) !important; }
+.dark .hover\:bg-white\/70:hover, .dark .hover\:bg-white\/80:hover { background-color: rgb(var(--surface-3)) !important; }
+.dark .hover\:bg-white\/5:hover { background-color: rgb(255 255 255 / 0.06) !important; }
+.dark .hover\:bg-white\/10:hover, .dark .hover\:bg-white\/15:hover { background-color: rgb(255 255 255 / 0.12) !important; }
+
+/* ---------- Border / ring / divide remaps ---------- */
+.dark .border-gray-100, .dark .border-gray-200, .dark .border-gray-300,
+.dark .border-slate-100, .dark .border-slate-200, .dark .border-slate-300,
+.dark .border-brand-200, .dark .border-brand-100 { border-color: rgb(var(--line)) !important; }
+
+.dark .ring-gray-200, .dark .ring-gray-300, .dark .ring-slate-200,
+.dark .ring-brand-200, .dark .ring-brand-100 { --tw-ring-color: rgb(var(--line)) !important; }
+
+.dark .ring-darkBlue\/10, .dark .ring-darkBlue\/20 { --tw-ring-color: rgb(71 85 105) !important; }
+.dark .border-darkBlue\/10, .dark .border-darkBlue\/20 { border-color: rgb(71 85 105) !important; }
+
+.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { border-color: rgb(var(--line)) !important; }
+
+/* ---------- Focus ring remap (brand-yellow → blue) ---------- */
+.dark .focus\:ring-brand-yellow\/10:focus { --tw-ring-color: rgb(37 99 235 / 0.1) !important; }
+.dark .focus\:ring-brand-yellow\/40:focus { --tw-ring-color: rgb(96 165 250 / 0.4) !important; }
+.dark .focus\:border-brand-yellow:focus { border-color: #60a5fa !important; }
+.dark .focus\:border-darkBlue:focus { border-color: #60a5fa !important; }
+
+/* ------------------------------------------------------------------
+   Legacy yellow-brand remap — the reference design uses a BLUE
+   primary, so any component still styled with the old brand-yellow
+   tokens renders in the reference blue automatically (light mode).
+   Dark-mode variants are handled further up.
+   ------------------------------------------------------------------ */
+.bg-brand-yellow { background-color: #2563eb !important; color: #ffffff !important; }
+.hover\:bg-\[\#E5A800\]:hover { background-color: #1d4ed8 !important; }
+.bg-brand-yellow\/5 { background-color: rgb(37 99 235 / 0.05) !important; }
+.bg-brand-yellow\/10 { background-color: rgb(37 99 235 / 0.1) !important; }
+.bg-brand-yellow\/20 { background-color: rgb(37 99 235 / 0.2) !important; }
+.border-brand-yellow { border-color: #2563eb !important; }
+.border-brand-yellow\/40 { border-color: rgb(37 99 235 / 0.4) !important; }
+.ring-brand-yellow { --tw-ring-color: #2563eb !important; }
+.ring-brand-yellow\/40 { --tw-ring-color: rgb(37 99 235 / 0.4) !important; }
+.text-brand-yellow { color: #2563eb !important; }
+.focus\:border-brand-yellow:focus { border-color: #2563eb !important; }
+.focus\:ring-brand-yellow:focus { --tw-ring-color: rgb(37 99 235 / 0.4) !important; }
+.focus\:ring-brand-yellow\/40:focus { --tw-ring-color: rgb(37 99 235 / 0.4) !important; }

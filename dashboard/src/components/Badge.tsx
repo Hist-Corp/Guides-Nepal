@@ -15,19 +15,19 @@ export type BadgeVariant =
 export type BadgeSize = "sm" | "md" | "lg";
 
 const VARIANT_CLASSES: Record<BadgeVariant, string> = {
-  default: "bg-gray-100 text-gray-800",
-  primary: "bg-primary/10 text-primary",
-  success: "bg-green-100 text-green-800",
-  published: "bg-green-100 text-green-800",
-  danger: "bg-red-100 text-red-800",
-  warning: "bg-amber-100 text-amber-800",
-  draft: "bg-amber-100 text-amber-800",
-  archived: "bg-gray-300 text-gray-700",
-  info: "bg-lightBlue/60 text-darkBlue",
+  default: "bg-gray-100 text-gray-700 ring-1 ring-inset ring-gray-200 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700",
+  primary: "bg-darkBlue/10 text-darkBlue ring-1 ring-inset ring-darkBlue/20 dark:bg-brand-500/15 dark:text-brand-300 dark:ring-brand-500/40",
+  success: "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/30",
+  published: "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/30",
+  danger: "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200 dark:bg-rose-500/15 dark:text-rose-300 dark:ring-rose-500/30",
+  warning: "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/30",
+  draft: "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/30",
+  archived: "bg-gray-100 text-gray-500 ring-1 ring-inset ring-gray-200 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-700",
+  info: "bg-sky-50 text-sky-700 ring-1 ring-inset ring-sky-200 dark:bg-sky-500/15 dark:text-sky-300 dark:ring-sky-500/30",
 };
 
 const SIZE_CLASSES: Record<BadgeSize, string> = {
-  sm: "text-xs",
+  sm: "text-[11px]",
   md: "text-xs",
   lg: "text-sm",
 };

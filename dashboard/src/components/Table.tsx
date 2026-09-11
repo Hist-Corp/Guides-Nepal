@@ -25,28 +25,28 @@ export default function Table<T extends Record<string, any>>({
   return (
     <div
       className={cn(
-        "overflow-x-auto rounded-lg border border-gray-200 bg-white",
+        "overflow-x-auto rounded-lg border border-line bg-surface text-main",
         className
       )}
     >
       <table className="min-w-full text-sm">
-        <thead className="bg-gray-50 border-b border-gray-200">
+        <thead className="bg-surface-3 border-b border-line">
           <tr>
             {columns.map((c, ci) => (
               <th
                 key={`${String(c.key)}-${ci}`}
-                className="text-left px-3 py-2.5 text-xs font-medium uppercase tracking-wide text-gray-500"
+                className="text-left px-3 py-2.5 text-xs font-medium uppercase tracking-wide text-soft"
               >
                 {c.label}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-line divide-y">
           {rows.map((r, idx) => (
             <tr
               key={rowKey ? rowKey(r, idx) : idx}
-              className="hover:bg-gray-50"
+              className="transition-colors hover:bg-surface-2"
             >
               {columns.map((c, ci) => (
                 <td
@@ -63,7 +63,7 @@ export default function Table<T extends Record<string, any>>({
         </tbody>
       </table>
       {rows.length === 0 ? (
-        <div className="py-8 text-center text-sm text-gray-500">
+        <div className="py-8 text-center text-sm text-soft">
           {emptyMessage}
         </div>
       ) : null}

@@ -5,18 +5,17 @@ import SectionCard from "../components/SectionCard"
 import StatCard from "../components/StatCard"
 import KPICard from "../components/KPICard"
 import HeroGreeting from "../components/HeroGreeting"
-import BarChart from "../components/BarChart"
+import { WeeklyBarChart } from "../components/charts"
 import Badge from "../components/Badge"
 import SchedulePanel from "../components/SchedulePanel"
 import Table from "../components/Table"
-import { mockExperiences, mockBookings as mockB, mockGuideTasks, mockGuideScheduleItems } from "../mock/data"
+import { mockExperiences, mockBookings as mockB, mockGuideTasks, mockGuideScheduleItems, weeklyBookings } from "../mock/data"
 
 export default function GuideOverview() {
   const { data, loading } = useFetch(getBookings)
   const bookings = Array.isArray(data) ? data : []
   const upcoming = bookings.filter((x: any) => x.status === "upcoming").length
   const earningsTotal = bookings.reduce((sum: number, x: any) => sum + (x.price ?? 0), 0)
-  const series = (mockB ?? []).map((bk) => ({ label: bk.date, value: bk.price }))
   return (
     <PageShell
       title="Guide Overview"
@@ -24,9 +23,11 @@ export default function GuideOverview() {
       noCard
     >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-4">
           <HeroGreeting />
         </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <KPICard title="Upcoming" value={loading ? "…" : upcoming} delta={{ value: "+1", positive: true }} />
         <KPICard title="Total bookings" value={loading ? "…" : bookings.length} delta={{ value: "+3%", positive: true }} />
         <KPICard title="Earnings" value={loading ? "…" : `$${earningsTotal}`} delta={{ value: "+1%", positive: true }} />
@@ -37,7 +38,7 @@ export default function GuideOverview() {
           subtitle="Earnings across recent bookings"
           className="lg:col-span-2"
         >
-          <BarChart series={series} />
+          <WeeklyBarChart data={weeklyBookings} height={240} />
         </SectionCard>
         <SectionCard title="Tasks" subtitle="Your to-do list">
           <ul className="space-y-2">
@@ -69,6 +70,24 @@ export default function GuideOverview() {
           ))}
         </SectionCard>
         <SchedulePanel items={mockGuideScheduleItems} />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <SectionCard
+          title="Booking activity by weekday"
+          subtitle="When your guests book across the week"
+        >
+          <WeeklyBarChart data={weeklyBookings} height={170} />
+        </SectionCard>
+        <SectionCard title="Top experiences" subtitle="Your best-performing tours">
+          <ul className="space-y-2">
+            {mockExperiences.slice(0, 5).map((e) => (
+              <li key={e.id} className="flex items-center justify-between">
+                <div className="text-sm font-medium text-main">{e.title}</div>
+                <Badge text={e.duration} />
+              </li>
+            ))}
+          </ul>
+        </SectionCard>
       </div>
       <SectionCard
         title="Recent Bookings"

@@ -4,11 +4,11 @@ import NavSidebar from "../components/NavSidebar"
 
 export default function WriterLayout() {
   return (
-    <div className="h-screen flex flex-col">
+    <div className="dash-backdrop h-screen flex flex-col">
       <Topbar />
-      <div className="flex flex-1">
+      <div className="relative flex flex-1 overflow-hidden">
         <NavSidebar />
-        <main className="flex-1 p-6 lg:p-8 bg-[#f5f7fa]">
+        <main className="gn-scroll-light relative flex-1 overflow-y-auto p-6 lg:p-8">
           <Outlet />
         </main>
       </div>

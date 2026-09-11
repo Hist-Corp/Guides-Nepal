@@ -5,11 +5,11 @@ import SectionCard from "../components/SectionCard"
 import StatCard from "../components/StatCard"
 import KPICard from "../components/KPICard"
 import HeroGreeting from "../components/HeroGreeting"
-import BarChart from "../components/BarChart"
+import { WeeklyBarChart } from "../components/charts"
 import Badge from "../components/Badge"
 import SchedulePanel from "../components/SchedulePanel"
 import Table from "../components/Table"
-import { mockExperiences, mockBookings as mockB, mockHostTasks, mockHostScheduleItems } from "../mock/data"
+import { mockExperiences, mockBookings as mockB, mockHostTasks, mockHostScheduleItems, weeklyBookings } from "../mock/data"
 
 export default function HostOverview() {
   const { data: exps, loading: expsLoading } = useFetch(getExperiences)
@@ -17,7 +17,6 @@ export default function HostOverview() {
   const experiences = Array.isArray(exps) ? exps : []
   const b = Array.isArray(bookings) ? bookings : []
   const earningsTotal = b.reduce((sum: number, x: any) => sum + (x.price ?? 0), 0)
-  const series = (mockB ?? []).map((bk) => ({ label: bk.date, value: bk.price }))
   return (
     <PageShell
       title="Host Overview"
@@ -25,9 +24,11 @@ export default function HostOverview() {
       noCard
     >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-4">
           <HeroGreeting />
         </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <KPICard title="Experiences" value={expsLoading ? "…" : experiences.length} delta={{ value: "+2", positive: true }} />
         <KPICard title="Bookings" value={bookingsLoading ? "…" : b.length} delta={{ value: "+5%", positive: true }} />
         <KPICard title="Earnings" value={bookingsLoading ? "…" : `$${earningsTotal}`} delta={{ value: "-3%", positive: false }} />
@@ -38,7 +39,7 @@ export default function HostOverview() {
           subtitle="Revenue across recent bookings"
           className="lg:col-span-2"
         >
-          <BarChart series={series} />
+          <WeeklyBarChart data={weeklyBookings} height={240} />
         </SectionCard>
         <SectionCard title="Tasks" subtitle="Your to-do list">
           <ul className="space-y-2">
@@ -71,6 +72,24 @@ export default function HostOverview() {
           ))}
         </SectionCard>
         <SchedulePanel items={mockHostScheduleItems} />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <SectionCard
+          title="Booking activity by weekday"
+          subtitle="When your guests book across the week"
+        >
+          <WeeklyBarChart data={weeklyBookings} height={170} />
+        </SectionCard>
+        <SectionCard title="Top experiences" subtitle="Your best-performing listings">
+          <ul className="space-y-2">
+            {mockExperiences.slice(0, 5).map((e) => (
+              <li key={e.id} className="flex items-center justify-between">
+                <div className="text-sm font-medium text-main">{e.title}</div>
+                <Badge text={`$${e.price}`} />
+              </li>
+            ))}
+          </ul>
+        </SectionCard>
       </div>
       <SectionCard
         title="Recent Bookings"

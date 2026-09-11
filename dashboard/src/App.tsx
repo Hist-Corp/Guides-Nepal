@@ -25,6 +25,10 @@ import AdminRevenue from "./admin/Revenue"
 import AdminSettings from "./admin/Settings"
 import WebsiteContentManager from "./components/WebsiteContentManager"
 import AdminContent from "./admin/Content"
+import RoleHierarchy from "./superadmin/RoleHierarchy"
+import Customers from "./components/Customers"
+import Administration from "./components/Administration"
+import SuperAdminIntelligence from "./superadmin/Intelligence"
 import WriterLayout from "./layouts/WriterLayout"
 import WriterOverview from "./writer/Overview"
 import WriterPages from "./writer/Pages"
@@ -94,7 +98,14 @@ export default function App() {
           <Route index element={<AdminOverview />} />
           <Route path="hosts" element={<AdminHosts />} />
           <Route path="guides" element={<AdminGuides />} />
+          <Route path="customers" element={<Customers />} />
           <Route path="content" element={<AdminContent />} />
+          <Route path="pages" element={<WriterPages />} />
+          <Route path="blog" element={<WriterBlog />} />
+          <Route path="guides-content" element={<WriterGuidesContent />} />
+          <Route path="media" element={<WriterMedia />} />
+          <Route path="seo" element={<WriterSeo />} />
+          <Route path="administration" element={<Administration />} />
           <Route path="website-content" element={<WebsiteContentManager area="admin" />} />
           <Route path="analytics" element={<AdminAnalytics />} />
           <Route path="revenue" element={<AdminRevenue />} />
@@ -113,7 +124,16 @@ export default function App() {
           <Route index element={<SuperAdminOverview />} />
           <Route path="host-applications" element={<SuperAdminHostApplications />} />
           <Route path="support-tickets" element={<SuperAdminSupportTickets />} />
+          <Route path="hierarchy" element={<RoleHierarchy />} />
+          <Route path="administration" element={<Administration />} />
+          <Route path="customers" element={<Customers />} />
           <Route path="website-content" element={<WebsiteContentManager area="super-admin" />} />
+          <Route path="intelligence" element={<SuperAdminIntelligence />} />
+          <Route path="pages" element={<WriterPages />} />
+          <Route path="blog" element={<WriterBlog />} />
+          <Route path="guides-content" element={<WriterGuidesContent />} />
+          <Route path="media" element={<WriterMedia />} />
+          <Route path="seo" element={<WriterSeo />} />
         </Route>
         <Route
           path="regional-head/*"
@@ -128,6 +148,7 @@ export default function App() {
           <Route index element={<RegionalHeadOverview />} />
           <Route path="applications" element={<RegionalApplications />} />
           <Route path="region" element={<RegionalInfo />} />
+          <Route path="customers" element={<Customers title="Customers" description="Travelers and bookings within your region." />} />
         </Route>
         <Route
           path="customer-support/*"
@@ -142,6 +163,7 @@ export default function App() {
           <Route index element={<SupportOverview />} />
           <Route path="tickets" element={<SupportTickets />} />
           <Route path="faq" element={<SupportFaq />} />
+          <Route path="customers" element={<Customers title="Customers" description="Travelers you have helped or can assist." />} />
         </Route>
         <Route
           path="content-writer/*"
@@ -157,6 +179,7 @@ export default function App() {
           <Route path="pages" element={<WriterPages />} />
           <Route path="blog" element={<WriterBlog />} />
           <Route path="guides-content" element={<WriterGuidesContent />} />
+          <Route path="website-content" element={<WebsiteContentManager area="content-writer" />} />
           <Route path="media" element={<WriterMedia />} />
           <Route path="seo" element={<WriterSeo />} />
         </Route>
@@ -174,6 +197,7 @@ export default function App() {
           <Route path="guides" element={<HostGuides />} />
           <Route path="tours" element={<HostTours />} />
           <Route path="bookings" element={<HostBookings />} />
+          <Route path="customers" element={<Customers title="My Customers" description="Travelers who booked your experiences." />} />
           <Route path="earnings" element={<HostEarnings />} />
           <Route path="performance" element={<HostPerformance />} />
         </Route>
@@ -191,6 +215,7 @@ export default function App() {
           <Route path="my-tours" element={<GuideMyTours />} />
           <Route path="my-bookings" element={<GuideMyBookings />} />
           <Route path="schedule" element={<GuideSchedule />} />
+          <Route path="customers" element={<Customers title="My Customers" description="Travelers you have guided or can help." />} />
           <Route path="earnings" element={<GuideEarnings />} />
           <Route path="profile" element={<GuideProfile />} />
         </Route>

@@ -5,12 +5,11 @@ import SectionCard from "../components/SectionCard"
 import StatCard from "../components/StatCard"
 import KPICard from "../components/KPICard"
 import HeroGreeting from "../components/HeroGreeting"
-import BarChart from "../components/BarChart"
-import DonutChart from "../components/DonutChart"
+import { GrowthAreaChart, DonutChartCard, WeeklyBarChart } from "../components/charts"
 import Table from "../components/Table"
 import Badge from "../components/Badge"
 import SchedulePanel from "../components/SchedulePanel"
-import { mockAnalyticsSeries, mockTasks, mockActivity, mockEmployees, mockSources, mockScheduleItems } from "../mock/data"
+import { growthSeries, weeklyBookings, mockTasks, mockActivity, mockEmployees, mockSources, mockScheduleItems } from "../mock/data"
 
 export default function AdminOverview() {
   const [stats, setStats] = useState<any>({})
@@ -48,9 +47,11 @@ export default function AdminOverview() {
       noCard
     >
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-4">
           <HeroGreeting />
         </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <KPICard title="Total Users" value={loading ? "…" : (stats.total_users || 0)} sub="Registered users" />
         <KPICard title="Total Guides" value={loading ? "…" : (stats.total_guides || 0)} sub={`${stats.verified_guides || 0} verified`} />
         <KPICard title="Bookings" value={loading ? "…" : (stats.total_bookings || 0)} sub="Total bookings" />
@@ -58,11 +59,18 @@ export default function AdminOverview() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <SectionCard
-          title="Average KPIs"
-          subtitle="Performance trends across the platform"
+          title="Platform KPIs"
+          subtitle="Bookings · users · tours across the last weeks"
           className="lg:col-span-2"
         >
-          <BarChart series={mockAnalyticsSeries} />
+          <GrowthAreaChart
+            data={growthSeries}
+            series={[
+              { key: "bookings", name: "Bookings", color: "#2563eb" },
+              { key: "users", name: "New users", color: "#ff8a5c" },
+              { key: "tours", name: "Active tours", color: "#34d399" },
+            ]}
+          />
         </SectionCard>
         <SectionCard title="Tasks" subtitle="Items needing attention">
           <ul className="space-y-2">
@@ -107,7 +115,13 @@ export default function AdminOverview() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <SectionCard title="Application Resources" subtitle="Where signups come from">
-          <DonutChart segments={mockSources} />
+          <div className="space-y-4">
+            <DonutChartCard segments={mockSources} />
+            <div>
+              <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-soft">Bookings by weekday</div>
+              <WeeklyBarChart data={weeklyBookings} height={160} />
+            </div>
+          </div>
         </SectionCard>
         <SectionCard
           title="Current Experiences"

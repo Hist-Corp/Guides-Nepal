@@ -5,22 +5,22 @@ export type ButtonVariant = "primary" | "secondary" | "danger" | "ghost" | "icon
 export type ButtonSize = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center rounded-lg font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
+  "inline-flex items-center justify-center rounded-full font-semibold transition-all active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
 
 const variants: Record<ButtonVariant, string> = {
   primary:
-    "bg-brand-yellow text-darkBlue hover:opacity-90 focus-visible:ring-brand-yellow",
+    "bg-brand-600 text-white hover:bg-brand-700 focus-visible:ring-brand-500 shadow-btn-blue",
   secondary:
-    "border border-gray-300 text-darkBlue hover:bg-gray-50 focus-visible:ring-gray-400",
+    "border border-line bg-surface text-main hover:bg-surface-2 focus-visible:ring-brand-400",
   danger: "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500",
-  ghost: "text-gray-600 hover:bg-gray-100 focus-visible:ring-gray-300",
-  icon: "border border-gray-300 text-darkBlue hover:bg-gray-50 focus-visible:ring-gray-400",
+  ghost: "text-soft hover:bg-surface-2 hover:text-main focus-visible:ring-brand-400",
+  icon: "border border-line bg-surface text-main hover:bg-surface-2 focus-visible:ring-brand-400",
 };
 
 const sizes: Record<ButtonSize, string> = {
-  sm: "px-2.5 py-1.5 text-xs",
-  md: "px-3 py-2 text-sm",
-  lg: "px-4 py-2 text-base",
+  sm: "px-3 py-1.5 text-xs",
+  md: "px-4 py-2 text-sm",
+  lg: "px-5 py-2.5 text-base",
 };
 
 export default function Button({
