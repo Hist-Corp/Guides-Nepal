@@ -203,6 +203,8 @@ const CmsEditMode: React.FC = () => {
       target.classList.add('cms-selected')
       const kind = target.getAttribute('data-cms-kind') || undefined
       const sectionEl = target.closest('[data-cms-id]:not([data-cms-kind])') as HTMLElement | null
+      const isImage = kind === 'image' || target.tagName.toLowerCase() === 'img' || !!target.querySelector('img')
+      const imgEl = (target.tagName.toLowerCase() === 'img' ? target : target.querySelector('img')) as HTMLImageElement | null
       window.parent.postMessage(
         {
           type: 'cms-section-click',
@@ -211,6 +213,8 @@ const CmsEditMode: React.FC = () => {
           label: target.getAttribute('data-cms-label') || undefined,
           kind,
           sectionId: sectionEl?.getAttribute('data-cms-id') || undefined,
+          currentUrl: isImage ? (imgEl?.src || undefined) : undefined,
+          alt: isImage ? (imgEl?.alt || undefined) : undefined,
         },
         '*'
       )
@@ -222,6 +226,18 @@ const CmsEditMode: React.FC = () => {
       if (data.type === 'cms-refresh') {
         clearCmsSectionsCache(data.slug)
         window.location.reload()
+      } else if (data.type === 'cms-update-image') {
+        // Update image live without reload
+        const el = document.querySelector(`[data-cms-id="${data.sectionId}"]`) as HTMLElement | null
+        if (el) {
+          const img = (el.tagName.toLowerCase() === 'img' ? el : el.querySelector('img')) as HTMLImageElement | null
+          if (img) {
+            img.src = data.url
+            img.style.transition = 'opacity 0.3s'
+            img.style.opacity = '0.5'
+            setTimeout(() => { img.style.opacity = '1' }, 300)
+          }
+        }
       }
     }
     window.addEventListener('message', onMessage)

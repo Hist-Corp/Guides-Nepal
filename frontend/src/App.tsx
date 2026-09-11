@@ -1,8 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import ScrollToTop from './components/common/ScrollToTop';
 import SupportWidget from './components/common/SupportWidget';
 import CmsEditMode from './components/common/CmsEditMode';
+import CmsPreviewBridge from './components/CmsPreviewBridge';
 import { GlobalImageFallback } from './components/common/GlobalImageFallback';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { CartProvider } from './contexts/CartContext';
@@ -79,11 +80,14 @@ import CommunityPage from './pages/CommunityPage';
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
+  const isCmsPreview = typeof window !== 'undefined' && window.location.search.includes('cms-preview=1');
+
   return (
     <CurrencyProvider>
       <CartProvider>
         <Router>
           <CmsEditMode />
+          {isCmsPreview && <CmsPreviewBridge />}
           <ScrollToTop />
           <GlobalImageFallback />
           <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />

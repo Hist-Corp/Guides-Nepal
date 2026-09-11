@@ -12,7 +12,7 @@ export const PromoBanner: React.FC = () => {
   return (
     <section data-cms-id="home-promo" data-cms-label="Promo Banner" className="py-16 bg-background-cream">
        <div className="container mx-auto px-4">
-          <div className="bg-sky-500 rounded-3xl overflow-hidden flex flex-col md:flex-row text-white relative">
+          <div className="bg-sky-500 rounded-[34px] md:rounded-3xl overflow-hidden flex flex-col md:flex-row text-white relative px-8 md:px-10 py-8 md:py-0 gap-6 md:gap-12">
             {/* Left Content */}
             <div className="flex-1 p-8 md:p-12 lg:p-16 z-10">
                {cmsPromo?.content?.tagline && (
