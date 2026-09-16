@@ -17,7 +17,7 @@ guides_data = [
     {
         "id": 1,
         "name": "Apicha",
-        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+        "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
         "role": "Cultural Expert",
         "rating": 4.9,
         "reviews": 120,
@@ -35,7 +35,7 @@ guides_data = [
     {
         "id": 2,
         "name": "Sujal",
-        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+        "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
         "role": "Adventure Specialist",
         "rating": 4.92,
         "reviews": 89,
@@ -52,7 +52,7 @@ guides_data = [
     {
         "id": 3,
         "name": "Priya",
-        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+        "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
         "role": "Food & Culture Guide",
         "rating": 4.95,
         "reviews": 156,
@@ -64,13 +64,13 @@ guides_data = [
         "gallery": [
             "https://images.unsplash.com/photo-1556909114-f6e7a7a97c0e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
             "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-            "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+            "https://images.unsplash.com/photo-1574484284002-952d92456975?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
         ],
     },
     {
         "id": 4,
         "name": "Rohan",
-        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+        "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
         "role": "Adventure Enthusiast",
         "rating": 4.92,
         "reviews": 78,

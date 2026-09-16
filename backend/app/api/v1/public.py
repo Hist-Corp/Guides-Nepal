@@ -52,7 +52,9 @@ class PublicHostApplicationCreate(BaseModel):
 
 
 @router.post("/host-applications", status_code=status.HTTP_201_CREATED)
-def submit_host_application(payload: PublicHostApplicationCreate, db: Session = Depends(get_db)):
+def submit_host_application(
+    payload: PublicHostApplicationCreate, db: Session = Depends(get_db)
+):
     """Public guide/host registration form from the marketing website."""
     application = HostApplication(
         host_name=payload.full_name,
@@ -74,7 +76,7 @@ MOCK_GUIDES = [
     {
         "id": 1,
         "name": "Ram Bahadur",
-        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+        "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
         "role": "Cultural Expert",
         "rating": 4.9,
         "reviews": 120,
@@ -102,7 +104,7 @@ MOCK_GUIDES = [
     {
         "id": 3,
         "name": "Priya Sharma",
-        "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+        "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
         "role": "Food & Culture Guide",
         "rating": 4.95,
         "reviews": 156,
@@ -126,7 +128,7 @@ MOCK_GUIDES = [
         "livesIn": "Bharatpur",
         "cities": ["Bharatpur", "Kathmandu"],
         "gallery": [],
-    }
+    },
 ]
 
 MOCK_EXPERIENCES = [
@@ -297,7 +299,7 @@ MOCK_EXPERIENCES = [
         "city": "Lalitpur",
         "category": "Food",
         "host": MOCK_GUIDES[2],
-    }
+    },
 ]
 
 
@@ -311,29 +313,34 @@ def list_experiences(
     sort: Optional[str] = None,
 ) -> List[dict]:
     results = MOCK_EXPERIENCES.copy()
-    
+
     # Filter by city
     if city:
         results = [e for e in results if e.get("city", "").lower() == city.lower()]
-    
+
     # Filter by category
     if category:
-        results = [e for e in results if e.get("category", "").lower() == category.lower()]
-    
+        results = [
+            e for e in results if e.get("category", "").lower() == category.lower()
+        ]
+
     # Filter by search term
     if search:
         search_lower = search.lower()
-        results = [e for e in results if 
-                   search_lower in e.get("title", "").lower() or 
-                   search_lower in e.get("description", "").lower() or
-                   search_lower in e.get("city", "").lower()]
-    
+        results = [
+            e
+            for e in results
+            if search_lower in e.get("title", "").lower()
+            or search_lower in e.get("description", "").lower()
+            or search_lower in e.get("city", "").lower()
+        ]
+
     # Filter by price range
     if min_price is not None:
         results = [e for e in results if e.get("price", 0) >= min_price]
     if max_price is not None:
         results = [e for e in results if e.get("price", 0) <= max_price]
-    
+
     # Sort results
     if sort == "price_low":
         results.sort(key=lambda x: x.get("price", 0))
@@ -343,7 +350,7 @@ def list_experiences(
         results.sort(key=lambda x: x.get("rating", 0), reverse=True)
     elif sort == "popular":
         results.sort(key=lambda x: x.get("reviews", 0), reverse=True)
-    
+
     return results
 
 
