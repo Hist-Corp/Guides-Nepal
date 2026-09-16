@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File
-from app.core.dependencies import require_role
+from app.core.dependencies import require_role, get_optional_user
 from app.models.user import User
 import copy
 import json
@@ -8,6 +8,7 @@ import re
 import io
 import hashlib
 from uuid import uuid4
+from typing import Optional
 
 # Optional server-side image compression (Pillow). If Pillow is not
 # installed the upload still works — images are just stored as-is.
@@ -469,44 +470,53 @@ NEXT_SECTION_ID = 100
 DEFAULT_SECTIONS = {
     "home": [
         {"id": "home-hero", "title": "Hero Section", "type": "hero",
-         "content": {"heading": "Go local in Charming Cities", "subtitle": "Find unforgettable experiences with locals across Nepal", "buttonText": "Explore", "primaryText": "Guides Nepal", "tagline": "Discover Nepal like a local"},
-         "style": {"backgroundColor": "#213448", "textColor": "#ffffff", "accentColor": "#F4B400", "alignment": "center", "headingSize": "3rem", "padding": "4rem"}},
-        {"id": "home-promo", "title": "Promo Banner", "type": "promo",
-         "content": {"heading": "Enjoy the Best of the City Like a Local", "subtitle": "Skip the tourist traps and explore the city with people who know it best.", "buttonText": "Find a Local"},
-         "style": {"backgroundColor": "#9A2143", "textColor": "#ffffff", "alignment": "center", "headingSize": "2.5rem", "padding": "5rem"}},
-        {"id": "home-categories", "title": "Category Grid", "type": "categories",
-         "content": {"heading": "Browse by category", "subtitle": "Find the perfect experience type for you", "items": ["Foodies", "Families", "Night owls", "Newbies", "Outdoor", "Culture"]},
-         "style": {"backgroundColor": "#ffffff", "textColor": "#213448", "headingSize": "1.5rem"}},
+         "content": {"heading": "Enchanting experiences,\nwith incredible locals", "subtitle": "Book unique and memorable travel\nexperiences guided by locals", "buttonText": "Search", "primaryText": "Guides Nepal", "tagline": "Guides Nepal"},
+         "style": {"backgroundColor": "#F9E6D6", "textColor": "#547792", "accentColor": "#F4B400", "alignment": "left", "headingSize": "4rem", "padding": "4rem"}},
         {"id": "home-featured", "title": "Featured Experiences", "type": "featured",
-         "content": {"heading": "Go local in Charming Cities", "subtitle": "Find unforgettable experiences with locals"},
+         "content": {"heading": "Go local in Charming Cities", "subtitle": "Find unforgettable experiences with locals", "buttonText": "View all"},
          "style": {"backgroundColor": "#ffffff", "textColor": "#213448", "alignment": "left"}},
+        {"id": "home-promo", "title": "Promo Banner", "type": "promo",
+         "content": {"heading": "We have released our 2024\nImpact Report!", "subtitle": "Discover the true power of your travel with our 2024 Impact Report. See how responsible tourism supports local communities, preserves culture, and protects the planet.", "buttonText": "Read our report"},
+         "style": {"backgroundColor": "#FDF8F5", "textColor": "#213448", "accentColor": "#F4B400", "alignment": "left", "headingSize": "2.5rem", "padding": "4rem"}},
+        {"id": "home-categories", "title": "Categories Grid", "type": "categories",
+         "content": {"heading": "Most Popular. Most Delicious.", "subtitle": "Real-Good Travel."},
+         "style": {"backgroundColor": "#ffffff", "textColor": "#213448", "alignment": "center"}},
+        {"id": "home-find-experience", "title": "Find Your Perfect Experience", "type": "categories",
+         "content": {"heading": "Find your perfect experience", "subtitle": "Discover experiences based on your interest"},
+         "style": {"backgroundColor": "#ffffff", "textColor": "#213448", "alignment": "center"}},
         {"id": "home-testimonials", "title": "Testimonials", "type": "testimonials",
          "content": {"heading": "Travelers love our locals", "subtitle": "Real reviews from real travelers in Nepal"},
          "style": {"backgroundColor": "#E0F2FE", "textColor": "#213448", "alignment": "center"}},
-        {"id": "home-values", "title": "Why Guides Nepal", "type": "values",
-         "content": {"heading": "Why guides-nepal?", "items": ["People first", "Tailor it to your wishes", "More you, less checklist"]},
+        {"id": "home-values", "title": "Why Us", "type": "values",
+         "content": {"heading": "Why is Guides Nepal the best place to book a tour?", "subtitle": "Real People. Real Stories. Really Good Travel."},
          "style": {"backgroundColor": "#ffffff", "textColor": "#213448", "alignment": "center"}},
+        {"id": "home-regions", "title": "Discovering Regions through Local Eyes", "type": "featured",
+         "content": {"heading": "Discovering Regions through Local Eyes", "subtitle": "Every corner of Nepal has a story \u2014 meet the locals who tell it best.", "buttonText": "Explore"},
+         "style": {"backgroundColor": "#213448", "textColor": "#ffffff", "accentColor": "#F4B400", "alignment": "center"}},
+        {"id": "home-plan-book", "title": "Plan and Book on the Go", "type": "promo",
+         "content": {"heading": "Plan and book on the go", "subtitle": "Your whole trip, one pocket-sized local \u2014 book, chat and travel from your phone.", "buttonText": "Book in a few taps", "tagline": "MOBILE"},
+         "style": {"backgroundColor": "#E0F2FE", "textColor": "#213448", "accentColor": "#F4B400", "alignment": "left"}},
         {"id": "home-footer", "title": "Footer", "type": "footer",
-         "content": {"topLinks": ["About", "Help", "Hosting", "Community"], "supportEmail": "support@guides-nepal.com", "copyright": "guides-nepal. All rights reserved."},
-         "style": {"backgroundColor": "#9A2143", "textColor": "#ffffff"}},
+         "content": {"heading": "Guides Nepal", "tagline": "Real People. Real Stories. Really Good Travel.", "supportEmail": "support@guides-nepal.com", "copyright": "guides-nepal. All rights reserved."},
+         "style": {"backgroundColor": "#213448", "textColor": "#ffffff"}},
     ],
     "about": [
         {"id": "about-hero", "title": "About Hero", "type": "hero",
-         "content": {"heading": "About Guides Nepal", "subtitle": "Connecting travelers with authentic local experiences across Nepal.", "buttonText": "Contact Us"},
+         "content": {"heading": "About Guides Nepal", "subtitle": "Connecting travelers with authentic local experiences across Nepal's most beautiful destinations.", "buttonText": "Contact Us"},
          "style": {"backgroundColor": "#213448", "textColor": "#ffffff", "alignment": "center", "headingSize": "3rem"}},
         {"id": "about-mission", "title": "Our Mission", "type": "text",
-         "content": {"heading": "Our Mission", "body": "We believe that the best travel experiences come from connecting with locals who share their passion, knowledge, and culture."},
+         "content": {"heading": "Our Mission", "body": "We believe that the best travel experiences come from connecting with locals who share their passion, knowledge, and culture. Our platform makes it easy to find authentic guided experiences across Nepal."},
          "style": {"backgroundColor": "#ffffff", "textColor": "#213448", "alignment": "center"}},
         {"id": "about-values", "title": "Our Values", "type": "values",
-         "content": {"items": ["Authenticity", "Sustainability", "Community"]},
-         "style": {"backgroundColor": "#f8f8f8", "textColor": "#213448"}},
+         "content": {"heading": "Our Values", "subtitle": "Authenticity, community and real responsibility."},
+         "style": {"backgroundColor": "#E0F2FE", "textColor": "#213448", "alignment": "center"}},
     ],
     "contact": [
         {"id": "contact-hero", "title": "Contact Hero", "type": "hero",
          "content": {"heading": "Contact Us", "subtitle": "Have a question or need help? We're here for you."},
          "style": {"backgroundColor": "#213448", "textColor": "#ffffff", "alignment": "center", "headingSize": "3rem"}},
         {"id": "contact-info", "title": "Contact Info", "type": "contact",
-         "content": {"heading": "Get in Touch", "email": "support@guides-nepal.com", "phone": "+977-1-1234567", "address": "Thamel, Kathmandu, Nepal"},
+         "content": {"heading": "Get in Touch", "body": "Reach out by email at support@guides-nepal.com or send us a message using the form.", "email": "support@guides-nepal.com", "phone": "+977-1-1234567", "address": "Thamel, Kathmandu, Nepal"},
          "style": {"backgroundColor": "#ffffff", "textColor": "#213448"}},
     ],
 }
@@ -560,7 +570,15 @@ def _upsert_section(slug: str, section: dict):
 
 
 @router.get("/pages/{slug}/sections")
-def get_page_sections(slug: str, current_user: User = Depends(CMS_WRITER_OR_ADMIN)) -> dict:
+def get_page_sections(
+    slug: str, current_user: Optional[User] = Depends(get_optional_user)
+) -> dict:
+    """Public read of a page's sections so the website can render CMS content.
+
+    Writes (POST/PUT/DELETE below) stay restricted to admins and content
+    writers; only this read is open so the live preview and the public site
+    can display the saved content.
+    """
     return {"slug": slug, "sections": _get_sections(slug)}
 
 

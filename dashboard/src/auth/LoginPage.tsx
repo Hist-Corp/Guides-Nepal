@@ -122,7 +122,6 @@ export default function LoginPage() {
         setToken('dev-token');
         setRole(selectRole);
         setUser(me);
-        navigate(`/dashboard/${me.role}`, { replace: true });
         if (remember) {
           try {
             localStorage.setItem('gn_token', 'dev-token');
@@ -130,26 +129,31 @@ export default function LoginPage() {
             localStorage.setItem('gn_user', JSON.stringify(me));
           } catch {}
         }
+        navigate(`/dashboard/${me.role}`, { replace: true });
         return;
       }
       const res = await login({ email, password });
-      setToken(res.access_token ?? null);
       const me = res.user;
       const normalized = normalizeRole(me.role);
-      if (!normalized) {
+      if (!normalized || !res.access_token) {
+        // Clear any token set earlier so we don't leave a broken half-session
+        // that would bounce the user straight back to the login page.
+        setToken(null);
         setError('Your account does not have dashboard access');
         return;
       }
+      setToken(res.access_token);
       setRole(normalized);
       setUser({ ...me, role: normalized });
-      navigate(`/dashboard/${normalized}`, { replace: true });
+      // Persist before navigating so a full page load keeps the session.
       if (remember) {
         try {
-          localStorage.setItem('gn_token', res.access_token ?? '');
+          localStorage.setItem('gn_token', res.access_token);
           localStorage.setItem('gn_role', normalized);
           localStorage.setItem('gn_user', JSON.stringify({ ...me, role: normalized }));
         } catch {}
       }
+      navigate(`/dashboard/${normalized}`, { replace: true });
     } catch (err: any) {
       // Show the actual error from the API when available
       const detail = err?.response?.data?.detail;

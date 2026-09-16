@@ -6,6 +6,7 @@ import { SafeImage } from '../common/SafeImage';
 import { NEPAL_IMAGES } from '../../data/images';
 import { Star } from 'lucide-react';
 import { useCmsSection } from '../../hooks/useCms';
+import { cmsBackground } from '../../utils/cmsText';
 
 const experiences = [
   {
@@ -70,7 +71,7 @@ export const FeaturedExperiences: React.FC = () => {
   };
 
   return (
-    <section id="featured-experiences" data-cms-id="home-featured" data-cms-label="Featured" className="py-16 bg-white">
+    <section id="featured-experiences" data-cms-id="home-featured" data-cms-label="Featured" className="py-16 bg-white" style={cmsBackground(cms?.style, '#ffffff')}>
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-end mb-8">
            <div>

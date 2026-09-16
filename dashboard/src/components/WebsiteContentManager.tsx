@@ -5,10 +5,12 @@ import Button from "./Button";
 import Loading from "./Loading";
 import LivePageEditor, { type Section } from "../writer/LivePageEditor";
 import { FRONTEND_PAGES, FrontendPage } from "../config/frontendPages";
+import { getFrontendContent, frontendFooter } from "../config/frontendContent";
 import { updateAllSections } from "../services/api";
 
-function buildSections(page: FrontendPage): Section[] {
-  const sections: Section[] = [
+/** Generic fallback used only for slugs with no pre-populated frontend content. */
+function fallbackSections(page: FrontendPage): Section[] {
+  return [
     {
       id: "hero",
       label: "Hero Section",
@@ -47,36 +49,29 @@ function buildSections(page: FrontendPage): Section[] {
       format: {},
     },
   ];
-  // Extra, page-type-specific sections
-  if (page.path === "/") {
-    sections.push(
-      {
-        id: "featured",
-        label: "Featured Experiences",
-        type: "featured",
-        content: {
-          heading: "Featured Experiences",
-          subtitle: "Hand-picked experiences loved by travelers",
-          buttonText: "View all",
-        },
-        style: { backgroundColor: "#ffffff", textColor: "#213448", alignment: "center" },
-        format: {},
-      },
-      {
-        id: "promo",
-        label: "Promo Banner",
-        type: "promo",
-        content: {
-          heading: "Travel, taste & explore Nepal",
-          subtitle: "Book authentic local experiences with verified guides",
-          buttonText: "Start exploring",
-        },
-        style: { backgroundColor: "#9A2143", textColor: "#ffffff", alignment: "center" },
-        format: {},
-      },
+}
+
+/**
+ * Builds the section list for a page. Every registered page opens pre-filled
+ * with the real copy rendered by the public site (src/config/frontendContent),
+ * and only falls back to generic placeholders for unknown slugs.
+ */
+function buildSections(page: FrontendPage): Section[] {
+  const preloaded = getFrontendContent(page.slug);
+  const sections: Section[] = (preloaded.length ? preloaded : fallbackSections(page)).map(
+    (s) => ({ ...s, format: {} })
+  );
+
+  const has = (id: string) => sections.some((s) => s.id === id);
+
+  const isCategoryPage =
+    page.path === "/explore" ||
+    page.path.startsWith("/most-") ||
+    ["food-tours", "cultural-tours", "outdoor-activities", "cooking-classes"].includes(
+      page.path.replace("/", "")
     );
-  }
-  if (page.path === "/explore" || page.path.startsWith("/most-") || ["food-tours", "cultural-tours", "outdoor-activities", "cooking-classes"].includes(page.path.replace("/", ""))) {
+
+  if (isCategoryPage && !has("categories")) {
     sections.push({
       id: "categories",
       label: "Categories Strip",
@@ -89,17 +84,9 @@ function buildSections(page: FrontendPage): Section[] {
       format: {},
     });
   }
-  sections.push({
-    id: "footer",
-    label: "Footer",
-    type: "footer",
-    content: {
-      supportEmail: "support@guidesnepal.com",
-      copyright: `© ${new Date().getFullYear()} Guides Nepal — ${page.title}`,
-    },
-    style: { backgroundColor: "#9A2143", textColor: "#ffffff", alignment: "left", padding: "1.5rem" },
-    format: {},
-  });
+
+  if (!has("footer")) sections.push(frontendFooter(page.title));
+
   return sections;
 }
 
@@ -114,7 +101,7 @@ export default function WebsiteContentManager({ area }: { area: "admin" | "super
         slug={editing.slug}
         title={editing.title}
         path={editing.path}
-        
+        initialSections={buildSections(editing)}
         onSaved={async (sections) => {
           setSavingSlug(editing.slug);
           try {

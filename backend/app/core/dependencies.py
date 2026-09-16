@@ -1,6 +1,8 @@
 from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
+from typing import Optional
+
 from app.core.database import get_db
 from app.core.security import get_user_id_from_token
 from app.core.roles import has_access
@@ -21,6 +23,19 @@ def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
     if not user.is_active:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user")
     return user
+
+
+def get_optional_user(request: Request, db: Session = Depends(get_db)) -> Optional[User]:
+    """Best-effort authentication.
+
+    Returns the authenticated user when a valid bearer token is supplied and
+    ``None`` otherwise, so read-only endpoints that feed the public website can
+    be served to anonymous visitors while still knowing who is asking.
+    """
+    try:
+        return get_current_user(request=request, db=db)
+    except HTTPException:
+        return None
 
 
 def require_role(*allowed_roles: str):

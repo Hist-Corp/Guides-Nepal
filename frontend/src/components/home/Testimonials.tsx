@@ -3,6 +3,7 @@ import { Card } from '../common/Card';
 import { SafeImage } from '../common/SafeImage';
 import { NEPAL_IMAGES } from '../../data/images';
 import { useCmsSection } from '../../hooks/useCms';
+import { cmsBackground } from '../../utils/cmsText';
 
 // Nepal cities with reasonable, verified imagery:
 // Kathmandu/Bhaktapur/Lalitpur -> heritage temples & old towns
@@ -36,7 +37,7 @@ export const Testimonials: React.FC = () => {
   const heading = cms?.content?.heading || 'Travelers love our locals';
   const subtitle = cms?.content?.subtitle || 'Real reviews from real travelers in Nepal';
   return (
-    <section data-cms-id="home-testimonials" data-cms-label="Testimonials" className="py-16 bg-[#E0F2FE]">
+    <section data-cms-id="home-testimonials" data-cms-label="Testimonials" className="py-16 bg-[#E0F2FE]" style={cmsBackground(cms?.style, '#E0F2FE')}>
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-primary text-center mb-2">{heading}</h2>
         <p className="text-center text-slate-600 mb-12">{subtitle}</p>

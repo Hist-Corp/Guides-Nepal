@@ -9,6 +9,7 @@ import Modal from "../components/Modal";
 import Field from "../components/Field";
 import { statusVariant } from "../utils/statusVariant";
 import LivePageEditor from "./LivePageEditor";
+import { getFrontendContent } from "../config/frontendContent";
 import { FRONTEND_PAGES } from "../config/frontendPages";
 import { getContentPages, createContentPage, updateContentPage, deleteContentPage } from "../services/api";
 import { uploadMedia } from "../services/api";
@@ -391,51 +392,59 @@ export default function WriterPages() {
         <LivePageEditor
           slug={liveEdit.slug}
           title={liveEdit.title}
-          path={liveEdit.path || undefined}
-          initialSections={[
-            {
-              id: "page-hero",
-              title: "Header Section",
-              type: "hero",
-              content: {
-                heading: liveEdit.title,
-                subtitle: "Manage your dynamic page content",
-                buttonText: "Get Started",
-                tagline: liveEdit.slug,
+          path={liveEdit.path || FRONTEND_PAGES.find((page) => page.slug === liveEdit.slug)?.path || `/${liveEdit.slug}`}
+          initialSections={(() => {
+            // Prefer the real content of the public page so the live editor opens
+            // filled in; only build a generic skeleton for unknown slugs.
+            const preloaded = getFrontendContent(liveEdit.slug);
+            if (preloaded.length) return preloaded;
+            return [
+              {
+                id: "page-hero",
+                label: "Header Section",
+                type: "hero",
+                content: {
+                  heading: liveEdit.title,
+                  subtitle: "Manage your dynamic page content",
+                  buttonText: "Get Started",
+                  tagline: liveEdit.slug,
+                },
+                style: {
+                  backgroundColor: "#213448",
+                  textColor: "#ffffff",
+                  accentColor: "#F4B400",
+                  alignment: "left",
+                  headingSize: "2.5rem",
+                  padding: "3rem",
+                },
               },
-              style: {
-                backgroundColor: "#213448",
-                textColor: "#ffffff",
-                accentColor: "#F4B400",
-                alignment: "left",
-                headingSize: "2.5rem",
-                padding: "3rem",
+              {
+                id: "page-body",
+                label: "Page Body",
+                type: "text",
+                content: {
+                  heading: "",
+                  body: liveEdit.content || "Edit your page content here.",
+                },
+                style: {
+                  backgroundColor: "#ffffff",
+                  textColor: "#213448",
+                  alignment: "left",
+                  padding: "2.5rem",
+                },
               },
-            },
-            {
-              id: "page-body",
-              title: "Page Body",
-              type: "text",
-              content: {
-                heading: "",
-                body: liveEdit.content || "Edit your page content here.",
-              },
-              style: {
-                backgroundColor: "#ffffff",
-                textColor: "#213448",
-                alignment: "left",
-                padding: "2.5rem",
-              },
-            },
-          ]}
-onSaved={async (sections) => {
+            ];
+          })()}
+          onSaved={async (sections) => {
             const hero = sections.find((s) => s.type === "hero");
             const body = sections.find((s) => s.type === "text");
             if (hero?.content?.heading || body?.content?.body) {
               try {
                 await updateContentPage(liveEdit.id, {
                   title: hero?.content?.heading || liveEdit.title,
-                  content: body?.content?.body,
+                  // Only overwrite the page body when the page actually has a
+                  // body section, so sections without one keep their stored copy.
+                  ...(body?.content?.body ? { content: body.content.body } : {}),
                 });
               } catch {
                 // sections already persisted

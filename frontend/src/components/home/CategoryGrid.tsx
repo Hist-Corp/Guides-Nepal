@@ -40,16 +40,17 @@ const categories = [
 ];
 
 import { useCmsSection } from '../../hooks/useCms';
+import { linkifyCategories, cmsBackground } from '../../utils/cmsText';
 
 export const CategoryGrid: React.FC = () => {
   const cmsCat = useCmsSection('home', 'home-categories');
   return (
-    <section data-cms-id="home-categories" data-cms-label="Categories" className="py-16 bg-white">
+    <section data-cms-id="home-categories" data-cms-label="Categories" className="py-16 bg-white" style={cmsBackground(cmsCat?.style, '#ffffff')}>
       <div className="container mx-auto px-4">
         <div className="text-center mb-10">
            <h2 className="text-xl font-bold text-brand-yellow mb-2 uppercase tracking-wide">
              {cmsCat?.content?.heading ? (
-               cmsCat.content.heading
+               linkifyCategories(cmsCat.content.heading)
              ) : (
                <>
              <Link to="/most-popular">Most Popular</Link>. <Link to="/most-delicious">Most Delicious</Link>.
@@ -58,7 +59,7 @@ export const CategoryGrid: React.FC = () => {
            </h2>
            <h3 className="text-3xl font-bold text-slate-800">
              {cmsCat?.content?.subtitle ? (
-               cmsCat.content.subtitle
+               linkifyCategories(cmsCat.content.subtitle)
              ) : (
                <Link to="/real-good-travel">Real-Good Travel.</Link>
              )}

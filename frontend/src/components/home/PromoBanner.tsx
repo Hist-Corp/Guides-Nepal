@@ -4,13 +4,14 @@ import { Button } from '../common/Button';
 import { SafeImage } from '../common/SafeImage';
 import { NEPAL_IMAGES } from '../../data/images';
 import { useCmsSection } from '../../hooks/useCms';
+import { accentText, withLineBreaks, cmsBackground } from '../../utils/cmsText';
 
 export const PromoBanner: React.FC = () => {
   const navigate = useNavigate();
   const cmsPromo = useCmsSection('home', 'home-promo');
 
   return (
-    <section data-cms-id="home-promo" data-cms-label="Promo Banner" className="py-16 bg-background-cream">
+    <section data-cms-id="home-promo" data-cms-label="Promo Banner" className="py-16 bg-background-cream" style={cmsBackground(cmsPromo?.style, '#FDF8F5')}>
        <div className="container mx-auto px-4">
           <div className="bg-sky-500 rounded-[34px] md:rounded-3xl overflow-hidden flex flex-col md:flex-row text-white relative px-8 md:px-10 py-8 md:py-0 gap-6 md:gap-12">
             {/* Left Content */}
@@ -20,7 +21,7 @@ export const PromoBanner: React.FC = () => {
                )}
                <h2 className="text-3xl md:text-4xl font-bold mb-6 leading-tight">
                   {cmsPromo?.content?.heading ? (
-                    cmsPromo.content.heading
+                    accentText(cmsPromo.content.heading, ['2024'])
                   ) : (
                     <>
                   We have released our <span className="text-brand-yellow">2024</span><br />
@@ -30,7 +31,7 @@ export const PromoBanner: React.FC = () => {
                </h2>
                <p className="text-white/80 mb-8 max-w-md leading-relaxed">
                   {cmsPromo?.content?.subtitle ? (
-                    cmsPromo.content.subtitle
+                    withLineBreaks(cmsPromo.content.subtitle)
                   ) : (
                     <>
                   Discover the true power of your travel with our 2024 Impact Report. 

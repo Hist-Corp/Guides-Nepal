@@ -1,0 +1,289 @@
+{
+  "home": [
+    {
+      "id": "home-hero",
+      "title": "Hero Section",
+      "type": "hero",
+      "content": {
+        "heading": "Enchanting experiences,\nwith incredible locals",
+        "subtitle": "Book unique and memorable travel\nexperiences guided by locals",
+        "buttonText": "Search",
+        "primaryText": "Guides Nepal",
+        "tagline": "Guides Nepal"
+      },
+      "style": {
+        "backgroundColor": "#F9E6D6",
+        "textColor": "#547792",
+        "accentColor": "#F4B400",
+        "alignment": "left",
+        "headingSize": "4rem",
+        "padding": "4rem"
+      }
+    },
+    {
+      "id": "home-featured",
+      "title": "Featured Experiences",
+      "type": "featured",
+      "content": {
+        "heading": "Go local in Charming Cities",
+        "subtitle": "Find unforgettable experiences with locals",
+        "buttonText": "View all"
+      },
+      "style": {
+        "backgroundColor": "#ffffff",
+        "textColor": "#213448",
+        "alignment": "left"
+      }
+    },
+    {
+      "id": "home-promo",
+      "title": "Promo Banner",
+      "type": "promo",
+      "content": {
+        "heading": "We have released our 2024\nImpact Report!",
+        "subtitle": "Discover the true power of your travel with our 2024 Impact Report. See how responsible tourism supports local communities, preserves culture, and protects the planet.",
+        "buttonText": "Read our report",
+        "tagline": "IMPACT"
+      },
+      "style": {
+        "backgroundColor": "#FDF8F5",
+        "textColor": "#213448",
+        "accentColor": "#F4B400",
+        "alignment": "left",
+        "headingSize": "2.5rem",
+        "padding": "4rem"
+      }
+    },
+    {
+      "id": "home-categories",
+      "title": "Categories Grid",
+      "type": "categories",
+      "content": {
+        "heading": "Most Popular. Most Delicious.",
+        "subtitle": "Real-Good Travel."
+      },
+      "style": {
+        "backgroundColor": "#ffffff",
+        "textColor": "#213448",
+        "alignment": "center"
+      }
+    },
+    {
+      "id": "home-find-experience",
+      "title": "Find Your Perfect Experience",
+      "type": "categories",
+      "content": {
+        "heading": "Find your perfect experience",
+        "subtitle": "Discover experiences based on your interest"
+      },
+      "style": {
+        "backgroundColor": "#ffffff",
+        "textColor": "#213448",
+        "alignment": "center"
+      }
+    },
+    {
+      "id": "home-testimonials",
+      "title": "Testimonials",
+      "type": "testimonials",
+      "content": {
+        "heading": "Travelers love our locals",
+        "subtitle": "Real reviews from real travelers in Nepal"
+      },
+      "style": {
+        "backgroundColor": "#E0F2FE",
+        "textColor": "#213448",
+        "alignment": "center"
+      }
+    },
+    {
+      "id": "home-values",
+      "title": "Why Us",
+      "type": "values",
+      "content": {
+        "heading": "Why is Guides Nepal the best place to book a tour?",
+        "subtitle": "Real People. Real Stories. Really Good Travel."
+      },
+      "style": {
+        "backgroundColor": "#ffffff",
+        "textColor": "#213448",
+        "alignment": "center"
+      }
+    },
+    {
+      "id": "home-regions",
+      "title": "Discovering Regions through Local Eyes",
+      "type": "featured",
+      "content": {
+        "heading": "Discovering Regions through Local Eyes",
+        "subtitle": "Every corner of Nepal has a story — meet the locals who tell it best.",
+        "buttonText": "Explore"
+      },
+      "style": {
+        "backgroundColor": "#213448",
+        "textColor": "#ffffff",
+        "accentColor": "#F4B400",
+        "alignment": "center"
+      }
+    },
+    {
+      "id": "home-plan-book",
+      "title": "Plan and Book on the Go",
+      "type": "promo",
+      "content": {
+        "heading": "Plan and book on the go",
+        "subtitle": "Your whole trip, one pocket-sized local — book, chat and travel from your phone.",
+        "buttonText": "Book in a few taps",
+        "tagline": "MOBILE"
+      },
+      "style": {
+        "backgroundColor": "#E0F2FE",
+        "textColor": "#213448",
+        "accentColor": "#F4B400",
+        "alignment": "left"
+      }
+    },
+    {
+      "id": "home-footer",
+      "title": "Footer",
+      "type": "footer",
+      "content": {
+        "heading": "Guides Nepal",
+        "tagline": "Real People. Real Stories. Really Good Travel.",
+        "topLinks": [
+          "About",
+          "Help",
+          "Hosting",
+          "Community"
+        ],
+        "supportEmail": "support@guides-nepal.com",
+        "copyright": "guides-nepal. All rights reserved."
+      },
+      "style": {
+        "backgroundColor": "#213448",
+        "textColor": "#ffffff"
+      }
+    }
+  ],
+  "about": [
+    {
+      "id": "about-hero",
+      "title": "About Hero",
+      "type": "hero",
+      "content": {
+        "heading": "About Guides Nepal",
+        "subtitle": "Connecting travelers with authentic local experiences across Nepal's most beautiful destinations.",
+        "buttonText": "Contact Us"
+      },
+      "style": {
+        "backgroundColor": "#213448",
+        "textColor": "#ffffff",
+        "alignment": "center",
+        "headingSize": "3rem"
+      }
+    },
+    {
+      "id": "about-mission",
+      "title": "Our Mission",
+      "type": "text",
+      "content": {
+        "heading": "Our Mission",
+        "body": "We believe that the best travel experiences come from connecting with locals who share their passion, knowledge, and culture. Our platform makes it easy to find authentic guided experiences across Nepal."
+      },
+      "style": {
+        "backgroundColor": "#ffffff",
+        "textColor": "#213448",
+        "alignment": "center"
+      }
+    },
+    {
+      "id": "about-values",
+      "title": "Our Values",
+      "type": "values",
+      "content": {
+        "heading": "Our Values",
+        "subtitle": "Authenticity, community and real responsibility."
+      },
+      "style": {
+        "backgroundColor": "#E0F2FE",
+        "textColor": "#213448",
+        "alignment": "center"
+      }
+    },
+    {
+      "id": "about-footer",
+      "title": "Footer",
+      "type": "footer",
+      "content": {
+        "heading": "Guides Nepal",
+        "tagline": "Real People. Real Stories. Really Good Travel.",
+        "topLinks": [
+          "About",
+          "Help",
+          "Hosting",
+          "Community"
+        ],
+        "supportEmail": "support@guides-nepal.com",
+        "copyright": "guides-nepal. All rights reserved."
+      },
+      "style": {
+        "backgroundColor": "#213448",
+        "textColor": "#ffffff"
+      }
+    }
+  ],
+  "contact": [
+    {
+      "id": "contact-hero",
+      "title": "Contact Hero",
+      "type": "hero",
+      "content": {
+        "heading": "Contact Us",
+        "subtitle": "Have a question or need help? We're here for you."
+      },
+      "style": {
+        "backgroundColor": "#213448",
+        "textColor": "#ffffff",
+        "alignment": "center",
+        "headingSize": "3rem"
+      }
+    },
+    {
+      "id": "contact-info",
+      "title": "Contact Info",
+      "type": "contact",
+      "content": {
+        "heading": "Get in Touch",
+        "body": "Reach out by email at support@guides-nepal.com or send us a message using the form.",
+        "email": "support@guides-nepal.com",
+        "phone": "+977-1-1234567",
+        "address": "Thamel, Kathmandu, Nepal"
+      },
+      "style": {
+        "backgroundColor": "#ffffff",
+        "textColor": "#213448"
+      }
+    },
+    {
+      "id": "contact-footer",
+      "title": "Footer",
+      "type": "footer",
+      "content": {
+        "heading": "Guides Nepal",
+        "tagline": "Real People. Real Stories. Really Good Travel.",
+        "topLinks": [
+          "About",
+          "Help",
+          "Hosting",
+          "Community"
+        ],
+        "supportEmail": "support@guides-nepal.com",
+        "copyright": "guides-nepal. All rights reserved."
+      },
+      "style": {
+        "backgroundColor": "#213448",
+        "textColor": "#ffffff"
+      }
+    }
+  ]
+}

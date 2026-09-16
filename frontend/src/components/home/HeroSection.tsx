@@ -3,6 +3,7 @@ import { Search, MapPin, ChevronRight } from 'lucide-react';
 import { useUIStore } from '../../store/uiStore';
 import { Link } from 'react-router-dom';
 import { useCmsSection } from '../../hooks/useCms';
+import { accentText, withLineBreaks, cmsBackground } from '../../utils/cmsText';
 import { cityImages, NEPAL_IMAGES } from '../../data/images';
 import { SafeImage } from '../common/SafeImage';
 
@@ -33,7 +34,7 @@ export const HeroSection: React.FC = () => {
   const currentImages = cityImages(currentCity.name);
 
   return (
-    <section data-cms-id="home-hero" data-cms-label="Hero" className="bg-peach py-12 md:py-20 relative overflow-hidden">
+    <section data-cms-id="home-hero" data-cms-label="Hero" className="bg-peach py-12 md:py-20 relative overflow-hidden" style={cmsBackground(cmsHero?.style, '#F9E6D6')}>
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
           {/* Left Content */}
@@ -41,7 +42,9 @@ export const HeroSection: React.FC = () => {
             <div className="space-y-4">
               <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tight">
                 {cmsHero?.content?.heading ? (
-                  <span className="text-[#547792]">{cmsHero.content.heading}</span>
+                  <span className="text-[#547792]">
+                    {accentText(cmsHero.content.heading, ['incredible locals'], 'text-[#F4B400] drop-shadow-sm')}
+                  </span>
                 ) : (
                   <>
                 <span className="text-[#547792]">Enchanting experiences,</span><br />
@@ -52,7 +55,7 @@ export const HeroSection: React.FC = () => {
               </h1>
               <p className="text-xl text-[#555555] font-medium max-w-lg leading-relaxed mx-auto md:mx-0">
                 {cmsHero?.content?.subtitle ? (
-                  cmsHero.content.subtitle
+                  withLineBreaks(cmsHero.content.subtitle, 'hidden md:block')
                 ) : (
                   <>
                 Book unique and memorable travel<br className="hidden md:block" />

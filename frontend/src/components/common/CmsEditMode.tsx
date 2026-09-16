@@ -81,14 +81,23 @@ async function applyCmsOverrides(slug: string) {
   } catch {
     return
   }
-  const ELEMENT_TYPES = ['heading', 'paragraph', 'listitem', 'quote', 'image', 'button', 'link']
+  sections.forEach(applySectionOverride)
+}
 
-  sections.forEach((section) => {
-    const el = document.querySelector(`[data-cms-id="${section.id}"]`) as HTMLElement | null
+/** Shared by saved content and unsaved dashboard preview messages. */
+function applySectionOverride(section: any) {
+  const ELEMENT_TYPES = ['heading', 'paragraph', 'listitem', 'quote', 'image', 'button', 'link']
+  const setText = (element: HTMLElement | null, value: unknown) => {
+    if (!element || typeof value !== 'string') return
+    // Leave React's nested accents, links and line breaks intact when unchanged.
+    const normalize = (text: string) => text.replace(/\s+/g, ' ').trim()
+    if (normalize(element.innerText) !== normalize(value)) element.textContent = value
+  }
+    const el = document.querySelector(`[data-cms-id="${CSS.escape(section.id)}"]`) as HTMLElement | null
     if (!el) return
     const c = section.content || {}
     const st = section.style || {}
-    const type = section.type || ''
+    const type = section.type || el.getAttribute('data-cms-kind') || ''
 
     if (ELEMENT_TYPES.includes(type)) {
       // --- Granular element sections: apply directly to the element ---
@@ -105,8 +114,7 @@ async function applyCmsOverrides(slug: string) {
           if (anchor) anchor.setAttribute('href', c.link)
         }
       } else {
-        const text = c.heading || c.body || c.subtitle
-        if (text) el.textContent = text
+        setText(el, c.heading ?? c.body ?? c.subtitle)
       }
       if (st.fontSize) el.style.fontSize = st.fontSize
       if (st.fontWeight) el.style.fontWeight = st.fontWeight
@@ -121,12 +129,12 @@ async function applyCmsOverrides(slug: string) {
       const heading = (el.matches('h1, h2, h3')
         ? el
         : el.querySelector('h1, h2, h3')) as HTMLElement | null
-      if (heading) heading.textContent = c.heading
+      setText(heading, c.heading)
     }
     if (c.subtitle) {
       const heading = el.querySelector('h1, h2, h3')
       const p = (heading?.nextElementSibling as HTMLElement | null) || el.querySelector('p')
-      if (p && p.tagName === 'P') p.textContent = c.subtitle
+      if (p && p.tagName === 'P') setText(p, c.subtitle)
     }
     if (c.body) {
       const p = el.querySelector('p')
@@ -141,7 +149,6 @@ async function applyCmsOverrides(slug: string) {
       const heading = el.querySelector('h1, h2, h3') as HTMLElement | null
       if (heading) heading.style.fontSize = st.headingSize
     }
-  })
 }
 
 const CmsEditMode: React.FC = () => {
@@ -212,6 +219,13 @@ const CmsEditMode: React.FC = () => {
           id: target.getAttribute('data-cms-id'),
           label: target.getAttribute('data-cms-label') || undefined,
           kind,
+          content: kind === 'image'
+            ? { image: imgEl?.src || '', alt: imgEl?.alt || '' }
+            : kind === 'button' || kind === 'link'
+              ? { buttonText: target.innerText, link: target.getAttribute('href') || '' }
+              : kind === 'heading'
+                ? { heading: target.innerText }
+                : { body: target.innerText },
           sectionId: sectionEl?.getAttribute('data-cms-id') || undefined,
           currentUrl: isImage ? (imgEl?.src || undefined) : undefined,
           alt: isImage ? (imgEl?.alt || undefined) : undefined,
@@ -222,8 +236,15 @@ const CmsEditMode: React.FC = () => {
     document.addEventListener('click', onClick, true)
 
     const onMessage = (e: MessageEvent) => {
+      if (e.source !== window.parent) return
       const data = e.data || {}
-      if (data.type === 'cms-refresh') {
+      if (data.type === 'cms-update-section' && typeof data.sectionId === 'string') {
+        applySectionOverride({
+          id: data.sectionId,
+          content: data.content,
+          style: data.style,
+        })
+      } else if (data.type === 'cms-refresh') {
         clearCmsSectionsCache(data.slug)
         window.location.reload()
       } else if (data.type === 'cms-update-image') {

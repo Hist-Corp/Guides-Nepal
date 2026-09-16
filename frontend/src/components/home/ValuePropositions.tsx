@@ -9,6 +9,7 @@ import {
   Award,
 } from 'lucide-react';
 import { useCmsSection } from '../../hooks/useCms';
+import { cmsBackground } from '../../utils/cmsText';
 
 const usps = [
   {
@@ -65,22 +66,46 @@ const usps = [
 export const ValuePropositions: React.FC = () => {
   const cms = useCmsSection('home', 'home-values');
   const heading = cms?.content?.heading || 'Why is Guides Nepal the best place to book a tour?';
+  const sectionRef = React.useRef<HTMLElement>(null);
+  const [inView, setInView] = React.useState(false);
+
+  React.useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setInView(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <section
+      ref={sectionRef}
       data-cms-id="home-values"
       data-cms-label="Why us"
       className="py-16 bg-white text-center"
+      style={cmsBackground(cms?.style, '#ffffff')}
     >
       <div className="container mx-auto px-4">
-        <p className="text-sm font-semibold uppercase tracking-wider mb-2 text-[#d12b79]">
+        <p className="text-sm font-semibold uppercase tracking-wider mb-2 text-brand-yellow">
           Real People. Real Stories. Really Good Travel.
         </p>
-        <h2 className="text-2xl md:text-3xl font-semibold leading-[1.2] mb-8 text-[#8b174e]">
+        <h2 className="text-2xl md:text-3xl font-semibold leading-[1.2] mb-8 text-primary">
           {heading.split('the best place').length > 1 ? (
             <>
               {heading.split('the best place')[0]}
-              <mark className="bg-transparent text-[#d12b79]">the best place</mark>
+              <mark className="bg-transparent text-brand-yellow">the best place</mark>
               {heading.split('the best place')[1]}
             </>
           ) : (
@@ -92,15 +117,25 @@ export const ValuePropositions: React.FC = () => {
           {usps.map((usp, index) => (
             <li
               key={index}
-              className="w-full sm:w-[calc(50%-0.625rem)] md:w-[calc(33.333%-0.8333rem)] min-w-[288px] max-w-[340px] md:max-w-[calc(33.333%-0.8333rem)] bg-white rounded-2xl shadow-[0_1px_1px_0_rgba(0,0,0,0.05),0_2px_2px_0_rgba(0,0,0,0.05),0_4px_4px_0_rgba(0,0,0,0.05)] px-5 pt-6 pb-10 flex flex-col items-center"
+              className={`w-full sm:w-[calc(50%-0.625rem)] md:w-[calc(33.333%-0.8333rem)] min-w-[288px] max-w-[340px] md:max-w-[calc(33.333%-0.8333rem)] flex ${
+                inView ? 'animate-fade-in-up' : 'opacity-0'
+              }`}
+              style={{ animationDelay: `${index * 100}ms` }}
             >
-              <usp.icon className="w-12 h-12 text-[#8b174e] mb-4" strokeWidth={1.5} />
-              <h3 className="text-base font-semibold leading-[1.2] mb-2 text-[#8b174e] max-w-[256px]">
-                {usp.title}
-              </h3>
-              <div className="text-sm leading-[1.3] text-slate-700 max-w-[256px]">
-                <p className="mb-4">{usp.subtitle}</p>
-                <p>{usp.description}</p>
+              <div className="group w-full bg-white rounded-2xl shadow-[0_1px_1px_0_rgba(0,0,0,0.05),0_2px_2px_0_rgba(0,0,0,0.05),0_4px_4px_0_rgba(0,0,0,0.05)] px-5 pt-6 pb-10 flex flex-col items-center transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-[0_8px_30px_rgba(33,52,72,0.12)] hover:border hover:border-secondary/30 border border-transparent">
+                <div className="w-20 h-20 mb-4 rounded-full bg-secondary/10 flex items-center justify-center transition-all duration-300 group-hover:bg-brand-yellow/15 group-hover:scale-110">
+                  <usp.icon
+                    className="w-12 h-12 text-secondary transition-colors duration-300 group-hover:text-brand-yellow"
+                    strokeWidth={1.5}
+                  />
+                </div>
+                <h3 className="text-base font-semibold leading-[1.2] mb-2 text-primary max-w-[256px] transition-colors duration-300 group-hover:text-secondary">
+                  {usp.title}
+                </h3>
+                <div className="text-sm leading-[1.3] text-slate-700 max-w-[256px]">
+                  <p className="mb-4">{usp.subtitle}</p>
+                  <p>{usp.description}</p>
+                </div>
               </div>
             </li>
           ))}
