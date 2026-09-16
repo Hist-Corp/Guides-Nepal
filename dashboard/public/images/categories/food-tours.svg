@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" rx="12" fill="url(#bg)"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fef3c7"/>
+      <stop offset="1" stop-color="#fcd34d"/>
+    </linearGradient>
+  </defs>
+  <path d="M100 180 C100 150 130 130 170 130 C210 130 240 150 240 180 C240 210 210 230 170 230 C130 230 100 210 100 180 Z" fill="#fbbf24"/>
+  <path d="M170 130 L170 90 L210 90 L210 130 Z" fill="#f59e0b"/>
+  <circle cx="190" cy="200" r="10" fill="#dc2626"/>
+  <circle cx="150" cy="200" r="8" fill="#dc2626"/>
+  <path d="M170 180 Q190 170 210 180" stroke="#92400e" stroke-width="3" fill="none"/>
+  <circle cx="130" cy="170" r="25" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <circle cx="160" cy="165" r="5" fill="#92400e"/>
+  <circle cx="120" cy="175" r="4" fill="#92400e"/>
+  <circle cx="140" cy="180" r="3" fill="#92400e"/>
+  <text x="200" y="285" font-family="Arial" font-size="14" fill="#92400e" text-anchor="middle">Food Tours</text>
+</svg>

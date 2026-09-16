@@ -1,21 +1,34 @@
-import { Link } from "react-router-dom"
-import useCatalog from "./hooks/useCatalog"
-import { ExperienceGrid } from "./components/ExperienceCard"
-import { CITIES, CATEGORIES } from "./data/catalog"
+import { Link } from 'react-router-dom';
+import useCatalog from './hooks/useCatalog';
+import { ExperienceGrid } from './components/ExperienceCard';
+import {
+  CITIES,
+  CATEGORIES,
+  CITY_IMAGES,
+  CATEGORY_IMAGES,
+  DEFAULT_GUIDE_IMAGE,
+} from './data/catalog';
 
 function categoryPath(category: string) {
-  return "/" + category.toLowerCase().replace(/[^a-z0-9]+/g, "-")
+  return '/' + category.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 }
 
 export default function Home() {
-  const { experiences, guides, loading, usingSeed } = useCatalog()
-  const featured = [...experiences].sort((a, b) => b.rating - a.rating).slice(0, 6)
-  const popular = [...experiences].sort((a, b) => b.reviews - a.reviews).slice(0, 3)
+  const { experiences, guides, loading, usingSeed } = useCatalog();
+  const featured = [...experiences].sort((a, b) => b.rating - a.rating).slice(0, 6);
+  const popular = [...experiences].sort((a, b) => b.reviews - a.reviews).slice(0, 3);
 
   return (
     <div>
       {/* Hero — rounded gradient panel with blur orbs (reference style) */}
-      <section className="relative overflow-hidden rounded-b-[2.5rem] bg-gradient-to-br from-darkBlue via-[#2b4257] to-[#3a5a78] shadow-2xl shadow-darkBlue/20">
+      <section className="relative overflow-hidden rounded-b-[2.5rem] shadow-2xl shadow-darkBlue/20">
+        <img
+          src="/images/nepal-hero.jpg"
+          alt="Nepal landscape"
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-darkBlue/85 via-[#2b4257]/90 to-[#3a5a78]/85" />
         <div className="absolute -left-32 top-0 h-96 w-96 rounded-full bg-brand-yellow/20 blur-3xl" />
         <div className="absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
         <div className="relative mx-auto max-w-6xl px-4 py-20 text-center sm:py-24">
@@ -26,9 +39,13 @@ export default function Home() {
             Experience Nepal like a local
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/85">
-            Heritage walks, food tours, cooking classes and mountain adventures — hosted by licensed local guides.
+            Heritage walks, food tours, cooking classes and mountain adventures — hosted by licensed
+            local guides.
           </p>
-          <form action="/search" className="mx-auto mt-8 flex max-w-xl gap-2 rounded-full bg-white/10 p-1.5 backdrop-blur">
+          <form
+            action="/search"
+            className="mx-auto mt-8 flex max-w-xl gap-2 rounded-full bg-white/10 p-1.5 backdrop-blur"
+          >
             <input
               name="q"
               className="flex-1 rounded-full bg-white px-5 py-3 text-sm text-darkBlue focus:outline-none focus:ring-2 focus:ring-brand-yellow"
@@ -39,8 +56,15 @@ export default function Home() {
             </button>
           </form>
           <div className="mx-auto mt-10 grid max-w-md grid-cols-3 gap-4">
-            {[["500+", "Verified locals"], ["1,200+", "Tours listed"], ["4.9★", "Avg rating"]].map(([v, l]) => (
-              <div key={l} className="rounded-2xl border border-white/15 bg-white/5 p-3 backdrop-blur">
+            {[
+              ['500+', 'Verified locals'],
+              ['1,200+', 'Tours listed'],
+              ['4.9★', 'Avg rating'],
+            ].map(([v, l]) => (
+              <div
+                key={l}
+                className="rounded-2xl border border-white/15 bg-white/5 p-3 backdrop-blur"
+              >
                 <div className="text-xl font-black text-white">{v}</div>
                 <div className="mt-0.5 text-[11px] text-white/75">{l}</div>
               </div>
@@ -55,14 +79,22 @@ export default function Home() {
           <h2 className="text-xl font-semibold text-darkBlue mb-5">Browse by category</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {CATEGORIES.map((c) => {
-              const count = experiences.filter((e) => e.category === c).length
+              const count = experiences.filter((e) => e.category === c).length;
               return (
-                <Link key={c} to={categoryPath(c)} className="gn-card rounded-2xl border border-gray-200/70 p-6 transition hover:-translate-y-0.5 hover:shadow-card">
-                  <div className="text-3xl">{c === "Food Tours" ? "🍲" : c === "Cultural Tours" ? "🏯" : c === "Outdoor Activities" ? "🏔️" : "🧭"}</div>
+                <Link
+                  key={c}
+                  to={categoryPath(c)}
+                  className="gn-card rounded-2xl border border-gray-200/70 p-6 transition hover:-translate-y-0.5 hover:shadow-card"
+                >
+                  <img
+                    src={CATEGORY_IMAGES[c] ?? CATEGORY_IMAGES['Food Tours']}
+                    alt={c}
+                    className="h-12 w-12 rounded-xl object-cover"
+                  />
                   <div className="font-semibold text-darkBlue mt-3">{c}</div>
                   <div className="text-sm text-gray-500">{count} experiences</div>
                 </Link>
-              )
+              );
             })}
           </div>
         </section>
@@ -71,7 +103,9 @@ export default function Home() {
         <section>
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-xl font-semibold text-darkBlue">Featured experiences</h2>
-            <Link to="/explore" className="text-sm font-semibold text-darkBlue hover:underline">See all →</Link>
+            <Link to="/explore" className="text-sm font-semibold text-darkBlue hover:underline">
+              See all →
+            </Link>
           </div>
           {loading ? (
             <div className="text-gray-500 py-8 text-center">Loading experiences...</div>
@@ -85,8 +119,17 @@ export default function Home() {
           <h2 className="text-xl font-semibold text-darkBlue mb-5">Explore cities</h2>
           <div className="grid gap-4 grid-cols-2 md:grid-cols-5">
             {CITIES.map((city) => (
-              <Link key={city} to={`/city/${city.toLowerCase()}`} className="gn-card rounded-2xl border border-gray-200/70 p-6 text-center transition hover:-translate-y-0.5 hover:shadow-card">
-                <div className="text-3xl">{city === "Kathmandu" ? "🏛️" : city === "Pokhara" ? "🏔️" : city === "Lalitpur" ? "🎨" : city === "Bhaktapur" ? "🧱" : "🌳"}</div>
+              <Link
+                key={city}
+                to={`/city/${city.toLowerCase()}`}
+                className="gn-card rounded-2xl border border-gray-200/70 p-6 text-center transition hover:-translate-y-0.5 hover:shadow-card"
+              >
+                <img
+                  src={CITY_IMAGES[city] ?? CITY_IMAGES['Kathmandu']}
+                  alt={city}
+                  className="h-24 w-full rounded-xl object-cover"
+                  loading="lazy"
+                />
                 <div className="font-semibold text-darkBlue mt-2">{city}</div>
               </Link>
             ))}
@@ -97,7 +140,12 @@ export default function Home() {
         <section>
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-xl font-semibold text-darkBlue">Most popular right now</h2>
-            <Link to="/most-popular" className="text-sm font-semibold text-darkBlue hover:underline">See all →</Link>
+            <Link
+              to="/most-popular"
+              className="text-sm font-semibold text-darkBlue hover:underline"
+            >
+              See all →
+            </Link>
           </div>
           {!loading && <ExperienceGrid items={popular} />}
         </section>
@@ -107,12 +155,25 @@ export default function Home() {
           <h2 className="text-xl font-semibold text-darkBlue mb-5">Meet some local guides</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {guides.slice(0, 3).map((g) => (
-              <Link key={g.id} to={`/local/${g.id}`} className="gn-card rounded-2xl border border-gray-200/70 p-5 flex gap-4 transition hover:-translate-y-0.5 hover:shadow-card">
-                <div className="h-14 w-14 rounded-full bg-brand-100 flex items-center justify-center text-2xl">🧭</div>
+              <Link
+                key={g.id}
+                to={`/local/${g.id}`}
+                className="gn-card rounded-2xl border border-gray-200/70 p-5 flex gap-4 transition hover:-translate-y-0.5 hover:shadow-card"
+              >
+                <img
+                  src={g.image ?? DEFAULT_GUIDE_IMAGE}
+                  alt={g.name}
+                  className="h-14 w-14 rounded-full object-cover"
+                />
                 <div>
                   <div className="font-semibold text-darkBlue">{g.name}</div>
-                  <div className="text-xs text-gray-500">{g.city} · {g.languages.join(", ")}</div>
-                  <div className="text-sm text-amber-500 mt-1">★ {g.rating.toFixed(1)} <span className="text-gray-400">({g.reviews} reviews)</span></div>
+                  <div className="text-xs text-gray-500">
+                    {g.city} · {g.languages.join(', ')}
+                  </div>
+                  <div className="text-sm text-amber-500 mt-1">
+                    ★ {g.rating.toFixed(1)}{' '}
+                    <span className="text-gray-400">({g.reviews} reviews)</span>
+                  </div>
                 </div>
               </Link>
             ))}
@@ -126,5 +187,5 @@ export default function Home() {
         )}
       </div>
     </div>
-  )
+  );
 }

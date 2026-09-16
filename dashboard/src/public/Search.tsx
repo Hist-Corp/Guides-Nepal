@@ -1,11 +1,12 @@
-﻿import { useSearchParams, Link } from "react-router-dom"
-import useCatalog from "./hooks/useCatalog"
-import { ExperienceGrid } from "./components/ExperienceCard"
+﻿import { useSearchParams, Link } from 'react-router-dom';
+import useCatalog from './hooks/useCatalog';
+import { DEFAULT_GUIDE_IMAGE } from './data/catalog';
+import { ExperienceGrid } from './components/ExperienceCard';
 
 export default function Search() {
-  const [params] = useSearchParams()
-  const q = (params.get("q") ?? "").toLowerCase()
-  const { experiences, guides, loading } = useCatalog()
+  const [params] = useSearchParams();
+  const q = (params.get('q') ?? '').toLowerCase();
+  const { experiences, guides, loading } = useCatalog();
 
   const matched = experiences.filter(
     (e) =>
@@ -14,10 +15,10 @@ export default function Search() {
       e.city.toLowerCase().includes(q) ||
       e.category.toLowerCase().includes(q) ||
       e.description.toLowerCase().includes(q)
-  )
+  );
   const matchedGuides = guides.filter(
     (g) => !q || g.name.toLowerCase().includes(q) || g.city.toLowerCase().includes(q)
-  )
+  );
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
@@ -25,16 +26,19 @@ export default function Search() {
       <form className="mt-4 flex gap-2 max-w-xl">
         <input
           name="q"
-          defaultValue={params.get("q") ?? ""}
+          defaultValue={params.get('q') ?? ''}
           className="flex-1 rounded-full border px-5 py-3 focus:outline-none focus:ring-2 focus:ring-brand-yellow"
           placeholder="Search experiences, cities, guides..."
         />
-        <button className="rounded-full px-6 py-3 bg-brand-yellow text-darkBlue font-semibold hover:opacity-90">Search</button>
+        <button className="rounded-full px-6 py-3 bg-brand-yellow text-darkBlue font-semibold hover:opacity-90">
+          Search
+        </button>
       </form>
 
       {q && (
         <p className="mt-4 text-sm text-gray-500">
-          {matched.length} experience(s) and {matchedGuides.length} guide(s) matching "<span className="font-semibold">{q}</span>"
+          {matched.length} experience(s) and {matchedGuides.length} guide(s) matching "
+          <span className="font-semibold">{q}</span>"
         </p>
       )}
 
@@ -52,10 +56,24 @@ export default function Search() {
                 <h2 className="text-xl font-bold text-darkBlue mb-4">Guides</h2>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {matchedGuides.map((g) => (
-                    <Link key={g.id} to={`/local/${g.id}`} className="rounded-2xl bg-white border border-gray-200 p-5 hover:shadow-md transition">
-                      <div className="font-semibold text-darkBlue">{g.name}</div>
-                      <div className="text-xs text-gray-500">{g.city} · {g.languages.join(", ")}</div>
-                      <div className="text-sm text-amber-500 mt-1">★ {g.rating.toFixed(1)}</div>
+                    <Link
+                      key={g.id}
+                      to={`/local/${g.id}`}
+                      className="rounded-2xl bg-white border border-gray-200 p-5 flex gap-3 items-center hover:shadow-md transition"
+                    >
+                      <img
+                        src={g.image ?? DEFAULT_GUIDE_IMAGE}
+                        alt={g.name}
+                        className="h-10 w-10 rounded-full object-cover shrink-0"
+                        loading="lazy"
+                      />
+                      <div>
+                        <div className="font-semibold text-darkBlue">{g.name}</div>
+                        <div className="text-xs text-gray-500">
+                          {g.city} · {g.languages.join(', ')}
+                        </div>
+                        <div className="text-sm text-amber-500 mt-1">★ {g.rating.toFixed(1)}</div>
+                      </div>
                     </Link>
                   ))}
                 </div>
@@ -65,5 +83,5 @@ export default function Search() {
         )}
       </div>
     </div>
-  )
+  );
 }

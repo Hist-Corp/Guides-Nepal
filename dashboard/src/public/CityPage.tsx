@@ -1,23 +1,53 @@
-import { useParams, Link } from "react-router-dom"
-import useCatalog from "./hooks/useCatalog"
-import { ExperienceGrid } from "./components/ExperienceCard"
-import { CITIES } from "./data/catalog"
+import { useParams, Link } from 'react-router-dom';
+import useCatalog from './hooks/useCatalog';
+import { ExperienceGrid } from './components/ExperienceCard';
+import { CITIES, CITY_IMAGES } from './data/catalog';
 
-const CITY_META: Record<string, { tagline: string; emoji: string; about: string }> = {
-  Kathmandu: { tagline: "Temples, stupas & street food", emoji: "🏛️", about: "Nepal's capital is a living museum of medieval palaces, beating bazaars and Himalayan panoramas." },
-  Pokhara: { tagline: "Lakes, mountains & adventure", emoji: "🚤", about: "Nestled beneath the Annapurnas on Phewa Lake, Pokhara is the launchpad for treks and lazy lakeside evenings." },
-  Lalitpur: { tagline: "Artisan quarters & Newar culture", emoji: "🏯", about: "Patan, as locals call it, is famed for its Durbar Square, golden temples and metalworking artisans." },
-  Bhaktapur: { tagline: "Medieval city of devotees", emoji: "🛕", about: "A preserved medieval city of brick lanes, pottery squares and the best juju dhau (king curd) in Nepal." },
-  Bharatpur: { tagline: "Gateway to Chitwan", emoji: "🐘", about: "Riverside city near Chitwan National Park, home to Tharu culture and jungle safaris." },
-}
+const CITY_META: Record<string, { tagline: string; emoji: string; image: string; about: string }> =
+  {
+    Kathmandu: {
+      tagline: 'Temples, stupas & street food',
+      emoji: '🏛️',
+      image: CITY_IMAGES.Kathmandu,
+      about:
+        "Nepal's capital is a living museum of medieval palaces, beating bazaars and Himalayan panoramas.",
+    },
+    Pokhara: {
+      tagline: 'Lakes, mountains & adventure',
+      emoji: '🚤',
+      image: CITY_IMAGES.Pokhara,
+      about:
+        'Nestled beneath the Annapurnas on Phewa Lake, Pokhara is the launchpad for treks and lazy lakeside evenings.',
+    },
+    Lalitpur: {
+      tagline: 'Artisan quarters & Newar culture',
+      emoji: '🏯',
+      image: CITY_IMAGES.Lalitpur,
+      about:
+        'Patan, as locals call it, is famed for its Durbar Square, golden temples and metalworking artisans.',
+    },
+    Bhaktapur: {
+      tagline: 'Medieval city of devotees',
+      emoji: '🛕',
+      image: CITY_IMAGES.Bhaktapur,
+      about:
+        'A preserved medieval city of brick lanes, pottery squares and the best juju dhau (king curd) in Nepal.',
+    },
+    Bharatpur: {
+      tagline: 'Gateway to Chitwan',
+      emoji: '🐘',
+      image: CITY_IMAGES.Bharatpur,
+      about: 'Riverside city near Chitwan National Park, home to Tharu culture and jungle safaris.',
+    },
+  };
 
 export default function CityPage() {
-  const { cityId } = useParams()
-  const name = (cityId ?? "").toLowerCase()
-  const matched = CITIES.find((c) => c.toLowerCase() === name)
-  const { experiences, loading } = useCatalog()
-  const cityExp = matched ? experiences.filter((e) => e.city === matched) : []
-  const meta = matched ? CITY_META[matched] : undefined
+  const { cityId } = useParams();
+  const name = (cityId ?? '').toLowerCase();
+  const matched = CITIES.find((c) => c.toLowerCase() === name);
+  const { experiences, loading } = useCatalog();
+  const cityExp = matched ? experiences.filter((e) => e.city === matched) : [];
+  const meta = matched ? CITY_META[matched] : undefined;
 
   if (matched && !meta) {
     // City recognized but no metadata — fall through to generic render below
@@ -27,12 +57,25 @@ export default function CityPage() {
     <div>
       <div className="bg-gradient-to-br from-lightBlue/60 to-peach/40">
         <div className="max-w-6xl mx-auto px-4 py-14">
-          <div className="text-6xl">{meta?.emoji ?? "🗺️"}</div>
+          {meta ? (
+            <img
+              src={meta.image}
+              alt={matched}
+              className="mb-4 h-20 w-20 rounded-2xl object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <img
+              src={CITY_IMAGES[matched ?? ''] ?? CITY_IMAGES.Kathmandu}
+              alt={matched ?? cityId}
+              className="mb-4 h-20 w-20 rounded-2xl object-cover"
+            />
+          )}
           <h1 className="text-3xl md:text-4xl font-bold text-darkBlue mt-2">
-            Discover {matched ?? (cityId || "Nepal")}
+            Discover {matched ?? (cityId || 'Nepal')}
           </h1>
           <p className="text-gray-600 mt-2 max-w-2xl">
-            {meta?.about ?? "Explore experiences, guides and hidden gems in this region of Nepal."}
+            {meta?.about ?? 'Explore experiences, guides and hidden gems in this region of Nepal.'}
           </p>
           {matched && (
             <Link
@@ -54,7 +97,11 @@ export default function CityPage() {
         {!matched && (
           <div className="mt-8 flex flex-wrap gap-3">
             {CITIES.map((c) => (
-              <Link key={c} to={`/city/${c.toLowerCase()}`} className="rounded-full border bg-white px-4 py-1.5 text-sm text-gray-600 hover:border-darkBlue">
+              <Link
+                key={c}
+                to={`/city/${c.toLowerCase()}`}
+                className="rounded-full border bg-white px-4 py-1.5 text-sm text-gray-600 hover:border-darkBlue"
+              >
                 {CITY_META[c]?.emoji} {c}
               </Link>
             ))}
@@ -62,5 +109,5 @@ export default function CityPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

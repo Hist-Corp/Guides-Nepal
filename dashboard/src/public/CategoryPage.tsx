@@ -1,36 +1,66 @@
-﻿import { useParams } from "react-router-dom"
-import useCatalog from "./hooks/useCatalog"
-import { ExperienceGrid } from "./components/ExperienceCard"
+﻿import { useParams } from 'react-router-dom';
+import useCatalog from './hooks/useCatalog';
+import { ExperienceGrid } from './components/ExperienceCard';
 
 const CATEGORY_MAP: Record<string, string> = {
-  "most-popular": "most-popular",
-  "most-delicious": "most-delicious",
-  "real-good-travel": "real-good-travel",
-  "food-tours": "Food Tours",
-  "cultural-tours": "Cultural Tours",
-  "outdoor-activities": "Outdoor Activities",
-  "cooking-classes": "Cooking Classes",
-}
+  'most-popular': 'most-popular',
+  'most-delicious': 'most-delicious',
+  'real-good-travel': 'real-good-travel',
+  'food-tours': 'Food Tours',
+  'cultural-tours': 'Cultural Tours',
+  'outdoor-activities': 'Outdoor Activities',
+  'cooking-classes': 'Cooking Classes',
+};
 
 const TITLES: Record<string, { title: string; blurb: string }> = {
-  "most-popular": { title: "Most Popular", blurb: "The experiences travelers book again and again." },
-  "most-delicious": { title: "Most Delicious", blurb: "Food tours and cooking classes loved by foodies." },
-  "real-good-travel": { title: "Real Good Travel", blurb: "Curated stories and tips for traveling well in Nepal." },
-}
+  'most-popular': {
+    title: 'Most Popular',
+    blurb: 'The experiences travelers book again and again.',
+  },
+  'most-delicious': {
+    title: 'Most Delicious',
+    blurb: 'Food tours and cooking classes loved by foodies.',
+  },
+  'real-good-travel': {
+    title: 'Real Good Travel',
+    blurb: 'Curated stories and tips for traveling well in Nepal.',
+  },
+  'food-tours': {
+    title: 'Food Tours',
+    blurb: 'Street food crawls, market visits and tastings led by local foodies.',
+  },
+  'cultural-tours': {
+    title: 'Cultural Tours',
+    blurb: 'Heritage walks, temples and living traditions with local experts.',
+  },
+  'outdoor-activities': {
+    title: 'Outdoor Activities',
+    blurb: 'Treks, jungle safaris, rafting and adventure across Nepal.',
+  },
+  'cooking-classes': {
+    title: 'Cooking Classes',
+    blurb: 'Hands-on cooking workshops with local home chefs.',
+  },
+};
 
 export default function CategoryPage({ slugKey }: { slugKey?: string }) {
-  const params = useParams()
-  const key = slugKey ?? (params as any)["*"] ?? ""
-  const { experiences, loading } = useCatalog()
-  const mapped = CATEGORY_MAP[key]
+  const params = useParams();
+  const key = slugKey ?? (params as any)['*'] ?? '';
+  const { experiences, loading } = useCatalog();
+  const mapped = CATEGORY_MAP[key];
 
-  let items = experiences
-  if (mapped === "most-popular") items = [...experiences].sort((a, b) => b.reviews - a.reviews)
-  else if (mapped === "most-delicious" || mapped === "real-good-travel")
-    items = experiences.filter((e) => e.category === "Food Tours" || e.category === "Cooking Classes")
-  else if (mapped) items = experiences.filter((e) => e.category === mapped)
+  let items = experiences;
+  if (mapped === 'most-popular') items = [...experiences].sort((a, b) => b.reviews - a.reviews);
+  else if (mapped === 'most-delicious' || mapped === 'real-good-travel')
+    items = experiences.filter(
+      (e) => e.category === 'Food Tours' || e.category === 'Cooking Classes'
+    );
+  else if (mapped) items = experiences.filter((e) => e.category === mapped);
 
-  const meta = TITLES[key] ?? { title: mapped ?? "Experiences", blurb: "Browse experiences on Guides Nepal." }
+  const meta = TITLES[key] ?? {
+    title: mapped ?? 'Experiences',
+    blurb: 'Browse experiences on Guides Nepal.',
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
@@ -44,5 +74,5 @@ export default function CategoryPage({ slugKey }: { slugKey?: string }) {
         )}
       </div>
     </div>
-  )
+  );
 }

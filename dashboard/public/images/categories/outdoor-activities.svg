@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" rx="12" fill="url(#bg)"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#dcfce7"/>
+      <stop offset="1" stop-color="#86efac"/>
+    </gradient>
+  </defs>
+  <path d="M100 220 L100 180 L200 140 L300 180 L300 220 L200 260 Z" fill="#16a34a"/>
+  <path d="M200 140 L200 80 L210 80 L200 70 L190 80 L190 80 L200 70 L200 140 Z" fill="#158042"/>
+  <path d="M130 220 L140 180 L180 180 L190 220 Z" fill="#158042"/>
+  <path d="M210 220 L220 180 L260 180 L270 220 Z" fill="#158042"/>
+  <path d="M200 80 L170 160 L230 160 Z" fill="#22c55e"/>
+  <circle cx="200" cy="100" r="5" fill="#16a34a"/>
+  <text x="200" y="285" font-family="Arial" font-size="14" fill="#14532d" text-anchor="middle">Outdoor Activities</text>
+</svg>

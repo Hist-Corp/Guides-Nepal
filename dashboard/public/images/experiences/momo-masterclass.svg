@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" rx="12" fill="url(#bg)"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fef3c7"/>
+      <stop offset="1" stop-color="#fbbf24"/>
+    </gradient>
+  </defs>
+  <rect x="80" y="150" width="240" height="30" rx="4" fill="#d97706"/>
+  <path d="M120 150 L110 100 L290 100 L280 150 Z" fill="#d97706"/>
+  <circle cx="200" cy="80" r="25" fill="#fef3c7"/>
+  <circle cx="200" cy="80" r="18" fill="#fbbf24"/>
+  <path d="M180 90 L180 100 L220 100 L220 90 Z" fill="#fef3c7"/>
+  <path d="M175 85 L180 90 M225 85 L220 90" stroke="#92400e" stroke-width="2" stroke-linecap="round"/>
+  <path d="M160 120 Q200 135 240 120" stroke="#92400e" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <rect x="170" y="100" width="20" height="50" fill="#ea580c"/>
+  <rect x="210" y="100" width="20" height="50" fill="#ea580c"/>
+  <text x="200" y="285" font-family="Arial" font-size="12" fill="#92400e" text-anchor="middle">Momo Masterclass</text>
+</svg>
