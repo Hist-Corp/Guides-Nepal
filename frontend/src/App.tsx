@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
 import ScrollToTop from './components/common/ScrollToTop';
 import SupportWidget from './components/common/SupportWidget';
 import CmsEditMode from './components/common/CmsEditMode';
@@ -58,6 +58,8 @@ import { FoodToursPage } from './pages/FoodToursPage';
 import CulturalToursPage from './pages/CulturalToursPage';
 import OutdoorActivitiesPage from './pages/OutdoorActivitiesPage';
 import CookingClassesPage from './pages/CookingClassesPage';
+import CookingExperiencePage from './pages/cooking/CookingExperiencePage';
+import CookingExperiencesPage from './pages/cooking/CookingExperiencesPage';
 import FoodTourCulturePage from './pages/food/FoodTourCulturePage';
 
 // Footer Pages
@@ -80,7 +82,8 @@ import CommunityPage from './pages/CommunityPage';
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  const isCmsPreview = typeof window !== 'undefined' && window.location.search.includes('cms-preview=1');
+  const isCmsPreview =
+    typeof window !== 'undefined' && window.location.search.includes('cms-preview=1');
 
   return (
     <CurrencyProvider>
@@ -92,89 +95,91 @@ function App() {
           <GlobalImageFallback />
           <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
           <Routes>
-          <Route path="/" element={<HomePage onCartOpen={() => setIsCartOpen(true)} />} />
-          <Route path="/most-popular" element={<MostPopularPage />} />
-          <Route path="/most-delicious" element={<MostDeliciousPage />} />
-          <Route path="/real-good-travel" element={<RealGoodTravelPage />} />
-          <Route path="/food-tours" element={<FoodToursPage />} />
-          <Route path="/food-tours/culture/:slug" element={<FoodTourCulturePage />} />
-          <Route path="/cultural-tours" element={<CulturalToursPage />} />
-          <Route path="/outdoor-activities" element={<OutdoorActivitiesPage />} />
-          <Route path="/cooking-classes" element={<CookingClassesPage />} />
-          <Route path="/explore" element={<ExplorePage />} />
-          <Route path="/become-host" element={<BecomeHostPage />} />
-          <Route path="/host-application" element={<HostApplicationPage />} />
-          <Route path="/bookings" element={<BookingsPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/account" element={<AccountSettingsPage />} />
-          <Route path="/favorites" element={<FavoritesPage />} />
-          <Route path="/chat" element={<ChatPage />} />
-          <Route path="/maila-dai" element={<MailaDaiChatPage />} />
-          <Route path="/consent" element={<ConsentPage />} />
-          <Route path="/privacy" element={<PrivacyPolicyPage />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/impact-report-2024" element={<ImpactReportPage />} />
-          <Route path="/experience/seo/:slug" element={<SeoExperiencePage />} />
-          <Route path="/experience/:id" element={<ExperiencePage />} />
-          <Route path="/auth/callback" element={<OAuthCallback />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          
-          {/* Kathmandu Routes */}
-          <Route path="/city/kathmandu" element={<KathmanduPage />} />
-          <Route path="/city/kathmandu/experiences" element={<KathmanduExperiencesPage />} />
-          <Route path="/city/kathmandu/experience/:slug" element={<KathmanduExperiencePage />} />
+            <Route path="/" element={<HomePage onCartOpen={() => setIsCartOpen(true)} />} />
+            <Route path="/most-popular" element={<MostPopularPage />} />
+            <Route path="/most-delicious" element={<MostDeliciousPage />} />
+            <Route path="/real-good-travel" element={<RealGoodTravelPage />} />
+            <Route path="/food-tours" element={<FoodToursPage />} />
+            <Route path="/food-tours/culture/:slug" element={<FoodTourCulturePage />} />
+            <Route path="/cultural-tours" element={<CulturalToursPage />} />
+            <Route path="/outdoor-activities" element={<OutdoorActivitiesPage />} />
+            <Route path="/cooking-classes" element={<CookingClassesPage />} />
+            <Route path="/cooking-classes/experiences" element={<CookingExperiencesPage />} />
+            <Route path="/cooking-classes/experience/:slug" element={<CookingExperiencePage />} />
+            <Route path="/explore" element={<ExplorePage />} />
+            <Route path="/become-host" element={<BecomeHostPage />} />
+            <Route path="/host-application" element={<HostApplicationPage />} />
+            <Route path="/bookings" element={<BookingsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/account" element={<AccountSettingsPage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/chat" element={<ChatPage />} />
+            <Route path="/maila-dai" element={<MailaDaiChatPage />} />
+            <Route path="/consent" element={<ConsentPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/impact-report-2024" element={<ImpactReportPage />} />
+            <Route path="/experience/seo/:slug" element={<SeoExperiencePage />} />
+            <Route path="/experience/:id" element={<ExperiencePage />} />
+            <Route path="/auth/callback" element={<OAuthCallback />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-          {/* Pokhara Routes */}
-          <Route path="/city/pokhara" element={<PokharaPage />} />
-          <Route path="/city/pokhara/experiences" element={<PokharaExperiencesPage />} />
-          <Route path="/city/pokhara/experience/:slug" element={<PokharaExperiencePage />} />
+            {/* Kathmandu Routes */}
+            <Route path="/city/kathmandu" element={<KathmanduPage />} />
+            <Route path="/city/kathmandu/experiences" element={<KathmanduExperiencesPage />} />
+            <Route path="/city/kathmandu/experience/:slug" element={<KathmanduExperiencePage />} />
 
-          {/* Lalitpur Routes */}
-          <Route path="/city/lalitpur" element={<LalitpurPage />} />
-          <Route path="/city/lalitpur/experiences" element={<LalitpurExperiencesPage />} />
-          <Route path="/city/lalitpur/experience/:slug" element={<LalitpurExperiencePage />} />
+            {/* Pokhara Routes */}
+            <Route path="/city/pokhara" element={<PokharaPage />} />
+            <Route path="/city/pokhara/experiences" element={<PokharaExperiencesPage />} />
+            <Route path="/city/pokhara/experience/:slug" element={<PokharaExperiencePage />} />
 
-          {/* Bhaktapur Routes */}
-          <Route path="/city/bhaktapur" element={<BhaktapurPage />} />
-          <Route path="/city/bhaktapur/experiences" element={<BhaktapurExperiencesPage />} />
-          <Route path="/city/bhaktapur/experience/:slug" element={<BhaktapurExperiencePage />} />
+            {/* Lalitpur Routes */}
+            <Route path="/city/lalitpur" element={<LalitpurPage />} />
+            <Route path="/city/lalitpur/experiences" element={<LalitpurExperiencesPage />} />
+            <Route path="/city/lalitpur/experience/:slug" element={<LalitpurExperiencePage />} />
 
-          {/* Bharatpur Routes */}
-          <Route path="/city/bharatpur" element={<BharatpurPage />} />
-          <Route path="/city/bharatpur/experiences" element={<BharatpurExperiencesPage />} />
-          <Route path="/city/bharatpur/experience/:slug" element={<BharatpurExperiencePage />} />
+            {/* Bhaktapur Routes */}
+            <Route path="/city/bhaktapur" element={<BhaktapurPage />} />
+            <Route path="/city/bhaktapur/experiences" element={<BhaktapurExperiencesPage />} />
+            <Route path="/city/bhaktapur/experience/:slug" element={<BhaktapurExperiencePage />} />
 
-          <Route path="/local/:id" element={<LocalProfilePage />} />
-          <Route path="/local/:id/gallery" element={<GalleryPage />} />
-          <Route path="/local/:id/portfolio" element={<GuidePortfolioPage />} />
-          <Route path="/local/:id/contact" element={<ContactGuidePage />} />
-          <Route path="/city/:cityId" element={<CityPage />} />
-          
-          {/* Footer Pages */}
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/jobs" element={<JobsPage />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/press" element={<PressPage />} />
-          <Route path="/sustainability" element={<SustainabilityPage />} />
-          <Route path="/destinations" element={<DestinationsPage />} />
-          <Route path="/how-it-works" element={<HowItWorksPage />} />
-          <Route path="/gift-cards" element={<GiftCardsPage />} />
-          <Route path="/host-center" element={<HostCenterPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/faq" element={<FaqPage />} />
-          <Route path="/terms" element={<TermsPage />} />
-          <Route path="/help" element={<HelpPage />} />
-          <Route path="/hosting" element={<HostingPage />} />
-          <Route path="/community" element={<CommunityPage />} />
-          <Route path="/host" element={<BecomeHostPage />} />
-          <Route path="/careers" element={<JobsPage />} />
-          
-          <Route path="*" element={<div>404 Not Found</div>} />
-        </Routes>
-        <SupportWidget />
-      </Router>
-    </CartProvider>
-  </CurrencyProvider>
+            {/* Bharatpur Routes */}
+            <Route path="/city/bharatpur" element={<BharatpurPage />} />
+            <Route path="/city/bharatpur/experiences" element={<BharatpurExperiencesPage />} />
+            <Route path="/city/bharatpur/experience/:slug" element={<BharatpurExperiencePage />} />
+
+            <Route path="/local/:id" element={<LocalProfilePage />} />
+            <Route path="/local/:id/gallery" element={<GalleryPage />} />
+            <Route path="/local/:id/portfolio" element={<GuidePortfolioPage />} />
+            <Route path="/local/:id/contact" element={<ContactGuidePage />} />
+            <Route path="/city/:cityId" element={<CityPage />} />
+
+            {/* Footer Pages */}
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/jobs" element={<JobsPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/press" element={<PressPage />} />
+            <Route path="/sustainability" element={<SustainabilityPage />} />
+            <Route path="/destinations" element={<DestinationsPage />} />
+            <Route path="/how-it-works" element={<HowItWorksPage />} />
+            <Route path="/gift-cards" element={<GiftCardsPage />} />
+            <Route path="/host-center" element={<HostCenterPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/faq" element={<FaqPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/help" element={<HelpPage />} />
+            <Route path="/hosting" element={<HostingPage />} />
+            <Route path="/community" element={<CommunityPage />} />
+            <Route path="/host" element={<BecomeHostPage />} />
+            <Route path="/careers" element={<JobsPage />} />
+
+            <Route path="*" element={<div>404 Not Found</div>} />
+          </Routes>
+          <SupportWidget />
+        </Router>
+      </CartProvider>
+    </CurrencyProvider>
   );
 }
 

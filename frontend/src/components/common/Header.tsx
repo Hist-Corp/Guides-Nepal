@@ -471,7 +471,7 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
                       Currency Converter
                     </button>
                     <Link
-                      to="/gift-voucher"
+                      to="/gift-cards"
                       className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
                       onClick={() => setIsMenuOpen(false)}
                     >
