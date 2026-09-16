@@ -10,6 +10,15 @@ vi.mock('../../contexts/CurrencyContext', () => ({
 
 vi.mock('../../contexts/CartContext', () => ({
   CartProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useCart: () => ({
+    items: [],
+    addItem: vi.fn(),
+    removeItem: vi.fn(),
+    updateQuantity: vi.fn(),
+    clearCart: vi.fn(),
+    getTotalItems: () => 0,
+    getTotalPrice: () => 0,
+  }),
 }));
 
 describe('HomePage', () => {
@@ -28,6 +37,9 @@ describe('HomePage', () => {
         <HomePage onCartOpen={() => {}} />
       </BrowserRouter>
     );
-    expect(screen.getByText(/Featured Experiences/i)).toBeInTheDocument();
+    // The featured experiences section renders this heading by default
+    // (see FeaturedExperiences.tsx) and has id="featured-experiences".
+    expect(screen.getByText(/Go local in Charming Cities/i)).toBeInTheDocument();
+    expect(document.getElementById('featured-experiences')).not.toBeNull();
   });
 });

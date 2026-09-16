@@ -2,79 +2,91 @@ export const bhaktapurTours = [
   {
     id: 1,
     slug: 'bhaktapur-heritage-walk',
-    title: "Bhaktapur Heritage Walk",
+    title: 'Bhaktapur Heritage Walk',
     rating: 4.9,
     reviews: 245,
-    duration: "3 hours",
-    type: "City Highlight",
-    price: 35.00,
-    description: "Step back in time in the 'City of Devotees'. Walk through medieval streets, admire the 55-Window Palace, and discover the Golden Gate.",
-    image: "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80",
-    locals: ["Krishna", "Radha"]
+    duration: '3 hours',
+    type: 'City Highlight',
+    price: 35.0,
+    description:
+      "Step back in time in the 'City of Devotees'. Walk through medieval streets, admire the 55-Window Palace, and discover the Golden Gate.",
+    image:
+      'https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80',
+    locals: ['Krishna', 'Radha'],
   },
   {
     id: 2,
     slug: 'pottery-making-class',
-    title: "Pottery Making Class",
+    title: 'Pottery Making Class',
     rating: 4.8,
     reviews: 134,
-    duration: "2 hours",
-    type: "Workshop",
-    price: 30.00,
-    description: "Get your hands dirty! Learn the ancient art of pottery in Bhaktapur's famous Pottery Square from a master craftsman.",
-    image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1740&q=80",
-    locals: ["Radha", "Prakash"]
+    duration: '2 hours',
+    type: 'Workshop',
+    price: 30.0,
+    description:
+      "Get your hands dirty! Learn the ancient art of pottery in Bhaktapur's famous Pottery Square from a master craftsman.",
+    image:
+      'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1740&q=80',
+    locals: ['Radha', 'Prakash'],
   },
   {
     id: 3,
     slug: 'taste-juju-dhau',
-    title: "Taste Juju Dhau (King Curd)",
+    title: 'Taste Juju Dhau (King Curd)',
     rating: 5.0,
     reviews: 320,
-    duration: "1 hour",
-    type: "Food Tour",
-    price: 15.00,
-    description: "You can't leave Bhaktapur without trying the King of Yogurt. Discover the secrets behind this creamy, delicious dessert.",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=1740&q=80",
-    locals: ["Prakash", "Krishna"]
+    duration: '1 hour',
+    type: 'Food Tour',
+    price: 15.0,
+    description:
+      "You can't leave Bhaktapur without trying the King of Yogurt. Discover the secrets behind this creamy, delicious dessert.",
+    image:
+      'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=1740&q=80',
+    locals: ['Prakash', 'Krishna'],
   },
   {
     id: 4,
     slug: 'changu-narayan-hike',
-    title: "Changu Narayan Temple Hike",
+    title: 'Changu Narayan Temple Hike',
     rating: 4.9,
     reviews: 180,
-    duration: "4 hours",
-    type: "Hiking",
-    price: 40.00,
-    description: "Hike through pine forests and villages to reach the oldest temple in Nepal, Changu Narayan, a UNESCO World Heritage site.",
-    image: "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80",
-    locals: ["Laxmi", "Krishna"]
+    duration: '4 hours',
+    type: 'Hiking',
+    price: 40.0,
+    description:
+      'Hike through pine forests and villages to reach the oldest temple in Nepal, Changu Narayan, a UNESCO World Heritage site.',
+    image:
+      'https://images.unsplash.com/photo-1545126178-862cdb469409?auto=format&fit=crop&w=1740&q=80',
+    locals: ['Laxmi', 'Krishna'],
   },
   {
     id: 5,
     slug: 'bhaktapur-night-tour',
-    title: "Bhaktapur Night Tour",
+    title: 'Bhaktapur Night Tour',
     rating: 4.8,
     reviews: 95,
-    duration: "3 hours",
-    type: "Night Tour",
-    price: 45.00,
-    description: "Experience the magic of Bhaktapur after dark. The temples are beautifully lit, and the streets are quiet and atmospheric.",
-    image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=1740&q=80",
-    locals: ["Krishna", "Radha"]
+    duration: '3 hours',
+    type: 'Night Tour',
+    price: 45.0,
+    description:
+      'Experience the magic of Bhaktapur after dark. The temples are beautifully lit, and the streets are quiet and atmospheric.',
+    image:
+      'https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=1740&q=80',
+    locals: ['Krishna', 'Radha'],
   },
   {
     id: 6,
     slug: 'thangka-painting-workshop-bhaktapur',
-    title: "Thangka Painting Workshop",
+    title: 'Thangka Painting Workshop',
     rating: 5.0,
     reviews: 70,
-    duration: "3 hours",
-    type: "Workshop",
-    price: 50.00,
-    description: "Learn the intricate art of Thangka painting from a master artist. A spiritual and artistic experience.",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=1740&q=80",
-    locals: ["Radha", "Prakash"]
-  }
+    duration: '3 hours',
+    type: 'Workshop',
+    price: 50.0,
+    description:
+      'Learn the intricate art of Thangka painting from a master artist. A spiritual and artistic experience.',
+    image:
+      'https://images.unsplash.com/photo-1554188248-986adbb73be4?auto=format&fit=crop&w=1740&q=80',
+    locals: ['Radha', 'Prakash'],
+  },
 ];
