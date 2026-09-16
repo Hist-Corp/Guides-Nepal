@@ -35,7 +35,7 @@
     "typecheck:dashboard": "cd dashboard && npm run typecheck",
     "typecheck:backend": "cd backend && .venv\\Scripts\\activate && mypy app",
     "setup": "node scripts/setup.js",
-    "prepare": "husky install",
+    "prepare": "npx husky",
     "clean": "npm run clean:frontend && npm run clean:dashboard && npm run clean:backend",
     "clean:frontend": "cd frontend && rimraf dist node_modules",
     "clean:dashboard": "cd dashboard && rimraf dist node_modules",
