@@ -28,7 +28,7 @@ describe('HomePage', () => {
         <HomePage onCartOpen={() => {}} />
       </BrowserRouter>
     );
-    expect(screen.getByText(/Guides Nepal/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Guides Nepal/i).length).toBeGreaterThan(0);
   });
 
   it('displays featured experiences section', () => {

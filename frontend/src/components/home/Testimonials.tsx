@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from '../common/Card';
 import { SafeImage } from '../common/SafeImage';
+import { Reveal } from '../common/Reveal';
 import { NEPAL_IMAGES } from '../../data/images';
 import { useCmsSection } from '../../hooks/useCms';
 import { cmsBackground } from '../../utils/cmsText';
@@ -11,23 +12,26 @@ import { cmsBackground } from '../../utils/cmsText';
 const testimonials = [
   {
     id: 1,
-    quote: "A must-do tour in Kathmandu! We learned so much about the city and its history. Our guide was fantastic and made the experience truly special.",
-    author: "Sarah J.",
-    location: "Kathmandu",
+    quote:
+      'A must-do tour in Kathmandu! We learned so much about the city and its history. Our guide was fantastic and made the experience truly special.',
+    author: 'Sarah J.',
+    location: 'Kathmandu',
     image: NEPAL_IMAGES.traveler1,
   },
   {
     id: 2,
-    quote: "The best food tour I've ever been on! We tasted so many delicious dishes that we never would have found on our own. Highly recommend!",
-    author: "Michael T.",
-    location: "Pokhara",
+    quote:
+      "The best food tour I've ever been on! We tasted so many delicious dishes that we never would have found on our own. Highly recommend!",
+    author: 'Michael T.',
+    location: 'Pokhara',
     image: NEPAL_IMAGES.traveler2,
   },
   {
     id: 3,
-    quote: "Our guide was amazing! She was so knowledgeable and friendly. It felt like exploring the city with an old friend. Best part of our trip!",
-    author: "Emily R.",
-    location: "Bhaktapur",
+    quote:
+      'Our guide was amazing! She was so knowledgeable and friendly. It felt like exploring the city with an old friend. Best part of our trip!',
+    author: 'Emily R.',
+    location: 'Bhaktapur',
     image: NEPAL_IMAGES.traveler3,
   },
 ];
@@ -37,32 +41,45 @@ export const Testimonials: React.FC = () => {
   const heading = cms?.content?.heading || 'Travelers love our locals';
   const subtitle = cms?.content?.subtitle || 'Real reviews from real travelers in Nepal';
   return (
-    <section data-cms-id="home-testimonials" data-cms-label="Testimonials" className="py-16 bg-[#E0F2FE]" style={cmsBackground(cms?.style, '#E0F2FE')}>
+    <section
+      data-cms-id="home-testimonials"
+      data-cms-label="Testimonials"
+      className="py-16 bg-[#E0F2FE]"
+      style={cmsBackground(cms?.style, '#E0F2FE')}
+    >
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-primary text-center mb-2">{heading}</h2>
-        <p className="text-center text-slate-600 mb-12">{subtitle}</p>
+        <Reveal variant="down">
+          <h2 className="text-3xl font-bold text-primary text-center mb-2">{heading}</h2>
+        </Reveal>
+        <Reveal variant="down" delay={90}>
+          <p className="text-center text-slate-600 mb-12">{subtitle}</p>
+        </Reveal>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((testimonial) => (
-            <Card key={testimonial.id} className="p-6 border-none shadow-sm h-full flex flex-col justify-between">
-              <div>
-                 <div className="text-primary text-4xl font-serif mb-4 leading-none">“</div>
-                 <p className="text-slate-700 mb-6 italic leading-relaxed">
-                   {testimonial.quote}
-                 </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <SafeImage
-                  src={testimonial.image}
-                  alt={testimonial.author}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
+          {testimonials.map((testimonial, index) => (
+            <Reveal key={testimonial.id} delay={index * 120} className="h-full">
+              <Card className="group p-6 border-none shadow-sm h-full flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <div>
-                  <h4 className="font-bold text-slate-900">{testimonial.author}</h4>
-                  <p className="text-xs text-slate-500 uppercase tracking-wide">Visited {testimonial.location}</p>
+                  <div className="text-primary text-4xl font-serif mb-4 leading-none transition-all duration-300 group-hover:scale-110 group-hover:text-brand-yellow">
+                    “
+                  </div>
+                  <p className="text-slate-700 mb-6 italic leading-relaxed">{testimonial.quote}</p>
                 </div>
-              </div>
-            </Card>
+                <div className="flex items-center gap-3">
+                  <SafeImage
+                    src={testimonial.image}
+                    alt={testimonial.author}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                  <div>
+                    <h4 className="font-bold text-slate-900">{testimonial.author}</h4>
+                    <p className="text-xs text-slate-500 uppercase tracking-wide">
+                      Visited {testimonial.location}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -71,4 +88,3 @@ export const Testimonials: React.FC = () => {
 };
 
 export default Testimonials;
-

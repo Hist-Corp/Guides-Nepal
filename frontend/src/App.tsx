@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 import ScrollToTop from './components/common/ScrollToTop';
 import SupportWidget from './components/common/SupportWidget';
+import PageReveal from './components/common/PageReveal';
 import CmsEditMode from './components/common/CmsEditMode';
 import CmsPreviewBridge from './components/CmsPreviewBridge';
 import { GlobalImageFallback } from './components/common/GlobalImageFallback';
@@ -92,6 +93,7 @@ function App() {
           <CmsEditMode />
           {isCmsPreview && <CmsPreviewBridge />}
           <ScrollToTop />
+          <PageReveal />
           <GlobalImageFallback />
           <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
           <Routes>
