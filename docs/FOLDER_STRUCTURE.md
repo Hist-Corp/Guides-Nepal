@@ -24,12 +24,11 @@ guides-nepal/
 ├── dashboard/               # RBAC dashboard (Vite + React 18 + TS, port 5176)
 │   ├── docs/                # IA.md, ROLES.md, ROUTING.md, PERMISSIONS.md, UX.md, SCALABILITY.md
 │   └── src/
-│       ├── superadmin/      # Super Admin area
-│       ├── admin/           # Admin area
+│       ├── admin/           # Admin area (top role) + governance pages
 │       ├── regionalhead/    # Regional Head area
 │       ├── support/         # Customer Support area
-│       ├── writer/          # Content Writer area
-│       ├── host/ guide/     # Host & Guide areas
+│       ├── writer/          # Content Manager area
+│       ├── host/            # Host area
 │       ├── auth/ guards/    # Auth flows and role guards
 │       ├── components/forms/# Shared dashboard components (KPICard, Table, charts, Modal, forms)
 │       ├── layouts/ services/ state/ mock/  # Layout, API services, stores, fixtures
@@ -68,11 +67,14 @@ Typed API clients: `guidesApi.ts` (guides directory), `publicApi.ts` (public con
 offline queue for form submissions), `cms.ts` (CMS-managed content).
 
 ### backend/app/core/roles.py
-Canonical 8-role hierarchy (`super-admin > admin > content-writer > regional-head >
-customer-support > host > guide > traveler`) with `has_access()` role guards. Super-admin
-implicitly passes every guard.
+Canonical 5-role dashboard hierarchy (`admin > content-manager > regional-head >
+customer-support > host`) with `has_access()` role guards. Admin implicitly passes
+every guard; travelers use the public site and are not part of the hierarchy.
+
+> The former `super-admin` and `guide` roles were removed; existing records using the
+> previous `content-writer` name still resolve to `content-manager`.
 
 ### dashboard/src/<area>/
-One folder per role area (`superadmin/`, `admin/`, `regionalhead/`, `support/`, `writer/`,
-`host/`, `guide/`) plus `guards/` for route protection. See `dashboard/docs/ROLES.md` and
+One folder per role area (`admin/`, `regionalhead/`, `support/`, `writer/`, `host/`)
+plus `guards/` for route protection. See `dashboard/docs/ROLES.md` and
 `dashboard/docs/ROUTING.md`.

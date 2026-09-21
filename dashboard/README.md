@@ -1,7 +1,7 @@
 # Guides Nepal — Dashboard
 
-RBAC dashboard for the staff roles of Guides Nepal: **Super Admin, Admin, Regional Head,
-Customer Support, Content Writer, Host, and Guide**. It is a separate Vite + React 18 + TypeScript
+RBAC dashboard for the staff roles of Guides Nepal: **Admin, Content Manager, Regional Head,
+Customer Support, and Host**. It is a separate Vite + React 18 + TypeScript
 app, isolated from the public website, and consumes the FastAPI backend (`/api/v1`).
 
 ## Quick start
@@ -28,13 +28,17 @@ Each role has a dedicated area under `src/` with its own routes and guards:
 
 | Role | Area folder | Route prefix |
 |------|-------------|--------------|
-| Super Admin | `src/superadmin/` | `/super-admin/*` |
 | Admin | `src/admin/` | `/admin/*` |
 | Regional Head | `src/regionalhead/` | `/regional-head/*` |
 | Customer Support | `src/support/` | `/customer-support/*` |
-| Content Writer | `src/writer/` | `/content-writer/*` |
+| Content Manager | `src/writer/` | `/content-manager/*` |
 | Host | `src/host/` | `/host/*` |
-| Guide | `src/guide/` | `/guide/*` |
+
+Hierarchy (highest privilege first): **Admin > Content Manager > Regional Head >
+Customer Support > Host**. Admin implicitly passes every guard. The former
+Super Admin and Guide roles were removed; the governance pages they hosted
+(role hierarchy, host applications, support tickets, intelligence) now live under the
+Admin console.
 
 Role definitions mirror the backend (`backend/app/core/roles.py`); route protection lives in
 `src/guards/`. Details: [docs/ROLES.md](./docs/ROLES.md), [docs/ROUTING.md](./docs/ROUTING.md),

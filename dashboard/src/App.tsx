@@ -3,20 +3,8 @@ import LoginPage from "./auth/LoginPage"
 import DashboardLayout from "./layouts/DashboardLayout"
 import AdminLayout from "./layouts/AdminLayout"
 import HostLayout from "./layouts/HostLayout"
-import GuideLayout from "./layouts/GuideLayout"
 import RequireAuth from "./guards/RequireAuth"
 import RequireRole from "./guards/RequireRole"
-import PublicLayout from "./public/components/PublicLayout"
-import PublicHome from "./public/Home"
-import PublicExplore from "./public/Explore"
-import PublicSearch from "./public/Search"
-import CategoryPage from "./public/CategoryPage"
-import ExperienceDetail from "./public/ExperienceDetail"
-import CityPage from "./public/CityPage"
-import CityExperiences from "./public/CityExperiences"
-import LocalProfile from "./public/LocalProfile"
-import NotFound from "./public/NotFound"
-import Support from "./public/Support"
 import AdminOverview from "./admin/Overview"
 import AdminHosts from "./admin/Hosts"
 import AdminGuides from "./admin/Guides"
@@ -25,10 +13,13 @@ import AdminRevenue from "./admin/Revenue"
 import AdminSettings from "./admin/Settings"
 import WebsiteContentManager from "./components/WebsiteContentManager"
 import AdminContent from "./admin/Content"
-import RoleHierarchy from "./superadmin/RoleHierarchy"
+import RoleHierarchy from "./admin/RoleHierarchy"
+import AdminIntelligence from "./admin/Intelligence"
+import PlatformOverview from "./admin/PlatformOverview"
 import Customers from "./components/Customers"
 import Administration from "./components/Administration"
-import SuperAdminIntelligence from "./superadmin/Intelligence"
+import HostApplicationsPanel from "./components/HostApplicationsPanel"
+import SupportTicketsPanel from "./components/SupportTicketsPanel"
 import WriterLayout from "./layouts/WriterLayout"
 import WriterOverview from "./writer/Overview"
 import WriterPages from "./writer/Pages"
@@ -36,9 +27,6 @@ import WriterBlog from "./writer/Blog"
 import WriterGuidesContent from "./writer/GuidesContent"
 import WriterMedia from "./writer/Media"
 import WriterSeo from "./writer/Seo"
-import SuperAdminOverview from "./superadmin/Overview"
-import SuperAdminHostApplications from "./superadmin/HostApplications"
-import SuperAdminSupportTickets from "./superadmin/SupportTickets"
 import RegionalHeadOverview from "./regionalhead/Overview"
 import RegionalApplications from "./regionalhead/Applications"
 import RegionalInfo from "./regionalhead/Region"
@@ -51,37 +39,12 @@ import HostTours from "./host/Tours"
 import HostBookings from "./host/Bookings"
 import HostEarnings from "./host/Earnings"
 import HostPerformance from "./host/Performance"
-import GuideOverview from "./guide/Overview"
-import GuideMyTours from "./guide/MyTours"
-import GuideMyBookings from "./guide/MyBookings"
-import GuideSchedule from "./guide/Schedule"
-import GuideEarnings from "./guide/Earnings"
-import GuideProfile from "./guide/Profile"
 
 export default function App() {
   return (
     <Routes>
-      {/* Public traveler-facing site */}
-      <Route path="/" element={<PublicLayout />}>
-        <Route index element={<PublicHome />} />
-        <Route path="explore" element={<PublicExplore />} />
-        <Route path="search" element={<PublicSearch />} />
-        <Route path="most-popular" element={<CategoryPage slugKey="most-popular" />} />
-        <Route path="most-delicious" element={<CategoryPage slugKey="most-delicious" />} />
-        <Route path="real-good-travel" element={<CategoryPage slugKey="real-good-travel" />} />
-        <Route path="food-tours" element={<CategoryPage slugKey="food-tours" />} />
-        <Route path="food-tours/culture/:slug" element={<ExperienceDetail />} />
-        <Route path="cultural-tours" element={<CategoryPage slugKey="cultural-tours" />} />
-        <Route path="outdoor-activities" element={<CategoryPage slugKey="outdoor-activities" />} />
-        <Route path="cooking-classes" element={<CategoryPage slugKey="cooking-classes" />} />
-        <Route path="experience/:id" element={<ExperienceDetail />} />
-        <Route path="experience/seo/:slug" element={<ExperienceDetail />} />
-        <Route path="city/:cityId" element={<CityPage />} />
-        <Route path="city/:cityId/experiences" element={<CityExperiences />} />
-        <Route path="city/:cityId/experience/:slug" element={<ExperienceDetail />} />
-        <Route path="local/:id" element={<LocalProfile />} />
-        <Route path="*" element={<NotFound />} />
-      </Route>
+      {/* Root always lands on the dashboard login — the dashboard app ships no public pages. */}
+      <Route path="/" element={<Navigate to="/dashboard/login" replace />} />
       <Route path="/dashboard" element={<DashboardLayout />}>
         <Route index element={<Navigate to="/dashboard/login" replace />} />
         <Route path="login" element={<LoginPage />} />
@@ -96,8 +59,13 @@ export default function App() {
           }
         >
           <Route index element={<AdminOverview />} />
+          <Route path="platform" element={<PlatformOverview />} />
           <Route path="hosts" element={<AdminHosts />} />
           <Route path="guides" element={<AdminGuides />} />
+          <Route path="host-applications" element={<HostApplicationsPanel />} />
+          <Route path="support-tickets" element={<SupportTicketsPanel />} />
+          <Route path="hierarchy" element={<RoleHierarchy />} />
+          <Route path="intelligence" element={<AdminIntelligence />} />
           <Route path="customers" element={<Customers />} />
           <Route path="content" element={<AdminContent />} />
           <Route path="pages" element={<WriterPages />} />
@@ -110,30 +78,6 @@ export default function App() {
           <Route path="analytics" element={<AdminAnalytics />} />
           <Route path="revenue" element={<AdminRevenue />} />
           <Route path="settings" element={<AdminSettings />} />
-        </Route>
-        <Route
-          path="super-admin/*"
-          element={
-            <RequireAuth>
-              <RequireRole role="super-admin">
-                <AdminLayout />
-              </RequireRole>
-            </RequireAuth>
-          }
-        >
-          <Route index element={<SuperAdminOverview />} />
-          <Route path="host-applications" element={<SuperAdminHostApplications />} />
-          <Route path="support-tickets" element={<SuperAdminSupportTickets />} />
-          <Route path="hierarchy" element={<RoleHierarchy />} />
-          <Route path="administration" element={<Administration />} />
-          <Route path="customers" element={<Customers />} />
-          <Route path="website-content" element={<WebsiteContentManager area="super-admin" />} />
-          <Route path="intelligence" element={<SuperAdminIntelligence />} />
-          <Route path="pages" element={<WriterPages />} />
-          <Route path="blog" element={<WriterBlog />} />
-          <Route path="guides-content" element={<WriterGuidesContent />} />
-          <Route path="media" element={<WriterMedia />} />
-          <Route path="seo" element={<WriterSeo />} />
         </Route>
         <Route
           path="regional-head/*"
@@ -166,10 +110,10 @@ export default function App() {
           <Route path="customers" element={<Customers title="Customers" description="Travelers you have helped or can assist." />} />
         </Route>
         <Route
-          path="content-writer/*"
+          path="content-manager/*"
           element={
             <RequireAuth>
-              <RequireRole role="content-writer">
+              <RequireRole role="content-manager">
                 <WriterLayout />
               </RequireRole>
             </RequireAuth>
@@ -179,7 +123,7 @@ export default function App() {
           <Route path="pages" element={<WriterPages />} />
           <Route path="blog" element={<WriterBlog />} />
           <Route path="guides-content" element={<WriterGuidesContent />} />
-          <Route path="website-content" element={<WebsiteContentManager area="content-writer" />} />
+          <Route path="website-content" element={<WebsiteContentManager area="content-manager" />} />
           <Route path="media" element={<WriterMedia />} />
           <Route path="seo" element={<WriterSeo />} />
         </Route>
@@ -201,27 +145,10 @@ export default function App() {
           <Route path="earnings" element={<HostEarnings />} />
           <Route path="performance" element={<HostPerformance />} />
         </Route>
-        <Route
-          path="guide/*"
-          element={
-            <RequireAuth>
-              <RequireRole role="guide">
-                <GuideLayout />
-              </RequireRole>
-            </RequireAuth>
-          }
-        >
-          <Route index element={<GuideOverview />} />
-          <Route path="my-tours" element={<GuideMyTours />} />
-          <Route path="my-bookings" element={<GuideMyBookings />} />
-          <Route path="schedule" element={<GuideSchedule />} />
-          <Route path="customers" element={<Customers title="My Customers" description="Travelers you have guided or can help." />} />
-          <Route path="earnings" element={<GuideEarnings />} />
-          <Route path="profile" element={<GuideProfile />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Unknown dashboard URLs fall back to login. */}
+        <Route path="*" element={<Navigate to="/dashboard/login" replace />} />
       </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard/login" replace />} />
     </Routes>
   )
 }

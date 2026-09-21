@@ -17,13 +17,11 @@ type AdminUser = {
 };
 
 const ROLE_TONE: Record<string, "info" | "primary" | "success" | "default" | "danger" | "warning"> = {
-  "super-admin": "danger",
   admin: "primary",
-  "content-writer": "info",
+  "content-manager": "info",
   "regional-head": "info",
   "customer-support": "warning",
   host: "success",
-  guide: "success",
   traveler: "default",
 };
 

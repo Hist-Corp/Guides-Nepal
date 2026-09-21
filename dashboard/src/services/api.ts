@@ -8,7 +8,7 @@ export async function login(payload: { email: string; password: string }) {
 export async function registerUser(payload: {
   email: string
   password: string
-  role?: "admin" | "host" | "guide" | "traveler"
+  role?: "admin" | "content-manager" | "regional-head" | "customer-support" | "host" | "traveler"
   firstName?: string
   lastName?: string
   phone?: string

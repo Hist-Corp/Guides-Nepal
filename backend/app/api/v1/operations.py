@@ -1,10 +1,10 @@
 """Operations endpoints: host applications and support tickets.
 
 Role guards (via ``has_access``):
-- Host applications: super-admin / admin / regional-head
+- Host applications: admin / regional-head
   (regional heads manage applications for their region).
-- Support tickets: super-admin / admin / customer-support.
-Super-admin is universally authorized by ``has_access``.
+- Support tickets: admin / customer-support.
+Admin is the highest role and is authorized on both guard groups.
 """
 
 from typing import Optional
@@ -15,15 +15,15 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.dependencies import require_role
-from app.core.roles import ADMIN, CUSTOMER_SUPPORT, REGIONAL_HEAD, SUPER_ADMIN
+from app.core.roles import ADMIN, CUSTOMER_SUPPORT, REGIONAL_HEAD
 from app.models.host_application import HostApplication
 from app.models.support_ticket import SupportTicket
 from app.models.user import User
 
 router = APIRouter()
 
-APPLICATION_STAFF = [SUPER_ADMIN, ADMIN, REGIONAL_HEAD]
-TICKET_STAFF = [SUPER_ADMIN, ADMIN, CUSTOMER_SUPPORT]
+APPLICATION_STAFF = [ADMIN, REGIONAL_HEAD]
+TICKET_STAFF = [ADMIN, CUSTOMER_SUPPORT]
 
 
 class HostApplicationCreate(BaseModel):

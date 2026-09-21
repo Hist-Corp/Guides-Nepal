@@ -35,11 +35,14 @@ Source: `backend/app/core/config.py`, `backend/app/core/security.py`, `backend/a
 Canonical roles in `backend/app/core/roles.py`:
 
 ```
-super-admin > admin > content-writer > regional-head > customer-support > host > guide > traveler
+admin > content-manager > regional-head > customer-support > host
 ```
 
-- Super-admin implicitly passes every role guard via `has_access()`.
-- Dashboard roles: `super-admin`, `admin`, `content-writer`, `regional-head`, `customer-support`, `host`, `guide`.
+- Admin implicitly passes every role guard via `has_access()`.
+- Dashboard roles: `admin`, `content-manager`, `regional-head`, `customer-support`, `host`.
+- The former `super-admin` and `guide` dashboard roles were removed; accounts holding
+  them no longer pass any guard. Legacy `content-writer` values still resolve to
+  `content-manager` with identical permissions.
 
 ## Frontend security
 - Environment validation (HTTPS Supabase URL) and input sanitization utilities.

@@ -36,7 +36,7 @@ export default function WriterOverview() {
 
   return (
     <PageShell
-      title="Content Writer Overview"
+      title="Content Manager Overview"
       description="Quick overview of your content and a shortcut to the live website."
       action={
         <Button

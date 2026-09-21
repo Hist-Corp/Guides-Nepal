@@ -1,18 +1,23 @@
 """Set known passwords for dev seed users that had undocumented passwords."""
+from app.core.roles import (
+    ADMIN,
+    CONTENT_MANAGER,
+    CUSTOMER_SUPPORT,
+    HOST,
+    REGIONAL_HEAD,
+)
 from app.core.database import SessionLocal
 from app.core.security import get_password_hash, verify_password, validate_password_strength
 from app.models.user import User
 
-# All credentials for every role in the project
+# All credentials for every dashboard role in the project.
+# Role hierarchy: admin > content-manager > regional-head > customer-support > host
 CREDENTIALS = {
-    "admin@guides-nepal.com":       {"password": "Admin@12345",      "role": "admin"},
-    "superadmin@guides-nepal.com":   {"password": "SuperAdmin@2024",  "role": "super-admin"},
-    "regional@guides-nepal.com":     {"password": "Regional@2024",    "role": "regional-head"},
-    "support@guides-nepal.com":      {"password": "Support@2024",     "role": "customer-support"},
-    "writer@guides-nepal.com":       {"password": "Writer@12345",     "role": "content-writer"},
-    "host@guides-nepal.com":         {"password": "Host@12345",       "role": "host"},
-    "guide@guides-nepal.com":        {"password": "Guide@12345",      "role": "guide"},
-    "traveler@guides-nepal.com":     {"password": "Traveler@12345",   "role": "traveler"},
+    "admin@guides-nepal.com":        {"password": "Admin@12345",      "role": ADMIN},
+    "content@guides-nepal.com":      {"password": "Content@2024",     "role": CONTENT_MANAGER},
+    "regional@guides-nepal.com":     {"password": "Regional@2024",    "role": REGIONAL_HEAD},
+    "support@guides-nepal.com":      {"password": "Support@2024",     "role": CUSTOMER_SUPPORT},
+    "host@guides-nepal.com":         {"password": "Host@2024",        "role": HOST},
 }
 
 db = SessionLocal()

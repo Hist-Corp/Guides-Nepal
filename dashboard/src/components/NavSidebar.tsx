@@ -117,40 +117,15 @@ export default function NavSidebar() {
   const { theme, toggleTheme } = useTheme()
   const base = role ? `/dashboard/${role}` : "/dashboard/login"
   const groups: NavGroup[] =
-    role === "super-admin"
+    role === "admin"
       ? [
-          { heading: "Overview", items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }] },
           {
-            heading: "Governance",
+            heading: "Overview",
             items: [
-              { to: `${base}/hierarchy`, label: "Role Hierarchy", icon: "shield" },
-              { to: `${base}/administration`, label: "Administration", icon: "settings" },
+              { to: `${base}`, label: "Dashboard", icon: "grid" },
+              { to: `${base}/platform`, label: "Platform", icon: "globe" },
             ],
           },
-          {
-            heading: "Operations",
-            items: [
-              { to: `${base}/host-applications`, label: "Host Applications", icon: "mail" },
-              { to: `${base}/support-tickets`, label: "Support Tickets", icon: "ticket" },
-              { to: `${base}/customers`, label: "Customers", icon: "user" },
-            ],
-          },
-          {
-            heading: "Content & Growth",
-            items: [
-              { to: `${base}/website-content`, label: "Website Content", icon: "globe" },
-              { to: `${base}/pages`, label: "Pages", icon: "map" },
-              { to: `${base}/blog`, label: "Blog", icon: "pen" },
-              { to: `${base}/guides-content`, label: "Guides Content", icon: "compass" },
-              { to: `${base}/media`, label: "Media Library", icon: "photo" },
-              { to: `${base}/seo`, label: "SEO Settings", icon: "search" },
-              { to: `${base}/intelligence`, label: "Intelligence", icon: "chart" },
-            ],
-          },
-        ]
-      : role === "admin"
-      ? [
-          { heading: "Overview", items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }] },
           {
             heading: "Marketplace",
             items: [
@@ -160,10 +135,20 @@ export default function NavSidebar() {
             ],
           },
           {
+            heading: "Governance",
+            items: [
+              { to: `${base}/host-applications`, label: "Host Applications", icon: "mail" },
+              { to: `${base}/support-tickets`, label: "Support Tickets", icon: "ticket" },
+              { to: `${base}/hierarchy`, label: "Role Hierarchy", icon: "shield" },
+              { to: `${base}/administration`, label: "Administration", icon: "settings" },
+            ],
+          },
+          {
             heading: "Growth",
             items: [
               { to: `${base}/analytics`, label: "Analytics", icon: "chart" },
               { to: `${base}/revenue`, label: "Revenue", icon: "wallet" },
+              { to: `${base}/intelligence`, label: "Intelligence", icon: "chart" },
             ],
           },
           {
@@ -181,7 +166,6 @@ export default function NavSidebar() {
             items: [
               { to: `${base}/content`, label: "Content", icon: "pen" },
               { to: `${base}/website-content`, label: "Website Content", icon: "globe" },
-              { to: `${base}/administration`, label: "Administration", icon: "settings" },
               { to: `${base}/settings`, label: "Settings", icon: "settings" },
             ],
           },
@@ -203,26 +187,6 @@ export default function NavSidebar() {
               { to: `${base}/earnings`, label: "Earnings", icon: "wallet" },
               { to: `${base}/performance`, label: "Performance", icon: "chart" },
               { to: `${base}/customers`, label: "Customers", icon: "user" },
-            ],
-          },
-        ]
-      : role === "guide"
-      ? [
-          { heading: "Overview", items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }] },
-          {
-            heading: "Work",
-            items: [
-              { to: `${base}/my-tours`, label: "My Tours", icon: "map" },
-              { to: `${base}/my-bookings`, label: "My Bookings", icon: "calendar" },
-              { to: `${base}/schedule`, label: "Schedule", icon: "calendar" },
-            ],
-          },
-          {
-            heading: "You",
-            items: [
-              { to: `${base}/earnings`, label: "Earnings", icon: "wallet" },
-              { to: `${base}/customers`, label: "Customers", icon: "user" },
-              { to: `${base}/profile`, label: "Profile", icon: "user" },
             ],
           },
         ]
@@ -250,7 +214,7 @@ export default function NavSidebar() {
             ],
           },
         ]
-      : role === "content-writer"
+      : role === "content-manager"
       ? [
           { heading: "Overview", items: [{ to: `${base}`, label: "Dashboard", icon: "grid" }] },
           {

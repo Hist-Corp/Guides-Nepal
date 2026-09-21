@@ -16,33 +16,33 @@ This repository contains a Vite + React frontend, an optional dashboard app, and
 
 ## User Roles & Permissions
 
-Guides Nepal has a comprehensive role-based access control (RBAC) system with 8 user roles, each with specific permissions and dashboard access.
+Guides Nepal has a comprehensive role-based access control (RBAC) system with 5 dashboard
+roles, each with specific permissions and dashboard access. Travelers use the public site
+and are not part of the dashboard hierarchy.
 
 ### Role Hierarchy
 
 ```
-Super Admin
-    └── Admin
-            ├── Regional Head (by region)
-            ├── Customer Support
-            ├── Content Writer
-            ├── Host (approved)
-            └── Guide (approved)
-    └── Traveler (default role for all users)
+Admin
+    ├── Content Manager
+    ├── Regional Head (by region)
+    ├── Customer Support
+    └── Host
 ```
 
 ### Complete User Roles Table
 
 | Role | Dashboard Access | Key Permissions |
 |------|-----------------|-----------------|
-| **Super Admin** | `/super-admin/*` | Full system access, manage all users, approve/reject host applications, manage support tickets, system-wide analytics |
-| **Admin** | `/admin/*` | Manage users, hosts, guides, content, analytics, revenue reports, regional head applications |
+| **Admin** | `/admin/*` | Full system access, manage users, hosts, guides, content, host applications, support tickets, analytics, revenue reports, role hierarchy |
+| **Content Manager** | `/content-manager/*` | Create/edit pages, blog posts, guides content, media uploads, SEO settings |
 | **Regional Head** | `/regional-head/*` | Manage host applications for assigned region, view regional information |
 | **Customer Support** | `/customer-support/*` | View and manage support tickets, respond to customer inquiries |
-| **Content Writer** | `/content-writer/*` | Create/edit pages, blog posts, guides content, media uploads, SEO settings |
 | **Host** | `/host/*` | Manage own tours, view bookings, track earnings, view performance metrics |
-| **Guide** | `/guide/*` | Manage own tours, view bookings, manage schedule, track earnings, edit profile |
 | **Traveler** | `/` (public site) | Browse experiences, book tours, chat with guides, view profiles (default role) |
+
+> **Note:** The former Super Admin and Guide dashboard roles were removed. Admin is now
+> the top of the hierarchy and holds full system access.
 
 ### Pre-configured Seed Users
 
@@ -51,9 +51,10 @@ The system comes with the following pre-configured users for development and tes
 | Email | Role | Password | Region/Scope |
 |-------|------|----------|--------------|
 | `admin@guides-nepal.com` | Admin | `Admin@12345` | Full system |
-| `superadmin@guides-nepal.com` | Super Admin | `SuperAdmin@2024` | Full system |
+| `content@guides-nepal.com` | Content Manager | `Content@2024` | Pages · Blog · Media · SEO |
 | `regional@guides-nepal.com` | Regional Head | `Regional@2024` | Kathmandu Valley |
-| `support@guides-nepal.com` | Customer Support | `Support@2024` | Full system |
+| `support@guides-nepal.com` | Customer Support | `Support@2024` | Tickets · FAQ |
+| `host@guides-nepal.com` | Host | `Host@2024` | Tours · Bookings · Earnings |
 
 > **⚠️ Security Notice:** These are development-only credentials. Always change default passwords before deploying to production. For security, these credentials are stored in `backend/.env` and should never be committed to version control.
 
@@ -68,16 +69,15 @@ The system comes with the following pre-configured users for development and tes
 - `/contact` - Contact page
 - `/faq` - FAQ
 
-#### Super Admin (`super-admin` role)
-- `/super-admin` - Overview dashboard
-- `/super-admin/host-applications` - Review all host applications
-- `/super-admin/support-tickets` - View all support tickets
-- `/super-admin/website-content` - Full website content management
-
 #### Admin (`admin` role)
 - `/admin` - Admin overview
+- `/admin/platform` - Platform-wide overview
 - `/admin/hosts` - Manage hosts
 - `/admin/guides` - Manage guides
+- `/admin/host-applications` - Review all host applications
+- `/admin/support-tickets` - View all support tickets
+- `/admin/hierarchy` - Role hierarchy
+- `/admin/intelligence` - Platform intelligence
 - `/admin/analytics` - Analytics dashboard
 - `/admin/revenue` - Revenue reports
 - `/admin/settings` - System settings
@@ -93,13 +93,13 @@ The system comes with the following pre-configured users for development and tes
 - `/customer-support/tickets` - Support tickets
 - `/customer-support/faq` - FAQ management
 
-#### Content Writer (`content-writer` role)
-- `/content-writer` - Content overview
-- `/content-writer/pages` - Manage pages
-- `/content-writer/blog` - Blog management
-- `/content-writer/guides-content` - Guides content
-- `/content-writer/media` - Media library
-- `/content-writer/seo` - SEO settings
+#### Content Manager (`content-manager` role)
+- `/content-manager` - Content overview
+- `/content-manager/pages` - Manage pages
+- `/content-manager/blog` - Blog management
+- `/content-manager/guides-content` - Guides content
+- `/content-manager/media` - Media library
+- `/content-manager/seo` - SEO settings
 
 #### Host (`host` role)
 - `/host` - Host overview
@@ -109,35 +109,25 @@ The system comes with the following pre-configured users for development and tes
 - `/host/earnings` - Earnings dashboard
 - `/host/performance` - Performance metrics
 
-#### Guide (`guide` role)
-- `/guide` - Guide overview
-- `/guide/my-tours` - Own tours
-- `/guide/my-bookings` - View bookings
-- `/guide/schedule` - Schedule management
-- `/guide/earnings` - Earnings
-- `/guide/profile` - Profile management
-
 ### Role Selection During Registration
 
 When registering through the dashboard, users can select their intended role:
-- `super-admin` - System administrator
-- `admin` - Administrator
-- `content-writer` - Content creator
+- `admin` - Administrator (full system access)
+- `content-manager` - Content creator
 - `regional-head` - Regional manager
 - `customer-support` - Support staff
 - `host` - Tour host
-- `guide` - Local guide
 
-After registration, hosts and guides must be approved by an admin or regional head before they can access their full dashboard features.
+After registration, hosts must be approved by an admin or regional head before they can access their full dashboard features.
 
 ## Key features
 
 - Experience browsing with consistent booking UI
 - JWT + OAuth authentication (Google, Facebook)
-- Booking management and host/guide workflows
+- Booking management and host workflows
 - User profiles with avatar/photo uploads and bookmarks
 - AI chat assistant (Ollama local model or OpenAI) with streaming support
-- Role-based admin dashboard (Super Admin, Admin, Regional Head, Customer Support, Content Writer, Host, Guide)
+- Role-based admin dashboard (Admin, Content Manager, Regional Head, Customer Support, Host)
 - Mobile-first responsive UI using Tailwind CSS
 
 ---

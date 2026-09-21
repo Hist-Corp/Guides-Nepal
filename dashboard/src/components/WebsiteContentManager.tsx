@@ -4,6 +4,7 @@ import SectionCard from "./SectionCard";
 import Button from "./Button";
 import Loading from "./Loading";
 import LivePageEditor, { type Section } from "../writer/LivePageEditor";
+import { FRONTEND_URL } from "../config/api";
 import { FRONTEND_PAGES, FrontendPage } from "../config/frontendPages";
 import { getFrontendContent, frontendFooter } from "../config/frontendContent";
 import { updateAllSections } from "../services/api";
@@ -90,7 +91,7 @@ function buildSections(page: FrontendPage): Section[] {
   return sections;
 }
 
-export default function WebsiteContentManager({ area }: { area: "admin" | "super-admin" | "content-writer" }) {
+export default function WebsiteContentManager({ area }: { area: "admin" | "content-manager" }) {
   const [editing, setEditing] = useState<FrontendPage | null>(null);
   const [savingSlug, setSavingSlug] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -124,7 +125,7 @@ export default function WebsiteContentManager({ area }: { area: "admin" | "super
       title="Website Content"
       description="Edit the content of the public website with a live preview. Click a page, then click sections in the preview to edit text and styling."
       action={
-        <Button variant="secondary" onClick={() => window.open("/", "_blank")}>
+        <Button variant="secondary" onClick={() => window.open(FRONTEND_URL, "_blank")}>
           View live site
         </Button>
       }

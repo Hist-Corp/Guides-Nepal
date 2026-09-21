@@ -3,35 +3,32 @@ import StatCard from "../components/StatCard";
 import Badge from "../components/Badge";
 
 const HIERARCHY = [
-  { role: "super-admin", emoji: "🛡️", label: "Super Admin", note: "Full system", level: 1 },
-  { role: "admin", emoji: "⚙️", label: "Admin", note: "Full system", level: 2 },
-  { role: "content-writer", emoji: "✍️", label: "Content Writer", note: "CMS creator", level: 3 },
-  { role: "regional-head", emoji: "🗺️", label: "Regional Head", note: "Scoped by region", level: 4 },
-  { role: "customer-support", emoji: "🎧", label: "Customer Support", note: "Tickets & FAQ", level: 5 },
-  { role: "host", emoji: "🏠", label: "Host (approved)", note: "Own records", level: 6 },
-  { role: "guide", emoji: "🧭", label: "Guide (approved)", note: "Own records", level: 7 },
-  { role: "traveler", emoji: "🎒", label: "Traveler (default)", note: "Public site", level: 8 },
+  { role: "admin", emoji: "⚙️", label: "Admin", note: "Full system", level: 1 },
+  { role: "content-manager", emoji: "✍️", label: "Content Manager", note: "CMS & content", level: 2 },
+  { role: "regional-head", emoji: "🗺️", label: "Regional Head", note: "Scoped by region", level: 3 },
+  { role: "customer-support", emoji: "🎧", label: "Customer Support", note: "Tickets & FAQ", level: 4 },
+  { role: "host", emoji: "🏠", label: "Host", note: "Own records", level: 5 },
 ];
 
 type Perm = "full" | "own" | "region" | "no";
-const ROLES = ["super-admin", "admin", "regional-head", "customer-support", "content-writer", "host", "guide", "traveler"];
+const ROLES = ["admin", "content-manager", "regional-head", "customer-support", "host"];
 const ROW_LABELS: Record<string, string> = {
-  "super-admin": "Super\nAdmin",
   admin: "Admin",
+  "content-manager": "Content\nManager",
   "regional-head": "Regional\nHead",
   "customer-support": "Cust.\nSupport",
-  "content-writer": "Writer",
+  host: "Host",
 };
 
 const MATRIX: { area: string; perms: Record<string, Perm> }[] = [
-  { area: "Users & roles", perms: { "super-admin": "full", admin: "full", "regional-head": "no", "customer-support": "no", "content-writer": "no", host: "no", guide: "no", traveler: "no" } },
-  { area: "Host applications", perms: { "super-admin": "full", admin: "full", "regional-head": "region", "customer-support": "no", "content-writer": "no", host: "no", guide: "no", traveler: "no" } },
-  { area: "Support tickets", perms: { "super-admin": "full", admin: "no", "regional-head": "no", "customer-support": "full", "content-writer": "no", host: "no", guide: "no", traveler: "no" } },
-  { area: "Website content", perms: { "super-admin": "full", admin: "full", "regional-head": "no", "customer-support": "no", "content-writer": "own", host: "no", guide: "no", traveler: "no" } },
-  { area: "Pages, blog & SEO", perms: { "super-admin": "full", admin: "full", "regional-head": "no", "customer-support": "no", "content-writer": "own", host: "no", guide: "no", traveler: "no" } },
-  { area: "Media library", perms: { "super-admin": "full", admin: "full", "regional-head": "no", "customer-support": "no", "content-writer": "own", host: "no", guide: "no", traveler: "no" } },
-  { area: "Tours & bookings", perms: { "super-admin": "full", admin: "full", "regional-head": "no", "customer-support": "no", "content-writer": "no", host: "own", guide: "own", traveler: "no" } },
-  { area: "Earnings & payouts", perms: { "super-admin": "full", admin: "full", "regional-head": "no", "customer-support": "no", "content-writer": "no", host: "own", guide: "own", traveler: "no" } },
+  { area: "Users & roles", perms: { admin: "full", "content-manager": "no", "regional-head": "no", "customer-support": "no", host: "no" } },
+  { area: "Host applications", perms: { admin: "full", "content-manager": "no", "regional-head": "region", "customer-support": "no", host: "no" } },
+  { area: "Support tickets", perms: { admin: "full", "content-manager": "no", "regional-head": "no", "customer-support": "full", host: "no" } },
+  { area: "Website content", perms: { admin: "full", "content-manager": "own", "regional-head": "no", "customer-support": "no", host: "no" } },
+  { area: "Pages, blog & SEO", perms: { admin: "full", "content-manager": "own", "regional-head": "no", "customer-support": "no", host: "no" } },
+  { area: "Media library", perms: { admin: "full", "content-manager": "own", "regional-head": "no", "customer-support": "no", host: "no" } },
+  { area: "Tours & bookings", perms: { admin: "full", "content-manager": "no", "regional-head": "no", "customer-support": "no", host: "own" } },
+  { area: "Earnings & payouts", perms: { admin: "full", "content-manager": "no", "regional-head": "no", "customer-support": "no", host: "own" } },
 ];
 
 const PERM_CLASS: Record<Perm, { label: string; cls: string }> = {
@@ -45,14 +42,14 @@ export default function RoleHierarchy() {
   return (
     <PageShell
       title="Role Hierarchy"
-      description="Who can do what — the RBAC model powering every console. Admin & Super Admin hold Full content access; writers, hosts and guides edit only their own."
+      description="Who can do what — the RBAC model powering every console. Admin holds Full content access; content managers and hosts edit only their own."
       noCard
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <StatCard label="Roles defined" value="8" icon="🛡️" accent="bg-brand-100" />
-        <StatCard label="Console types" value="7" icon="🖥️" accent="bg-sky-100" />
+        <StatCard label="Roles defined" value={String(HIERARCHY.length)} icon="🛡️" accent="bg-brand-100" />
+        <StatCard label="Console types" value={String(ROLES.length)} icon="🖥️" accent="bg-sky-100" />
         <StatCard label="Capability zones" value={String(MATRIX.length)} icon="🗂️" accent="bg-amber-50" />
-        <StatCard label="Full-access admins" value="2" icon="👑" accent="bg-rose-100" />
+        <StatCard label="Full-access admins" value="1" icon="👑" accent="bg-rose-100" />
       </div>
 
       <div className="space-y-2">
@@ -63,7 +60,7 @@ export default function RoleHierarchy() {
               <div className="text-sm font-bold text-darkBlue dark:text-slate-100">{n.label}</div>
               <div className="text-[11px] text-gray-500">{n.note}</div>
             </div>
-            <Badge variant="info" size="sm">Level {n.level} / 8</Badge>
+            <Badge variant="info" size="sm">Level {n.level} / {ROLES.length}</Badge>
           </div>
         ))}
       </div>
@@ -108,7 +105,7 @@ export default function RoleHierarchy() {
 
       <div className="mt-3 gn-card rounded-2xl border border-gray-200/70 text-xs text-gray-600 dark:text-slate-300">
         🔐 In production this maps to JWT claims + backend middleware (<span className="font-mono">/api/v1/admin/*</span> guards).
-        Admin and Super Admin get full content access; content writers, hosts and guides only edit their own.
+        Admin gets full content access; content managers and hosts only edit their own.
       </div>
     </PageShell>
   );

@@ -45,12 +45,16 @@ Health: `GET /health`, `GET /api/v1/health`. OpenAPI docs at `/api/v1/docs` only
 Roles defined in `backend/app/core/roles.py`:
 
 ```
-super-admin > admin > content-writer > regional-head > customer-support > host > guide > traveler
+admin > content-manager > regional-head > customer-support > host
 ```
 
-All role guards go through `has_access()`; super-admin implicitly passes every guard. The
-dashboard exposes one area per role (`superadmin/`, `admin/`, `regionalhead/`, `support/`,
-`writer/`, `host/`, `guide/`) behind auth guards; travelers use the public site.
+All role guards go through `has_access()`; admin implicitly passes every guard. The
+dashboard exposes one area per role (`admin/`, `regionalhead/`, `support/`,
+`writer/`, `host/`) behind auth guards; travelers use the public site.
+
+> The former `super-admin` and `guide` dashboard roles were removed during the hierarchy
+> refactor; the platform-wide governance pages they hosted (host applications, support
+> tickets, role hierarchy, intelligence) now live under the Admin console.
 
 ## 5. Frontend Data Flow
 

@@ -1,37 +1,34 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Compass, Eye, EyeOff, Moon, Sun } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { login } from '../services/api';
-import { normalizeRole } from '../utils/roles';
+import { normalizeRole, Role } from '../utils/roles';
 import { useAuthStore } from '../state/authStore';
 import { useTheme } from '../hooks/useTheme';
 import ForgotPasswordModal from './ForgotPasswordModal';
 import HelpFaqModal from '../components/HelpFaqModal';
 import nepalHero from '../assets/nepal-hero.jpg';
+import { FRONTEND_URL } from '../config/api';
 
 // Role identity shown in the sign-in dropdown — roles only, never real names.
 const ROLE_EMOJIS: Record<string, string> = {
-  'super-admin': '🛡️',
   admin: '⚙️',
-  'content-writer': '✍️',
+  'content-manager': '✍️',
   'regional-head': '🗺️',
   'customer-support': '🎧',
   host: '🏠',
-  guide: '🧭',
 };
 
 // Dev seed credentials per role (backend/seed_*.py). Picking a role in the
 // dropdown pre-fills these so you can sign straight in — the list shows only
 // the role you are logging in as.
 const ROLE_ACCOUNTS: { value: string; label: string; email: string; password: string; scope: string }[] = [
-  { value: 'super-admin', label: 'Super Admin', email: 'superadmin@guides-nepal.com', password: 'SuperAdmin@2024', scope: 'Full system access' },
   { value: 'admin', label: 'Admin', email: 'admin@guides-nepal.com', password: 'Admin@12345', scope: 'Full system access' },
-  { value: 'content-writer', label: 'Content Writer', email: 'content@guides-nepal.com', password: 'Content@2024', scope: 'Pages · Blog · Media · SEO' },
+  { value: 'content-manager', label: 'Content Manager', email: 'content@guides-nepal.com', password: 'Content@2024', scope: 'Pages · Blog · Media · SEO' },
   { value: 'regional-head', label: 'Regional Head', email: 'regional@guides-nepal.com', password: 'Regional@2024', scope: 'Kathmandu Valley' },
   { value: 'customer-support', label: 'Customer Support', email: 'support@guides-nepal.com', password: 'Support@2024', scope: 'Tickets · FAQ' },
   { value: 'host', label: 'Host', email: 'host@guides-nepal.com', password: 'Host@2024', scope: 'Tours · Bookings · Earnings' },
-  { value: 'guide', label: 'Guide', email: 'guide@guides-nepal.com', password: 'Guide@2024', scope: 'Schedule · Tours · Payouts' },
 ];
 
 /**
@@ -60,9 +57,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
-  const [selectRole, setSelectRole] = useState<
-    'super-admin' | 'admin' | 'content-writer' | 'regional-head' | 'customer-support' | 'host' | 'guide'
-  >('admin');
+  const [selectRole, setSelectRole] = useState<Role>('admin');
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -94,12 +89,12 @@ export default function LoginPage() {
     };
   }, [menuOpen]);
 
-  const selectedAccount = ROLE_ACCOUNTS.find((a) => a.value === selectRole) ?? ROLE_ACCOUNTS[1];
+  const selectedAccount = ROLE_ACCOUNTS.find((a) => a.value === selectRole) ?? ROLE_ACCOUNTS[0];
 
   const pickRole = (value: string) => {
     const acc = ROLE_ACCOUNTS.find((a) => a.value === value);
     if (!acc) return;
-    setSelectRole(value as any);
+    setSelectRole(value as Role);
     setEmail(acc.email);
     setPassword(acc.password);
     setMenuOpen(false);
@@ -169,14 +164,14 @@ export default function LoginPage() {
 
       {/* ---------- Top bar ---------- */}
       <header className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-5 py-5 sm:px-8">
-        <Link to="/" className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5">
           <div className="grid h-10 w-10 place-items-center rounded-xl bg-white/15 font-black text-white ring-1 ring-white/30 backdrop-blur">
             ग
           </div>
           <div className="text-sm font-black uppercase tracking-[0.22em] text-white drop-shadow">
             Guides<span className="font-light"> Nepal</span>
           </div>
-        </Link>
+        </div>
         <button
           type="button"
           onClick={() => setHelpOpen(true)}
@@ -201,7 +196,7 @@ export default function LoginPage() {
             Where your journey becomes a story — book the person, not just the place.
           </p>
           <p className="mt-3 max-w-sm text-xs leading-relaxed text-white/70">
-            Dashboard &amp; CMS demo · 7 role consoles · runs fully in your browser, no backend connected.
+            Dashboard &amp; CMS demo · 5 role consoles · runs fully in your browser, no backend connected.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-2">
@@ -443,9 +438,14 @@ export default function LoginPage() {
 
             <div className={cn('mt-5 border-t pt-4 text-center text-[11px]', dark ? 'border-white/10 text-white/50' : 'border-slate-200 text-slate-500')}>
               Are you new?{' '}
-              <Link to="/" className={cn('font-bold', dark ? 'text-brand-300 hover:text-brand-200' : 'text-brand-600 hover:underline')}>
+              <a
+                href={FRONTEND_URL}
+                target="_blank"
+                rel="noreferrer"
+                className={cn('font-bold', dark ? 'text-brand-300 hover:text-brand-200' : 'text-brand-600 hover:underline')}
+              >
                 Explore the platform
-              </Link>
+              </a>
               {' · '}
               <button
                 type="button"

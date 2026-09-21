@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { getAdminStats, getHostApplications, getSupportTickets } from "../services/api"
 import PageShell from "../components/PageShell"
 import SectionCard from "../components/SectionCard"
 import HeroGreeting from "../components/HeroGreeting"
@@ -7,8 +6,9 @@ import KPICard from "../components/KPICard"
 import { GrowthAreaChart, DonutChartCard, WeeklyBarChart, HBarList } from "../components/charts"
 import Table from "../components/Table"
 import { growthSeries, weeklyBookings, mockSources, mockActivity, bookingsByCity } from "../mock/data"
+import { getAdminStats, getHostApplications, getSupportTickets } from "../services/api"
 
-export default function SuperAdminOverview() {
+export default function PlatformOverview() {
   const [stats, setStats] = useState<any>({})
   const [apps, setApps] = useState<any[]>([])
   const [tickets, setTickets] = useState<any[]>([])
@@ -31,7 +31,7 @@ export default function SuperAdminOverview() {
 
   return (
     <PageShell
-      title="Super Admin — Full Access"
+      title="Platform Overview"
       description="Platform-wide control: users, host applications, and support operations."
       noCard
     >

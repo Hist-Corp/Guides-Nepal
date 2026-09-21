@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 
 router = APIRouter()
 
-CMS_WRITER_OR_ADMIN = require_role("admin", "content-writer")
+CMS_MANAGER_OR_ADMIN = require_role("admin", "content-manager")
 
 DB: dict[str, list] = {
     "pages": [
@@ -258,7 +258,7 @@ def _compress_image(content: bytes, content_type: str) -> tuple[bytes, str]:
 
 
 @router.get("/media")
-def list_media(request: Request, current_user: User = Depends(CMS_WRITER_OR_ADMIN)):
+def list_media(request: Request, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)):
     reg = _load_registry()
     items = []
     for it in reg["items"]:
@@ -277,7 +277,7 @@ async def upload_media(
     request: Request,
     file: UploadFile = File(...),
     replace_id: int | None = None,
-    current_user: User = Depends(CMS_WRITER_OR_ADMIN),
+    current_user: User = Depends(CMS_MANAGER_OR_ADMIN),
 ):
     """Upload an image to the media library. Images are automatically
     compressed (downscaled to 1920px, JPEG q85) to reduce storage and
@@ -331,7 +331,7 @@ async def upload_media(
 async def upload_media_from_url(
     request: Request,
     payload: dict,
-    current_user: User = Depends(CMS_WRITER_OR_ADMIN),
+    current_user: User = Depends(CMS_MANAGER_OR_ADMIN),
 ):
     """Download an image from a URL and add it to the media library.
     The image is fetched, compressed, and stored like a regular upload."""
@@ -395,7 +395,7 @@ async def upload_media_from_url(
 
 
 @router.patch("/media/{item_id}")
-def update_media(item_id: int, payload: dict, current_user: User = Depends(CMS_WRITER_OR_ADMIN)):
+def update_media(item_id: int, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)):
     reg = _load_registry()
     for it in reg["items"]:
         if it["id"] == item_id:
@@ -406,7 +406,7 @@ def update_media(item_id: int, payload: dict, current_user: User = Depends(CMS_W
 
 
 @router.delete("/media/{item_id}")
-def delete_media(item_id: int, current_user: User = Depends(CMS_WRITER_OR_ADMIN)):
+def delete_media(item_id: int, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)):
     reg = _load_registry()
     item = next((i for i in reg["items"] if i["id"] == item_id), None)
     if item is None:
@@ -438,7 +438,7 @@ def get_placements(request: Request):
 
 
 @router.put("/placements/{key}")
-def set_placement(key: str, payload: dict, current_user: User = Depends(CMS_WRITER_OR_ADMIN)):
+def set_placement(key: str, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)):
     if key not in _PLACEMENT_KEYS:
         raise HTTPException(status_code=404, detail="Unknown placement slot")
     media_id = payload.get("media_id")
@@ -451,18 +451,30 @@ def set_placement(key: str, payload: dict, current_user: User = Depends(CMS_WRIT
 
 
 @router.delete("/placements/{key}")
-def clear_placement(key: str, current_user: User = Depends(CMS_WRITER_OR_ADMIN)):
+def clear_placement(key: str, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)):
     reg = _load_registry()
     reg["placements"].pop(key, None)
     _save_registry(reg)
     return {"status": "ok"}
 
 
-_crud_routes("pages", "pages", CMS_WRITER_OR_ADMIN)
-_crud_routes("blog", "blog", CMS_WRITER_OR_ADMIN)
-_crud_routes("guides", "guides-content", CMS_WRITER_OR_ADMIN)
-_crud_routes("media", "media", CMS_WRITER_OR_ADMIN)
-_crud_routes("seo", "seo", CMS_WRITER_OR_ADMIN)
+_crud_routes("pages", "pages", CMS_MANAGER_OR_ADMIN)
+_crud_routes("blog", "blog", CMS_MANAGER_OR_ADMIN)
+_crud_routes("guides", "guides-content", CMS_MANAGER_OR_ADMIN)
+_crud_routes("media", "media", CMS_MANAGER_OR_ADMIN)
+
+
+@router.get("/seo")
+def list_seo_public():
+    """Public read of SEO entries so anonymous site visitors can render pages.
+
+    Writes stay restricted to admins and content managers via the CRUD routes
+    below.
+    """
+    return _clone(DB["seo"])
+
+
+_crud_routes("seo", "seo", CMS_MANAGER_OR_ADMIN)
 # --- Page Sections (Live Editor) ---
 SECTION_OVERRIDES: dict[str, list] = {}
 NEXT_SECTION_ID = 100
@@ -576,33 +588,33 @@ def get_page_sections(
     """Public read of a page's sections so the website can render CMS content.
 
     Writes (POST/PUT/DELETE below) stay restricted to admins and content
-    writers; only this read is open so the live preview and the public site
+    managers; only this read is open so the live preview and the public site
     can display the saved content.
     """
     return {"slug": slug, "sections": _get_sections(slug)}
 
 
 @router.post("/pages/{slug}/sections")
-def create_page_section(slug: str, payload: dict, current_user: User = Depends(CMS_WRITER_OR_ADMIN)) -> dict:
+def create_page_section(slug: str, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)) -> dict:
     section = _upsert_section(slug, payload)
     return {"status": "ok", "section": section}
 
 
 @router.put("/pages/{slug}/sections/{section_id}")
-def update_page_section(slug: str, section_id: str, payload: dict, current_user: User = Depends(CMS_WRITER_OR_ADMIN)) -> dict:
+def update_page_section(slug: str, section_id: str, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)) -> dict:
     saved = _upsert_section(slug, {**payload, "id": section_id})
     return {"status": "ok", "section": saved}
 
 
 @router.put("/pages/{slug}/sections")
-def update_all_sections(slug: str, payload: dict, current_user: User = Depends(CMS_WRITER_OR_ADMIN)) -> dict:
+def update_all_sections(slug: str, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)) -> dict:
     sections = payload.get("sections", [])
     SECTION_OVERRIDES[slug] = _clone(sections)
     return {"status": "ok", "count": len(sections)}
 
 
 @router.delete("/pages/{slug}/sections/{section_id}")
-def delete_page_section(slug: str, section_id: str, current_user: User = Depends(CMS_WRITER_OR_ADMIN)) -> dict:
+def delete_page_section(slug: str, section_id: str, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)) -> dict:
     if slug not in SECTION_OVERRIDES:
         SECTION_OVERRIDES[slug] = _clone(DEFAULT_SECTIONS.get(slug, []))
     before = len(SECTION_OVERRIDES[slug])

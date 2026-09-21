@@ -1,9 +1,10 @@
-"""Dev seed: create super-admin, regional-head and customer-support users,
+"""Dev seed: create regional-head and customer-support users,
 plus sample host applications and support tickets. Idempotent."""
 
 from sqlalchemy import inspect, text
 
 from app.core.database import Base, engine, SessionLocal
+from app.core.roles import CUSTOMER_SUPPORT, REGIONAL_HEAD
 from app.core.security import get_password_hash
 from app import models  # noqa: F401  (register all models)
 from app.models.user import User
@@ -12,17 +13,10 @@ from app.models.support_ticket import SupportTicket
 
 USERS = [
     {
-        "email": "superadmin@guides-nepal.com",
-        "firstName": "Super",
-        "lastName": "Admin",
-        "role": "super-admin",
-        "password": "SuperAdmin@2024",
-    },
-    {
         "email": "regional@guides-nepal.com",
         "firstName": "Regional",
         "lastName": "Head",
-        "role": "regional-head",
+        "role": REGIONAL_HEAD,
         "region": "Kathmandu Valley",
         "password": "Regional@2024",
     },
@@ -30,7 +24,7 @@ USERS = [
         "email": "support@guides-nepal.com",
         "firstName": "Customer",
         "lastName": "Support",
-        "role": "customer-support",
+        "role": CUSTOMER_SUPPORT,
         "password": "Support@2024",
     },
 ]

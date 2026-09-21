@@ -11,7 +11,7 @@ export default function HelpFaqModal({ open, onClose }: { open: boolean; onClose
   if (!open) return null;
   const faqs = [
     { q: 'How do I pick the right console?', a: 'Use the “Sign in as” dropdown — it pre-fills the matching demo credentials for each of the 7 role consoles.' },
-    { q: 'Which roles can sign in here?', a: 'Super Admin, Admin, Content Writer, Regional Head, Customer Support, Host and Guide — each gets its own console.' },
+    { q: 'Which roles can sign in here?', a: 'Admin, Content Manager, Regional Head, Customer Support and Host — each gets its own console.' },
     { q: 'Is booking data live?', a: 'The dashboards read from the Guides Nepal API where configured; demo content runs fully in your browser.' },
     { q: 'Need more help?', a: 'Reach the support console from inside any dashboard, or email support@guides-nepal.com.' },
   ];
