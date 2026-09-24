@@ -1,6 +1,9 @@
 from typing import List, Optional
+import json
+import os
+import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -69,6 +72,41 @@ def submit_host_application(
     db.commit()
     db.refresh(application)
     return {"status": "ok", "id": application.id, "message": "Application received"}
+
+
+@router.post("/host-applications/submit", status_code=status.HTTP_201_CREATED)
+async def submit_host_application_wizard(
+    first_name: str = Form(...), last_name: str = Form(...), date_of_birth: str = Form(...),
+    nationality: str = Form(...), email: str = Form(...), phone: str = Form(...), address: str = Form(...),
+    city: str = Form(...), district: str = Form(...), languages: str = Form(...), host_type: str = Form(...),
+    business_name: str = Form(""), registration_number: str = Form(""), primary_city: str = Form(...),
+    years_experience: str = Form(...), expertise: str = Form(...), experience: str = Form(...),
+    proposedTitle: str = Form(...), proposedDescription: str = Form(...), proposedCategory: str = Form(...),
+    proposedDuration: str = Form(...), maxGuests: str = Form("8"), price: str = Form(...), availability: str = Form(...),
+    terms: bool = Form(False), privacy: bool = Form(False), accuracy: bool = Form(False),
+    identity: UploadFile = File(None), photo: UploadFile = File(None), license: UploadFile = File(None), certificate: UploadFile = File(None),
+    db: Session = Depends(get_db),
+):
+    if not all([first_name.strip(), last_name.strip(), date_of_birth, nationality.strip(), email.strip(), phone.strip(), address.strip(), city.strip(), district.strip(), primary_city.strip(), proposedTitle.strip(), proposedDescription.strip()]):
+        raise HTTPException(status_code=422, detail="Please complete all required fields")
+    if not (terms and privacy and accuracy):
+        raise HTTPException(status_code=422, detail="All declarations must be accepted")
+    if len(experience.strip()) < 50 or len(proposedDescription.strip()) < 30:
+        raise HTTPException(status_code=422, detail="Please provide more detail in the experience sections")
+    documents = {}
+    upload_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../uploads/host-applications"))
+    os.makedirs(upload_root, exist_ok=True)
+    for key, upload in {"identity": identity, "photo": photo, "license": license, "certificate": certificate}.items():
+        if not upload: continue
+        content = await upload.read()
+        if len(content) > 10 * 1024 * 1024 or upload.content_type not in {"application/pdf", "image/jpeg", "image/png"}:
+            raise HTTPException(status_code=422, detail=f"{key}: use PDF, JPG, or PNG files under 10 MB")
+        filename = f"{uuid.uuid4().hex}_{os.path.basename(upload.filename or 'document')}"
+        with open(os.path.join(upload_root, filename), "wb") as target: target.write(content)
+        documents[key] = filename
+    application = HostApplication(host_name=f"{first_name} {last_name}", email=email, phone=phone, city=city, region=district, experience=json.dumps({"host_type":host_type,"business_name":business_name,"registration_number":registration_number,"primary_city":primary_city,"years_experience":years_experience,"expertise":expertise,"languages":languages,"proposed_experience":{"title":proposedTitle,"description":proposedDescription,"category":proposedCategory,"duration":proposedDuration,"max_guests":maxGuests,"price":price,"availability":availability},"documents":documents}, ensure_ascii=False), status="pending")
+    db.add(application); db.commit(); db.refresh(application)
+    return {"id": application.id, "status": application.status, "message": "Application received"}
 
 
 # Mock Data to match frontend types exactly

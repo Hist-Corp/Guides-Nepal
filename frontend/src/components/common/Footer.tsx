@@ -52,7 +52,7 @@ export const Footer: React.FC = () => {
           <div>
             <h4 className="font-bold text-slate-900 mb-4">Become a host</h4>
             <ul className="space-y-2 text-sm text-slate-600">
-              <li><Link to="/host" className="hover:text-primary transition-colors">Become a host</Link></li>
+              <li><Link to="/host-application" className="hover:text-primary transition-colors">Become a host</Link></li>
               <li><Link to="/host-center" className="hover:text-primary transition-colors">Host center</Link></li>
             </ul>
           </div>

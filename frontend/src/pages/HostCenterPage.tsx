@@ -73,7 +73,7 @@ const HostCenterPage: React.FC = () => {
             <p className="text-slate-600 max-w-xl mx-auto mb-6">
               Join our community of local guides and start sharing your passion with travelers from around the world.
             </p>
-            <Link to="/become-host" className="inline-block bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary-hover transition-colors">
+            <Link to="/host-application" className="inline-block bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary-hover transition-colors">
               Become a Host
             </Link>
           </div>

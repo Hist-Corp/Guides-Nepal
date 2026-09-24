@@ -40,7 +40,7 @@ import ContactGuidePage from './pages/ContactGuidePage';
 import ImpactReportPage from './pages/ImpactReportPage';
 import ExplorePage from './pages/ExplorePage';
 import BecomeHostPage from './pages/host/BecomeHostPage';
-import HostApplicationPage from './pages/host/HostApplicationPage';
+import HostApplicationWizard from './pages/host/HostApplicationWizard';
 import BookingsPage from './pages/user/BookingsPage';
 import ProfilePage from './pages/user/ProfilePage';
 import AccountSettingsPage from './pages/user/AccountSettingsPage';
@@ -110,7 +110,7 @@ function App() {
             <Route path="/cooking-classes/experience/:slug" element={<CookingExperiencePage />} />
             <Route path="/explore" element={<ExplorePage />} />
             <Route path="/become-host" element={<BecomeHostPage />} />
-            <Route path="/host-application" element={<HostApplicationPage />} />
+            <Route path="/host-application" element={<HostApplicationWizard />} />
             <Route path="/bookings" element={<BookingsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/account" element={<AccountSettingsPage />} />
