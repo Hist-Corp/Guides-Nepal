@@ -94,7 +94,7 @@ async def submit_host_application_wizard(
     if len(experience.strip()) < 50 or len(proposedDescription.strip()) < 30:
         raise HTTPException(status_code=422, detail="Please provide more detail in the experience sections")
     documents = {}
-    upload_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../uploads/host-applications"))
+    upload_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../private_host_applications"))
     os.makedirs(upload_root, exist_ok=True)
     for key, upload in {"identity": identity, "photo": photo, "license": license, "certificate": certificate}.items():
         if not upload: continue

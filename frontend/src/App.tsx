@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 import ScrollToTop from './components/common/ScrollToTop';
 import SupportWidget from './components/common/SupportWidget';
+import CookieConsent from './components/common/CookieConsent';
+import Analytics from './components/common/Analytics';
 import PageReveal from './components/common/PageReveal';
 import CmsEditMode from './components/common/CmsEditMode';
 import CmsPreviewBridge from './components/CmsPreviewBridge';
@@ -48,6 +50,7 @@ import FavoritesPage from './pages/user/FavoritesPage';
 import ChatPage from './pages/user/ChatPage';
 import ConsentPage from './pages/ConsentPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import NotFoundPage from './pages/NotFoundPage';
 import MailaDaiChatPage from './pages/MailaDaiChatPage';
 import OAuthCallback from './pages/auth/OAuthCallback';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
@@ -176,9 +179,11 @@ function App() {
             <Route path="/host" element={<BecomeHostPage />} />
             <Route path="/careers" element={<JobsPage />} />
 
-            <Route path="*" element={<div>404 Not Found</div>} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
           <SupportWidget />
+          <CookieConsent />
+          <Analytics />
         </Router>
       </CartProvider>
     </CurrencyProvider>

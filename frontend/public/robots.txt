@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /account
+Disallow: /profile
+Disallow: /bookings
+Disallow: /chat
+Disallow: /host-application
+
+Sitemap: https://guides-nepal-nine.vercel.app/sitemap.xml
