@@ -349,12 +349,12 @@ export default function LivePageEditor({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-surface flex flex-col">
-      <div className="min-h-16 border-b border-line bg-gradient-to-r from-slate-100 via-surface to-accent-500/10 dark:from-slate-800/40 dark:via-surface dark:to-accent-500/10 flex items-center justify-between px-4 sm:px-5 py-2.5 gap-3 shrink-0">
+    <div className="fixed inset-0 z-50 w-screen max-w-screen overflow-hidden bg-surface flex flex-col">
+      <div className="min-h-16 border-b border-line bg-gradient-to-r from-slate-100 via-surface to-accent-500/10 dark:from-slate-800/40 dark:via-surface dark:to-accent-500/10 flex flex-wrap items-center justify-between px-3 sm:px-5 py-2.5 gap-2 sm:gap-3 shrink-0">
         <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={onClose}
-            className="group flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 bg-surface border border-slate-300 dark:border-slate-600 shadow-sm hover:shadow-md hover:border-slate-400 hover:-translate-x-0.5 active:translate-x-0 active:scale-[0.98] transition-all duration-200"
+            className="group flex items-center gap-2 pl-1.5 pr-2 sm:pr-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 bg-surface border border-slate-300 dark:border-slate-600 shadow-sm hover:shadow-md hover:border-slate-400 active:scale-[0.98] transition-all duration-200"
             title="Back to pages"
           >
             <span className="w-7 h-7 rounded-lg bg-slate-500/10 dark:bg-slate-400/15 flex items-center justify-center group-hover:bg-slate-600 dark:group-hover:bg-slate-400 transition-colors duration-200">
@@ -368,7 +368,7 @@ export default function LivePageEditor({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
             </span>
-            Back
+            Back<span className="hidden sm:inline"> to pages</span>
           </button>
           <div className="w-px h-8 bg-line hidden sm:block" />
           <div className="flex items-center gap-2.5 min-w-0">
@@ -406,8 +406,8 @@ export default function LivePageEditor({
         </div>
       </div>
 
-      <div className="flex-1 flex overflow-hidden">
-        <div className="w-64 border-r border-line bg-surface-2 overflow-y-auto shrink-0">
+      <div className="flex-1 grid min-h-0 min-w-0 grid-cols-1 grid-rows-[auto_minmax(280px,1fr)_minmax(280px,42vh)] overflow-y-auto lg:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)_minmax(18rem,24rem)] lg:grid-rows-1 lg:overflow-hidden">
+        <div className="w-full min-w-0 min-h-0 border-b border-line bg-surface-2 overflow-y-auto lg:border-b-0 lg:border-r">
           <div className="p-3">
             <h2 className="text-xs font-semibold text-soft uppercase tracking-wider mb-2">
               Sections
@@ -441,7 +441,7 @@ export default function LivePageEditor({
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col overflow-hidden bg-surface-2 relative">
+        <div className="flex-1 min-w-0 basis-0 min-h-[280px] flex flex-col overflow-hidden bg-surface-2 relative">
           {!iframeReady && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-surface-2">
               <div className="w-8 h-8 border-3 border-brand-500 border-t-transparent rounded-full animate-spin" />
@@ -451,7 +451,7 @@ export default function LivePageEditor({
             ref={iframeRef}
             key={slug + path}
             src={iframeSrc}
-            className="w-full h-full border-0"
+            className="w-full min-w-0 h-full min-h-0 border-0"
             title="Live Preview"
             sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
             onLoad={() => setIframeReady(true)}
@@ -461,7 +461,7 @@ export default function LivePageEditor({
           </div>
         </div>
 
-        <div className="w-96 border-l border-line bg-surface overflow-y-auto shrink-0">
+        <div className="w-full min-w-0 min-h-[280px] border-t border-line bg-surface overflow-y-auto lg:border-t-0 lg:border-l">
           {selected ? (
             <div className="p-4">
               <div className="flex items-center justify-between mb-4">

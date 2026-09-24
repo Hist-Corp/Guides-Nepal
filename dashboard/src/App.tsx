@@ -36,6 +36,7 @@ import SupportFaq from "./support/Faq"
 import HostOverview from "./host/Overview"
 import HostGuides from "./host/Guides"
 import HostTours from "./host/Tours"
+import HostExperiences from "./host/Experiences"
 import HostBookings from "./host/Bookings"
 import HostEarnings from "./host/Earnings"
 import HostPerformance from "./host/Performance"
@@ -140,6 +141,7 @@ export default function App() {
           <Route index element={<HostOverview />} />
           <Route path="guides" element={<HostGuides />} />
           <Route path="tours" element={<HostTours />} />
+          <Route path="experiences" element={<HostExperiences />} />
           <Route path="bookings" element={<HostBookings />} />
           <Route path="customers" element={<Customers title="My Customers" description="Travelers who booked your experiences." />} />
           <Route path="earnings" element={<HostEarnings />} />

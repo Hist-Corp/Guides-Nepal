@@ -48,6 +48,61 @@ export async function getBookings() {
   return res.data
 }
 
+export async function getHostBookings() {
+  const res = await http.get("/host/bookings")
+  return res.data
+}
+
+export async function createHostBooking(payload: Record<string, unknown>) {
+  const res = await http.post("/host/bookings", payload)
+  return res.data
+}
+
+export async function decideHostBooking(id: number, status: "accepted" | "rejected") {
+  const res = await http.patch(`/host/bookings/${id}`, { status })
+  return res.data
+}
+
+export async function getHostTours() {
+  const res = await http.get("/host/tours")
+  return res.data
+}
+
+export async function createHostTour(payload: Record<string, unknown>) {
+  const res = await http.post("/host/tours", payload)
+  return res.data
+}
+
+export async function updateHostTour(id: number, payload: Record<string, unknown>) {
+  const res = await http.patch(`/host/tours/${id}`, payload)
+  return res.data
+}
+
+export async function deleteHostTour(id: number) {
+  const res = await http.delete(`/host/tours/${id}`)
+  return res.data
+}
+
+export async function getHostExperiences() {
+  const res = await http.get("/host/experiences")
+  return res.data
+}
+
+export async function createHostExperience(payload: Record<string, unknown>) {
+  const res = await http.post("/host/experiences", payload)
+  return res.data
+}
+
+export async function updateHostExperience(id: number, payload: Record<string, unknown>) {
+  const res = await http.patch(`/host/experiences/${id}`, payload)
+  return res.data
+}
+
+export async function deleteHostExperience(id: number) {
+  const res = await http.delete(`/host/experiences/${id}`)
+  return res.data
+}
+
 export async function createBooking(payload: {
   experience_id: number
   date: string

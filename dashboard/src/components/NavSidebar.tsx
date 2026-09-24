@@ -177,6 +177,7 @@ export default function NavSidebar() {
             heading: "Business",
             items: [
               { to: `${base}/tours`, label: "Tours", icon: "map" },
+              { to: `${base}/experiences`, label: "Experiences", icon: "compass" },
               { to: `${base}/bookings`, label: "Bookings", icon: "calendar" },
               { to: `${base}/guides`, label: "My Guides", icon: "compass" },
             ],

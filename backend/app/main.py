@@ -12,7 +12,7 @@ from app.core.middleware import (
     InputValidationMiddleware,
     HTTPSEnforcementMiddleware,
 )
-from app.api.v1 import auth, bookings, public, ai, profile, admin, content, operations
+from app.api.v1 import auth, bookings, public, ai, profile, admin, content, operations, host
 import os
 import logging
 
@@ -53,6 +53,7 @@ app.include_router(
 app.include_router(
     bookings.router, prefix=f"{settings.API_V1_STR}/bookings", tags=["bookings"]
 )
+app.include_router(host.router, prefix=settings.API_V1_STR, tags=["host"])
 app.include_router(public.router, prefix=f"{settings.API_V1_STR}", tags=["public"])
 app.include_router(ai.router, prefix=f"{settings.API_V1_STR}/ai", tags=["ai"])
 app.include_router(

@@ -6,6 +6,8 @@ from enum import Enum
 
 class BookingStatus(str, Enum):
     upcoming = "upcoming"
+    accepted = "accepted"
+    rejected = "rejected"
     completed = "completed"
     cancelled = "cancelled"
     archived = "archived"
