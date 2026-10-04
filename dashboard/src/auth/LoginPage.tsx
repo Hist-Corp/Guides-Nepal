@@ -61,7 +61,6 @@ export default function LoginPage() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
-  const [hint, setHint] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const { token, role, setToken, setRole, setUser, setError, setLoading, error } = useAuthStore();
   const { theme, toggleTheme } = useTheme();
@@ -393,46 +392,11 @@ export default function LoginPage() {
                 Remember me &amp; keep me signed in
               </label>
 
-              {hint && (
-                <div
-                  className={cn(
-                    'rounded-xl px-3 py-2 text-xs ring-1',
-                    dark ? 'bg-brand-500/15 text-brand-100 ring-brand-400/30' : 'bg-brand-50 text-brand-700 ring-brand-200',
-                  )}
-                >
-                  {hint}
-                </div>
-              )}
-
               <button
                 type="submit"
                 className="w-full cursor-pointer rounded-xl bg-brand-600 py-3 text-xs font-black uppercase tracking-[0.2em] text-white shadow-lg shadow-brand-600/35 transition hover:bg-brand-700 active:scale-[0.99]"
               >
                 Sign in
-              </button>
-
-              {/* or divider */}
-              <div className={cn('flex items-center gap-3 text-[11px] font-semibold uppercase tracking-widest', dark ? 'text-white/40' : 'text-slate-400')}>
-                <span className={cn('h-px flex-1', dark ? 'bg-white/15' : 'bg-slate-200')} />
-                or
-                <span className={cn('h-px flex-1', dark ? 'bg-white/15' : 'bg-slate-200')} />
-              </div>
-
-              {/* Demo access */}
-              <button
-                type="button"
-                onClick={() => {
-                  setHint('This is a demo — picking a role above pre-fills the right password automatically.');
-                  setMenuOpen(true);
-                }}
-                className={cn(
-                  'flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-xl border py-2.5 text-xs font-bold transition',
-                  dark
-                    ? 'border-white/20 bg-white/5 text-white hover:bg-white/10'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-brand-400 hover:text-brand-700',
-                )}
-              >
-                <span aria-hidden>🎓</span> Use a demo account
               </button>
             </form>
 
@@ -446,24 +410,8 @@ export default function LoginPage() {
               >
                 Explore the platform
               </a>
-              {' · '}
-              <button
-                type="button"
-                onClick={() => {
-                  localStorage.clear();
-                  sessionStorage.clear();
-                  window.location.reload();
-                }}
-                className="cursor-pointer hover:underline"
-              >
-                ↺ Reset demo
-              </button>
             </div>
           </div>
-
-          <p className="mx-auto mt-4 max-w-md text-center text-[11px] text-white/70 drop-shadow">
-            Tip: the role dropdown pre-fills credentials — the eye icon reveals the password.
-          </p>
         </div>
       </div>
 
