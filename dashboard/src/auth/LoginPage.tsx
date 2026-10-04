@@ -23,12 +23,48 @@ const ROLE_EMOJIS: Record<string, string> = {
 // Dev seed credentials per role (backend/seed_*.py). Picking a role in the
 // dropdown pre-fills these so you can sign straight in — the list shows only
 // the role you are logging in as.
-const ROLE_ACCOUNTS: { value: string; label: string; email: string; password: string; scope: string }[] = [
-  { value: 'admin', label: 'Admin', email: 'admin@guides-nepal.com', password: 'Admin@12345', scope: 'Full system access' },
-  { value: 'content-manager', label: 'Content Manager', email: 'content@guides-nepal.com', password: 'Content@2024', scope: 'Pages · Blog · Media · SEO' },
-  { value: 'regional-head', label: 'Regional Head', email: 'regional@guides-nepal.com', password: 'Regional@2024', scope: 'Kathmandu Valley' },
-  { value: 'customer-support', label: 'Customer Support', email: 'support@guides-nepal.com', password: 'Support@2024', scope: 'Tickets · FAQ' },
-  { value: 'host', label: 'Host', email: 'host@guides-nepal.com', password: 'Host@2024', scope: 'Tours · Bookings · Earnings' },
+const ROLE_ACCOUNTS: {
+  value: string;
+  label: string;
+  email: string;
+  password: string;
+  scope: string;
+}[] = [
+  {
+    value: 'admin',
+    label: 'Admin',
+    email: 'admin@guides-nepal.com',
+    password: 'Admin@12345',
+    scope: 'Full system access',
+  },
+  {
+    value: 'content-manager',
+    label: 'Content Manager',
+    email: 'content@guides-nepal.com',
+    password: 'Content@2024',
+    scope: 'Pages · Blog · Media · SEO',
+  },
+  {
+    value: 'regional-head',
+    label: 'Regional Head',
+    email: 'regional@guides-nepal.com',
+    password: 'Regional@2024',
+    scope: 'Kathmandu Valley',
+  },
+  {
+    value: 'customer-support',
+    label: 'Customer Support',
+    email: 'support@guides-nepal.com',
+    password: 'Support@2024',
+    scope: 'Tickets · FAQ',
+  },
+  {
+    value: 'host',
+    label: 'Host',
+    email: 'host@guides-nepal.com',
+    password: 'Host@2024',
+    scope: 'Tours · Bookings · Earnings',
+  },
 ];
 
 /**
@@ -188,14 +224,16 @@ export default function LoginPage() {
             <Compass size={14} /> Travel · Nepal
           </div>
           <h1 className="text-5xl font-black uppercase leading-[0.98] tracking-tight sm:text-6xl xl:text-7xl">
-            Explore<br />
+            Explore
+            <br />
             <span className="text-accent-300">Nepal</span>
           </h1>
           <p className="mt-5 max-w-sm text-base font-semibold leading-snug text-white/95">
             Where your journey becomes a story — book the person, not just the place.
           </p>
           <p className="mt-3 max-w-sm text-xs leading-relaxed text-white/70">
-            Dashboard &amp; CMS demo · 5 role consoles · runs fully in your browser, no backend connected.
+            Dashboard &amp; CMS demo · 5 role consoles · runs fully in your browser, no backend
+            connected.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-2">
@@ -215,12 +253,17 @@ export default function LoginPage() {
           <div
             className={cn(
               'relative mx-auto w-full max-w-md rounded-3xl p-6 shadow-2xl backdrop-blur-2xl sm:p-8',
-              dark ? 'border border-white/15 bg-[#1b1730]/75' : 'border border-white/60 bg-white/85',
+              dark ? 'border border-white/15 bg-[#1b1730]/75' : 'border border-white/60 bg-white/85'
             )}
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className={cn('text-xl font-black tracking-tight', dark ? 'text-white' : 'text-slate-900')}>
+                <h2
+                  className={cn(
+                    'text-xl font-black tracking-tight',
+                    dark ? 'text-white' : 'text-slate-900'
+                  )}
+                >
                   Sign in
                 </h2>
                 <p className={cn('mt-1 text-xs', dark ? 'text-white/60' : 'text-slate-500')}>
@@ -232,7 +275,9 @@ export default function LoginPage() {
                 onClick={toggleTheme}
                 className={cn(
                   'cursor-pointer rounded-full border p-2 transition',
-                  dark ? 'border-white/25 text-white hover:bg-white/10' : 'border-slate-200 text-slate-500 hover:border-brand-400 hover:text-brand-600',
+                  dark
+                    ? 'border-white/25 text-white hover:bg-white/10'
+                    : 'border-slate-200 text-slate-500 hover:border-brand-400 hover:text-brand-600'
                 )}
                 aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
                 title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -245,7 +290,9 @@ export default function LoginPage() {
               <div
                 className={cn(
                   'mt-5 rounded-xl px-3 py-2 text-xs ring-1',
-                  dark ? 'bg-rose-500/15 text-rose-200 ring-rose-400/30' : 'bg-rose-50 text-rose-600 ring-rose-200',
+                  dark
+                    ? 'bg-rose-500/15 text-rose-200 ring-rose-400/30'
+                    : 'bg-rose-50 text-rose-600 ring-rose-200'
                 )}
               >
                 {error}
@@ -255,7 +302,12 @@ export default function LoginPage() {
             <form onSubmit={onSubmit} className="mt-6 space-y-4">
               {/* Role dropdown */}
               <div ref={menuRef} className="relative">
-                <span className={cn('mb-1.5 block text-xs font-semibold', dark ? 'text-white/80' : 'text-slate-600')}>
+                <span
+                  className={cn(
+                    'mb-1.5 block text-xs font-semibold',
+                    dark ? 'text-white/80' : 'text-slate-600'
+                  )}
+                >
                   Sign in as
                 </span>
                 <button
@@ -267,14 +319,20 @@ export default function LoginPage() {
                     'flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border px-4 py-2.5 text-left text-sm outline-none transition',
                     dark
                       ? 'border-white/20 bg-white/10 text-white placeholder:text-white/40 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/40'
-                      : 'border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25',
+                      : 'border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25'
                   )}
                 >
                   <span className="flex min-w-0 items-center gap-2.5">
                     <span className="text-base leading-none">{ROLE_EMOJIS[selectRole]}</span>
                     <span className="truncate text-sm font-bold">{selectedAccount.label}</span>
                   </span>
-                  <ChevronDown size={15} className={cn('shrink-0 opacity-60 transition-transform', menuOpen && 'rotate-180')} />
+                  <ChevronDown
+                    size={15}
+                    className={cn(
+                      'shrink-0 opacity-60 transition-transform',
+                      menuOpen && 'rotate-180'
+                    )}
+                  />
                 </button>
 
                 {menuOpen && (
@@ -282,7 +340,7 @@ export default function LoginPage() {
                     role="listbox"
                     className={cn(
                       'absolute left-0 right-0 top-full z-20 mt-2 max-h-72 space-y-1 overflow-y-auto rounded-2xl border p-1.5 shadow-2xl',
-                      dark ? 'border-white/15 bg-slate-900' : 'border-slate-200 bg-white',
+                      dark ? 'border-white/15 bg-slate-900' : 'border-slate-200 bg-white'
                     )}
                   >
                     {ROLE_ACCOUNTS.map((acc) => (
@@ -300,15 +358,31 @@ export default function LoginPage() {
                               : 'bg-brand-50 ring-1 ring-brand-200'
                             : dark
                               ? 'hover:bg-white/5'
-                              : 'hover:bg-slate-50',
+                              : 'hover:bg-slate-50'
                         )}
                       >
                         <span className="text-lg leading-none">{ROLE_EMOJIS[acc.value]}</span>
                         <span className="min-w-0 flex-1">
-                          <span className={cn('block truncate text-sm font-semibold', dark ? 'text-white' : 'text-slate-900')}>{acc.label}</span>
-                          <span className={cn('block truncate text-xs', dark ? 'text-slate-400' : 'text-slate-500')}>{acc.scope}</span>
+                          <span
+                            className={cn(
+                              'block truncate text-sm font-semibold',
+                              dark ? 'text-white' : 'text-slate-900'
+                            )}
+                          >
+                            {acc.label}
+                          </span>
+                          <span
+                            className={cn(
+                              'block truncate text-xs',
+                              dark ? 'text-slate-400' : 'text-slate-500'
+                            )}
+                          >
+                            {acc.scope}
+                          </span>
                         </span>
-                        {acc.value === selectRole && <span className="text-sm font-bold text-brand-600">✓</span>}
+                        {acc.value === selectRole && (
+                          <span className="text-sm font-bold text-brand-600">✓</span>
+                        )}
                       </button>
                     ))}
                   </div>
@@ -316,7 +390,13 @@ export default function LoginPage() {
               </div>
               {/* Email */}
               <div>
-                <label htmlFor="login-email" className={cn('mb-1.5 block text-xs font-semibold', dark ? 'text-white/80' : 'text-slate-600')}>
+                <label
+                  htmlFor="login-email"
+                  className={cn(
+                    'mb-1.5 block text-xs font-semibold',
+                    dark ? 'text-white/80' : 'text-slate-600'
+                  )}
+                >
                   Email
                 </label>
                 <input
@@ -325,7 +405,7 @@ export default function LoginPage() {
                     'w-full rounded-xl border px-4 py-2.5 text-sm outline-none transition',
                     dark
                       ? 'border-white/20 bg-white/10 text-white placeholder:text-white/40 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/40'
-                      : 'border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25',
+                      : 'border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25'
                   )}
                   type="email"
                   value={email}
@@ -339,13 +419,24 @@ export default function LoginPage() {
               {/* Password */}
               <div>
                 <div className="flex items-center justify-between">
-                  <label htmlFor="login-password" className={cn('mb-1.5 block text-xs font-semibold', dark ? 'text-white/80' : 'text-slate-600')}>
+                  <label
+                    htmlFor="login-password"
+                    className={cn(
+                      'mb-1.5 block text-xs font-semibold',
+                      dark ? 'text-white/80' : 'text-slate-600'
+                    )}
+                  >
                     Password
                   </label>
                   <button
                     type="button"
                     onClick={() => setShowForgotPassword(true)}
-                    className={cn('mb-1.5 cursor-pointer text-xs font-semibold', dark ? 'text-brand-300 hover:text-brand-200' : 'text-brand-600 hover:underline')}
+                    className={cn(
+                      'mb-1.5 cursor-pointer text-xs font-semibold',
+                      dark
+                        ? 'text-brand-300 hover:text-brand-200'
+                        : 'text-brand-600 hover:underline'
+                    )}
                   >
                     Forgot password?
                   </button>
@@ -357,7 +448,7 @@ export default function LoginPage() {
                       'w-full rounded-xl border px-4 py-2.5 pr-11 text-sm outline-none transition',
                       dark
                         ? 'border-white/20 bg-white/10 text-white placeholder:text-white/40 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/40'
-                        : 'border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25',
+                        : 'border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/25'
                     )}
                     type={showPassword ? 'text' : 'password'}
                     value={password}
@@ -373,7 +464,9 @@ export default function LoginPage() {
                     title={showPassword ? 'Hide password' : 'Show password'}
                     className={cn(
                       'absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer rounded-full p-1 transition',
-                      dark ? 'text-white/60 hover:text-white' : 'text-slate-400 hover:text-brand-600',
+                      dark
+                        ? 'text-white/60 hover:text-white'
+                        : 'text-slate-400 hover:text-brand-600'
                     )}
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -382,7 +475,12 @@ export default function LoginPage() {
               </div>
 
               {/* Remember me */}
-              <label className={cn('flex cursor-pointer select-none items-center gap-2.5 text-xs', dark ? 'text-white/75' : 'text-slate-600')}>
+              <label
+                className={cn(
+                  'flex cursor-pointer select-none items-center gap-2.5 text-xs',
+                  dark ? 'text-white/75' : 'text-slate-600'
+                )}
+              >
                 <input
                   type="checkbox"
                   className="h-4 w-4 cursor-pointer accent-brand-600"
@@ -400,13 +498,21 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <div className={cn('mt-5 border-t pt-4 text-center text-[11px]', dark ? 'border-white/10 text-white/50' : 'border-slate-200 text-slate-500')}>
+            <div
+              className={cn(
+                'mt-5 border-t pt-4 text-center text-[11px]',
+                dark ? 'border-white/10 text-white/50' : 'border-slate-200 text-slate-500'
+              )}
+            >
               Are you new?{' '}
               <a
                 href={FRONTEND_URL}
                 target="_blank"
                 rel="noreferrer"
-                className={cn('font-bold', dark ? 'text-brand-300 hover:text-brand-200' : 'text-brand-600 hover:underline')}
+                className={cn(
+                  'font-bold',
+                  dark ? 'text-brand-300 hover:text-brand-200' : 'text-brand-600 hover:underline'
+                )}
               >
                 Explore the platform
               </a>
