@@ -10,7 +10,20 @@
  * which cannot find the frontend's flat config and fails.
  *
  * Note: functions are responsible for including the file paths themselves;
- * paths may be absolute or relative (resolved against the repo root).
+ * lint-staged does not append them to a function task.
+ *
+ * Two rules keep these tasks working on every platform:
+ *
+ * 1. Invoke tools as `node <path-to-bin>`, never via `npx`. Husky runs hooks
+ *    with Git Bash on Windows, where the `npx` shell wrapper misbehaves: it
+ *    either fails with '"node"' is not recognized or hangs outright. `node`
+ *    itself resolves reliably in that shell.
+ *
+ * 2. Quote every path that is interpolated into a command string. lint-staged
+ *    parses the command string on whitespace before running it, so an unquoted
+ *    path is re-split at each space. This repo lives under "Guides Nepal", so
+ *    unquoted absolute paths were shredded into "Guides" and
+ *    "Nepal/dashboard/..." and prettier reported that no files matched.
  */
 const path = require('path');
 
@@ -22,7 +35,10 @@ const runEslint = (workspace, filenames) => {
   return `node scripts/run-eslint.js ${workspace} --fix ${files}`;
 };
 
-const runPrettier = (filenames) => `npx prettier --write ${filenames.join(' ')}`;
+const runPrettier = (filenames) => {
+  const files = filenames.map((f) => `"${f}"`).join(' ');
+  return `node node_modules/prettier/bin/prettier.cjs --write ${files}`;
+};
 
 module.exports = {
   'frontend/**/*.{ts,tsx}': (filenames) => [

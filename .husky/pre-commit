@@ -1,9 +1,10 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 echo "🔍 Running pre-commit checks..."
 
-# Run lint-staged
-npx lint-staged
+# Run lint-staged.
+# Invoked through `node <path>` rather than `npx lint-staged`: husky runs hooks
+# with Git Bash on Windows, where the `npx` shell wrapper misbehaves (it fails
+# with '"node"' is not recognized or hangs). `node` itself resolves reliably in
+# that shell, and this lint-staged install is a repo-root devDependency.
+node node_modules/lint-staged/bin/lint-staged.js
 
 echo "✅ Pre-commit checks passed!"
