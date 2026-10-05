@@ -6,6 +6,23 @@
   font-family: inherit;
 }
 
+/* The sticky Book-Now bar only exists on experience/city pages (flagged by
+   StickyBarPortal as body[data-sticky-bar]). On mobile/tablet (<1024px) lift
+   the bubble fully above it (bar height + gap) instead of sitting on top of
+   the price / Book Now button. Pages without a bar keep the normal
+   bottom: 24px position. */
+@media (max-width: 1023px) {
+  .support-widget {
+    right: 16px;
+  }
+  body[data-sticky-bar] .support-widget {
+    bottom: 108px;
+  }
+  .support-panel {
+    margin-bottom: 8px;
+  }
+}
+
 .support-fab {
   width: 56px;
   height: 56px;

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { submitSupportTicket } from '../../services/publicApi';
+import { useUIStore } from '../../store/uiStore';
 import './SupportWidget.css';
 
 type WidgetState = 'closed' | 'open' | 'sent';
@@ -32,6 +33,15 @@ export default function SupportWidget() {
     };
   }, [state]);
 
+  // The mobile booking sheet (z-index 90) sits below this widget (z-index
+  // 1000), so the bubble would float over the "Configure booking" sheet.
+  // Hide the whole widget while the sheet is open and collapse the panel so
+  // it doesn't pop back open once the sheet closes.
+  const isBookingSheetOpen = useUIStore((s) => s.isBookingSheetOpen);
+  useEffect(() => {
+    if (isBookingSheetOpen) setState('closed');
+  }, [isBookingSheetOpen]);
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
@@ -59,6 +69,9 @@ export default function SupportWidget() {
     }
   }
 
+  // Hidden entirely while the booking sheet is open (see effect above).
+  if (isBookingSheetOpen) return null;
+
   return (
     <div className="support-widget" ref={panelRef}>
       {state === 'open' && (
@@ -81,12 +94,7 @@ export default function SupportWidget() {
             </label>
             <label>
               Email
-              <input
-                name="customer_email"
-                type="email"
-                required
-                placeholder="you@example.com"
-              />
+              <input name="customer_email" type="email" required placeholder="you@example.com" />
             </label>
             <label>
               Subject
@@ -125,7 +133,9 @@ export default function SupportWidget() {
 
       {state === 'sent' && (
         <div className="support-panel support-sent" role="status">
-          <div className="support-sent-icon" aria-hidden="true">✓</div>
+          <div className="support-sent-icon" aria-hidden="true">
+            ✓
+          </div>
           <h3>Ticket submitted!</h3>
           <p>Our support team will get back to you by email shortly.</p>
           <button type="button" className="support-submit" onClick={() => setState('closed')}>
@@ -143,7 +153,17 @@ export default function SupportWidget() {
           onClick={() => setState('open')}
         >
           {/* Headset support icon */}
-          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            width="26"
+            height="26"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
             <path d="M4 13a8 8 0 0 1 16 0" />
             <path d="M3 15a2 2 0 0 1 2-2h1v5H5a2 2 0 0 1-2-2v-1z" />
             <path d="M21 15a2 2 0 0 0-2-2h-1v5h1a2 2 0 0 0 2-2v-1z" />

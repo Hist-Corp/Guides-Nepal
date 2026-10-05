@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { StickyBarPortal } from '../../components/common/StickyBarPortal';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
@@ -21,6 +22,7 @@ import { BookingCalendar } from '../../components/common/BookingCalendar';
 import { GuestPicker } from '../../components/common/GuestPicker';
 import { TimePicker } from '../../components/common/TimePicker';
 import { useBookingStore } from '../../store/bookingStore';
+import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
 import { getAvailableGuides } from '../../utils/guides';
 
 const ReadMoreText = ({
@@ -71,6 +73,9 @@ const PokharaExperiencePage: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [bookingDate, setBookingDate] = useState('');
   const [bookingTime, setBookingTime] = useState('09:00');
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [sheetError, setSheetError] = useState<string | null>(null);
+  const [sheetConfirmed, setSheetConfirmed] = useState(false);
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
@@ -140,6 +145,20 @@ const PokharaExperiencePage: React.FC = () => {
     if (cardElement) {
       cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+  };
+
+  const handleSheetConfirm = () => {
+    if (!checkIn) {
+      setSheetError('Please select a check-in date');
+      return;
+    }
+    if (!checkOut) {
+      setSheetError('Please select a check-out date');
+      return;
+    }
+    setSheetError(null);
+    handleBookNow();
+    setSheetConfirmed(true);
   };
 
   useEffect(() => {
@@ -368,26 +387,39 @@ const PokharaExperiencePage: React.FC = () => {
             {/* Right Column - Sidebar */}
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-8">
-                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-2xl lg:hidden z-40 flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-xl font-bold text-gray-900">
-                        <Price amount={data.price} />
-                      </span>
-                      <span className="text-gray-500 text-xs">/ person</span>
+                <StickyBarPortal>
+                  <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-2xl lg:hidden z-40 flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-xl font-bold text-gray-900">
+                          <Price amount={data.price} />
+                        </span>
+                        <span className="text-gray-500 text-xs">/ person</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSheetError(null);
+                          setSheetConfirmed(false);
+                          setIsSheetOpen(true);
+                        }}
+                        className="text-xs underline font-bold text-gray-900 text-left"
+                      >
+                        Show dates
+                      </button>
                     </div>
-                    <span className="text-xs underline font-bold text-gray-900">Show dates</span>
+                    <button
+                      onClick={() => {
+                        setSheetError(null);
+                        setSheetConfirmed(false);
+                        setIsSheetOpen(true);
+                      }}
+                      className="bg-primary hover:bg-primary-hover text-white font-bold py-3 px-6 rounded-lg uppercase tracking-wide"
+                    >
+                      Book Now
+                    </button>
                   </div>
-                  <button
-                    onClick={() => {
-                      const formElement = document.getElementById('booking');
-                      if (formElement) formElement.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className="bg-primary hover:bg-primary-hover text-white font-bold py-3 px-6 rounded-lg uppercase tracking-wide"
-                  >
-                    Book Now
-                  </button>
-                </div>
+                </StickyBarPortal>
 
                 <div
                   id="booking-card-desktop"
@@ -805,6 +837,55 @@ const PokharaExperiencePage: React.FC = () => {
         </div>
       </main>
 
+      {/* Mobile Configure-booking sheet (dates/guests/time/guide) */}
+      {isSheetOpen && (
+        <MobileBookingSheet
+          open={isSheetOpen}
+          onClose={() => {
+            setIsSheetOpen(false);
+            setSheetError(null);
+          }}
+          pricePerPerson={data.price || 45}
+          rating={data.rating || 0}
+          reviews={data.reviews || 124}
+          accentClass="bg-primary hover:bg-primary-hover"
+          checkIn={checkIn}
+          checkOut={checkOut}
+          onDateChange={(ci, co) => {
+            setCheckIn(ci);
+            setCheckOut(co);
+          }}
+          guests={guestCount}
+          onGuestsChange={setGuestCount}
+          maxGuests={6}
+          bookingTime={bookingTime}
+          onTimeChange={setBookingTime}
+          guides={availableGuides}
+          selectedGuide={selectedGuide}
+          onSelectGuide={(g) => setSelectedGuide(g as Guide)}
+          onConfirm={handleSheetConfirm}
+          error={sheetError}
+          confirmed={sheetConfirmed}
+          confirmedSummary={
+            <ul className="space-y-1">
+              <li>
+                <span className="font-bold">Dates:</span> {checkIn} - {checkOut}
+              </li>
+              <li>
+                <span className="font-bold">Guests:</span> {guestCount}
+              </li>
+              <li>
+                <span className="font-bold">Start time:</span> {bookingTime}
+              </li>
+              {selectedGuide && (
+                <li>
+                  <span className="font-bold">Guide:</span> {selectedGuide.name}
+                </li>
+              )}
+            </ul>
+          }
+        />
+      )}
       {/* Guide Details Modal */}
       {showGuideModal && viewingGuide && (
         <div

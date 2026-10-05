@@ -12,9 +12,17 @@ export default {
     },
     extend: {
       keyframes: {
+        // NOTE: reveal animations below use `animation-fill-mode: both`, so the
+        // 100% keyframe stays applied forever after the animation ends. The
+        // final `transform` MUST be `none` (the identity) — a lingering
+        // `translateY(0)`/`scale(1)` is still "a transform other than none",
+        // which makes the element the containing block for `position: fixed`
+        // descendants. That silently pins fixed elements (e.g. the sticky
+        // mobile Book-Now bar) to the animated container instead of the
+        // viewport. `none` interpolates with the same visual result.
         'fade-in-up': {
           '0%': { opacity: '0', transform: 'translateY(18px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
+          '100%': { opacity: '1', transform: 'none' },
         },
         'fade-in': {
           '0%': { opacity: '0' },
@@ -22,24 +30,24 @@ export default {
         },
         'fade-in-down': {
           '0%': { opacity: '0', transform: 'translateY(-18px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
+          '100%': { opacity: '1', transform: 'none' },
         },
         'fade-in-left': {
           '0%': { opacity: '0', transform: 'translateX(-28px)' },
-          '100%': { opacity: '1', transform: 'translateX(0)' },
+          '100%': { opacity: '1', transform: 'none' },
         },
         'fade-in-right': {
           '0%': { opacity: '0', transform: 'translateX(28px)' },
-          '100%': { opacity: '1', transform: 'translateX(0)' },
+          '100%': { opacity: '1', transform: 'none' },
         },
         'zoom-in': {
           '0%': { opacity: '0', transform: 'scale(0.94)' },
-          '100%': { opacity: '1', transform: 'scale(1)' },
+          '100%': { opacity: '1', transform: 'none' },
         },
         'pop-in': {
           '0%': { opacity: '0', transform: 'scale(0.82)' },
           '60%': { opacity: '1', transform: 'scale(1.04)' },
-          '100%': { opacity: '1', transform: 'scale(1)' },
+          '100%': { opacity: '1', transform: 'none' },
         },
         float: {
           '0%, 100%': { transform: 'translateY(0)' },

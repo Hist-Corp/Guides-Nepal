@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { StickyBarPortal } from '../components/common/StickyBarPortal';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
@@ -20,6 +21,7 @@ import guidesApi from '../services/guidesApi';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { BookingCalendar } from '../components/common/BookingCalendar';
 import { GuestPicker } from '../components/common/GuestPicker';
+import { MobileBookingSheet, SheetGuide } from '../components/common/MobileBookingSheet';
 import { NEPAL_IMAGES } from '../data/images';
 import { culturalTours } from './CulturalToursPage';
 import { outdoorActivities } from './OutdoorActivitiesPage';
@@ -354,7 +356,7 @@ const ExperiencePage: React.FC = () => {
               ? {
                   ...match.host,
                   about:
-                    (match.host as any).about ??
+                    (match.host as unknown as { about?: string }).about ??
                     'A passionate local guide ready to show you the best of Nepal.',
                 }
               : {
@@ -390,7 +392,44 @@ const ExperiencePage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [guests, setGuests] = useState(2);
   const [bookingError, setBookingError] = useState<string | null>(null);
-  const [bookmarkSaved, setBookmarkSaved] = useState(false);
+  // Set after saving a bookmark (the card button feedback lives in handleBookmark).
+  const [, setBookmarkSaved] = useState(false);
+
+  // Mobile sticky footer: configure-booking sheet state (same flow as the
+  // city experience pages - dates, guests, start time and host in a sheet).
+  const [bookingTime, setBookingTime] = useState('09:00');
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [sheetError, setSheetError] = useState<string | null>(null);
+  const [sheetConfirmed, setSheetConfirmed] = useState(false);
+
+  // The sheet offers guide selection; this page only has the host.
+  const hostGuide: SheetGuide | null = experience
+    ? {
+        id: `host-${experience.id}`,
+        name: experience.host.name,
+        role: 'Your host',
+        image: experience.host.image,
+        rating: experience.host.rating,
+        reviews: experience.host.reviews,
+      }
+    : null;
+  const sheetGuides: SheetGuide[] = hostGuide ? [hostGuide] : [];
+
+  const persistBooking = () => {
+    if (!experience) return;
+    addBooking({
+      id: Math.random().toString(36).substr(2, 9),
+      experienceId: experience.id,
+      experienceTitle: experience.title,
+      city: experience.city,
+      date: selectedDate,
+      guests: guests,
+      price: experience.price,
+      image: experience.images[0],
+      status: 'upcoming',
+    });
+    setIsBooked(true);
+  };
 
   const handleBooking = () => {
     if (!isAuthenticated) {
@@ -405,20 +444,39 @@ const ExperiencePage: React.FC = () => {
 
     if (experience) {
       setBookingError(null);
-      addBooking({
-        id: Math.random().toString(36).substr(2, 9),
-        experienceId: experience.id,
-        experienceTitle: experience.title,
-        city: experience.city,
-        date: selectedDate,
-        guests: guests,
-        price: experience.price,
-        image: experience.images[0],
-        status: 'upcoming',
-      });
-      setIsBooked(true);
+      persistBooking();
       setTimeout(() => navigate('/bookings'), 1000);
     }
+  };
+
+  const openSheet = () => {
+    setSheetError(null);
+    setSheetConfirmed(false);
+    setIsSheetOpen(true);
+  };
+
+  const handleSheetConfirm = () => {
+    if (!selectedDate) {
+      setSheetError('Please select a date');
+      return;
+    }
+    if (!isAuthenticated) {
+      setSheetError('Please log in to book this experience');
+      return;
+    }
+    setSheetError(null);
+    setBookingError(null);
+    persistBooking();
+    setSheetConfirmed(true);
+  };
+
+  const closeSheet = () => {
+    const wasConfirmed = sheetConfirmed;
+    setIsSheetOpen(false);
+    setSheetError(null);
+    setSheetConfirmed(false);
+    // Mirrors the card flow: once booked, head over to the bookings page.
+    if (wasConfirmed) navigate('/bookings');
   };
 
   const handleBookmark = () => {
@@ -598,6 +656,33 @@ const ExperiencePage: React.FC = () => {
 
             {/* Right Sidebar (Booking Card) */}
             <div className="lg:w-1/3">
+              {/* Mobile sticky footer (visible only on small screens) */}
+              <StickyBarPortal>
+                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-2xl lg:hidden z-40 flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-xl font-bold text-gray-900">
+                        {formatPrice(experience.price, 'EUR')}
+                      </span>
+                      <span className="text-gray-500 text-xs">/ person</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={openSheet}
+                      className="text-xs underline font-bold text-gray-900 text-left"
+                    >
+                      Show dates
+                    </button>
+                  </div>
+                  <button
+                    onClick={openSheet}
+                    className="bg-primary hover:bg-primary-hover text-white font-bold py-3 px-6 rounded-lg uppercase tracking-wide"
+                  >
+                    Book Now
+                  </button>
+                </div>
+              </StickyBarPortal>
+
               <div className="sticky top-24 bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
                 <div className="flex items-center space-x-1 mb-2">
                   {[...Array(5)].map((_, i) => (
@@ -687,6 +772,55 @@ const ExperiencePage: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* Mobile configure-booking sheet opened from the sticky footer */}
+      {isSheetOpen && (
+        <MobileBookingSheet
+          open={isSheetOpen}
+          onClose={closeSheet}
+          pricePerPerson={experience.price}
+          rating={experience.rating}
+          reviews={experience.reviews}
+          accentClass="bg-primary hover:bg-primary-hover"
+          singleDate
+          checkIn={selectedDate}
+          checkOut=""
+          onDateChange={(ci) => {
+            setSelectedDate(ci);
+            setBookingError(null);
+          }}
+          guests={guests}
+          onGuestsChange={(g) => {
+            setGuests(g);
+            setBookingError(null);
+          }}
+          maxGuests={20}
+          bookingTime={bookingTime}
+          onTimeChange={setBookingTime}
+          guides={sheetGuides}
+          selectedGuide={hostGuide}
+          onSelectGuide={() => undefined}
+          onConfirm={handleSheetConfirm}
+          error={sheetError}
+          confirmed={sheetConfirmed}
+          confirmedSummary={
+            <ul className="space-y-1">
+              <li>
+                <span className="font-bold">Date:</span> {selectedDate}
+              </li>
+              <li>
+                <span className="font-bold">Guests:</span> {guests}
+              </li>
+              <li>
+                <span className="font-bold">Start time:</span> {bookingTime}
+              </li>
+              <li>
+                <span className="font-bold">Host:</span> {experience.host.name}
+              </li>
+            </ul>
+          }
+        />
+      )}
 
       <Footer />
     </div>
