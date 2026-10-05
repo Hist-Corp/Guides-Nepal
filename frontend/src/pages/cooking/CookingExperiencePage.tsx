@@ -1079,6 +1079,8 @@ const CookingExperiencePage: React.FC = () => {
             setSheetError(null);
           }}
           pricePerPerson={data.price || 45}
+          cleaningFee={cleaningFee}
+          serviceFee={serviceFee}
           rating={data.rating || 0}
           reviews={data.reviews || 124}
           accentClass="bg-orange-600 hover:bg-orange-700"

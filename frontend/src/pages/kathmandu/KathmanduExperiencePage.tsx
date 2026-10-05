@@ -873,6 +873,8 @@ const KathmanduExperiencePage: React.FC = () => {
             setSheetError(null);
           }}
           pricePerPerson={data.price || 45}
+          cleaningFee={cleaningFee}
+          serviceFee={serviceFee}
           rating={data.rating || 0}
           reviews={data.reviews || 124}
           accentClass="bg-primary hover:bg-primary-hover"

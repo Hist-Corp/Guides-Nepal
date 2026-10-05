@@ -118,4 +118,54 @@ describe('MobileBookingSheet', () => {
     rerender(<MobileBookingSheet {...baseProps} guides={[]} />);
     expect(screen.getByTestId('sheet-calendar')).toHaveAttribute('data-single', 'false');
   });
+
+  it('shows the full price breakdown (rate x guests x days, fees, total) for date ranges', () => {
+    render(
+      <MobileBookingSheet
+        {...baseProps}
+        checkIn="2026-10-15"
+        checkOut="2026-11-11"
+        guests={4}
+        guides={[]}
+      />
+    );
+    // $45 x 4 guests x 27 days + $15 cleaning + $0 service = $4875
+    expect(screen.getByText(/x 4 guests/)).toBeInTheDocument();
+    expect(screen.getByText(/x 27 days/)).toBeInTheDocument();
+    expect(screen.getByText('$4860')).toBeInTheDocument();
+    expect(screen.getByText('Cleaning fee')).toBeInTheDocument();
+    expect(screen.getByText('$15')).toBeInTheDocument();
+    expect(screen.getByText('Service fee')).toBeInTheDocument();
+    expect(screen.getByText('$0')).toBeInTheDocument();
+    expect(screen.getByText('Total')).toBeInTheDocument();
+    expect(screen.getByText('$4875')).toBeInTheDocument();
+  });
+
+  it('honours cleaningFee/serviceFee overrides in the breakdown', () => {
+    render(
+      <MobileBookingSheet
+        {...baseProps}
+        checkIn="2026-10-15"
+        checkOut="2026-10-16"
+        cleaningFee={20}
+        serviceFee={5}
+        guides={[]}
+      />
+    );
+    expect(screen.getByText('$20')).toBeInTheDocument();
+    expect(screen.getByText('$5')).toBeInTheDocument();
+    expect(screen.getByText('$70')).toBeInTheDocument(); // 45 x 1 x 1 + 20 + 5
+  });
+
+  it('shows the guests subtotal line for single-day experiences only when guests > 1', () => {
+    const { rerender } = render(
+      <MobileBookingSheet {...baseProps} singleDate guests={1} guides={[]} />
+    );
+    expect(screen.queryByText(/× 1 guests/)).toBeNull();
+    expect(screen.queryByText('Cleaning fee')).toBeNull();
+
+    rerender(<MobileBookingSheet {...baseProps} singleDate guests={3} guides={[]} />);
+    expect(screen.getByText(/× 3 guests/)).toBeInTheDocument();
+    expect(screen.getByText('$135')).toBeInTheDocument(); // 45 x 3
+  });
 });

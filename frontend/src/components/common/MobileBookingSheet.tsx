@@ -20,6 +20,9 @@ export interface MobileBookingSheetProps<TGuide extends SheetGuide = SheetGuide>
   open: boolean;
   onClose: () => void;
   pricePerPerson: number;
+  /** Fee lines for the price breakdown (defaults mirror the desktop booking card). */
+  cleaningFee?: number;
+  serviceFee?: number;
   rating?: number;
   reviews?: number | string;
   accentClass?: string;
@@ -54,6 +57,8 @@ export function MobileBookingSheet<TGuide extends SheetGuide = SheetGuide>({
   open,
   onClose,
   pricePerPerson,
+  cleaningFee = 15,
+  serviceFee = 0,
   rating,
   reviews,
   accentClass = 'bg-primary hover:bg-primary-hover',
@@ -95,6 +100,18 @@ export function MobileBookingSheet<TGuide extends SheetGuide = SheetGuide>({
       document.removeEventListener('keydown', onKey);
     };
   }, [open, onClose]);
+
+  // Price-breakdown maths — mirrors the desktop booking card:
+  // nightly rate x guests x days (+ fixed cleaning/service fees).
+  const days = (() => {
+    if (singleDate || !checkIn || !checkOut) return 1;
+    const diff = new Date(checkOut).getTime() - new Date(checkIn).getTime();
+    const d = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    return d > 0 ? d : 1;
+  })();
+  const subtotal = pricePerPerson * guests * days;
+  const total = subtotal + cleaningFee + serviceFee;
+
   if (!open) return null;
   return createPortal(
     <div
@@ -245,6 +262,56 @@ export function MobileBookingSheet<TGuide extends SheetGuide = SheetGuide>({
                   )}
                 </section>
               </div>
+
+              {/* Price breakdown — mirrors the desktop booking card */}
+              {(!singleDate || guests > 1) && (
+                <div className="mt-5 border-t border-gray-100 pt-4">
+                  {singleDate ? (
+                    <div className="flex justify-between gap-4 text-sm text-slate-600">
+                      <span>
+                        <Price amount={pricePerPerson} /> × {guests} guests
+                      </span>
+                      <span className="shrink-0 font-bold text-secondary">
+                        <Price amount={subtotal} />
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex justify-between gap-4 text-sm text-gray-600">
+                        <span className="underline decoration-gray-300 decoration-1 underline-offset-2">
+                          <Price amount={pricePerPerson} /> x {guests} guests{' '}
+                          {days > 1 && `x ${days} days`}
+                        </span>
+                        <span className="shrink-0">
+                          <Price amount={subtotal} />
+                        </span>
+                      </div>
+                      <div className="flex justify-between gap-4 text-sm text-gray-600">
+                        <span className="underline decoration-gray-300 decoration-1 underline-offset-2">
+                          Cleaning fee
+                        </span>
+                        <span className="shrink-0">
+                          <Price amount={cleaningFee} />
+                        </span>
+                      </div>
+                      <div className="flex justify-between gap-4 text-sm text-gray-600">
+                        <span className="underline decoration-gray-300 decoration-1 underline-offset-2">
+                          Service fee
+                        </span>
+                        <span className="shrink-0">
+                          <Price amount={serviceFee} />
+                        </span>
+                      </div>
+                      <div className="flex justify-between gap-4 border-t border-gray-100 pt-4 text-base font-bold text-gray-900">
+                        <span>Total</span>
+                        <span className="shrink-0">
+                          <Price amount={total} />
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </>
           )}
         </div>
