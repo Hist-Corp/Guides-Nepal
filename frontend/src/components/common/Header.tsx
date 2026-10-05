@@ -13,7 +13,6 @@ import {
   Heart,
   User,
   ShoppingCart,
-  Banknote,
 } from 'lucide-react';
 import { LoginModal } from '../auth/LoginModal';
 import { SignupModal } from '../auth/SignupModal';
@@ -269,19 +268,15 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
             </>
           )}
 
-          {/* Currency picker - opens "Choose your currency" modal.
-              On-brand: dark-slate icon tile + gold accent ring, sits
-              between Sign up and Cart. */}
+          {/* Currency picker - opens "Choose your currency" modal. Text-only
+              code pill (USD / NPR / EUR ...), original white background. */}
           <button
             onClick={() => setIsCurrencyPickerOpen(true)}
             title={`Currency: ${currencyInfo.name} (${currencyInfo.label}) - Change currency`}
             aria-label={`Change currency, current: ${currencyInfo.name}`}
             data-testid="currency-picker-button"
-            className="group flex items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pl-1.5 pr-2.5 shadow-sm transition-colors hover:border-primary hover:shadow"
+            className="group flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2.5 shadow-sm transition-colors hover:border-primary hover:shadow"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-brand-yellow ring-2 ring-brand-yellow/60 transition-colors group-hover:bg-primary-hover">
-              <Banknote className="h-5 w-5" strokeWidth={2.25} aria-hidden="true" />
-            </span>
             <span className="text-sm font-bold tracking-wide text-primary">
               {currencyInfo.code}
             </span>

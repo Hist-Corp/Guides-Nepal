@@ -127,14 +127,14 @@ export const CurrencyPickerModal: React.FC<CurrencyPickerModalProps> = ({ isOpen
                     onClick={() => setSelected(currency.code)}
                     className={
                       isActive
-                        ? 'rounded-lg border p-3 text-left transition-all border-[#c13572] bg-[#c13572]/5 text-[#c13572]'
+                        ? 'rounded-lg border p-3 text-left transition-all border-sky-500 bg-sky-50 text-sky-700'
                         : 'rounded-lg border p-3 text-left transition-all border-gray-300 bg-white text-[#52525b] hover:border-gray-400'
                     }
                   >
                     <span
                       className={
                         isActive
-                          ? 'block truncate text-[15px] font-bold text-[#c13572]'
+                          ? 'block truncate text-[15px] font-bold text-sky-700'
                           : 'block truncate text-[15px] font-bold text-[#52525b]'
                       }
                     >
@@ -168,7 +168,7 @@ export const CurrencyPickerModal: React.FC<CurrencyPickerModalProps> = ({ isOpen
             type="button"
             onClick={handleSave}
             disabled={!selectedInfo}
-            className="w-full rounded-lg bg-[#c13572] px-6 py-3 text-[15px] font-bold text-white transition-colors hover:bg-[#a52c60] disabled:cursor-not-allowed disabled:opacity-50 sm:max-w-xs"
+            className="w-full rounded-lg bg-sky-500 px-6 py-3 text-[15px] font-bold text-white transition-colors hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50 sm:max-w-xs"
           >
             Save Currency
           </button>

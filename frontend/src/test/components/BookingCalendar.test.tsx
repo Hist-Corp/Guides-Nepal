@@ -1,7 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { BookingCalendar } from '../../components/common/BookingCalendar';
 
 /** Renders the calendar and tracks the dates it commits. */
@@ -109,77 +109,41 @@ describe('BookingCalendar', () => {
     expect(panelField('checkin')).toHaveAttribute('aria-invalid', 'true');
   });
 
-  it('stays fully on screen, with a constant height, while the page scrolls', async () => {
-    // jsdom has no layout engine, so stand in for the page: a card at a fixed
-    // offset in the document whose viewport rect slides up as the page
-    // scrolls, in an 800px-tall window. The calendar's natural height (456)
-    // deliberately does NOT fit under the card at the top of the page, which
-    // is the situation that used to make the panel resize on every scroll
-    // frame and clipped its Clear/Close footer off the bottom of the window.
-    let scrollY = 0;
-    const rectSpy = vi
-      .spyOn(Element.prototype, 'getBoundingClientRect')
-      .mockImplementation(function (this: Element) {
-        const top = 300 - scrollY;
-        return {
-          top,
-          bottom: top + 80,
-          left: 40,
-          right: 720,
-          width: 680,
-          height: 80,
-          x: 40,
-          y: top,
-          toJSON: () => ({}),
-        } as DOMRect;
-      });
-    const heightSpy = vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(456);
-    const innerHeight = window.innerHeight;
-    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 800 });
+  it('is anchored directly beneath the fields in document flow', async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    await user.click(cardField('checkin'));
 
-    try {
-      render(<Harness />);
-      await userEvent.setup().click(cardField('checkin'));
+    const panel = screen.getByRole('dialog');
+    // Anchored via normal document flow (absolute, top-full) inside the
+    // relative wrapper - so it inherently scrolls one-for-one with the
+    // fields and can never cross over them. No fixed positioning, no
+    // inline top/left tracking, no portal.
+    expect(panel.className).toMatch(/absolute/);
+    expect(panel.className).toMatch(/top-full/);
+    expect((panel as HTMLElement).style.position).not.toBe('fixed');
+    expect((panel as HTMLElement).style.top).toBe('');
+    expect((panel as HTMLElement).style.left).toBe('');
+    // Panel renders after the field row inside the same relative wrapper.
+    const wrapper = panel.parentElement!;
+    expect(wrapper.className).toMatch(/relative/);
+    const row = wrapper.firstElementChild!;
+    expect(row.contains(cardField('checkin'))).toBe(true);
+    expect(row.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
 
-      const panel = dialog();
-      const top = () => Number.parseFloat(panel.style.top);
-      const scrollTo = (next: number) => {
-        scrollY = next;
-        window.dispatchEvent(new Event('scroll'));
-      };
+  it('keeps Clear dates and Close pinned visible while the months scroll', async () => {
+    const localUser = userEvent.setup();
+    render(<Harness />);
+    await localUser.click(cardField('checkin'));
 
-      // The fields end 388px down the window and the panel is 456px tall, so
-      // hanging below them would run it 164px past the bottom of the screen.
-      // Instead it lifts until its bottom sits 8px above the viewport edge —
-      // no height cap, so the footer and both months stay reachable.
-      await waitFor(() => expect(top()).toBe(336));
-      expect(top() + 456).toBe(792);
-      expect(panel.style.maxHeight).toBe('');
-
-      // Scrolled down there is room under the fields again, so the panel
-      // docks 8px beneath them and tracks them one-for-one — moving by
-      // exactly as much as they did, without ever changing height.
-      scrollTo(120);
-      await waitFor(() => expect(top()).toBe(388 - scrollY));
-      let lastTop = top();
-      for (const delta of [90, 90, 60, -40, -60, -30, 30]) {
-        scrollTo(scrollY + delta);
-        await waitFor(() => expect(top()).toBe(388 - scrollY));
-        expect(top() - lastTop).toBe(-delta);
-        // Same height throughout, so it never appears to shrink and grow.
-        expect(panel.style.maxHeight).toBe('');
-        expect(top() + 456).toBeLessThanOrEqual(792);
-        lastTop = top();
-      }
-
-      // Back at the top of the page it lifts again instead of overflowing.
-      scrollTo(0);
-      await waitFor(() => expect(top()).toBe(336));
-      expect(top() + 456).toBe(792);
-    } finally {
-      heightSpy.mockRestore();
-      rectSpy.mockRestore();
-      Object.defineProperty(window, 'innerHeight', { configurable: true, value: innerHeight });
-    }
+    const panel = screen.getByRole('dialog');
+    const footer = screen.getByText('Clear dates').closest('div.flex')!;
+    // Sticky bottom footer with a solid background, so the buttons stay
+    // readable and clickable while the long month grid scrolls under them.
+    expect(footer.className).toMatch(/sticky/);
+    expect(footer.className).toMatch(/bottom-0/);
+    expect(footer.className).toMatch(/bg-white/);
+    expect(panel.className).toMatch(/overflow-y-auto/);
   });
 });

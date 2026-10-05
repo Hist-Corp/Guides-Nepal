@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useEffect, useRef, useState } from 'react';
 import { ChevronRight, Minus, Plus } from 'lucide-react';
 
 export interface GuestPickerProps {
@@ -21,6 +20,8 @@ export interface GuestPickerProps {
   ariaLabel?: string;
 }
 
+const clamp = (n: number, min: number, max: number): number => Math.min(Math.max(n, min), max);
+
 interface CounterRow {
   key: 'adults' | 'children' | 'infants' | 'pets';
   title: string;
@@ -31,15 +32,14 @@ interface CounterRow {
   set: (n: number) => void;
 }
 
-const clamp = (n: number, min: number, max: number): number => Math.min(Math.max(n, min), max);
-
 /**
  * Airbnb-inspired guest selector used on experience booking cards.
  *
  * The trigger mirrors the BookingCalendar card trigger (uppercase label +
- * value + chevron). The panel is portaled to document.body and
- * fixed-positioned from the trigger's bounding rect, so it is never
- * clipped by a card's overflow-hidden container. Rows: Adults, Children,
+ * value + chevron). The panel is anchored directly beneath the trigger
+ * (absolute, top-full inside a
+ * relative wrapper), so it scrolls one-for-one with the trigger and can
+ * never cross over it. Rows: Adults, Children,
  * Infants and Pets with circular −/+ steppers, a max-guests note and a
  * Close footer.
  */
@@ -56,12 +56,6 @@ export const GuestPicker: React.FC<GuestPickerProps> = ({
   const [infants, setInfants] = useState(0);
   const [pets, setPets] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
-  const [pos, setPos] = useState<{
-    top: number;
-    left: number;
-    width: number;
-    maxHeight: number;
-  } | null>(null);
 
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -89,82 +83,9 @@ export const GuestPicker: React.FC<GuestPickerProps> = ({
     if (na !== adults || nc !== children) onChange(na + nc);
   };
 
-  /**
-   * Places the portaled panel as a dropdown under the trigger.
-   *
-   * While scrolling only `top`/`left`/`width` are recomputed, so the panel
-   * tracks the trigger one-to-one and its height never changes — recomputing
-   * the cap against the live space below made it visibly shrink and grow as
-   * it moved. The cap is only recomputed on open, on window resize, and when
-   * the panel's own content changes size.
-   */
-  const reposition = useCallback((recalcHeight: boolean) => {
-    const trigger = triggerRef.current;
-    if (!trigger) return;
-    const rect = trigger.getBoundingClientRect();
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const width = Math.min(Math.max(rect.width, 300), vw - 16);
-    const left = clamp(rect.left, 8, Math.max(8, vw - width - 8));
-    // Classic dropdown: always drop straight below the trigger (never flip
-    // above), and grow no taller than the space left on screen — the panel
-    // scrolls internally instead of jumping around the card.
-    const top = rect.bottom + 8;
-
-    setPos((prev) => {
-      const maxHeight = recalcHeight || !prev ? Math.max(160, vh - top - 8) : prev.maxHeight;
-      return prev &&
-        prev.top === top &&
-        prev.left === left &&
-        prev.width === width &&
-        prev.maxHeight === maxHeight
-        ? prev
-        : { top, left, width, maxHeight };
-    });
-  }, []);
-
-  // True only while the portaled panel is actually in the DOM. Depending on
-  // this instead of `pos` keeps the effect below from re-running on every
-  // scroll frame, since `pos.top` changes each frame.
-  const panelMounted = Boolean(isOpen && pos);
-
-  // Position (and re-position) the panel while open. Scrolling is throttled to
-  // one measurement per frame, and leaves the height cap alone.
-  useLayoutEffect(() => {
-    if (!isOpen) return;
-    reposition(true);
-    let frame = 0;
-    const onScroll = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        reposition(false);
-      });
-    };
-    const onResize = () => reposition(true);
-    window.addEventListener('scroll', onScroll, true);
-    window.addEventListener('resize', onResize);
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', onScroll, true);
-      window.removeEventListener('resize', onResize);
-    };
-  }, [isOpen, reposition]);
-
-  // Watch the panel's own box rather than re-measuring on every `pos` change,
-  // which would re-cap the height mid-scroll. The observer only fires when the
-  // panel is genuinely resized — e.g. the summary line rewrapping as the
-  // guest count grows.
-  useLayoutEffect(() => {
-    const panel = panelRef.current;
-    if (!panelMounted || !panel) return;
-    const recapture = () => reposition(true);
-    const observer = new ResizeObserver(recapture);
-    observer.observe(panel);
-    // The panel has just mounted, so cap it against the space below.
-    recapture();
-    return () => observer.disconnect();
-  }, [panelMounted, adults, children, infants, pets, maxGuests, reposition]);
+  // Close on open-state resize? No: the panel is anchored in normal document
+  // flow directly beneath the trigger, so it scrolls one-for-one with it
+  // and can never cross over it. No scroll/resize listeners needed.
 
   // Close on Escape.
   useEffect(() => {
@@ -233,7 +154,7 @@ export const GuestPicker: React.FC<GuestPickerProps> = ({
   ];
 
   return (
-    <div className={className}>
+    <div className={`relative ${className ?? ''}`}>
       <button
         ref={triggerRef}
         type="button"
@@ -261,75 +182,65 @@ export const GuestPicker: React.FC<GuestPickerProps> = ({
         </span>
       </button>
 
-      {isOpen &&
-        pos &&
-        createPortal(
-          <div
-            ref={panelRef}
-            role="dialog"
-            aria-label="Select guests"
-            className="fixed overflow-y-auto rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl"
-            style={{
-              top: pos.top,
-              left: pos.left,
-              width: pos.width,
-              maxHeight: pos.maxHeight,
-              zIndex: 9999,
-            }}
-          >
-            {rows.map((row, i) => (
-              <div
-                key={row.key}
-                className={`flex items-center justify-between gap-4 py-4 ${
-                  i > 0 ? 'border-t border-gray-100' : ''
-                }`}
-              >
-                <div>
-                  <p className="text-base font-semibold text-gray-900">{row.title}</p>
-                  <p className="text-sm text-gray-500">{row.subtitle}</p>
-                </div>
-                <div className="flex shrink-0 items-center gap-3">
-                  <button
-                    type="button"
-                    aria-label={`Decrease ${row.title}`}
-                    disabled={row.count <= row.min}
-                    onClick={() => row.set(row.count - 1)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:text-gray-300 disabled:hover:bg-gray-100"
-                  >
-                    <Minus className="h-4 w-4" />
-                  </button>
-                  <span className="w-6 text-center text-sm font-semibold text-gray-900">
-                    {row.count}
-                  </span>
-                  <button
-                    type="button"
-                    aria-label={`Increase ${row.title}`}
-                    disabled={row.count >= row.max}
-                    onClick={() => row.set(row.count + 1)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:text-gray-300 disabled:hover:bg-gray-100"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </button>
-                </div>
+      {isOpen && (
+        <div
+          ref={panelRef}
+          role="dialog"
+          aria-label="Select guests"
+          className="absolute left-0 right-0 top-full z-50 mt-2 max-h-[60vh] overflow-y-auto rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl"
+        >
+          {rows.map((row, i) => (
+            <div
+              key={row.key}
+              className={`flex items-center justify-between gap-4 py-4 ${
+                i > 0 ? 'border-t border-gray-100' : ''
+              }`}
+            >
+              <div>
+                <p className="text-base font-semibold text-gray-900">{row.title}</p>
+                <p className="text-sm text-gray-500">{row.subtitle}</p>
               </div>
-            ))}
-
-            <p className="border-t border-gray-100 pt-4 text-sm text-gray-500">
-              A maximum of {maxGuests} guests, not including infants or pets.
-            </p>
-
-            <div className="mt-3 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="rounded-lg px-3 py-1.5 text-sm font-bold text-gray-900 transition-colors hover:bg-gray-100"
-              >
-                Close
-              </button>
+              <div className="flex shrink-0 items-center gap-3">
+                <button
+                  type="button"
+                  aria-label={`Decrease ${row.title}`}
+                  disabled={row.count <= row.min}
+                  onClick={() => row.set(row.count - 1)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:text-gray-300 disabled:hover:bg-gray-100"
+                >
+                  <Minus className="h-4 w-4" />
+                </button>
+                <span className="w-6 text-center text-sm font-semibold text-gray-900">
+                  {row.count}
+                </span>
+                <button
+                  type="button"
+                  aria-label={`Increase ${row.title}`}
+                  disabled={row.count >= row.max}
+                  onClick={() => row.set(row.count + 1)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-700 transition-colors hover:bg-gray-200 disabled:cursor-not-allowed disabled:text-gray-300 disabled:hover:bg-gray-100"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              </div>
             </div>
-          </div>,
-          document.body
-        )}
+          ))}
+
+          <p className="border-t border-gray-100 pt-4 text-sm text-gray-500">
+            A maximum of {maxGuests} guests, not including infants or pets.
+          </p>
+
+          <div className="mt-3 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="rounded-lg px-3 py-1.5 text-sm font-bold text-gray-900 transition-colors hover:bg-gray-100"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

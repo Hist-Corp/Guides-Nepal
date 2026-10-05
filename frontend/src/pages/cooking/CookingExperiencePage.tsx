@@ -611,9 +611,9 @@ const CookingExperiencePage: React.FC = () => {
                 {/* Desktop Booking Card */}
                 <div
                   id="booking-card-desktop"
-                  className="hidden lg:block bg-white rounded-2xl shadow-xl border border-gray-100 p-6 overflow-hidden relative"
+                  className="hidden lg:block bg-white rounded-2xl shadow-xl border border-gray-100 p-6 overflow-visible relative"
                 >
-                  <div className="absolute top-0 left-0 w-full h-1 bg-orange-600"></div>
+                  <div className="absolute top-0 left-0 w-full h-1 bg-orange-600 rounded-t-2xl"></div>
 
                   {!isBookingConfirmed ? (
                     <>

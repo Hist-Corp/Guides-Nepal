@@ -1,5 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface BookingCalendarProps {
@@ -109,15 +108,18 @@ const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
 /**
  * Airbnb-style date-range picker used on experience booking cards.
- * The popup is portaled to document.body and fixed-positioned from the
- * trigger's bounding rect, so it is never clipped by a card's
- * overflow-hidden container. Shows a two-month grid with prev/next
+ * The popup is anchored directly beneath the fields (absolute, top-full
+ * inside a relative wrapper), so it scrolls one-for-one with them and can
+ * never cross over them. Shows a two-month grid with prev/next
  * month navigation; the previous button is disabled at the current
  * month so the calendar never shows past months. Check-in and
  * check-out fields are real inputs — users can type DD/MM/YYYY
- * directly (or pick from the grid), and the panel stays glued to the
- * fields as the page scrolls — lifting just enough to stay fully on
- * screen instead of being cut off by the bottom of the window. The card
+ * directly (or pick from the grid), and the panel hangs glued beneath
+ * the fields as the page scrolls: always 8px under them, tracking them
+ * one-for-one, never lifting up over them. When the room below the
+ * fields cannot fit its full height it caps itself to that room (the
+ * same model GuestPicker and TimePicker use) so its bottom stays on
+ * screen. The card
  * and the popup both show the
  * check-in and check-out fields together; the field being edited is
  * outlined and the other is dimmed, mirroring Airbnb's date picker.
@@ -154,17 +156,6 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
   );
   /** Focus target after a typed commit (moves the user on to check-out). */
   const [pendingFocus, setPendingFocus] = useState<'checkin' | 'checkout' | null>(null);
-  /**
-   * Popup placement. `natural` is the panel's un-capped content height, so
-   * `top` can be recomputed while scrolling without re-measuring (and
-   * therefore without the panel resizing frame-to-frame).
-   */
-  const [popupPos, setPopupPos] = useState<{
-    top: number;
-    left: number;
-    maxHeight: number | null;
-    natural: number | null;
-  } | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -340,113 +331,30 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
           ? 'Update your check-in date'
           : 'Select check-in, then check-out';
 
-  /**
-   * Places the portaled popup as a dropdown anchored to the check-in /
-   * check-out fields.
-   *
-   * Horizontally the panel is right-aligned to the fields: the booking card
-   * lives in the right-hand column, so its wide (680px) popup would otherwise
-   * be clamped against the viewport edge and stick out of the page container.
-   * The alignment is then nudged back inside the viewport when the fields sit
-   * close to the left edge.
-   *
-   * Vertically it hangs 8px under the fields when there is room. When there
-   * is not, it slides *up* so its bottom stays 8px above the viewport edge —
-   * covering the fields, whose inputs it repeats in its own header — instead
-   * of being height-capped, which used to clip the second month and push the
-   * Clear/Close footer out of reach behind an inner scrollbar. The panel is
-   * only ever capped when the window itself is shorter than the panel.
-   *
-   * While scrolling only `top`/`left` are recomputed, so the panel tracks the
-   * fields one-to-one and its height never changes (that resizing is what
-   * made it jitter). The height is only recomputed on open, on window
-   * resize, and when the content itself changes.
-   */
-  const placePanel = (rect: DOMRect, recalcHeight: boolean) => {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const panelWidth = single ? 340 : Math.min(680, vw - 16);
-    const gap = 8;
-    // Right-aligned to the fields, then kept inside the viewport.
-    const left = Math.max(8, Math.min(rect.right - panelWidth, vw - panelWidth - 8));
-    const below = rect.bottom + gap;
-
-    setPopupPos((prev) => {
-      let natural = prev?.natural ?? null;
-      if (recalcHeight) {
-        const node = panelRef.current;
-        // scrollHeight is the natural height even while a cap is applied,
-        // so this cannot oscillate. The 1px borders are not part of it, and
-        // the lift below works with the panel's outer box, so add them.
-        const content = node?.scrollHeight ?? 0;
-        if (node && content > 0) {
-          const cs = getComputedStyle(node);
-          const borders =
-            (Number.parseFloat(cs.borderTopWidth) || 0) +
-            (Number.parseFloat(cs.borderBottomWidth) || 0);
-          natural = content + borders;
-        }
-      }
-      // Never taller than the viewport (only then does it scroll internally),
-      // and lifted rather than clipped when the room below runs out.
-      const height = natural === null ? null : Math.min(natural, vh - 16);
-      const top = height === null ? below : Math.min(below, vh - gap - height);
-      const maxHeight = natural !== null && height < natural ? height : null;
-      return prev &&
-        prev.top === top &&
-        prev.left === left &&
-        prev.maxHeight === maxHeight &&
-        prev.natural === natural
-        ? prev
-        : { top, left, maxHeight, natural };
-    });
-  };
-
+  // Escape closes the popup; clicking anywhere outside the wrapper (fields
+  // + inline panel) closes it. No scroll/resize listeners: the panel is
+  // anchored in normal document flow directly beneath the fields, so it
+  // scrolls one-for-one with them and can never cross over them.
   useEffect(() => {
-    if (!isOpen) {
-      setPopupPos(null);
-      return;
-    }
-    const el = wrapperRef.current;
-    if (el) placePanel(el.getBoundingClientRect(), true);
-
-    // Re-dock the panel whenever the card moves, so the calendar stays
-    // directly under the check-in / check-out fields while scrolling.
-    // Throttled to one measurement per frame to keep scrolling smooth, and
-    // height is left untouched so the panel only ever translates.
-    let frame = 0;
-    const redock = (recalcHeight: boolean) => () => {
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        const node = wrapperRef.current;
-        if (node) placePanel(node.getBoundingClientRect(), recalcHeight);
-      });
-    };
-    const onScroll = redock(false);
-    const onResize = redock(true);
+    if (!isOpen) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setIsOpen(false);
     };
     const onPointerDown = (e: MouseEvent) => {
       const target = e.target as Node;
-      if (panelRef.current?.contains(target)) return;
       if (wrapperRef.current?.contains(target)) return;
       setIsOpen(false);
     };
+    const onResize = () => setIsOpen(false);
     window.addEventListener('resize', onResize);
-    window.addEventListener('scroll', onScroll, true);
     window.addEventListener('keydown', onKeyDown);
     document.addEventListener('mousedown', onPointerDown);
     return () => {
-      if (frame) cancelAnimationFrame(frame);
       window.removeEventListener('resize', onResize);
-      window.removeEventListener('scroll', onScroll, true);
       window.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('mousedown', onPointerDown);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, single]);
+  }, [isOpen]);
 
   // Keep the typed input text aligned with the committed dates and drop
   // stale validation errors when a matching date changes or the popup closes.
@@ -467,33 +375,11 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     }
   }, [isOpen, checkIn, checkOut]);
 
-  // True only while the portaled panel is actually in the DOM. Depending on
-  // this instead of `popupPos` keeps the effect below from re-running on every
-  // scroll frame, since `popupPos.top` changes each frame.
-  const panelMounted = Boolean(isOpen && popupPos);
-
-  // Watch the popup's own box rather than re-measuring on every `popupPos`
-  // change. Recomputing the cap on each scroll frame made the panel visibly
-  // shrink and grow as it moved; the observer only fires when the panel is
-  // genuinely resized — opening, switching months, or showing an error.
-  useLayoutEffect(() => {
-    const panel = panelRef.current;
-    const el = wrapperRef.current;
-    if (!panelMounted || !panel || !el) return;
-    const recapture = () => placePanel(el.getBoundingClientRect(), true);
-    const observer = new ResizeObserver(recapture);
-    observer.observe(panel);
-    // The panel has just mounted, so cap it against the space below.
-    recapture();
-    return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [panelMounted, visibleMonth, checkIn, checkOut, typeErr, focusOverride]);
-
   // After a typed check-in commits, move focus (and select the text) of the
   // next check-out input — panel when open, otherwise the visible card field.
   useEffect(() => {
     if (!pendingFocus) return;
-    const root = isOpen && panelRef.current ? panelRef.current : wrapperRef.current;
+    const root = wrapperRef.current;
     if (root) {
       const inputs = root.querySelectorAll<HTMLInputElement>(`input[data-field="${pendingFocus}"]`);
       for (let i = 0; i < inputs.length; i++) {
@@ -668,7 +554,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
   };
 
   return (
-    <div ref={wrapperRef} className="space-y-2">
+    <div ref={wrapperRef} className="relative space-y-2">
       {/* Initial state: the check-in and check-out fields sit side by side.
           They are typed DD/MM/YYYY inputs that also open the calendar — a
           complete date commits on blur or Enter. */}
@@ -690,109 +576,101 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
         {nights > 0 ? `${nights} night${nights === 1 ? '' : 's'}` : single ? 'One day' : ''}
       </p>
 
-      {/* Popup portaled to document.body so no card can clip it */}
-      {isOpen &&
-        popupPos &&
-        createPortal(
-          <div
-            ref={panelRef}
-            role="dialog"
-            aria-modal="false"
-            aria-label="Choose dates"
-            onMouseLeave={() => setHoverKey(null)}
-            style={{
-              position: 'fixed',
-              top: popupPos.top,
-              left: popupPos.left,
-              maxHeight: popupPos.maxHeight ?? undefined,
-              zIndex: 9999,
-            }}
-            className={`${
-              single ? 'w-[340px]' : 'w-[680px] max-w-[calc(100vw-16px)]'
-            } rounded-2xl border border-gray-200 bg-white shadow-2xl overflow-y-auto`}
-          >
-            {/* Popup header — Airbnb-style "Select dates" with typed
+      {/* Popup anchored directly beneath the fields (absolute, top-full) so it
+          scrolls one-for-one with them and can never cross over them. Wide
+          two-month panel is right-aligned to the fields via right-0. */}
+      {isOpen && (
+        <div
+          ref={panelRef}
+          role="dialog"
+          aria-modal="false"
+          aria-label="Choose dates"
+          onMouseLeave={() => setHoverKey(null)}
+          className={`${
+            single ? 'w-[340px] max-w-[calc(100vw-16px)]' : 'w-[680px] max-w-[calc(100vw-16px)]'
+          } absolute left-0 md:left-auto md:right-0 top-full z-50 mt-2 max-h-[85vh] rounded-2xl border border-gray-200 bg-white shadow-2xl overflow-y-auto flex flex-col`}
+        >
+          {/* Popup header — Airbnb-style "Select dates" with typed
                 check-in / check-out boxes the user can write into */}
-            <div className="px-5 pt-5 pb-4">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-lg font-bold text-gray-900">Select dates</p>
-                  <p className="text-sm text-gray-500 mt-0.5">{panelSubtitle}</p>
-                </div>
-                {/* Both fields stay in the popup; the active one gets the
-                    black outline and the other is dimmed. */}
-                <div className="flex gap-2">
-                  {renderInputBox('checkin', 'panel')}
-                  {!single && renderInputBox('checkout', 'panel')}
-                </div>
+          <div className="px-5 pt-5 pb-4 sticky top-0 z-10 bg-white rounded-t-2xl shrink-0">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-lg font-bold text-gray-900">Select dates</p>
+                <p className="text-sm text-gray-500 mt-0.5">{panelSubtitle}</p>
               </div>
-              {typeErr && <p className="mt-1.5 text-xs font-medium text-red-600">{typeErr.msg}</p>}
+              {/* Both fields stay in the popup; the active one gets the
+                    black outline and the other is dimmed. */}
+              <div className="flex gap-2">
+                {renderInputBox('checkin', 'panel')}
+                {!single && renderInputBox('checkout', 'panel')}
+              </div>
             </div>
-            <div className="p-4">
-              {/* Month navigation: chevrons are pinned to the panel edges and
+            {typeErr && <p className="mt-1.5 text-xs font-medium text-red-600">{typeErr.msg}</p>}
+          </div>
+          <div className="p-4">
+            {/* Month navigation: chevrons are pinned to the panel edges and
                   each month caption is centred over its own grid, so the
                   calendar never needs scrolling. Previous stays disabled at
                   the current month and re-enables in future months. */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => shiftMonth(-1)}
-                  disabled={atMinMonth}
-                  aria-label="Previous month"
-                  className="absolute left-0 top-0 z-10 rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-300 disabled:hover:bg-transparent"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => shiftMonth(1)}
-                  aria-label="Next month"
-                  className="absolute right-0 top-0 z-10 rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-
-                {/* Two-month grid */}
-                <div className="flex gap-8">
-                  {renderMonth(visibleMonth, monthLabel(visibleMonth))}
-                  {!single && (
-                    <div className="hidden min-w-0 flex-1 md:block">
-                      {renderMonth(secondMonth, monthLabel(secondMonth))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Footer: clear + close */}
-            <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-gray-100">
+            <div className="relative">
               <button
                 type="button"
-                onClick={() => {
-                  onChange('', '');
-                  setCiText('');
-                  setCoText('');
-                  setTypeErr(null);
-                  setHoverKey(null);
-                  setFocusOverride(null);
-                }}
-                className="text-sm font-bold underline underline-offset-2 text-gray-700 hover:text-gray-900"
+                onClick={() => shiftMonth(-1)}
+                disabled={atMinMonth}
+                aria-label="Previous month"
+                className="absolute left-0 top-0 z-10 rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-300 disabled:hover:bg-transparent"
               >
-                Clear dates
+                <ChevronLeft className="h-4 w-4" />
               </button>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={closeCalendar}
-                  className="px-5 py-2 text-sm font-bold bg-gray-900 text-white rounded-lg hover:bg-gray-700"
-                >
-                  Close
-                </button>
+              <button
+                type="button"
+                onClick={() => shiftMonth(1)}
+                aria-label="Next month"
+                className="absolute right-0 top-0 z-10 rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+
+              {/* Two-month grid */}
+              <div className="flex gap-8">
+                {renderMonth(visibleMonth, monthLabel(visibleMonth))}
+                {!single && (
+                  <div className="hidden min-w-0 flex-1 md:block">
+                    {renderMonth(secondMonth, monthLabel(secondMonth))}
+                  </div>
+                )}
               </div>
             </div>
-          </div>,
-          document.body
-        )}
+          </div>
+
+          {/* Footer: clear + close — pinned visible while months scroll */}
+          <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-gray-100 sticky bottom-0 bg-white rounded-b-2xl shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                onChange('', '');
+                setCiText('');
+                setCoText('');
+                setTypeErr(null);
+                setHoverKey(null);
+                setFocusOverride(null);
+              }}
+              className="text-sm font-bold underline underline-offset-2 text-gray-700 hover:text-gray-900"
+            >
+              Clear dates
+            </button>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={closeCalendar}
+                className="px-5 py-2 text-sm font-bold bg-gray-900 text-white rounded-lg hover:bg-gray-700"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

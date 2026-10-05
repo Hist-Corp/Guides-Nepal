@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useEffect, useRef, useState } from 'react';
 import { Check, ChevronRight } from 'lucide-react';
 
 export interface TimeOption {
@@ -37,14 +36,12 @@ export interface TimePickerProps {
   ariaLabel?: string;
 }
 
-const clamp = (n: number, min: number, max: number): number => Math.min(Math.max(n, min), max);
-
 /**
  * Airbnb-style time-slot dropdown used on experience booking cards.
  *
  * The trigger mirrors the BookingCalendar/GuestPicker card triggers
  * (uppercase label + value + chevron). The panel is portaled to
- * document.body and fixed-positioned from the trigger's bounding rect,
+ * anchored directly beneath the trigger,
  * so it is never clipped by a card's overflow-hidden container. Picking
  * a slot closes the panel; Escape / outside click also close it.
  */
@@ -58,12 +55,6 @@ export const TimePicker: React.FC<TimePickerProps> = ({
   ariaLabel,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [pos, setPos] = useState<{
-    top: number;
-    left: number;
-    width: number;
-    maxHeight: number;
-  } | null>(null);
 
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -71,81 +62,9 @@ export const TimePicker: React.FC<TimePickerProps> = ({
   const selected = options.find((o) => o.value === value);
   const displayValue = selected?.label ?? value;
 
-  /**
-   * Places the portaled panel as a dropdown under the trigger.
-   *
-   * While scrolling only `top`/`left`/`width` are recomputed, so the panel
-   * tracks the trigger one-to-one and its height never changes — recomputing
-   * the cap against the live space below made it visibly shrink and grow as
-   * it moved. The cap is only recomputed on open, on window resize, and when
-   * the panel's own content changes size.
-   */
-  const reposition = useCallback((recalcHeight: boolean) => {
-    const trigger = triggerRef.current;
-    if (!trigger) return;
-    const rect = trigger.getBoundingClientRect();
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const width = Math.min(Math.max(rect.width, 260), vw - 16);
-    const left = clamp(rect.left, 8, Math.max(8, vw - width - 8));
-    // Classic dropdown: always drop straight below the trigger (never flip
-    // above), and grow no taller than the space left on screen — the list
-    // scrolls internally instead of jumping around the card.
-    const top = rect.bottom + 8;
-
-    setPos((prev) => {
-      const maxHeight = recalcHeight || !prev ? Math.max(160, vh - top - 8) : prev.maxHeight;
-      return prev &&
-        prev.top === top &&
-        prev.left === left &&
-        prev.width === width &&
-        prev.maxHeight === maxHeight
-        ? prev
-        : { top, left, width, maxHeight };
-    });
-  }, []);
-
-  // True only while the portaled panel is actually in the DOM. Depending on
-  // this instead of `pos` keeps the effect below from re-running on every
-  // scroll frame, since `pos.top` changes each frame.
-  const panelMounted = Boolean(isOpen && pos);
-
-  // Position (and re-position) the panel while open. Scrolling is throttled to
-  // one measurement per frame, and leaves the height cap alone.
-  useLayoutEffect(() => {
-    if (!isOpen) return;
-    reposition(true);
-    let frame = 0;
-    const onScroll = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        reposition(false);
-      });
-    };
-    const onResize = () => reposition(true);
-    window.addEventListener('scroll', onScroll, true);
-    window.addEventListener('resize', onResize);
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', onScroll, true);
-      window.removeEventListener('resize', onResize);
-    };
-  }, [isOpen, reposition]);
-
-  // Watch the panel's own box rather than re-measuring on every `pos` change,
-  // which would re-cap the height mid-scroll. The observer only fires when the
-  // panel is genuinely resized — e.g. the option list changing.
-  useLayoutEffect(() => {
-    const panel = panelRef.current;
-    if (!panelMounted || !panel) return;
-    const recapture = () => reposition(true);
-    const observer = new ResizeObserver(recapture);
-    observer.observe(panel);
-    // The panel has just mounted, so cap it against the space below.
-    recapture();
-    return () => observer.disconnect();
-  }, [panelMounted, options.length, reposition]);
+  // Close on open-state resize? No: the panel is anchored in normal document
+  // flow directly beneath the trigger, so it scrolls one-for-one with it
+  // and can never cross over it. No scroll/resize listeners needed.
 
   // Close on Escape.
   useEffect(() => {
@@ -175,7 +94,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
   };
 
   return (
-    <div className={className}>
+    <div className={`relative ${className ?? ''}`}>
       <button
         ref={triggerRef}
         type="button"
@@ -203,43 +122,33 @@ export const TimePicker: React.FC<TimePickerProps> = ({
         </span>
       </button>
 
-      {isOpen &&
-        pos &&
-        createPortal(
-          <div
-            ref={panelRef}
-            role="listbox"
-            aria-label={label}
-            className="fixed overflow-y-auto rounded-2xl border border-gray-200 bg-white p-2 shadow-2xl"
-            style={{
-              top: pos.top,
-              left: pos.left,
-              width: pos.width,
-              maxHeight: pos.maxHeight,
-              zIndex: 9999,
-            }}
-          >
-            {options.map((option) => {
-              const isSelected = option.value === value;
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  role="option"
-                  aria-selected={isSelected}
-                  onClick={() => select(option.value)}
-                  className={`flex w-full items-center justify-between rounded-lg px-4 py-3 text-left text-sm transition-colors hover:bg-gray-50 ${
-                    isSelected ? 'font-bold text-gray-900' : 'text-gray-600'
-                  }`}
-                >
-                  {option.label}
-                  {isSelected && <Check className="h-4 w-4 shrink-0 text-gray-900" />}
-                </button>
-              );
-            })}
-          </div>,
-          document.body
-        )}
+      {isOpen && (
+        <div
+          ref={panelRef}
+          role="listbox"
+          aria-label={label}
+          className="absolute left-0 right-0 top-full z-50 mt-2 max-h-[60vh] overflow-y-auto rounded-2xl border border-gray-200 bg-white p-2 shadow-2xl"
+        >
+          {options.map((option) => {
+            const isSelected = option.value === value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                role="option"
+                aria-selected={isSelected}
+                onClick={() => select(option.value)}
+                className={`flex w-full items-center justify-between rounded-lg px-4 py-3 text-left text-sm transition-colors hover:bg-gray-50 ${
+                  isSelected ? 'font-bold text-gray-900' : 'text-gray-600'
+                }`}
+              >
+                {option.label}
+                {isSelected && <Check className="h-4 w-4 shrink-0 text-gray-900" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
