@@ -23,6 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
+# Kilo editor tooling (skills, agents, git worktrees) — not project code
+.kilo/
+
 # Python / Backend
 __pycache__/
 *.py[cod]
