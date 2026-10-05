@@ -109,12 +109,13 @@ describe('BookingCalendar', () => {
     expect(panelField('checkin')).toHaveAttribute('aria-invalid', 'true');
   });
 
-  it('moves exactly as much as the fields, with no resizing, while the page scrolls', async () => {
+  it('stays fully on screen, with a constant height, while the page scrolls', async () => {
     // jsdom has no layout engine, so stand in for the page: a card at a fixed
     // offset in the document whose viewport rect slides up as the page
     // scrolls, in an 800px-tall window. The calendar's natural height (456)
-    // deliberately does NOT fit under the card, so the panel has to be capped
-    // — the situation that used to make it resize on every scroll frame.
+    // deliberately does NOT fit under the card at the top of the page, which
+    // is the situation that used to make the panel resize on every scroll
+    // frame and clipped its Clear/Close footer off the bottom of the window.
     let scrollY = 0;
     const rectSpy = vi
       .spyOn(Element.prototype, 'getBoundingClientRect')
@@ -147,25 +148,34 @@ describe('BookingCalendar', () => {
         window.dispatchEvent(new Event('scroll'));
       };
 
-      // Docked 8px under the fields, never flipped above them, and capped to
-      // the 404px of room left underneath (800 - 388 - 8).
-      await waitFor(() => expect(top()).toBe(388));
-      expect(panel.style.maxHeight).toBe('404px');
+      // The fields end 388px down the window and the panel is 456px tall, so
+      // hanging below them would run it 164px past the bottom of the screen.
+      // Instead it lifts until its bottom sits 8px above the viewport edge —
+      // no height cap, so the footer and both months stay reachable.
+      await waitFor(() => expect(top()).toBe(336));
+      expect(top() + 456).toBe(792);
+      expect(panel.style.maxHeight).toBe('');
 
-      // Scroll down past the point where the calendar would fit again, then
-      // back up. Scrolling only ever translates the panel, so the cap must
-      // survive untouched instead of appearing and disappearing.
+      // Scrolled down there is room under the fields again, so the panel
+      // docks 8px beneath them and tracks them one-for-one — moving by
+      // exactly as much as they did, without ever changing height.
+      scrollTo(120);
+      await waitFor(() => expect(top()).toBe(388 - scrollY));
       let lastTop = top();
-      for (const delta of [120, 90, 90, 60, -40, -60, -30, 30]) {
+      for (const delta of [90, 90, 60, -40, -60, -30, 30]) {
         scrollTo(scrollY + delta);
-        // At every step the panel sits exactly 8px under the fields, having
-        // moved by exactly as much as they did.
-        await waitFor(() => expect(top()).toBe(380 - scrollY + 8));
+        await waitFor(() => expect(top()).toBe(388 - scrollY));
         expect(top() - lastTop).toBe(-delta);
         // Same height throughout, so it never appears to shrink and grow.
-        expect(panel.style.maxHeight).toBe('404px');
+        expect(panel.style.maxHeight).toBe('');
+        expect(top() + 456).toBeLessThanOrEqual(792);
         lastTop = top();
       }
+
+      // Back at the top of the page it lifts again instead of overflowing.
+      scrollTo(0);
+      await waitFor(() => expect(top()).toBe(336));
+      expect(top() + 456).toBe(792);
     } finally {
       heightSpy.mockRestore();
       rectSpy.mockRestore();

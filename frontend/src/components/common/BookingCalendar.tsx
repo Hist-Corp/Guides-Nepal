@@ -108,12 +108,6 @@ const parseTyped = (text: string): Date | null => {
 const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
 /**
- * Smallest height the popup is allowed to shrink to when the space beneath
- * the date fields is tight, so it never collapses into an unusable sliver.
- */
-const MIN_PANEL_HEIGHT = 220;
-
-/**
  * Airbnb-style date-range picker used on experience booking cards.
  * The popup is portaled to document.body and fixed-positioned from the
  * trigger's bounding rect, so it is never clipped by a card's
@@ -121,8 +115,10 @@ const MIN_PANEL_HEIGHT = 220;
  * month navigation; the previous button is disabled at the current
  * month so the calendar never shows past months. Check-in and
  * check-out fields are real inputs — users can type DD/MM/YYYY
- * directly (or pick from the grid), and the panel stays docked under
- * the fields as the page scrolls. The card and the popup both show the
+ * directly (or pick from the grid), and the panel stays glued to the
+ * fields as the page scrolls — lifting just enough to stay fully on
+ * screen instead of being cut off by the bottom of the window. The card
+ * and the popup both show the
  * check-in and check-out fields together; the field being edited is
  * outlined and the other is dimmed, mirroring Airbnb's date picker.
  */
@@ -158,10 +154,16 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
   );
   /** Focus target after a typed commit (moves the user on to check-out). */
   const [pendingFocus, setPendingFocus] = useState<'checkin' | 'checkout' | null>(null);
+  /**
+   * Popup placement. `natural` is the panel's un-capped content height, so
+   * `top` can be recomputed while scrolling without re-measuring (and
+   * therefore without the panel resizing frame-to-frame).
+   */
   const [popupPos, setPopupPos] = useState<{
     top: number;
     left: number;
     maxHeight: number | null;
+    natural: number | null;
   } | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -339,13 +341,25 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
           : 'Select check-in, then check-out';
 
   /**
-   * Places the portaled popup as a dropdown docked under the check-in /
-   * check-out fields. The panel always hangs below the fields — it never
-   * flips above them — and sits exactly 8px under them.
+   * Places the portaled popup as a dropdown anchored to the check-in /
+   * check-out fields.
+   *
+   * Horizontally the panel is right-aligned to the fields: the booking card
+   * lives in the right-hand column, so its wide (680px) popup would otherwise
+   * be clamped against the viewport edge and stick out of the page container.
+   * The alignment is then nudged back inside the viewport when the fields sit
+   * close to the left edge.
+   *
+   * Vertically it hangs 8px under the fields when there is room. When there
+   * is not, it slides *up* so its bottom stays 8px above the viewport edge —
+   * covering the fields, whose inputs it repeats in its own header — instead
+   * of being height-capped, which used to clip the second month and push the
+   * Clear/Close footer out of reach behind an inner scrollbar. The panel is
+   * only ever capped when the window itself is shorter than the panel.
    *
    * While scrolling only `top`/`left` are recomputed, so the panel tracks the
    * fields one-to-one and its height never changes (that resizing is what
-   * made it jitter). The height cap is only recomputed on open, on window
+   * made it jitter). The height is only recomputed on open, on window
    * resize, and when the content itself changes.
    */
   const placePanel = (rect: DOMRect, recalcHeight: boolean) => {
@@ -353,26 +367,38 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     const vh = window.innerHeight;
     const panelWidth = single ? 340 : Math.min(680, vw - 16);
     const gap = 8;
-    // Dropdown alignment: start at the fields' left edge, then keep the whole
-    // panel on screen.
-    const left = Math.max(8, Math.min(rect.left, vw - panelWidth - 8));
-
-    // Always below the fields, whatever the scroll position.
-    const top = rect.bottom + gap;
+    // Right-aligned to the fields, then kept inside the viewport.
+    const left = Math.max(8, Math.min(rect.right - panelWidth, vw - panelWidth - 8));
+    const below = rect.bottom + gap;
 
     setPopupPos((prev) => {
-      let maxHeight = prev?.maxHeight ?? null;
+      let natural = prev?.natural ?? null;
       if (recalcHeight) {
+        const node = panelRef.current;
         // scrollHeight is the natural height even while a cap is applied,
-        // so this cannot oscillate.
-        const natural = panelRef.current?.scrollHeight ?? 0;
-        const spaceBelow = vh - top - 8;
-        maxHeight =
-          natural > 0 && spaceBelow < natural ? Math.max(spaceBelow, MIN_PANEL_HEIGHT) : null;
+        // so this cannot oscillate. The 1px borders are not part of it, and
+        // the lift below works with the panel's outer box, so add them.
+        const content = node?.scrollHeight ?? 0;
+        if (node && content > 0) {
+          const cs = getComputedStyle(node);
+          const borders =
+            (Number.parseFloat(cs.borderTopWidth) || 0) +
+            (Number.parseFloat(cs.borderBottomWidth) || 0);
+          natural = content + borders;
+        }
       }
-      return prev && prev.top === top && prev.left === left && prev.maxHeight === maxHeight
+      // Never taller than the viewport (only then does it scroll internally),
+      // and lifted rather than clipped when the room below runs out.
+      const height = natural === null ? null : Math.min(natural, vh - 16);
+      const top = height === null ? below : Math.min(below, vh - gap - height);
+      const maxHeight = natural !== null && height < natural ? height : null;
+      return prev &&
+        prev.top === top &&
+        prev.left === left &&
+        prev.maxHeight === maxHeight &&
+        prev.natural === natural
         ? prev
-        : { top, left, maxHeight };
+        : { top, left, maxHeight, natural };
     });
   };
 
