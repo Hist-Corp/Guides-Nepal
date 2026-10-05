@@ -17,7 +17,7 @@ flushPendingSubmissions();
 import Cart from './components/common/Cart';
 import HomePage from './pages/HomePage';
 import SearchPage from './pages/SearchPage';
-import ExperiencePage from './pages/ExperiencePage';
+import CanonicalExperienceRoute from './components/routing/CanonicalExperienceRoute';
 import SeoExperiencePage from './pages/SeoExperiencePage';
 import CityPage from './pages/CityPage';
 import KathmanduPage from './pages/kathmandu/KathmanduPage';
@@ -125,7 +125,7 @@ function App() {
             <Route path="/search" element={<SearchPage />} />
             <Route path="/impact-report-2024" element={<ImpactReportPage />} />
             <Route path="/experience/seo/:slug" element={<SeoExperiencePage />} />
-            <Route path="/experience/:id" element={<ExperiencePage />} />
+            <Route path="/experience/:id" element={<CanonicalExperienceRoute />} />
             <Route path="/auth/callback" element={<OAuthCallback />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
 

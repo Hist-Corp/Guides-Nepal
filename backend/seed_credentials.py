@@ -3,6 +3,7 @@ from app.core.roles import (
     ADMIN,
     CONTENT_MANAGER,
     CUSTOMER_SUPPORT,
+    GUIDE,
     HOST,
     REGIONAL_HEAD,
 )
@@ -11,13 +12,18 @@ from app.core.security import get_password_hash, verify_password, validate_passw
 from app.models.user import User
 
 # All credentials for every dashboard role in the project.
-# Role hierarchy: admin > content-manager > regional-head > customer-support > host
+# Role hierarchy: admin > content-manager > regional-head > customer-support > host > guide
+#
+# These rows are created here rather than through POST /auth/register on purpose:
+# `guide` (and every staff role) is outside SELF_REGISTERABLE_ROLES, so the
+# public registration endpoint refuses to mint it.
 CREDENTIALS = {
     "admin@guides-nepal.com":        {"password": "Admin@12345",      "role": ADMIN},
     "content@guides-nepal.com":      {"password": "Content@2024",     "role": CONTENT_MANAGER},
     "regional@guides-nepal.com":     {"password": "Regional@2024",    "role": REGIONAL_HEAD},
     "support@guides-nepal.com":      {"password": "Support@2024",     "role": CUSTOMER_SUPPORT},
     "host@guides-nepal.com":         {"password": "Host@2024",        "role": HOST},
+    "guide@guides-nepal.com":        {"password": "Guide@2024",       "role": GUIDE},
 }
 
 db = SessionLocal()

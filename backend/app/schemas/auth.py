@@ -1,15 +1,55 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import Optional
+
+from app.core.roles import (
+    SELF_REGISTERABLE_ROLES,
+    TRAVELER,
+    can_self_register,
+    normalize_role,
+)
 
 
 class UserBase(BaseModel):
     email: EmailStr
     firstName: Optional[str] = None
     lastName: Optional[str] = None
-    role: str = "traveler"
+    role: str = TRAVELER
 
 
 class UserCreate(UserBase):
+    """Public self-registration payload.
+
+    ``role`` is clamped to :data:`app.core.roles.SELF_REGISTERABLE_ROLES`.
+    Requesting an elevated role (``admin``, ``content-manager``,
+    ``regional-head``, ``customer-support`` or ``guide``) is rejected with a 422
+    instead of silently creating a privileged account, because this body is
+    attacker-controlled.  Elevated roles are granted by an admin through
+    ``PATCH /api/v1/admin/users/{id}`` or by a seed script.
+    """
+
+    password: str
+    phone: Optional[str] = None
+
+    @field_validator("role")
+    @classmethod
+    def _reject_elevated_role(cls, value: str) -> str:
+        canonical = normalize_role(value)
+        if not can_self_register(canonical):
+            raise ValueError(
+                f"Role '{value}' cannot be self-assigned. "
+                f"Allowed at registration: {', '.join(sorted(SELF_REGISTERABLE_ROLES))}"
+            )
+        return canonical
+
+
+class PrivilegedUserCreate(UserBase):
+    """Server-side creation payload whose ``role`` is *not* restricted.
+
+    Reserved for trusted server-side callers such as the dev seed endpoint.
+    Never bind this schema to a publicly reachable route — use
+    :class:`UserCreate` for those.
+    """
+
     password: str
     phone: Optional[str] = None
 

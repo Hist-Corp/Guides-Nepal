@@ -3,6 +3,7 @@ from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.auth import (
+    PrivilegedUserCreate,
     UserCreate,
     UserLogin,
     Token,
@@ -13,6 +14,7 @@ from app.schemas.auth import (
 from app.services.auth_service import AuthService
 from app.core.config import settings, Settings
 from app.core.dependencies import get_current_user
+from app.core.roles import ADMIN
 from app.models.user import User
 import httpx
 import urllib.parse
@@ -112,10 +114,13 @@ def seed_admin(db: Session = Depends(get_db)) -> dict:
     auth_service = AuthService(db)
     existing = auth_service.get_user_by_email(email)
     if not existing:
-        user_in = UserCreate(
+        # PrivilegedUserCreate, not UserCreate: this trusted server-side path is
+        # the only way to mint an admin, since the public registration schema
+        # refuses elevated roles.
+        user_in = PrivilegedUserCreate(
             email=email,
             password=password,
-            role="admin",
+            role=ADMIN,
             firstName="Admin",
             lastName="User",
         )

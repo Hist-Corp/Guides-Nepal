@@ -575,9 +575,11 @@ const CityPage: React.FC = () => {
               guides-nepal
             </h1>
             <p className="text-lg md:text-xl font-medium drop-shadow-md mb-8">{city.description}</p>
-            <Button className="bg-brand-yellow hover:bg-brand-yellow/90 text-white font-bold text-lg px-8 rounded-full border-none">
-              View all tours
-            </Button>
+            <a href="#top-tours">
+              <Button className="bg-brand-yellow hover:bg-brand-yellow/90 text-white font-bold text-lg px-8 rounded-full border-none">
+                View all tours
+              </Button>
+            </a>
           </div>
         </div>
       </div>
@@ -609,12 +611,12 @@ const CityPage: React.FC = () => {
         </div>
 
         {/* Top Things to Do */}
-        <section>
+        <section id="top-tours">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-primary">Top things to do in {city.name}</h2>
-            <Link to="#" className="text-primary font-bold hover:underline">
+            <a href="#top-tours" className="text-primary font-bold hover:underline">
               See all tours
-            </Link>
+            </a>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {city.topThings.map((tour: Tour) => (
@@ -671,7 +673,7 @@ const CityPage: React.FC = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {city.guides.map((guide: Guide) => (
-              <div key={guide.id} className="text-center group cursor-pointer">
+              <Link to={`/local/${guide.id}`} className="text-center group block">
                 <div className="relative w-32 h-32 mx-auto mb-4">
                   <img
                     src={guide.image}
@@ -688,17 +690,19 @@ const CityPage: React.FC = () => {
                   {guide.name}
                 </h4>
                 <p className="text-xs text-slate-500">{guide.reviews} reviews</p>
-              </div>
+              </Link>
             ))}
           </div>
 
           <div className="text-center mt-8">
-            <Button
-              variant="outline"
-              className="rounded-full px-8 text-primary border-primary hover:bg-brand-yellow hover:text-white hover:border-brand-yellow transition-colors"
-            >
-              View all locals
-            </Button>
+            <Link to="/explore">
+              <Button
+                variant="outline"
+                className="rounded-full px-8 text-primary border-primary hover:bg-brand-yellow hover:text-white hover:border-brand-yellow transition-colors"
+              >
+                View all locals
+              </Button>
+            </Link>
           </div>
         </section>
       </main>

@@ -315,7 +315,10 @@ const ExperiencePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { formatPrice } = useCurrency();
-  const [staticExperience] = useState(id ? experiencesData[id] : undefined);
+  // Derive this from the URL on every render. React Router can reuse this
+  // component when only :id changes (for example, from a related experience),
+  // so storing it in state would leave the previous experience on screen.
+  const staticExperience = id ? experiencesData[id] : undefined;
   const [apiExperience, setApiExperience] = useState<Experience | undefined>(undefined);
   const [loading, setLoading] = useState(!staticExperience);
   const experience = staticExperience ?? apiExperience;
@@ -323,7 +326,14 @@ const ExperiencePage: React.FC = () => {
   // If the id is not in the static map (e.g. it comes from the backend
   // catalog surfaced via Search), resolve it from the API.
   useEffect(() => {
-    if (staticExperience || !id) return;
+    setApiExperience(undefined);
+
+    if (staticExperience || !id) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
     let cancelled = false;
     (async () => {
       try {
@@ -366,6 +376,10 @@ const ExperiencePage: React.FC = () => {
       cancelled = true;
     };
   }, [id, staticExperience]);
+
+  const cityPath = experience
+    ? `/city/${experience.city.toLowerCase().replace(/\s+/g, '-')}`
+    : '/destinations';
 
   const { addBooking } = useBookingStore();
   const { isAuthenticated } = useAuthStore();
@@ -466,11 +480,11 @@ const ExperiencePage: React.FC = () => {
         {/* Gallery Grid (Mobile: Carousel, Desktop: Grid) */}
         <div className="h-[40vh] md:h-[60vh] relative bg-slate-100">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate(cityPath)}
             className="absolute top-8 left-8 z-20 flex items-center gap-2 text-white hover:text-accent font-bold transition-colors bg-black/20 hover:bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full"
           >
             <ArrowLeft className="w-5 h-5" />
-            Back
+            Back to {experience.city}
           </button>
           {/* Simple single image for now, but could be a grid */}
           <img
