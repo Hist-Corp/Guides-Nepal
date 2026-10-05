@@ -14,6 +14,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Price } from '../components/common/Price';
 
 const cookingClassLocals = [
   {
@@ -576,7 +577,9 @@ export const CookingClassesPage: React.FC = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-xs opacity-80">From</div>
-                      <div className="text-xl font-bold">€{tour.price}</div>
+                      <div className="text-xl font-bold">
+                        <Price amount={tour.price} />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -765,7 +768,9 @@ export const CookingClassesPage: React.FC = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-xs text-gray-500">From</div>
-                      <div className="text-lg font-bold text-gray-900">€{tour.price}</div>
+                      <div className="text-lg font-bold text-gray-900">
+                        <Price amount={tour.price} />
+                      </div>
                     </div>
                   </div>
                 </div>

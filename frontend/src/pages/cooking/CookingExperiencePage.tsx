@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
@@ -14,7 +14,12 @@ import {
   Clock,
 } from 'lucide-react';
 
-import { ExperienceCurrencyConverter } from '../../components/common/ExperienceCurrencyConverter';
+import { Price } from '../../components/common/Price';
+import { BookingCalendar } from '../../components/common/BookingCalendar';
+import { GuestPicker } from '../../components/common/GuestPicker';
+import { TimePicker } from '../../components/common/TimePicker';
+import { useBookingStore } from '../../store/bookingStore';
+import { getAvailableGuides } from '../../utils/guides';
 
 interface Guide {
   id: number;
@@ -236,6 +241,14 @@ const CookingExperiencePage: React.FC = () => {
   const [checkOut, setCheckOut] = useState('');
   const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
 
+  // Active bookings decide which guides are still available to show/select
+  const bookings = useBookingStore((s) => s.bookings);
+  const addBooking = useBookingStore((s) => s.addBooking);
+  const availableGuides = useMemo(
+    () => (data ? getAvailableGuides(data.guides ?? [], bookings, data.id, '') : []),
+    [data, bookings]
+  );
+
   const handleBookNow = () => {
     if (!checkIn) {
       const infoElement = document.getElementById('booking-info-message');
@@ -248,7 +261,7 @@ const CookingExperiencePage: React.FC = () => {
       const checkInInput = document.getElementById('card-checkin');
       if (checkInInput) {
         checkInInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        checkInInput.focus();
+        if (checkInInput instanceof HTMLElement) checkInInput.focus();
         checkInInput.classList.add('ring-2', 'ring-primary');
         setTimeout(() => checkInInput.classList.remove('ring-2', 'ring-primary'), 2000);
       }
@@ -265,7 +278,7 @@ const CookingExperiencePage: React.FC = () => {
       const checkOutInput = document.getElementById('card-checkout');
       if (checkOutInput) {
         checkOutInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        checkOutInput.focus();
+        if (checkOutInput instanceof HTMLElement) checkOutInput.focus();
         checkOutInput.classList.add('ring-2', 'ring-primary');
         setTimeout(() => checkOutInput.classList.remove('ring-2', 'ring-primary'), 2000);
       }
@@ -277,6 +290,22 @@ const CookingExperiencePage: React.FC = () => {
     if (infoElement) {
       infoElement.classList.add('hidden');
     }
+
+    if (!data) return;
+    // Persist the booking so the reserved chef is hidden from "Who you'll meet"
+    addBooking({
+      id: Math.random().toString(36).substr(2, 9),
+      experienceId: data.id,
+      experienceTitle: data.title,
+      city: '',
+      date: checkIn,
+      guests: guestCount,
+      price: total,
+      image: data.heroImage,
+      status: 'upcoming',
+      guideId: selectedGuide?.id,
+      guideName: selectedGuide?.name,
+    });
 
     // Set confirmation state
     setIsBookingConfirmed(true);
@@ -299,6 +328,14 @@ const CookingExperiencePage: React.FC = () => {
       }
     }
   }, [slug]);
+
+  // Keep the selection on a visible guide: when the current guide becomes
+  // booked/reserved, fall back to the highest-rated available guide.
+  useEffect(() => {
+    if (!selectedGuide || !availableGuides.some((g) => g.id === selectedGuide.id)) {
+      setSelectedGuide(availableGuides[0] ?? null);
+    }
+  }, [availableGuides, selectedGuide]);
 
   const getDaysDifference = () => {
     if (checkIn && checkOut) {
@@ -427,11 +464,12 @@ const CookingExperiencePage: React.FC = () => {
                 </div>
 
                 {data.guides && data.guides.length > 0 ? (
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {data.guides.map((guide) => (
-                      <div
-                        key={guide.id}
-                        className={`
+                  availableGuides.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {availableGuides.map((guide) => (
+                        <div
+                          key={guide.id}
+                          className={`
                           relative flex flex-col items-center p-4 rounded-xl border transition-all cursor-pointer group
                           ${
                             selectedGuide?.id === guide.id
@@ -439,40 +477,48 @@ const CookingExperiencePage: React.FC = () => {
                               : 'border-gray-200 hover:border-gray-400 hover:shadow-md'
                           }
                         `}
-                        onClick={() => setSelectedGuide(guide)}
-                      >
-                        {selectedGuide?.id === guide.id && (
-                          <div className="absolute top-2 right-2 bg-black text-white rounded-full p-0.5">
-                            <Check className="w-3 h-3" />
-                          </div>
-                        )}
-                        <img
-                          src={guide.image}
-                          alt={guide.name}
-                          className="w-20 h-20 rounded-full object-cover mb-3 ring-2 ring-white shadow-sm"
-                        />
-                        <span className="font-bold text-gray-900 text-sm">{guide.name}</span>
-                        <span className="text-xs text-gray-500 text-center mb-2">{guide.role}</span>
-
-                        <div className="flex items-center gap-1 text-xs font-medium text-gray-900 mb-3">
-                          <Star className="w-3 h-3 fill-brand-yellow text-brand-yellow" />
-                          {guide.rating} <span className="text-gray-400">({guide.reviews})</span>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setViewingGuide(guide);
-                            setShowGuideModal(true);
-                          }}
-                          className="text-xs font-bold underline decoration-gray-400 decoration-1 underline-offset-2 hover:text-primary mt-auto"
+                          onClick={() => setSelectedGuide(guide)}
                         >
-                          View Profile
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+                          {selectedGuide?.id === guide.id && (
+                            <div className="absolute top-2 right-2 bg-black text-white rounded-full p-0.5">
+                              <Check className="w-3 h-3" />
+                            </div>
+                          )}
+                          <img
+                            src={guide.image}
+                            alt={guide.name}
+                            className="w-20 h-20 rounded-full object-cover mb-3 ring-2 ring-white shadow-sm"
+                          />
+                          <span className="font-bold text-gray-900 text-sm">{guide.name}</span>
+                          <span className="text-xs text-gray-500 text-center mb-2">
+                            {guide.role}
+                          </span>
+
+                          <div className="flex items-center gap-1 text-xs font-medium text-gray-900 mb-3">
+                            <Star className="w-3 h-3 fill-brand-yellow text-brand-yellow" />
+                            {guide.rating} <span className="text-gray-400">({guide.reviews})</span>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setViewingGuide(guide);
+                              setShowGuideModal(true);
+                            }}
+                            className="text-xs font-bold underline decoration-gray-400 decoration-1 underline-offset-2 hover:text-primary mt-auto"
+                          >
+                            View Profile
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">
+                      All chefs for this experience are currently booked — new dates open up
+                      regularly.
+                    </p>
+                  )
                 ) : (
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-full p-1 border-2 border-secondary">
@@ -544,7 +590,9 @@ const CookingExperiencePage: React.FC = () => {
                 <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-2xl lg:hidden z-40 flex items-center justify-between">
                   <div className="flex flex-col">
                     <div className="flex items-baseline gap-1">
-                      <span className="text-xl font-bold text-gray-900">€{data.price || 65}</span>
+                      <span className="text-xl font-bold text-gray-900">
+                        <Price amount={data.price || 65} />
+                      </span>
                       <span className="text-gray-500 text-xs">/ person</span>
                     </div>
                     <span className="text-xs underline font-bold text-gray-900">Show dates</span>
@@ -583,77 +631,30 @@ const CookingExperiencePage: React.FC = () => {
 
                       <div className="flex items-baseline space-x-2 mb-6">
                         <span className="text-3xl font-bold text-orange-600">
-                          €{data.price || 65}
+                          <Price amount={data.price || 65} />
                         </span>
                         <span className="text-gray-500">/ person</span>
                       </div>
 
                       <div className="space-y-4 mb-6">
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="p-3 bg-white rounded-xl border border-gray-200 hover:border-gray-900 cursor-pointer transition-colors relative group">
-                            <label className="block text-[10px] font-bold text-gray-800 uppercase mb-0.5">
-                              Check In
-                            </label>
-                            <input
-                              id="card-checkin"
-                              type="date"
-                              value={checkIn}
-                              onChange={(e) => setCheckIn(e.target.value)}
-                              className="w-full bg-transparent text-sm font-medium outline-none text-gray-600 font-sans p-0 cursor-pointer"
-                            />
-                          </div>
-                          <div className="p-3 bg-white rounded-xl border border-gray-200 hover:border-gray-900 cursor-pointer transition-colors relative group">
-                            <label className="block text-[10px] font-bold text-gray-800 uppercase mb-0.5">
-                              Check Out
-                            </label>
-                            <input
-                              id="card-checkout"
-                              type="date"
-                              value={checkOut}
-                              onChange={(e) => setCheckOut(e.target.value)}
-                              className="w-full bg-transparent text-sm font-medium outline-none text-gray-600 font-sans p-0 cursor-pointer"
-                            />
-                          </div>
-                        </div>
+                        <BookingCalendar
+                          checkIn={checkIn}
+                          checkOut={checkOut}
+                          onChange={(ci, co) => {
+                            setCheckIn(ci);
+                            setCheckOut(co);
+                          }}
+                          idPrefix="card"
+                        />
 
-                        <div className="p-3 bg-white rounded-xl border border-gray-200 hover:border-gray-900 cursor-pointer transition-colors">
-                          <label className="block text-[10px] font-bold text-gray-800 uppercase mb-0.5">
-                            Guests
-                          </label>
-                          <select
-                            value={guestCount}
-                            onChange={(e) => setGuestCount(parseInt(e.target.value))}
-                            className="w-full bg-transparent text-sm font-medium outline-none text-gray-600 cursor-pointer"
-                          >
-                            <option value="1">1 Guest</option>
-                            <option value="2">2 Guests</option>
-                            <option value="3">3 Guests</option>
-                            <option value="4">4 Guests</option>
-                            <option value="5">5 Guests</option>
-                            <option value="6">6 Guests</option>
-                          </select>
-                        </div>
+                        <GuestPicker
+                          value={guestCount}
+                          onChange={setGuestCount}
+                          maxGuests={6}
+                          idPrefix="card"
+                        />
 
-                        <div className="p-3 bg-white rounded-xl border border-gray-200 hover:border-gray-900 cursor-pointer transition-colors">
-                          <label className="block text-[10px] font-bold text-gray-800 uppercase mb-0.5">
-                            Start Time
-                          </label>
-                          <select
-                            value={bookingTime}
-                            onChange={(e) => setBookingTime(e.target.value)}
-                            className="w-full bg-transparent text-sm font-medium outline-none text-gray-600 cursor-pointer"
-                          >
-                            <option value="09:00">09:00 AM</option>
-                            <option value="10:00">10:00 AM</option>
-                            <option value="11:00">11:00 AM</option>
-                            <option value="12:00">12:00 PM</option>
-                            <option value="13:00">01:00 PM</option>
-                            <option value="14:00">02:00 PM</option>
-                            <option value="15:00">03:00 PM</option>
-                            <option value="16:00">04:00 PM</option>
-                            <option value="17:00">05:00 PM</option>
-                          </select>
-                        </div>
+                        <TimePicker value={bookingTime} onChange={setBookingTime} idPrefix="card" />
 
                         {/* Selected Guide Preview */}
                         {selectedGuide && (
@@ -703,32 +704,40 @@ const CookingExperiencePage: React.FC = () => {
                         <p className="text-center text-xs text-gray-500 font-medium">
                           You won't be charged yet
                         </p>
-                        <ExperienceCurrencyConverter price={pricePerPerson} />
                       </div>
 
                       {/* Price Breakdown */}
                       <div className="space-y-3 pt-6">
                         <div className="flex justify-between text-sm text-gray-600">
                           <span className="underline decoration-gray-300 decoration-1 underline-offset-2">
-                            €{pricePerPerson} x {guestCount} guests {days > 1 && `x ${days} days`}
+                            <Price amount={pricePerPerson} /> x {guestCount} guests{' '}
+                            {days > 1 && `x ${days} days`}
                           </span>
-                          <span>€{subtotal}</span>
+                          <span>
+                            <Price amount={subtotal} />
+                          </span>
                         </div>
                         <div className="flex justify-between text-sm text-gray-600">
                           <span className="underline decoration-gray-300 decoration-1 underline-offset-2">
                             Cleaning fee
                           </span>
-                          <span>€{cleaningFee}</span>
+                          <span>
+                            <Price amount={cleaningFee} />
+                          </span>
                         </div>
                         <div className="flex justify-between text-sm text-gray-600">
                           <span className="underline decoration-gray-300 decoration-1 underline-offset-2">
                             Service fee
                           </span>
-                          <span>€{serviceFee}</span>
+                          <span>
+                            <Price amount={serviceFee} />
+                          </span>
                         </div>
                         <div className="flex justify-between text-base font-bold text-gray-900 pt-4 border-t border-gray-100">
                           <span>Total</span>
-                          <span>€{total}</span>
+                          <span>
+                            <Price amount={total} />
+                          </span>
                         </div>
                       </div>
                     </>
@@ -768,7 +777,9 @@ const CookingExperiencePage: React.FC = () => {
                         </div>
                         <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
                           <span className="text-gray-500">Total</span>
-                          <span className="font-bold text-gray-900">€{total}</span>
+                          <span className="font-bold text-gray-900">
+                            <Price amount={total} />
+                          </span>
                         </div>
                       </div>
 
@@ -879,7 +890,7 @@ const CookingExperiencePage: React.FC = () => {
                             </button>
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto custom-scrollbar">
-                            {data.guides?.map((guide) => (
+                            {availableGuides.map((guide) => (
                               <button
                                 key={guide.id}
                                 type="button"

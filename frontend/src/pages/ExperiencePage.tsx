@@ -10,16 +10,16 @@ import {
   ShieldCheck,
   MapPin,
   CheckCircle,
-  Calendar,
   ArrowLeft,
   Bookmark,
-  DollarSign,
 } from 'lucide-react';
 import { useBookingStore } from '../store/bookingStore';
 import { useAuthStore } from '../store/authStore';
 import { useProfileStore } from '../store/profileStore';
 import guidesApi from '../services/guidesApi';
-import { CurrencyConverterModal } from '../components/common/CurrencyConverterModal';
+import { useCurrency } from '../contexts/CurrencyContext';
+import { BookingCalendar } from '../components/common/BookingCalendar';
+import { GuestPicker } from '../components/common/GuestPicker';
 import { NEPAL_IMAGES } from '../data/images';
 import { culturalTours } from './CulturalToursPage';
 import { outdoorActivities } from './OutdoorActivitiesPage';
@@ -314,6 +314,7 @@ const categoryPortraits = [
 const ExperiencePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { formatPrice } = useCurrency();
   const [staticExperience] = useState(id ? experiencesData[id] : undefined);
   const [apiExperience, setApiExperience] = useState<Experience | undefined>(undefined);
   const [loading, setLoading] = useState(!staticExperience);
@@ -371,13 +372,9 @@ const ExperiencePage: React.FC = () => {
   const [isBooked, setIsBooked] = useState(false);
   const { addBookmark } = useProfileStore();
 
-  // Currency converter modal state
-  const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
-
   // Booking form state (date + guests)
   const [selectedDate, setSelectedDate] = useState('');
   const [guests, setGuests] = useState(2);
-  const [showGuestsPicker, setShowGuestsPicker] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const [bookmarkSaved, setBookmarkSaved] = useState(false);
 
@@ -553,24 +550,6 @@ const ExperiencePage: React.FC = () => {
                 </ul>
               </div>
 
-              {/* Currency Converter Button */}
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold mb-2">Currency Converter</h2>
-                    <p className="text-slate-600">Convert prices to your preferred currency</p>
-                  </div>
-                  <Button
-                    onClick={() => setIsCurrencyModalOpen(true)}
-                    variant="outline"
-                    className="flex items-center gap-2"
-                  >
-                    <DollarSign className="w-5 h-5" />
-                    Convert
-                  </Button>
-                </div>
-              </div>
-
               {/* Host Section */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                 <h2 className="text-2xl font-bold mb-6">Your Host</h2>
@@ -617,83 +596,43 @@ const ExperiencePage: React.FC = () => {
                 </div>
 
                 <div className="flex items-baseline space-x-2 mb-6">
-                  <span className="text-3xl font-bold text-secondary">€{experience.price}</span>
+                  <span className="text-3xl font-bold text-secondary">
+                    {formatPrice(experience.price, 'EUR')}
+                  </span>
                   <span className="text-gray-500">/ person</span>
                 </div>
 
                 <div className="space-y-4 mb-6">
                   <div>
-                    <label className="border border-slate-200 rounded-lg p-3 flex items-center justify-between cursor-pointer hover:border-primary transition-colors">
-                      <div className="flex items-center gap-3">
-                        <Calendar className="w-5 h-5 text-slate-400" />
-                        <span className="font-medium text-slate-700">
-                          {selectedDate || 'Select Date'}
-                        </span>
-                      </div>
-                      <span className="text-primary font-bold text-sm">Change</span>
-                      <input
-                        type="date"
-                        value={selectedDate}
-                        min={new Date().toISOString().split('T')[0]}
-                        onChange={(e) => {
-                          setSelectedDate(e.target.value);
-                          setBookingError(null);
-                        }}
-                        className="sr-only"
-                      />
-                    </label>
+                    <BookingCalendar
+                      checkIn={selectedDate}
+                      checkOut=""
+                      onChange={(ci) => {
+                        setSelectedDate(ci);
+                        setBookingError(null);
+                      }}
+                      idPrefix="exp"
+                      single
+                      ariaLabel="Choose experience date"
+                    />
                   </div>
-                  <div className="relative">
-                    <div
-                      onClick={() => setShowGuestsPicker((v) => !v)}
-                      className="border border-slate-200 rounded-lg p-3 flex items-center justify-between cursor-pointer hover:border-primary transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <User className="w-5 h-5 text-slate-400" />
-                        <span className="font-medium text-slate-700">
-                          {guests} {guests === 1 ? 'Adult' : 'Adults'}
-                        </span>
-                      </div>
-                      <span className="text-primary font-bold text-sm">Change</span>
-                    </div>
-                    {showGuestsPicker && (
-                      <div className="absolute z-10 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg p-3 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-slate-700">Adults</span>
-                          <div className="flex items-center gap-3">
-                            <button
-                              type="button"
-                              onClick={() => setGuests((g) => Math.max(1, g - 1))}
-                              className="h-8 w-8 rounded-full border border-slate-300 font-bold text-slate-700 hover:border-primary"
-                            >
-                              −
-                            </button>
-                            <span className="w-6 text-center font-semibold">{guests}</span>
-                            <button
-                              type="button"
-                              onClick={() => setGuests((g) => Math.min(20, g + 1))}
-                              className="h-8 w-8 rounded-full border border-slate-300 font-bold text-slate-700 hover:border-primary"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setShowGuestsPicker(false)}
-                          className="w-full text-sm font-semibold text-white bg-primary rounded-lg py-1.5 hover:bg-primary-hover"
-                        >
-                          Done
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  <GuestPicker
+                    value={guests}
+                    onChange={(g) => {
+                      setGuests(g);
+                      setBookingError(null);
+                    }}
+                    maxGuests={20}
+                    idPrefix="exp"
+                  />
                   {guests > 1 && experience && (
                     <div className="flex justify-between text-sm text-slate-600 border-t border-slate-100 pt-3">
                       <span>
-                        €{experience.price} × {guests} guests
+                        {formatPrice(experience.price, 'EUR')} × {guests} guests
                       </span>
-                      <span className="font-bold text-secondary">€{experience.price * guests}</span>
+                      <span className="font-bold text-secondary">
+                        {formatPrice(experience.price * guests, 'EUR')}
+                      </span>
                     </div>
                   )}
                   {bookingError && (
@@ -736,13 +675,6 @@ const ExperiencePage: React.FC = () => {
       </main>
 
       <Footer />
-
-      {/* Currency Converter Modal */}
-      <CurrencyConverterModal
-        isOpen={isCurrencyModalOpen}
-        onClose={() => setIsCurrencyModalOpen(false)}
-        initialAmount={experience?.price || 0}
-      />
     </div>
   );
 };

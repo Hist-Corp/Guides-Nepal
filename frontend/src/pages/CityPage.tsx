@@ -5,6 +5,7 @@ import { Footer } from '../components/common/Footer';
 import { Button } from '../components/common/Button';
 import { Card } from '../components/common/Card';
 import { Star, Users, Heart, ShieldCheck, Clock, ArrowLeft } from 'lucide-react';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 interface Tour {
   id: number;
@@ -528,6 +529,7 @@ const cityData: Record<string, CityData> = {
 const CityPage: React.FC = () => {
   const { cityId } = useParams<{ cityId: string }>();
   const navigate = useNavigate();
+  const { formatPrice } = useCurrency();
   const city = cityData[cityId?.toLowerCase() || ''];
 
   if (!city) {
@@ -644,7 +646,9 @@ const CityPage: React.FC = () => {
                     <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
                       <div className="text-xs text-slate-500">
                         Starting price <br />
-                        <span className="text-lg font-bold text-primary">€{tour.price}</span>{' '}
+                        <span className="text-lg font-bold text-primary">
+                          {formatPrice(tour.price, 'EUR')}
+                        </span>{' '}
                         <span className="text-slate-400">pp</span>
                       </div>
                       <Button size="sm" className="bg-primary hover:bg-primary-hover text-white">

@@ -16,6 +16,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { lalitpurRichData } from '../../data/lalitpurRichData';
 import { allGuides } from '../../data/guidesData';
+import { Price } from '../../components/common/Price';
 
 export const LalitpurPage: React.FC = () => {
   const navigate = useNavigate();
@@ -208,7 +209,9 @@ export const LalitpurPage: React.FC = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-xs opacity-80">From</div>
-                      <div className="text-xl font-bold text-white">€{tour.price}</div>
+                      <div className="text-xl font-bold text-white">
+                        <Price amount={tour.price} />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -380,7 +383,9 @@ export const LalitpurPage: React.FC = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-[10px] text-gray-400 uppercase">From</div>
-                      <div className="text-lg font-bold text-gray-900">€{tour.price}</div>
+                      <div className="text-lg font-bold text-gray-900">
+                        <Price amount={tour.price} />
+                      </div>
                     </div>
                   </div>
                 </div>

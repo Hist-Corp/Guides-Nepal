@@ -7,11 +7,13 @@ import {
   MapPin,
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
   X,
   MessageSquare,
   Heart,
   User,
   ShoppingCart,
+  Banknote,
 } from 'lucide-react';
 import { LoginModal } from '../auth/LoginModal';
 import { SignupModal } from '../auth/SignupModal';
@@ -19,7 +21,8 @@ import { ForgotPasswordModal } from '../auth/ForgotPasswordModal';
 import { useUIStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
 import { useCart } from '../../contexts/CartContext';
-import { CurrencyConverterModal } from './CurrencyConverterModal';
+import { useCurrency } from '../../contexts/CurrencyContext';
+import { CurrencyPickerModal } from './CurrencyPickerModal';
 
 export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) => {
   const navigate = useNavigate();
@@ -28,10 +31,11 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
   const { isSearchOpen, openSearch, closeSearch, searchQuery, setSearchQuery } = useUIStore();
   const { isAuthenticated, user, logout } = useAuthStore();
   const { getTotalItems } = useCart();
+  const { currencyInfo } = useCurrency();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
-  const [isCurrencyConverterOpen, setIsCurrencyConverterOpen] = useState(false);
+  const [isCurrencyPickerOpen, setIsCurrencyPickerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'experiences' | 'guides'>('experiences');
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -265,6 +269,25 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
             </>
           )}
 
+          {/* Currency picker - opens "Choose your currency" modal.
+              On-brand: dark-slate icon tile + gold accent ring, sits
+              between Sign up and Cart. */}
+          <button
+            onClick={() => setIsCurrencyPickerOpen(true)}
+            title={`Currency: ${currencyInfo.name} (${currencyInfo.label}) - Change currency`}
+            aria-label={`Change currency, current: ${currencyInfo.name}`}
+            data-testid="currency-picker-button"
+            className="group flex items-center gap-2 rounded-full border border-gray-200 bg-white py-1.5 pl-1.5 pr-2.5 shadow-sm transition-colors hover:border-primary hover:shadow"
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-brand-yellow ring-2 ring-brand-yellow/60 transition-colors group-hover:bg-primary-hover">
+              <Banknote className="h-5 w-5" strokeWidth={2.25} aria-hidden="true" />
+            </span>
+            <span className="text-sm font-bold tracking-wide text-primary">
+              {currencyInfo.code}
+            </span>
+            <ChevronDown className="h-4 w-4 text-gray-400 transition-colors group-hover:text-primary" />
+          </button>
+
           {/* Cart Icon */}
           <button
             onClick={() => onCartOpen?.()}
@@ -463,12 +486,12 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
                   <div className="space-y-1">
                     <button
                       onClick={() => {
-                        setIsCurrencyConverterOpen(true);
+                        setIsCurrencyPickerOpen(true);
                         setIsMenuOpen(false);
                       }}
                       className="block w-full text-left px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
                     >
-                      Currency Converter
+                      Currency: {currencyInfo.code} - Change
                     </button>
                     <Link
                       to="/gift-cards"
@@ -694,12 +717,12 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
           document.body
         )}
 
-      {/* Currency Converter Modal Portal */}
-      {isCurrencyConverterOpen &&
+      {/* Currency Picker Modal Portal - "Choose your currency" grid */}
+      {isCurrencyPickerOpen &&
         createPortal(
-          <CurrencyConverterModal
-            isOpen={isCurrencyConverterOpen}
-            onClose={() => setIsCurrencyConverterOpen(false)}
+          <CurrencyPickerModal
+            isOpen={isCurrencyPickerOpen}
+            onClose={() => setIsCurrencyPickerOpen(false)}
           />,
           document.body
         )}

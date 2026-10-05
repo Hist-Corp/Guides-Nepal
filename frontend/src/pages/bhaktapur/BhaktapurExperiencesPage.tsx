@@ -4,6 +4,7 @@ import { Footer } from '../../components/common/Footer';
 import { bhaktapurTours } from '../../data/bhaktapurTours';
 import { Star, Clock, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Price } from '../../components/common/Price';
 
 const BhaktapurExperiencesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ const BhaktapurExperiencesPage: React.FC = () => {
                    </div>
                    <div className="text-right">
                       <div className="text-[10px] text-gray-400 uppercase">From</div>
-                      <div className="text-lg font-bold text-secondary">€{Math.floor(tour.price)}</div>
+                      <div className="text-lg font-bold text-secondary"><Price amount={Math.floor(tour.price)} /></div>
                    </div>
                 </div>
               </div>

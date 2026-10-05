@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export interface Booking {
   id: string;
-  experienceId: number;
+  experienceId: number | string;
   experienceTitle: string;
   city: string;
   date: string;
@@ -11,6 +11,9 @@ export interface Booking {
   price: number;
   image: string;
   status: 'upcoming' | 'archived' | 'cancelled';
+  /** Guide reserved by this booking (hidden from "Who you'll meet" while active) */
+  guideId?: number | string;
+  guideName?: string;
 }
 
 interface BookingStore {

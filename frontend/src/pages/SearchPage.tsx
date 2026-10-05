@@ -4,6 +4,7 @@ import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { Search, Star, Clock, MapPin, X, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { guidesApi, Experience } from '../services/guidesApi';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const cities = ['All', 'Kathmandu', 'Pokhara', 'Lalitpur', 'Bhaktapur', 'Bharatpur'];
 const cityPaths: Record<string, string> = {
@@ -25,6 +26,7 @@ const sortOptions = [
 export const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { formatPrice } = useCurrency();
   const query = searchParams.get('q') || '';
 
   const [experiences, setExperiences] = useState<Experience[]>([]);
@@ -317,7 +319,9 @@ export const SearchPage: React.FC = () => {
                             {exp.reviews} reviews
                           </span>
                         </div>
-                        <div className="font-bold text-primary">${exp.price}</div>
+                        <div className="font-bold text-primary">
+                          {formatPrice(exp.price, 'EUR')}
+                        </div>
                       </div>
                       {exp.host && (
                         <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2">

@@ -4,6 +4,7 @@ import { Footer } from '../components/common/Footer';
 import { Button } from '../components/common/Button';
 import { Link } from 'react-router-dom';
 import { Star, MapPin } from 'lucide-react';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 // Mock data - in a real app, this would be fetched from an API
 const experiencesData = {
@@ -47,6 +48,7 @@ const experiencesData = {
 
 const MostPopularPage: React.FC = () => {
   const popularExperiences = Object.values(experiencesData);
+  const { formatPrice } = useCurrency();
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-background-cream">
@@ -69,7 +71,7 @@ const MostPopularPage: React.FC = () => {
               <div className="relative">
                 <img src={exp.images[0]} alt={exp.title} className="w-full h-56 object-cover" />
                 <div className="absolute top-4 right-4 bg-primary text-white text-sm font-bold py-1 px-3 rounded-full">
-                  ${exp.price}
+                  {formatPrice(exp.price, 'USD')}
                 </div>
               </div>
               <div className="p-6">

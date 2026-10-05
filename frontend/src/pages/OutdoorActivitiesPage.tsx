@@ -14,6 +14,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const outdoorLocals = [
   {
@@ -125,6 +126,7 @@ export const outdoorActivities = [
 
 export const OutdoorActivitiesPage: React.FC = () => {
   const navigate = useNavigate();
+  const { formatPrice } = useCurrency();
   const [showAllLocals, setShowAllLocals] = useState(false);
   const displayedLocals = showAllLocals ? outdoorLocals : outdoorLocals.slice(0, 5);
   const displayedActivities = outdoorActivities.slice(0, 6);
@@ -338,7 +340,7 @@ export const OutdoorActivitiesPage: React.FC = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-xs opacity-80">From</div>
-                      <div className="text-xl font-bold">€{activity.price}</div>
+                      <div className="text-xl font-bold">{formatPrice(activity.price, 'EUR')}</div>
                     </div>
                   </div>
                 </div>
@@ -521,7 +523,7 @@ export const OutdoorActivitiesPage: React.FC = () => {
                     <div className="text-right">
                       <div className="text-[10px] text-gray-400 uppercase">From</div>
                       <div className="text-lg font-bold text-gray-900">
-                        €{Math.floor(activity.price)}
+                        {formatPrice(Math.floor(activity.price), 'EUR')}
                       </div>
                     </div>
                   </div>

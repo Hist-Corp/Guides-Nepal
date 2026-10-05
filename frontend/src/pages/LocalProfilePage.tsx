@@ -22,6 +22,7 @@ import guidesApi, { Guide } from '../services/guidesApi';
 import { kathmanduRichData } from '../data/kathmanduRichData';
 import { pokharaRichData } from '../data/pokharaRichData';
 import { lalitpurRichData } from '../data/lalitpurRichData';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 // Combine all experiences for lookup
 const allExperiences = [...kathmanduRichData, ...pokharaRichData, ...lalitpurRichData];
@@ -29,6 +30,7 @@ const allExperiences = [...kathmanduRichData, ...pokharaRichData, ...lalitpurRic
 const LocalProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { formatPrice } = useCurrency();
   const [guide, setGuide] = useState<Guide | null>(null);
   const [isBioExpanded, setIsBioExpanded] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -465,7 +467,9 @@ const LocalProfilePage: React.FC = () => {
                             </div>
                             <div className="text-right">
                               <span className="text-xs text-gray-400 uppercase mr-2">From</span>
-                              <span className="text-xl font-bold text-gray-900">€{tour.price}</span>
+                              <span className="text-xl font-bold text-gray-900">
+                                {formatPrice(tour.price, 'EUR')}
+                              </span>
                               <span className="text-xs text-gray-400"> pp</span>
                             </div>
                           </div>
