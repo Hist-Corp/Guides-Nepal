@@ -72,14 +72,51 @@ The system comes with the following pre-configured users for development and tes
 | `support@guides-nepal.com` | Customer Support | `Support@2024` | Tickets · FAQ |
 | `host@guides-nepal.com` | Host | `Host@2024` | Tours · Bookings · Earnings |
 | `guide@guides-nepal.com` | Guide | `Guide@2024` | Public frontend · **cannot sign in to the dashboard** |
+| `traveler@guides-nepal.com` | Traveler | `Traveler@2024` | Public site only · **cannot sign in to the dashboard** |
 
 The first five appear in the dashboard role dropdown and land on their console. The guide
-account is seeded for backend/API testing only.
+and traveler accounts are seeded for public-frontend/API testing only.
 
-Run `python seed_credentials.py` from `backend/` to create or reset them. The script is
-idempotent — it upserts by email, so it is safe to re-run.
+Run `python seed_credentials.py` from `backend/` to create or reset the staff/console
+accounts, or `python seed_traveler_guide.py` to create or reset just the traveler +
+guide test accounts. Both scripts are idempotent — they upsert by email, so they are
+safe to re-run.
 
 > **⚠️ Security Notice:** These are development-only credentials. Always change default passwords before deploying to production. For security, these credentials are stored in `backend/.env` and should never be committed to version control.
+
+### Traveller & Guide Test Credentials (public frontend)
+
+> **Spelling note:** "Traveller" (British English) maps to the codebase role
+> `traveler` (American English, see `backend/app/core/roles.py`).
+
+| Role | Email (username) | Password | Where to sign in |
+|------|------------------|----------|------------------|
+| Traveller (`traveler`) | `traveler@guides-nepal.com` | `Traveler@2024` | Public frontend login (`http://localhost:5175`, Login modal → Traveller tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `guide@guides-nepal.com` | `Guide@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+
+**Create / reset them:**
+
+```bash
+cd backend
+python seed_traveler_guide.py
+```
+
+**How to use them:**
+
+1. Start the backend and frontend (`.\start-all.bat`, or `cd backend` +
+   `uvicorn app.main:app --reload --port 8000` and `cd frontend` +
+   `npm run dev -- --port 5175 --host`).
+2. Open `http://localhost:5175`, click **Log in**, pick the **Traveller** or
+   **Guide** tab, and sign in with the email + password above.
+3. Or call the API directly:
+   ```bash
+   curl -X POST http://localhost:8000/api/v1/auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"email":"traveler@guides-nepal.com","password":"Traveler@2024"}'
+   ```
+4. Neither account can sign in to the dashboard (`http://localhost:5176`) —
+   they have no console and are refused at sign-in by design; admins can still
+   see them under **Administration**.
 
 ### Dashboard Routes by Role
 
@@ -251,6 +288,18 @@ pre-seeded accounts:
 **Host Login:**
 - Email: `host@guides-nepal.com`
 - Password: `Host@2024`
+
+**Traveller Login (public frontend only — no dashboard console):**
+- Email: `traveler@guides-nepal.com`
+- Password: `Traveler@2024`
+
+**Guide Login (public frontend only — no dashboard console):**
+- Email: `guide@guides-nepal.com`
+- Password: `Guide@2024`
+
+Create/reset just these two with `cd backend` + `python seed_traveler_guide.py`.
+Sign in at `http://localhost:5175` (Login modal → Traveller/Guide tab) or via
+`POST /api/v1/auth/login` — see [Traveller & Guide Test Credentials](#traveller--guide-test-credentials-public-frontend).
 
 See [Pre-configured Seed Users](#pre-configured-seed-users) for the full table. The
 dashboard login screen has a role dropdown that pre-fills the five console accounts; the
