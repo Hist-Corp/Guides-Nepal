@@ -415,9 +415,9 @@ const ExperiencePage: React.FC = () => {
     : null;
   const sheetGuides: SheetGuide[] = hostGuide ? [hostGuide] : [];
 
-  const persistBooking = () => {
-    if (!experience) return;
-    addBooking({
+  const persistBooking = async () => {
+    if (!experience) return false;
+    const bookingSaved = await addBooking({
       id: Math.random().toString(36).substr(2, 9),
       experienceId: experience.id,
       experienceTitle: experience.title,
@@ -428,10 +428,11 @@ const ExperiencePage: React.FC = () => {
       image: experience.images[0],
       status: 'upcoming',
     });
-    setIsBooked(true);
+    if (bookingSaved) setIsBooked(true);
+    return bookingSaved;
   };
 
-  const handleBooking = () => {
+  const handleBooking = async () => {
     if (!isAuthenticated) {
       alert('Please log in to book an experience');
       return;
@@ -444,8 +445,7 @@ const ExperiencePage: React.FC = () => {
 
     if (experience) {
       setBookingError(null);
-      persistBooking();
-      setTimeout(() => navigate('/bookings'), 1000);
+      if (await persistBooking()) setTimeout(() => navigate('/bookings'), 1000);
     }
   };
 
@@ -455,7 +455,7 @@ const ExperiencePage: React.FC = () => {
     setIsSheetOpen(true);
   };
 
-  const handleSheetConfirm = () => {
+  const handleSheetConfirm = async () => {
     if (!selectedDate) {
       setSheetError('Please select a date');
       return;
@@ -466,8 +466,7 @@ const ExperiencePage: React.FC = () => {
     }
     setSheetError(null);
     setBookingError(null);
-    persistBooking();
-    setSheetConfirmed(true);
+    if (await persistBooking()) setSheetConfirmed(true);
   };
 
   const closeSheet = () => {

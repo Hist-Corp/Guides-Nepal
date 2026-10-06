@@ -207,7 +207,7 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
           ) : (
             <>
               <Link
-                to="/bookings"
+                to={user?.role === 'guide' ? '/guide/bookings' : '/bookings'}
                 className="text-sm font-bold text-gray-800 hover:text-primary transition-colors flex items-center gap-2"
               >
                 Bookings

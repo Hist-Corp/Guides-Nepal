@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
-from sqlalchemy import inspect
+from sqlalchemy import inspect, text
 from app.core.config import settings
 from app.core.database import Base, engine
 from app import models  # noqa: F401  (registers all models on Base.metadata)
@@ -96,6 +96,11 @@ def ensure_database_schema() -> None:
     """
     try:
         Base.metadata.create_all(bind=engine)
+        inspector = inspect(engine)
+        booking_columns = {column["name"] for column in inspector.get_columns("bookings")}
+        if "guide_user_id" not in booking_columns:
+            with engine.begin() as connection:
+                connection.execute(text("ALTER TABLE bookings ADD COLUMN guide_user_id INTEGER"))
         logger.info("Database schema verified/created successfully.")
     except Exception as e:  # pragma: no cover - depends on DB availability
         logger.error(f"Could not create/verify database schema: {e}")

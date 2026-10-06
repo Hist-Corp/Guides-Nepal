@@ -13,6 +13,7 @@ import { Price } from '../components/common/Price';
 import { BookingCalendar } from '../components/common/BookingCalendar';
 import { GuestPicker } from '../components/common/GuestPicker';
 import { useBookingStore } from '../store/bookingStore';
+import { useAuthStore } from '../store/authStore';
 import { getAvailableGuides } from '../utils/guides';
 
 const ReadMoreText = ({ 
@@ -68,6 +69,7 @@ const SeoExperiencePage: React.FC = () => {
   // Active bookings decide which guides are still available to show/select
   const bookings = useBookingStore((s) => s.bookings);
   const addBooking = useBookingStore((s) => s.addBooking);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const availableGuides = useMemo(
     () => (data ? getAvailableGuides(data.guides ?? [], bookings, data.id, data.location) : []),
     [data, bookings]
@@ -138,7 +140,11 @@ const SeoExperiencePage: React.FC = () => {
     }
   };
 
-  const handleBooking = () => {
+  const handleBooking = async () => {
+    if (!isAuthenticated) {
+      setBookingError('Please log in to book an experience');
+      return;
+    }
     if (!data) return;
     if (!selectedDate) {
       setBookingError('Please select a check-in date');
@@ -146,7 +152,7 @@ const SeoExperiencePage: React.FC = () => {
     }
     setBookingError('');
     // Persist the booking so the reserved guide is hidden from "Who you'll meet"
-    addBooking({
+    const bookingSaved = await addBooking({
       id: Math.random().toString(36).substr(2, 9),
       experienceId: data.id,
       experienceTitle: data.title,
@@ -159,7 +165,7 @@ const SeoExperiencePage: React.FC = () => {
       guideId: selectedGuide?.id,
       guideName: selectedGuide?.name,
     });
-    setBookingConfirmed(true);
+    if (bookingSaved) setBookingConfirmed(true);
   };
 
   return (
