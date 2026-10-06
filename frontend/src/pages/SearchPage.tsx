@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useSearchParams, useNavigate, Link, Navigate } from 'react-router-dom';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { Search, Star, Clock, MapPin, X, ChevronDown, SlidersHorizontal } from 'lucide-react';
-import { guidesApi, Experience } from '../services/guidesApi';
+import { getCatalogSearchExperiences } from '../utils/canonicalExperience';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const cities = ['All', 'Kathmandu', 'Pokhara', 'Lalitpur', 'Bhaktapur', 'Bharatpur'];
 const cityPaths: Record<string, string> = {
@@ -22,13 +23,18 @@ const sortOptions = [
   { value: 'price_high', label: 'Price: High to Low' },
 ];
 
+const shuffle = <T,>(items: T[]) => [...items].sort(() => Math.random() - 0.5);
+
 export const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { formatPrice } = useCurrency();
   const query = searchParams.get('q') || '';
 
-  const [experiences, setExperiences] = useState<Experience[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Search is a mixed-city discovery feed. Every card comes directly from the
+  // same catalog used by its city page and detail page.
+  const [experiences] = useState(() => shuffle(getCatalogSearchExperiences()));
+  const [loading] = useState(false);
   const [searchQuery, setSearchQuery] = useState(query);
   const [selectedCity, setSelectedCity] = useState('All');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -36,27 +42,6 @@ export const SearchPage: React.FC = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 200]);
   const [showFilters, setShowFilters] = useState(false);
   const cityPath = getCityPath(query);
-
-  const fetchExperiences = useCallback(async () => {
-    setLoading(true);
-    try {
-      const results = await guidesApi.getExperiences(
-        selectedCity !== 'All' ? selectedCity : undefined,
-        selectedCategory !== 'All' ? selectedCategory : undefined,
-        query
-      );
-      setExperiences(Array.isArray(results) ? results : []);
-    } catch (error) {
-      console.error('Search error:', error);
-      setExperiences([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [query, selectedCity, selectedCategory]);
-
-  useEffect(() => {
-    if (!cityPath) fetchExperiences();
-  }, [cityPath, fetchExperiences]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,19 +62,30 @@ export const SearchPage: React.FC = () => {
   };
 
   const handleCityFilter = (city: string) => {
-    const cityPath = getCityPath(city);
-    if (cityPath) {
-      navigate(cityPath);
-      return;
-    }
-
-    setSelectedCity('All');
+    setSelectedCity(city);
   };
 
   const filteredExperiences = experiences
     .filter((experience) => {
       const price = experience.price ?? 0;
-      return price >= priceRange[0] && price <= priceRange[1];
+      const normalizedQuery = query.trim().toLowerCase();
+      const matchesQuery =
+        !normalizedQuery ||
+        [experience.title, experience.city, experience.category, experience.description].some(
+          (value) => value.toLowerCase().includes(normalizedQuery)
+        );
+      const matchesCity = selectedCity === 'All' || experience.city === selectedCity;
+      const matchesCategory =
+        selectedCategory === 'All' ||
+        experience.category.toLowerCase().includes(selectedCategory.toLowerCase());
+
+      return (
+        matchesQuery &&
+        matchesCity &&
+        matchesCategory &&
+        price >= priceRange[0] &&
+        price <= priceRange[1]
+      );
     })
     .sort((first, second) => {
       if (selectedSort === 'rating') return (second.rating ?? 0) - (first.rating ?? 0);
@@ -275,63 +271,67 @@ export const SearchPage: React.FC = () => {
               </div>
             ) : filteredExperiences.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredExperiences.map((exp) => (
-                  <Link
-                    key={exp.id}
-                    to={`/experience/${exp.id}`}
-                    className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-all group"
-                  >
-                    <div className="h-48 overflow-hidden relative">
-                      <img
-                        src={exp.heroImage}
-                        alt={exp.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-slate-800 text-xs font-bold px-2 py-1 rounded-full">
-                        {exp.category}
+                {filteredExperiences.map((exp) => {
+                  return (
+                    <Link
+                      key={`${exp.city}-${exp.slug}`}
+                      to={exp.path}
+                      className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-all group"
+                    >
+                      <div className="h-48 overflow-hidden relative">
+                        <img
+                          src={exp.heroImage}
+                          alt={exp.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-slate-800 text-xs font-bold px-2 py-1 rounded-full">
+                          {exp.category}
+                        </div>
+                        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-slate-800 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                          <Star className="w-3 h-3 text-brand-yellow fill-brand-yellow" />
+                          {exp.rating}
+                        </div>
                       </div>
-                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-slate-800 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                        <Star className="w-3 h-3 text-brand-yellow fill-brand-yellow" />
-                        {exp.rating}
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
-                        <MapPin className="w-3 h-3" />
-                        {exp.city}
-                      </div>
-                      <h3 className="font-bold text-lg mb-2 text-slate-900 group-hover:text-primary transition-colors">
-                        {exp.title}
-                      </h3>
-                      <p className="text-slate-600 text-sm mb-3 line-clamp-2">{exp.description}</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 text-sm text-slate-500">
-                          {exp.duration && (
+                      <div className="p-4">
+                        <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
+                          <MapPin className="w-3 h-3" />
+                          {exp.city}
+                        </div>
+                        <h3 className="font-bold text-lg mb-2 text-slate-900 group-hover:text-primary transition-colors">
+                          {exp.title}
+                        </h3>
+                        <p className="text-slate-600 text-sm mb-3 line-clamp-2">
+                          {exp.description}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3 text-sm text-slate-500">
+                            {exp.duration && (
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {exp.duration}
+                              </span>
+                            )}
                             <span className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {exp.duration}
+                              <Star className="w-3 h-3 text-brand-yellow fill-brand-yellow" />
+                              {exp.reviews} reviews
                             </span>
-                          )}
-                          <span className="flex items-center gap-1">
-                            <Star className="w-3 h-3 text-brand-yellow fill-brand-yellow" />
-                            {exp.reviews} reviews
-                          </span>
+                          </div>
+                          <div className="font-bold text-primary">{formatPrice(exp.price, 'EUR')}</div>
                         </div>
-                        <div className="font-bold text-primary">${exp.price}</div>
+                        {exp.host && (
+                          <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2">
+                            <img
+                              src={exp.host.image}
+                              alt={exp.host.name}
+                              className="w-6 h-6 rounded-full object-cover"
+                            />
+                            <span className="text-xs text-slate-500">{exp.host.name}</span>
+                          </div>
+                        )}
                       </div>
-                      {exp.host && (
-                        <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2">
-                          <img
-                            src={exp.host.image}
-                            alt={exp.host.name}
-                            className="w-6 h-6 rounded-full object-cover"
-                          />
-                          <span className="text-xs text-slate-500">{exp.host.name}</span>
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center py-16">

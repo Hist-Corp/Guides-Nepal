@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional, Dict, Any
 from app.core.database import get_db
 from app.core.dependencies import require_role
+from app.core.roles import ADMIN, is_assignable_role, normalize_role
 from app.models.user import User
 from app.models.guide import Guide
 from app.models.booking import Booking
@@ -10,7 +11,14 @@ from app.services.auth_service import AuthService
 
 router = APIRouter()
 
-ADMIN_ONLY = require_role("admin")
+ADMIN_ONLY = require_role(ADMIN)
+
+# Columns an admin may never set through PATCH /users/{id}.  ``hashed_password``
+# in particular would let a single unguarded setattr mint a login for any
+# account, so role and credential changes go through their own endpoints.
+PROTECTED_USER_FIELDS = frozenset(
+    {"hashed_password", "id", "created_at", "updated_at"}
+)
 
 
 # --- User Management ---
@@ -37,6 +45,18 @@ def update_user(user_id: int, payload: dict, db: Session = Depends(get_db), curr
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     for key, value in payload.items():
+        if key in PROTECTED_USER_FIELDS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"'{key}' cannot be updated through this endpoint",
+            )
+        if key == "role":
+            role = normalize_role(value)
+            if not is_assignable_role(role):
+                raise HTTPException(
+                    status_code=400, detail=f"'{value}' is not a known role"
+                )
+            value = role
         if hasattr(user, key):
             setattr(user, key, value)
     db.commit()

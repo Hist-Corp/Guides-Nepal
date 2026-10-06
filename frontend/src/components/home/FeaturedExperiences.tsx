@@ -7,6 +7,7 @@ import { NEPAL_IMAGES } from '../../data/images';
 import { Star } from 'lucide-react';
 import { useCmsSection } from '../../hooks/useCms';
 import { cmsBackground } from '../../utils/cmsText';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 const experiences = [
   {
@@ -15,7 +16,7 @@ const experiences = [
     description: 'Explore the ancient temples and vibrant streets of Thamel',
     image: NEPAL_IMAGES.oldTown,
     guide: NEPAL_IMAGES.guideMale,
-    price: 'From €25 pp',
+    price: 25,
   },
   {
     id: 2,
@@ -23,7 +24,7 @@ const experiences = [
     description: 'Boating on Phewa Lake with mountain views',
     image: NEPAL_IMAGES.phewaLake,
     guide: NEPAL_IMAGES.guideFemale,
-    price: 'From €30 pp',
+    price: 30,
   },
   {
     id: 3,
@@ -31,7 +32,7 @@ const experiences = [
     description: 'Discover the art and heritage of Patan',
     image: NEPAL_IMAGES.heritage,
     guide: NEPAL_IMAGES.portraitWoman,
-    price: 'From €28 pp',
+    price: 28,
   },
   {
     id: 4,
@@ -39,7 +40,7 @@ const experiences = [
     description: 'Step back in time in the City of Devotees',
     image: NEPAL_IMAGES.boudhanath,
     guide: NEPAL_IMAGES.traveler1,
-    price: 'From €26 pp',
+    price: 26,
   },
   {
     id: 5,
@@ -47,7 +48,7 @@ const experiences = [
     description: 'Gateway to Chitwan National Park and wildlife',
     image: NEPAL_IMAGES.forestHills,
     guide: NEPAL_IMAGES.traveler2,
-    price: 'From €35 pp',
+    price: 35,
   },
 ];
 

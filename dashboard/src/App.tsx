@@ -19,6 +19,7 @@ import PlatformOverview from "./admin/PlatformOverview"
 import Customers from "./components/Customers"
 import Administration from "./components/Administration"
 import HostApplicationsPanel from "./components/HostApplicationsPanel"
+import GuideApplicationsPanel from "./components/GuideApplicationsPanel"
 import SupportTicketsPanel from "./components/SupportTicketsPanel"
 import WriterLayout from "./layouts/WriterLayout"
 import WriterOverview from "./writer/Overview"
@@ -64,6 +65,7 @@ export default function App() {
           <Route path="hosts" element={<AdminHosts />} />
           <Route path="guides" element={<AdminGuides />} />
           <Route path="host-applications" element={<HostApplicationsPanel />} />
+          <Route path="guide-applications" element={<GuideApplicationsPanel />} />
           <Route path="support-tickets" element={<SupportTicketsPanel />} />
           <Route path="hierarchy" element={<RoleHierarchy />} />
           <Route path="intelligence" element={<AdminIntelligence />} />

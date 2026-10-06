@@ -25,10 +25,12 @@ export function canAccess(required: Role, actual: Role | null) {
 /**
  * Maps a stored/API role value onto a dashboard role.
  *
- * Only the five dashboard roles resolve; every other value (including the
- * retired `super-admin` and `guide` roles) returns `null`, which keeps those
- * accounts out of every console. `content-writer` stays mapped because it is
- * the previous name of the same role, not a separate one.
+ * Only the five dashboard roles resolve; every other value returns `null`, which
+ * keeps those accounts out of every console. That includes the retired
+ * `super-admin` role, the public-site `traveler` role, and `guide` — guides are
+ * not a dashboard persona, so a guide account gets "no dashboard access" on
+ * sign-in rather than an empty console. `content-writer` stays mapped because it
+ * is the previous name of the same role, not a separate one.
  */
 export function normalizeRole(role: string | null | undefined): Role | null {
   if (!role) return null

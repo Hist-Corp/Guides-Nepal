@@ -3,9 +3,19 @@ import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import HomePage from '../../pages/HomePage';
 
-// Mock the contexts
+// Mock the contexts. Header reads `currencyInfo` through `useCurrency`, so the
+// hook has to be mocked alongside the provider.
 vi.mock('../../contexts/CurrencyContext', () => ({
   CurrencyProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useCurrency: () => ({
+    currentCurrency: 'USD',
+    setCurrentCurrency: vi.fn(),
+    convertPrice: (amount: number) => amount,
+    currencyInfo: { code: 'USD', name: 'US Dollar', label: 'USD - $' },
+    exchangeRates: { USD: 1 },
+    isLoading: false,
+    lastUpdateTime: null,
+  }),
 }));
 
 vi.mock('../../contexts/CartContext', () => ({

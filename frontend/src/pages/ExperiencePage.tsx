@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { StickyBarPortal } from '../components/common/StickyBarPortal';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
@@ -10,16 +11,17 @@ import {
   ShieldCheck,
   MapPin,
   CheckCircle,
-  Calendar,
   ArrowLeft,
   Bookmark,
-  DollarSign,
 } from 'lucide-react';
 import { useBookingStore } from '../store/bookingStore';
 import { useAuthStore } from '../store/authStore';
 import { useProfileStore } from '../store/profileStore';
 import guidesApi from '../services/guidesApi';
-import { CurrencyConverterModal } from '../components/common/CurrencyConverterModal';
+import { useCurrency } from '../contexts/CurrencyContext';
+import { BookingCalendar } from '../components/common/BookingCalendar';
+import { GuestPicker } from '../components/common/GuestPicker';
+import { MobileBookingSheet, SheetGuide } from '../components/common/MobileBookingSheet';
 import { NEPAL_IMAGES } from '../data/images';
 import { culturalTours } from './CulturalToursPage';
 import { outdoorActivities } from './OutdoorActivitiesPage';
@@ -314,7 +316,11 @@ const categoryPortraits = [
 const ExperiencePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [staticExperience] = useState(id ? experiencesData[id] : undefined);
+  const { formatPrice } = useCurrency();
+  // Derive this from the URL on every render. React Router can reuse this
+  // component when only :id changes (for example, from a related experience),
+  // so storing it in state would leave the previous experience on screen.
+  const staticExperience = id ? experiencesData[id] : undefined;
   const [apiExperience, setApiExperience] = useState<Experience | undefined>(undefined);
   const [loading, setLoading] = useState(!staticExperience);
   const experience = staticExperience ?? apiExperience;
@@ -322,7 +328,14 @@ const ExperiencePage: React.FC = () => {
   // If the id is not in the static map (e.g. it comes from the backend
   // catalog surfaced via Search), resolve it from the API.
   useEffect(() => {
-    if (staticExperience || !id) return;
+    setApiExperience(undefined);
+
+    if (staticExperience || !id) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
     let cancelled = false;
     (async () => {
       try {
@@ -343,7 +356,7 @@ const ExperiencePage: React.FC = () => {
               ? {
                   ...match.host,
                   about:
-                    (match.host as any).about ??
+                    (match.host as unknown as { about?: string }).about ??
                     'A passionate local guide ready to show you the best of Nepal.',
                 }
               : {
@@ -366,20 +379,57 @@ const ExperiencePage: React.FC = () => {
     };
   }, [id, staticExperience]);
 
+  const cityPath = experience
+    ? `/city/${experience.city.toLowerCase().replace(/\s+/g, '-')}`
+    : '/destinations';
+
   const { addBooking } = useBookingStore();
   const { isAuthenticated } = useAuthStore();
   const [isBooked, setIsBooked] = useState(false);
   const { addBookmark } = useProfileStore();
 
-  // Currency converter modal state
-  const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
-
   // Booking form state (date + guests)
   const [selectedDate, setSelectedDate] = useState('');
   const [guests, setGuests] = useState(2);
-  const [showGuestsPicker, setShowGuestsPicker] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
-  const [bookmarkSaved, setBookmarkSaved] = useState(false);
+  // Set after saving a bookmark (the card button feedback lives in handleBookmark).
+  const [, setBookmarkSaved] = useState(false);
+
+  // Mobile sticky footer: configure-booking sheet state (same flow as the
+  // city experience pages - dates, guests, start time and host in a sheet).
+  const [bookingTime, setBookingTime] = useState('09:00');
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [sheetError, setSheetError] = useState<string | null>(null);
+  const [sheetConfirmed, setSheetConfirmed] = useState(false);
+
+  // The sheet offers guide selection; this page only has the host.
+  const hostGuide: SheetGuide | null = experience
+    ? {
+        id: `host-${experience.id}`,
+        name: experience.host.name,
+        role: 'Your host',
+        image: experience.host.image,
+        rating: experience.host.rating,
+        reviews: experience.host.reviews,
+      }
+    : null;
+  const sheetGuides: SheetGuide[] = hostGuide ? [hostGuide] : [];
+
+  const persistBooking = () => {
+    if (!experience) return;
+    addBooking({
+      id: Math.random().toString(36).substr(2, 9),
+      experienceId: experience.id,
+      experienceTitle: experience.title,
+      city: experience.city,
+      date: selectedDate,
+      guests: guests,
+      price: experience.price,
+      image: experience.images[0],
+      status: 'upcoming',
+    });
+    setIsBooked(true);
+  };
 
   const handleBooking = () => {
     if (!isAuthenticated) {
@@ -394,20 +444,39 @@ const ExperiencePage: React.FC = () => {
 
     if (experience) {
       setBookingError(null);
-      addBooking({
-        id: Math.random().toString(36).substr(2, 9),
-        experienceId: experience.id,
-        experienceTitle: experience.title,
-        city: experience.city,
-        date: selectedDate,
-        guests: guests,
-        price: experience.price,
-        image: experience.images[0],
-        status: 'upcoming',
-      });
-      setIsBooked(true);
+      persistBooking();
       setTimeout(() => navigate('/bookings'), 1000);
     }
+  };
+
+  const openSheet = () => {
+    setSheetError(null);
+    setSheetConfirmed(false);
+    setIsSheetOpen(true);
+  };
+
+  const handleSheetConfirm = () => {
+    if (!selectedDate) {
+      setSheetError('Please select a date');
+      return;
+    }
+    if (!isAuthenticated) {
+      setSheetError('Please log in to book this experience');
+      return;
+    }
+    setSheetError(null);
+    setBookingError(null);
+    persistBooking();
+    setSheetConfirmed(true);
+  };
+
+  const closeSheet = () => {
+    const wasConfirmed = sheetConfirmed;
+    setIsSheetOpen(false);
+    setSheetError(null);
+    setSheetConfirmed(false);
+    // Mirrors the card flow: once booked, head over to the bookings page.
+    if (wasConfirmed) navigate('/bookings');
   };
 
   const handleBookmark = () => {
@@ -469,11 +538,11 @@ const ExperiencePage: React.FC = () => {
         {/* Gallery Grid (Mobile: Carousel, Desktop: Grid) */}
         <div className="h-[40vh] md:h-[60vh] relative bg-slate-100">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate(cityPath)}
             className="absolute top-8 left-8 z-20 flex items-center gap-2 text-white hover:text-accent font-bold transition-colors bg-black/20 hover:bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full"
           >
             <ArrowLeft className="w-5 h-5" />
-            Back
+            Back to {experience.city}
           </button>
           {/* Simple single image for now, but could be a grid */}
           <img
@@ -553,24 +622,6 @@ const ExperiencePage: React.FC = () => {
                 </ul>
               </div>
 
-              {/* Currency Converter Button */}
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold mb-2">Currency Converter</h2>
-                    <p className="text-slate-600">Convert prices to your preferred currency</p>
-                  </div>
-                  <Button
-                    onClick={() => setIsCurrencyModalOpen(true)}
-                    variant="outline"
-                    className="flex items-center gap-2"
-                  >
-                    <DollarSign className="w-5 h-5" />
-                    Convert
-                  </Button>
-                </div>
-              </div>
-
               {/* Host Section */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                 <h2 className="text-2xl font-bold mb-6">Your Host</h2>
@@ -605,6 +656,33 @@ const ExperiencePage: React.FC = () => {
 
             {/* Right Sidebar (Booking Card) */}
             <div className="lg:w-1/3">
+              {/* Mobile sticky footer (visible only on small screens) */}
+              <StickyBarPortal>
+                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-2xl lg:hidden z-40 flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-xl font-bold text-gray-900">
+                        {formatPrice(experience.price, 'EUR')}
+                      </span>
+                      <span className="text-gray-500 text-xs">/ person</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={openSheet}
+                      className="text-xs underline font-bold text-gray-900 text-left"
+                    >
+                      Show dates
+                    </button>
+                  </div>
+                  <button
+                    onClick={openSheet}
+                    className="bg-primary hover:bg-primary-hover text-white font-bold py-3 px-6 rounded-lg uppercase tracking-wide"
+                  >
+                    Book Now
+                  </button>
+                </div>
+              </StickyBarPortal>
+
               <div className="sticky top-24 bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
                 <div className="flex items-center space-x-1 mb-2">
                   {[...Array(5)].map((_, i) => (
@@ -617,83 +695,43 @@ const ExperiencePage: React.FC = () => {
                 </div>
 
                 <div className="flex items-baseline space-x-2 mb-6">
-                  <span className="text-3xl font-bold text-secondary">€{experience.price}</span>
+                  <span className="text-3xl font-bold text-secondary">
+                    {formatPrice(experience.price, 'EUR')}
+                  </span>
                   <span className="text-gray-500">/ person</span>
                 </div>
 
                 <div className="space-y-4 mb-6">
                   <div>
-                    <label className="border border-slate-200 rounded-lg p-3 flex items-center justify-between cursor-pointer hover:border-primary transition-colors">
-                      <div className="flex items-center gap-3">
-                        <Calendar className="w-5 h-5 text-slate-400" />
-                        <span className="font-medium text-slate-700">
-                          {selectedDate || 'Select Date'}
-                        </span>
-                      </div>
-                      <span className="text-primary font-bold text-sm">Change</span>
-                      <input
-                        type="date"
-                        value={selectedDate}
-                        min={new Date().toISOString().split('T')[0]}
-                        onChange={(e) => {
-                          setSelectedDate(e.target.value);
-                          setBookingError(null);
-                        }}
-                        className="sr-only"
-                      />
-                    </label>
+                    <BookingCalendar
+                      checkIn={selectedDate}
+                      checkOut=""
+                      onChange={(ci) => {
+                        setSelectedDate(ci);
+                        setBookingError(null);
+                      }}
+                      idPrefix="exp"
+                      single
+                      ariaLabel="Choose experience date"
+                    />
                   </div>
-                  <div className="relative">
-                    <div
-                      onClick={() => setShowGuestsPicker((v) => !v)}
-                      className="border border-slate-200 rounded-lg p-3 flex items-center justify-between cursor-pointer hover:border-primary transition-colors"
-                    >
-                      <div className="flex items-center gap-3">
-                        <User className="w-5 h-5 text-slate-400" />
-                        <span className="font-medium text-slate-700">
-                          {guests} {guests === 1 ? 'Adult' : 'Adults'}
-                        </span>
-                      </div>
-                      <span className="text-primary font-bold text-sm">Change</span>
-                    </div>
-                    {showGuestsPicker && (
-                      <div className="absolute z-10 mt-1 w-full bg-white border border-slate-200 rounded-lg shadow-lg p-3 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-slate-700">Adults</span>
-                          <div className="flex items-center gap-3">
-                            <button
-                              type="button"
-                              onClick={() => setGuests((g) => Math.max(1, g - 1))}
-                              className="h-8 w-8 rounded-full border border-slate-300 font-bold text-slate-700 hover:border-primary"
-                            >
-                              −
-                            </button>
-                            <span className="w-6 text-center font-semibold">{guests}</span>
-                            <button
-                              type="button"
-                              onClick={() => setGuests((g) => Math.min(20, g + 1))}
-                              className="h-8 w-8 rounded-full border border-slate-300 font-bold text-slate-700 hover:border-primary"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setShowGuestsPicker(false)}
-                          className="w-full text-sm font-semibold text-white bg-primary rounded-lg py-1.5 hover:bg-primary-hover"
-                        >
-                          Done
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  <GuestPicker
+                    value={guests}
+                    onChange={(g) => {
+                      setGuests(g);
+                      setBookingError(null);
+                    }}
+                    maxGuests={20}
+                    idPrefix="exp"
+                  />
                   {guests > 1 && experience && (
                     <div className="flex justify-between text-sm text-slate-600 border-t border-slate-100 pt-3">
                       <span>
-                        €{experience.price} × {guests} guests
+                        {formatPrice(experience.price, 'EUR')} × {guests} guests
                       </span>
-                      <span className="font-bold text-secondary">€{experience.price * guests}</span>
+                      <span className="font-bold text-secondary">
+                        {formatPrice(experience.price * guests, 'EUR')}
+                      </span>
                     </div>
                   )}
                   {bookingError && (
@@ -735,14 +773,56 @@ const ExperiencePage: React.FC = () => {
         </div>
       </main>
 
-      <Footer />
+      {/* Mobile configure-booking sheet opened from the sticky footer */}
+      {isSheetOpen && (
+        <MobileBookingSheet
+          open={isSheetOpen}
+          onClose={closeSheet}
+          pricePerPerson={experience.price}
+          rating={experience.rating}
+          reviews={experience.reviews}
+          accentClass="bg-primary hover:bg-primary-hover"
+          singleDate
+          checkIn={selectedDate}
+          checkOut=""
+          onDateChange={(ci) => {
+            setSelectedDate(ci);
+            setBookingError(null);
+          }}
+          guests={guests}
+          onGuestsChange={(g) => {
+            setGuests(g);
+            setBookingError(null);
+          }}
+          maxGuests={20}
+          bookingTime={bookingTime}
+          onTimeChange={setBookingTime}
+          guides={sheetGuides}
+          selectedGuide={hostGuide}
+          onSelectGuide={() => undefined}
+          onConfirm={handleSheetConfirm}
+          error={sheetError}
+          confirmed={sheetConfirmed}
+          confirmedSummary={
+            <ul className="space-y-1">
+              <li>
+                <span className="font-bold">Date:</span> {selectedDate}
+              </li>
+              <li>
+                <span className="font-bold">Guests:</span> {guests}
+              </li>
+              <li>
+                <span className="font-bold">Start time:</span> {bookingTime}
+              </li>
+              <li>
+                <span className="font-bold">Host:</span> {experience.host.name}
+              </li>
+            </ul>
+          }
+        />
+      )}
 
-      {/* Currency Converter Modal */}
-      <CurrencyConverterModal
-        isOpen={isCurrencyModalOpen}
-        onClose={() => setIsCurrencyModalOpen(false)}
-        initialAmount={experience?.price || 0}
-      />
+      <Footer />
     </div>
   );
 };

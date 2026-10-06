@@ -1,8 +1,10 @@
-"""Operations endpoints: host applications and support tickets.
+"""Operations endpoints: host/guide applications and support tickets.
 
 Role guards (via ``has_access``):
 - Host applications: admin / regional-head
   (regional heads manage applications for their region).
+- Guide applications: admin / regional-head — stored in the dedicated
+  ``guide_applications`` table, separate from ``host_applications``.
 - Support tickets: admin / customer-support.
 Admin is the highest role and is authorized on both guard groups.
 """
@@ -16,6 +18,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.dependencies import require_role
 from app.core.roles import ADMIN, CUSTOMER_SUPPORT, REGIONAL_HEAD
+from app.models.guide_application import GuideApplication
 from app.models.host_application import HostApplication
 from app.models.support_ticket import SupportTicket
 from app.models.user import User
@@ -36,6 +39,21 @@ class HostApplicationCreate(BaseModel):
 
 
 class HostApplicationReview(BaseModel):
+    status: str  # approved / rejected / pending
+    review_note: Optional[str] = None
+
+
+class GuideApplicationCreate(BaseModel):
+    full_name: str
+    email: str
+    city: Optional[str] = None
+    region: Optional[str] = None
+    phone: Optional[str] = None
+    nin_number: Optional[str] = None
+    documents: Optional[str] = None
+
+
+class GuideApplicationReview(BaseModel):
     status: str  # approved / rejected / pending
     review_note: Optional[str] = None
 
@@ -111,6 +129,71 @@ def review_host_application(
     app = db.get(HostApplication, application_id)
     if app is None:
         raise HTTPException(status_code=404, detail="Host application not found")
+    # Regional heads may only act within their own region.
+    if current_user.role == REGIONAL_HEAD and current_user.region and app.region != current_user.region:
+        raise HTTPException(status_code=403, detail="Application outside your region")
+    app.status = payload.status
+    db.commit()
+    return {"id": app.id, "status": app.status}
+
+
+# ---------------- Guide applications (separate from Hosts) ----------------
+
+
+@router.get("/guide-applications")
+def list_guide_applications(
+    region: Optional[str] = None,
+    status_filter: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role(*APPLICATION_STAFF)),
+):
+    query = db.query(GuideApplication)
+    # Regional heads only see applications for their assigned region.
+    if current_user.role == REGIONAL_HEAD and current_user.region:
+        query = query.filter(GuideApplication.region == current_user.region)
+    elif region:
+        query = query.filter(GuideApplication.region == region)
+    if status_filter:
+        query = query.filter(GuideApplication.status == status_filter)
+    apps = query.order_by(GuideApplication.created_at.desc()).all()
+    return [
+        {
+            "id": a.id,
+            "full_name": a.full_name,
+            "email": a.email,
+            "city": a.city,
+            "region": a.region,
+            "phone": a.phone,
+            "nin_number": a.nin_number,
+            "documents": a.documents,
+            "status": a.status,
+            "created_at": a.created_at.isoformat() if a.created_at else None,
+        }
+        for a in apps
+    ]
+
+
+@router.post("/guide-applications", status_code=status.HTTP_201_CREATED)
+def create_guide_application(payload: GuideApplicationCreate, db: Session = Depends(get_db)):
+    app = GuideApplication(**payload.model_dump(), status="pending")
+    db.add(app)
+    db.commit()
+    db.refresh(app)
+    return {"id": app.id, "status": app.status}
+
+
+@router.patch("/guide-applications/{application_id}")
+def review_guide_application(
+    application_id: int,
+    payload: GuideApplicationReview,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role(*APPLICATION_STAFF)),
+):
+    if payload.status not in ("approved", "rejected", "pending"):
+        raise HTTPException(status_code=422, detail="Invalid status")
+    app = db.get(GuideApplication, application_id)
+    if app is None:
+        raise HTTPException(status_code=404, detail="Guide application not found")
     # Regional heads may only act within their own region.
     if current_user.role == REGIONAL_HEAD and current_user.region and app.region != current_user.region:
         raise HTTPException(status_code=403, detail="Application outside your region")

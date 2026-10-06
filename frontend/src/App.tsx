@@ -17,7 +17,7 @@ flushPendingSubmissions();
 import Cart from './components/common/Cart';
 import HomePage from './pages/HomePage';
 import SearchPage from './pages/SearchPage';
-import ExperiencePage from './pages/ExperiencePage';
+import CanonicalExperienceRoute from './components/routing/CanonicalExperienceRoute';
 import SeoExperiencePage from './pages/SeoExperiencePage';
 import CityPage from './pages/CityPage';
 import KathmanduPage from './pages/kathmandu/KathmanduPage';
@@ -43,6 +43,7 @@ import ImpactReportPage from './pages/ImpactReportPage';
 import ExplorePage from './pages/ExplorePage';
 import BecomeHostPage from './pages/host/BecomeHostPage';
 import HostApplicationWizard from './pages/host/HostApplicationWizard';
+import BecomeGuidePage from './pages/guide/BecomeGuidePage';
 import BookingsPage from './pages/user/BookingsPage';
 import ProfilePage from './pages/user/ProfilePage';
 import AccountSettingsPage from './pages/user/AccountSettingsPage';
@@ -114,6 +115,8 @@ function App() {
             <Route path="/explore" element={<ExplorePage />} />
             <Route path="/become-host" element={<BecomeHostPage />} />
             <Route path="/host-application" element={<HostApplicationWizard />} />
+            <Route path="/become-guide" element={<BecomeGuidePage />} />
+            <Route path="/guide-application" element={<BecomeGuidePage />} />
             <Route path="/bookings" element={<BookingsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/account" element={<AccountSettingsPage />} />
@@ -125,7 +128,7 @@ function App() {
             <Route path="/search" element={<SearchPage />} />
             <Route path="/impact-report-2024" element={<ImpactReportPage />} />
             <Route path="/experience/seo/:slug" element={<SeoExperiencePage />} />
-            <Route path="/experience/:id" element={<ExperiencePage />} />
+            <Route path="/experience/:id" element={<CanonicalExperienceRoute />} />
             <Route path="/auth/callback" element={<OAuthCallback />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
 

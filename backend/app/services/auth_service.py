@@ -13,6 +13,7 @@ from app.core.security import (
     validate_password_strength,
 )
 from app.core.config import settings
+from app.core.roles import TRAVELER, is_known_role, normalize_role
 
 logger = logging.getLogger(__name__)
 
@@ -163,13 +164,21 @@ class AuthService:
         if not is_valid:
             raise Exception(error_message)
 
+        # Defence in depth: the request schema already clamps public signups to
+        # SELF_REGISTERABLE_ROLES, and this re-checks that an unknown or
+        # elevated role can never reach the users table from a caller that
+        # skipped the schema.
+        role = normalize_role(user_in.role)
+        if not is_known_role(role):
+            raise Exception(f"'{user_in.role}' is not a known role")
+
         db_user = User(
             email=user_in.email,
             hashed_password=get_password_hash(user_in.password),
             firstName=user_in.firstName,
             lastName=user_in.lastName,
             phone=user_in.phone,
-            role=user_in.role,
+            role=role,
         )
         self.db.add(db_user)
         self.db.commit()
@@ -224,7 +233,7 @@ class AuthService:
             hashed_password=get_password_hash(random_password),
             firstName=first_name or "",
             lastName=last_name or "",
-            role="traveler",
+            role=TRAVELER,
             is_active=True,
         )
         self.db.add(db_user)

@@ -104,8 +104,9 @@ export default function RoleHierarchy() {
       </div>
 
       <div className="mt-3 gn-card rounded-2xl border border-gray-200/70 text-xs text-gray-600 dark:text-slate-300">
-        🔐 In production this maps to JWT claims + backend middleware (<span className="font-mono">/api/v1/admin/*</span> guards).
-        Admin gets full content access; content managers and hosts only edit their own.
+        🔐 Enforced server-side by <span className="font-mono">require_role(...)</span> on each route
+        (<span className="font-mono">/api/v1/admin/*</span>, <span className="font-mono">/api/v1/content/*</span>,
+        …). Admin is implicitly authorised for every guard; every other role must be named explicitly.
       </div>
     </PageShell>
   );

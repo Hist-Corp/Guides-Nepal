@@ -22,6 +22,10 @@ const ROLE_TONE: Record<string, "info" | "primary" | "success" | "default" | "da
   "regional-head": "info",
   "customer-support": "warning",
   host: "success",
+  // Guide accounts exist on the platform but have no dashboard console, so
+  // normalizeRole() returns null for them. Fall back to the stored role instead
+  // of mislabelling them as travelers.
+  guide: "success",
   traveler: "default",
 };
 
@@ -73,8 +77,9 @@ export default function Administration({
               key: "role",
               label: "Role",
               render: (r) => {
-                const role = normalizeRole(r.role) ?? "traveler";
-                return <Badge variant={ROLE_TONE[role] ?? "default"}>{role.replace("-", " ")}</Badge>;
+                const stored = (r.role ?? "traveler").toLowerCase();
+                const role = normalizeRole(r.role) ?? stored;
+                return <Badge variant={ROLE_TONE[role] ?? "default"}>{role.replace(/-/g, " ")}</Badge>;
               },
             },
             { key: "region", label: "Region", render: (r) => r.region || <span className="text-gray-400">—</span> },

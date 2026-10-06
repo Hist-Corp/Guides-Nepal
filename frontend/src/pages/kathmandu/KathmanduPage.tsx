@@ -5,6 +5,7 @@ import { Button } from '../../components/common/Button';
 import { Star, Users, Heart, ShieldCheck, Check, Clock, ChevronRight, Play, ArrowLeft } from 'lucide-react';
 import { kathmanduTours } from '../../data/kathmanduTours';
 import { useNavigate } from 'react-router-dom';
+import { Price } from '../../components/common/Price';
 
 const kathmanduLocals = [
   { name: "Artty", title: "The Lovely Storyteller", reviews: 814, languages: "English・Nepali" },
@@ -194,7 +195,7 @@ export const KathmanduPage: React.FC = () => {
                           </div>
                           <div className="text-right">
                              <div className="text-xs opacity-80">From</div>
-                             <div className="text-xl font-bold">€{tour.price}</div>
+                             <div className="text-xl font-bold"><Price amount={tour.price} /></div>
                           </div>
                        </div>
                     </div>
@@ -348,7 +349,7 @@ export const KathmanduPage: React.FC = () => {
                      </div>
                      <div className="text-right">
                         <div className="text-[10px] text-gray-400 uppercase">From</div>
-                        <div className="text-lg font-bold text-gray-900">€{Math.floor(tour.price)}</div>
+                        <div className="text-lg font-bold text-gray-900"><Price amount={Math.floor(tour.price)} /></div>
                      </div>
                   </div>
                 </div>

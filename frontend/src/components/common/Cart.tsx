@@ -10,7 +10,7 @@ interface CartProps {
 
 const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
   const { items, removeItem, updateQuantity, getTotalItems, getTotalPrice } = useCart();
-  const { convertPrice } = useCurrency();
+  const { formatPrice } = useCurrency();
 
   if (!isOpen) return null;
 
@@ -68,7 +68,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                       )}
                       <p className="text-sm text-gray-500 capitalize">{item.category}</p>
                       <p className="font-semibold text-primary">
-                        {convertPrice(item.price, item.currency)} each
+                        {formatPrice(item.price, item.currency)} each
                       </p>
                     </div>
 
@@ -106,7 +106,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
               <div className="flex justify-between items-center">
                 <span className="text-lg font-semibold">Total:</span>
                 <span className="text-xl font-bold text-primary">
-                  {convertPrice(getTotalPrice(), 'USD')}
+                  {formatPrice(getTotalPrice(), 'USD')}
                 </span>
               </div>
               <button

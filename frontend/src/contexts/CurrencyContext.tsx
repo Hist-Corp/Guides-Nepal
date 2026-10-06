@@ -1,12 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { 
-  convertCurrency, 
-  formatCurrency, 
-  getAvailableCurrencies, 
+import {
+  convertCurrency,
+  formatCurrency,
+  getAvailableCurrencies,
+  getCurrencyInfo,
+  getCurrencyList,
   initializeCurrencyConverter,
   getCurrentRates,
   shouldUpdateRates,
-  fetchLiveExchangeRates
+  fetchLiveExchangeRates,
+  type CurrencyInfo,
 } from '../utils/currencyConverter';
 
 interface CurrencyContextType {
@@ -15,6 +18,8 @@ interface CurrencyContextType {
   convertPrice: (amount: number, fromCurrency?: string) => number;
   formatPrice: (amount: number, fromCurrency?: string) => string;
   availableCurrencies: string[];
+  currencyList: CurrencyInfo[];
+  currencyInfo: CurrencyInfo;
   exchangeRates: { [key: string]: number };
   isLoading: boolean;
   lastUpdateTime: Date | null;
@@ -131,6 +136,8 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({
     convertPrice,
     formatPrice,
     availableCurrencies,
+    currencyList: getCurrencyList(),
+    currencyInfo: getCurrencyInfo(currentCurrency),
     exchangeRates,
     isLoading,
     lastUpdateTime,

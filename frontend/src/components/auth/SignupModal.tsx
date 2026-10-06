@@ -25,6 +25,7 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
   });
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   if (!isOpen) return null;
 
@@ -101,6 +102,11 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
       return;
     }
 
+    if (!acceptedTerms) {
+      setError('Please accept the Terms & Conditions and Privacy Policy to continue.');
+      return;
+    }
+
     setLoading(true);
     try {
       const base = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '/api/v1' : 'https://guides-nepal.onrender.com/api/v1');
@@ -148,7 +154,7 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
 
   const handleGuideSelect = () => {
     onClose();
-    navigate('/host-application');
+    navigate('/become-guide');
   };
 
   return (
@@ -205,7 +211,7 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
                 <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-primary transition-colors" />
               </button>
 
-              {/* Guide Option */}
+              {/* Guide Option — distinct Guide interface, never the Host app */}
               <button 
                 onClick={handleGuideSelect}
                 className="w-full p-4 border-2 border-gray-100 hover:border-[#213448] rounded-2xl flex items-center gap-4 transition-all hover:bg-[#213448]/5 group text-left"
@@ -215,7 +221,7 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
                 </div>
                 <div className="flex-1">
                   <h3 className="font-bold text-gray-900">I'm a Local Guide</h3>
-                  <p className="text-xs text-gray-500">I want to host tours and earn</p>
+                  <p className="text-xs text-gray-500">I want to lead tours and earn</p>
                 </div>
                 <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-[#213448] transition-colors" />
               </button>
@@ -338,14 +344,22 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
                   <div className="text-red-600 text-sm text-center">{error}</div>
                 )}
 
-                <div className="text-center text-xs text-gray-500 px-4">
-                  When using Guides-Nepal you accept our{' '}
-                  <a href="#" className="text-[#213448] font-bold hover:text-brand-yellow hover:underline transition-colors">Terms & Conditions</a>
-                  {' '}and{' '}
-                  <a href="#" className="text-[#213448] font-bold hover:text-brand-yellow hover:underline transition-colors">Privacy Policy</a>.
-                </div>
+                <label className="flex items-start gap-3 text-xs text-gray-500 px-1 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 shrink-0 accent-[#213448] cursor-pointer"
+                  />
+                  <span>
+                    When using Guides-Nepal you accept our{' '}
+                    <a href="#" className="text-[#213448] font-bold hover:text-brand-yellow hover:underline transition-colors">Terms & Conditions</a>
+                    {' '}and{' '}
+                    <a href="#" className="text-[#213448] font-bold hover:text-brand-yellow hover:underline transition-colors">Privacy Policy</a>.
+                  </span>
+                </label>
 
-                <button type="submit" disabled={loading} className="w-full bg-brand-yellow hover:bg-[#E5A800] text-[#213448] font-bold py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-60">
+                <button type="submit" disabled={loading || !acceptedTerms} className="w-full bg-brand-yellow hover:bg-[#E5A800] text-[#213448] font-bold py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0 disabled:shadow-none disabled:cursor-not-allowed">
                   {loading ? 'Signing up…' : 'Sign up'}
                 </button>
               </form>

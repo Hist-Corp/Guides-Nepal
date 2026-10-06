@@ -13,6 +13,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const culturalTourLocals = [
   { name: 'Artty', title: 'The Lovely Storyteller', reviews: 814, languages: 'English・Nepali' },
@@ -124,6 +125,7 @@ export const culturalTours = [
 
 export const CulturalToursPage: React.FC = () => {
   const navigate = useNavigate();
+  const { formatPrice } = useCurrency();
   const [showAllLocals, setShowAllLocals] = useState(false);
   const displayedLocals = showAllLocals ? culturalTourLocals : culturalTourLocals.slice(0, 5);
   const displayedTours = culturalTours.slice(0, 6);
@@ -320,7 +322,7 @@ export const CulturalToursPage: React.FC = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-xs opacity-80">From</div>
-                      <div className="text-xl font-bold">€{tour.price}</div>
+                      <div className="text-xl font-bold">{formatPrice(tour.price, 'EUR')}</div>
                     </div>
                   </div>
                 </div>
@@ -505,7 +507,7 @@ export const CulturalToursPage: React.FC = () => {
                     <div className="text-right">
                       <div className="text-[10px] text-gray-400 uppercase">From</div>
                       <div className="text-lg font-bold text-gray-900">
-                        €{Math.floor(tour.price)}
+                        {formatPrice(Math.floor(tour.price), 'EUR')}
                       </div>
                     </div>
                   </div>

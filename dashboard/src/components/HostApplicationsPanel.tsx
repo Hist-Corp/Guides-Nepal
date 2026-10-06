@@ -26,7 +26,7 @@ export default function HostApplicationsPanel() {
   const review = async (id: number, status: "approved" | "rejected") => {
     try {
       await reviewHostApplication(id, status)
-      setMsg(`Application #${id} ${status}`)
+      setMsg(`Host application #${id} ${status}`)
       await load()
     } catch (e: any) {
       setMsg(e?.response?.data?.detail || "Action failed")
@@ -115,3 +115,4 @@ export default function HostApplicationsPanel() {
     </div>
   )
 }
+

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Calculator, RefreshCw } from 'lucide-react';
 import { CurrencyConverterModal } from './CurrencyConverterModal';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 interface ExperienceCurrencyConverterProps {
   /** Experience price used to pre-fill the converter */
@@ -19,6 +20,7 @@ export const ExperienceCurrencyConverter: React.FC<ExperienceCurrencyConverterPr
   fromCurrency = 'EUR',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { formatPrice } = useCurrency();
 
   return (
     <>
@@ -41,7 +43,7 @@ export const ExperienceCurrencyConverter: React.FC<ExperienceCurrencyConverterPr
           className="mt-3 w-full bg-primary hover:bg-primary-hover text-white font-bold py-2.5 rounded-lg transition-colors text-sm flex items-center justify-center gap-2"
         >
           <Calculator className="w-4 h-4" />
-          Convert {price > 0 ? `€${price}` : 'price'}
+          Convert {price > 0 ? formatPrice(price, fromCurrency) : 'price'}
         </button>
       </div>
 

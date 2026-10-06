@@ -8,7 +8,7 @@ export async function login(payload: { email: string; password: string }) {
 export async function registerUser(payload: {
   email: string
   password: string
-  role?: "admin" | "content-manager" | "regional-head" | "customer-support" | "host" | "traveler"
+  role?: "host" | "traveler"
   firstName?: string
   lastName?: string
   phone?: string
@@ -149,7 +149,7 @@ export async function resetPassword(payload: {
   return res.data
 }
 
-// --- Operations API (host applications & support tickets) ---
+// --- Operations API (host/guide applications & support tickets) ---
 export async function getHostApplications(params?: { status?: string; region?: string }) {
   const res = await http.get("/operations/host-applications", { params })
   return res.data
@@ -157,6 +157,16 @@ export async function getHostApplications(params?: { status?: string; region?: s
 
 export async function reviewHostApplication(id: number, status: "approved" | "rejected" | "pending") {
   const res = await http.patch(`/operations/host-applications/${id}`, { status })
+  return res.data
+}
+
+export async function getGuideApplications(params?: { status?: string; region?: string }) {
+  const res = await http.get("/operations/guide-applications", { params })
+  return res.data
+}
+
+export async function reviewGuideApplication(id: number, status: "approved" | "rejected" | "pending") {
+  const res = await http.patch(`/operations/guide-applications/${id}`, { status })
   return res.data
 }
 

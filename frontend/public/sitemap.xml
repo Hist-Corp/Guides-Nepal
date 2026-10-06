@@ -6,4 +6,7 @@
   <url><loc>https://guides-nepal-nine.vercel.app/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://guides-nepal-nine.vercel.app/host-center</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://guides-nepal-nine.vercel.app/host-application</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://guides-nepal-nine.vercel.app/become-host</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://guides-nepal-nine.vercel.app/become-guide</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://guides-nepal-nine.vercel.app/guide-application</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
 </urlset>

@@ -60,6 +60,28 @@ test.describe('Frontend — Auth flow buttons', () => {
     await expect(page.locator('form input[type="password"]')).toBeVisible();
   });
 
+  test('signup modal no longer offers a Host option', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('header').getByRole('button', { name: /^Sign up$/i }).first().click();
+    await expect(page.locator('text=Join Guides-Nepal')).toBeVisible();
+    await expect(page.getByRole('button', { name: /I.m a Host/i })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /I.m a Traveler/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /I.m a Local Guide/i })).toBeVisible();
+  });
+
+  test('traveler signup requires accepting Terms & Privacy first', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('header').getByRole('button', { name: /^Sign up$/i }).first().click();
+    await page.getByRole('button', { name: /I.m a Traveler/i }).click();
+    const form = page.locator('form').last();
+    const termsBox = form.locator('input[type="checkbox"]');
+    await expect(termsBox).toBeVisible();
+    // Submit button stays disabled until the checkbox is ticked
+    await expect(form.getByRole('button', { name: /^Sign up$/i })).toBeDisabled();
+    await termsBox.check();
+    await expect(form.getByRole('button', { name: /^Sign up$/i })).toBeEnabled();
+  });
+
   test('currency converter modal opens and converts', async ({ page }) => {
     await page.goto('/');
     const ccBtn = page.locator('button[aria-label="Currency converter"], button[title*="Currency"], button[title*="currency"]');

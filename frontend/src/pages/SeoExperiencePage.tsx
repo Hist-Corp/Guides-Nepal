@@ -1,15 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { 
   Check, MapPin, Wifi, Wind, Coffee, 
   Ban, ShieldCheck, Star, Heart, Award,
-  Utensils, Camera, Ticket, Bus, Home, ChevronRight, 
+  Utensils, Camera, Ticket, Bus, Home, 
   Gift, Globe, X, ArrowLeft, User
 } from 'lucide-react';
 import { seoExperiences, Guide } from '../data/seoExperiences';
-import { ExperienceCurrencyConverter } from '../components/common/ExperienceCurrencyConverter';
+import { Price } from '../components/common/Price';
+import { BookingCalendar } from '../components/common/BookingCalendar';
+import { GuestPicker } from '../components/common/GuestPicker';
+import { useBookingStore } from '../store/bookingStore';
+import { getAvailableGuides } from '../utils/guides';
 
 const ReadMoreText = ({ 
   text, 
@@ -53,16 +57,35 @@ const SeoExperiencePage: React.FC = () => {
   const navigate = useNavigate();
   const data = seoExperiences[slug || ''];
   const [selectedDate, setSelectedDate] = useState('');
+  const [selectedCheckout, setSelectedCheckout] = useState('');
   const [guests, setGuests] = useState(1);
   const [selectedGuide, setSelectedGuide] = useState<Guide | null>(data?.guides?.[0] || null);
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [viewingGuide, setViewingGuide] = useState<Guide | null>(null);
+  const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  const [bookingError, setBookingError] = useState('');
+
+  // Active bookings decide which guides are still available to show/select
+  const bookings = useBookingStore((s) => s.bookings);
+  const addBooking = useBookingStore((s) => s.addBooking);
+  const availableGuides = useMemo(
+    () => (data ? getAvailableGuides(data.guides ?? [], bookings, data.id, data.location) : []),
+    [data, bookings]
+  );
 
   useEffect(() => {
     if (data?.guides && data.guides.length > 0) {
         setSelectedGuide(data.guides[0]);
     }
   }, [slug, data]);
+
+  // Keep the selection on a visible guide: when the current guide becomes
+  // booked/reserved, fall back to the highest-rated available guide.
+  useEffect(() => {
+    if (!selectedGuide || !availableGuides.some((g) => g.id === selectedGuide.id)) {
+      setSelectedGuide(availableGuides[0] ?? null);
+    }
+  }, [availableGuides, selectedGuide]);
 
   if (!data) {
     return (
@@ -113,6 +136,30 @@ const SeoExperiencePage: React.FC = () => {
         behavior: "smooth"
       });
     }
+  };
+
+  const handleBooking = () => {
+    if (!data) return;
+    if (!selectedDate) {
+      setBookingError('Please select a check-in date');
+      return;
+    }
+    setBookingError('');
+    // Persist the booking so the reserved guide is hidden from "Who you'll meet"
+    addBooking({
+      id: Math.random().toString(36).substr(2, 9),
+      experienceId: data.id,
+      experienceTitle: data.title,
+      city: data.location,
+      date: selectedDate,
+      guests,
+      price: data.price * guests + 15,
+      image: data.heroImage,
+      status: 'upcoming',
+      guideId: selectedGuide?.id,
+      guideName: selectedGuide?.name,
+    });
+    setBookingConfirmed(true);
   };
 
   return (
@@ -275,7 +322,11 @@ const SeoExperiencePage: React.FC = () => {
                   </div>
                   
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {data.guides.map((guide, i) => (
+                    {availableGuides.length === 0 ? (
+                      <p className="col-span-full text-sm text-gray-500">
+                        All guides for this experience are currently booked — new dates open up regularly.
+                      </p>
+                    ) : availableGuides.map((guide, i) => (
                       <div 
                         key={i} 
                         className={`
@@ -295,7 +346,12 @@ const SeoExperiencePage: React.FC = () => {
                         <img src={guide.image} alt={guide.name} className="w-20 h-20 rounded-full object-cover mb-3" />
                         <span className="font-bold text-gray-900 text-sm">{guide.name}</span>
                         <span className="text-xs text-gray-500 text-center mb-2">{guide.role}</span>
-                        
+
+                        <div className="flex items-center gap-1 text-xs font-medium text-gray-900 mb-3">
+                          <Star className="w-3 h-3 fill-accent text-accent" />
+                          {guide.rating} <span className="text-gray-400">({guide.reviews})</span>
+                        </div>
+
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
@@ -497,7 +553,7 @@ const SeoExperiencePage: React.FC = () => {
                 <div className="border border-gray-200 rounded-xl shadow-[0_6px_16px_rgba(0,0,0,0.12)] p-6 bg-white">
                   <div className="flex justify-between items-end mb-6">
                     <div>
-                      <span className="text-2xl font-bold text-gray-900">€{data.price}</span>
+                      <span className="text-2xl font-bold text-gray-900"><Price amount={data.price} /></span>
                       <span className="text-gray-500 text-sm"> / person</span>
                     </div>
                     <div className="flex items-center gap-1 text-sm font-bold text-gray-700">
@@ -507,38 +563,25 @@ const SeoExperiencePage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 mb-3">
-                    <div className="p-3.5 border border-gray-300 rounded-2xl hover:border-gray-800 focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all cursor-pointer bg-white">
-                        <label className="block text-[10px] font-bold uppercase text-gray-800 tracking-wider mb-0.5">Check-in</label>
-                        <input 
-                          type="date" 
-                          className="w-full text-sm outline-none text-gray-600 bg-transparent cursor-pointer font-medium"
-                          value={selectedDate}
-                          onChange={(e) => setSelectedDate(e.target.value)}
-                        />
-                    </div>
-                    <div className="p-3.5 border border-gray-300 rounded-2xl hover:border-gray-800 focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all cursor-pointer bg-white">
-                        <label className="block text-[10px] font-bold uppercase text-gray-800 tracking-wider mb-0.5">Check-out</label>
-                        <input 
-                          type="date" 
-                          className="w-full text-sm outline-none text-gray-600 bg-transparent cursor-pointer font-medium"
-                        />
-                    </div>
+                  <div className="mb-3">
+                    <BookingCalendar
+                      checkIn={selectedDate}
+                      checkOut={selectedCheckout}
+                      onChange={(ci, co) => {
+                        setSelectedDate(ci);
+                        setSelectedCheckout(co);
+                      }}
+                      idPrefix="seo-card"
+                    />
                   </div>
 
-                  <div className="p-3.5 border border-gray-300 rounded-2xl mb-4 hover:border-gray-800 focus-within:border-black focus-within:ring-1 focus-within:ring-black transition-all cursor-pointer bg-white relative">
-                      <label className="block text-[10px] font-bold uppercase text-gray-800 tracking-wider mb-0.5">Guests</label>
-                      <select 
-                        className="w-full text-sm outline-none text-gray-600 bg-transparent cursor-pointer appearance-none font-medium"
-                        value={guests}
-                        onChange={(e) => setGuests(Number(e.target.value))}
-                      >
-                        {[1,2,3,4,5,6].map(n => (
-                          <option key={n} value={n}>{n} guest{n > 1 ? 's' : ''}</option>
-                        ))}
-                      </select>
-                      <ChevronRight className="w-4 h-4 absolute right-4 top-1/2 mt-1 -translate-y-1/2 rotate-90 text-gray-500 pointer-events-none" />
-                  </div>
+                  <GuestPicker
+                    className="mb-4"
+                    value={guests}
+                    onChange={setGuests}
+                    maxGuests={6}
+                    idPrefix="seo-card"
+                  />
 
                   {/* Selected Guide Display */}
                   {selectedGuide && (
@@ -551,28 +594,39 @@ const SeoExperiencePage: React.FC = () => {
                     </div>
                   )}
 
-                  <button className="w-full bg-secondary hover:bg-secondary-hover text-white font-bold py-3.5 rounded-lg mb-4 transition-colors text-lg shadow-sm">
-                    Book Now
+                  <button
+                    onClick={handleBooking}
+                    disabled={bookingConfirmed}
+                    className={`w-full bg-secondary hover:bg-secondary-hover text-white font-bold py-3.5 rounded-lg mb-4 transition-colors text-lg shadow-sm ${
+                      bookingConfirmed ? 'opacity-70 cursor-default' : ''
+                    }`}
+                  >
+                    {bookingConfirmed ? 'Booked!' : 'Book Now'}
                   </button>
 
                   <div className="text-center">
-                    <p className="text-sm text-gray-500 mb-4">You won't be charged yet</p>
-                    <ExperienceCurrencyConverter price={data.price} />
+                    {bookingError ? (
+                      <p className="text-sm text-red-500 mb-4">{bookingError}</p>
+                    ) : (
+                      <p className="text-sm text-gray-500 mb-4">
+                        {bookingConfirmed ? 'Your spot has been reserved.' : "You won't be charged yet"}
+                      </p>
+                    )}
                     <div className="flex justify-between text-gray-600 mb-3 text-sm">
-                      <span className="underline decoration-gray-300">€{data.price} x {guests} guests</span>
-                      <span>€{data.price * guests}</span>
+                      <span className="underline decoration-gray-300"><Price amount={data.price} /> x {guests} guests</span>
+                      <span><Price amount={data.price * guests} /></span>
                     </div>
                     <div className="flex justify-between text-gray-600 mb-3 text-sm">
                       <span className="underline decoration-gray-300">Cleaning fee</span>
-                      <span>€15</span>
+                      <span><Price amount={15} /></span>
                     </div>
                     <div className="flex justify-between text-gray-600 border-b border-gray-200 pb-4 mb-4 text-sm">
                       <span className="underline decoration-gray-300">Service fee</span>
-                      <span>€0</span>
+                      <span><Price amount={0} /></span>
                     </div>
                     <div className="flex justify-between font-bold text-gray-900 text-lg">
                       <span>Total</span>
-                      <span>€{(data.price * guests) + 15}</span>
+                      <span><Price amount={(data.price * guests) + 15} /></span>
                     </div>
                   </div>
                 </div>
@@ -626,7 +680,7 @@ const SeoExperiencePage: React.FC = () => {
                     </div>
                     <p className="text-gray-500 text-sm">{item.location}</p>
                     <p className="text-gray-900 font-medium mt-1">
-                      <span className="font-bold">€{item.price}</span> / person
+                      <span className="font-bold"><Price amount={item.price} /></span> / person
                     </p>
                   </div>
                 </div>
