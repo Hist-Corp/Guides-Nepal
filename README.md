@@ -114,9 +114,66 @@ python seed_traveler_guide.py
      -H "Content-Type: application/json" \
      -d '{"email":"traveler@guides-nepal.com","password":"Traveler@2024"}'
    ```
-4. Neither account can sign in to the dashboard (`http://localhost:5176`) —
+4. Neither account can sign in to the staff dashboard (`http://localhost:5176`) —
    they have no console and are refused at sign-in by design; admins can still
    see them under **Administration**.
+
+### Guide Dashboard & Onboarding (public frontend)
+
+Guides get their own **post-login dashboard on the public site** (not the staff
+dashboard) after signing in with a `guide` account. Logging in as a guide
+redirects to `/guide/dashboard`.
+
+**Frontend routes** (all guarded — non-guide roles are redirected away):
+
+| Route | Purpose |
+|-------|---------|
+| `/guide/onboarding` | 4-step onboarding wizard: expertise areas → cities/languages → profile + default max-guest capacity → review |
+| `/guide/dashboard` | Post-login home: live stats, booking requests (accept/decline/complete), post real-time updates, capacity overview. Auto-refreshes every 30 s |
+| `/guide/listings` | Manage own listings: edit, remove, and adjust max guest capacity inline |
+| `/guide/listings/new` | Step-by-step listing wizard (create) |
+| `/guide/listings/:id/edit` | Step-by-step listing wizard (edit) |
+| `/guide/bookings` | Full booking request list |
+
+**Real-time updates** — from the dashboard a guide posts updates of type
+`availability`, `capacity`, `booking`, `schedule` or `announcement` (e.g. "4
+spots left for the Oct 20 Annapurna sunrise trek"). Updates are stored per
+guide + optional listing/area and appear in the dashboard feed; the booking
+list and stats re-poll every 30 seconds so new bookings show up live.
+
+**Backend API** (all under `require_role("guide")`, scoped to the signed-in user):
+
+| Method & path | Purpose |
+|---------------|---------|
+| `GET /api/v1/guide/dashboard` | Aggregated stats + listings + recent updates |
+| `GET/PUT /api/v1/guide/onboarding` | Load / save onboarding profile |
+| `GET/POST /api/v1/guide/listings` | List / create own listings |
+| `PATCH/DELETE /api/v1/guide/listings/{id}` | Edit / delete a listing |
+| `PATCH /api/v1/guide/listings/{id}/capacity` | Set `max_guests` or apply `booked_delta` |
+| `GET/POST /api/v1/guide/status`, `DELETE /api/v1/guide/status/{id}` | Manage real-time updates |
+| `PATCH /api/v1/guide/bookings/{id}` | Accept / reject / complete own bookings |
+
+#### Step-by-step: how a guide lists an experience (with capacity)
+
+1. **Sign in** as the guide (`guide@guides-nepal.com` / `Guide@2024`) on
+   `http://localhost:5175` → you land on `/guide/dashboard`.
+2. **Onboarding (first run):** at `/guide/onboarding` pick expertise areas
+   (trekking routes, travel tours, specialized activities), cities and
+   languages, then profile + **default max guests (1–100)** → *Complete
+   onboarding*.
+3. **New listing:** dashboard → *New listing* (`/guide/listings/new`).
+   - **Step 1 – type:** trekking route, travel tour, or specialized activity.
+   - **Step 2 – name & place:** title, city, optional finer area (e.g. Annapurna Circuit).
+   - **Steps 3–4 – details & capacity:** description, itinerary, meeting point,
+     duration, difficulty, price, and **maximum guests (1–100)**.
+   - **Step 5 – review & publish** (plus capacity rules on the final screen).
+4. **Manage capacity later:** `/guide/listings` → enter a new value next to any
+   listing → *Save capacity*. Raising is instant; lowering **below already-booked
+   guests is rejected with `422`**. Server-side `booked_delta` adjusts the
+   occupied count when travelers join or cancel (bounds 0…`max_guests`).
+5. **Post real-time updates:** dashboard → *Post a live update* → choose type
+   (`availability`, `capacity`, `booking`, `schedule`, `announcement`) and
+   message → *Post update*. It appears in the feed immediately.
 
 ### Dashboard Routes by Role
 

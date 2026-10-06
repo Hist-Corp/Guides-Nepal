@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Eye, EyeOff, Facebook } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { getApiUrl } from '../../config/api';
@@ -11,6 +12,7 @@ interface LoginModalProps {
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToSignup, onSwitchToForgotPassword }) => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState<'traveler' | 'guide'>('traveler');
   const { login, setTokens, setRememberMe } = useAuthStore();
@@ -125,6 +127,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
         });
         setTokens(data.access_token, data.refresh_token);
         onClose();
+        // Guides land on their dashboard (or onboarding if not yet complete).
+        if (data.user?.role === 'guide') {
+          navigate('/guide/dashboard');
+        }
       } else {
         try {
           const errData = await resp.json();

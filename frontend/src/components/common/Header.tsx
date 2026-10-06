@@ -206,6 +206,14 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
             </>
           ) : (
             <>
+              {user?.role === 'guide' && (
+                <Link
+                  to="/guide/dashboard"
+                  className="text-sm font-bold text-gray-800 hover:text-primary transition-colors flex items-center gap-2"
+                >
+                  Dashboard
+                </Link>
+              )}
               <Link
                 to={user?.role === 'guide' ? '/guide/bookings' : '/bookings'}
                 className="text-sm font-bold text-gray-800 hover:text-primary transition-colors flex items-center gap-2"
@@ -253,6 +261,31 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
                   >
                     Profile
                   </Link>
+                  {user?.role === 'guide' && (
+                    <>
+                      <Link
+                        to="/guide/dashboard"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        Guide dashboard
+                      </Link>
+                      <Link
+                        to="/guide/listings"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        My listings
+                      </Link>
+                      <Link
+                        to="/guide/onboarding"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        Onboarding
+                      </Link>
+                    </>
+                  )}
                   <button
                     onClick={() => {
                       logout();
