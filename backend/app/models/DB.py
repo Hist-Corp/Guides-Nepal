@@ -8,6 +8,7 @@ from app.models.user import User as User
 from app.models.booking import Booking as Booking
 from app.models.bookmark import Bookmark as Bookmark
 from app.models.guide import Guide as Guide
+from app.models.guide_application import GuideApplication as GuideApplication
 from app.models.host_application import HostApplication as HostApplication
 from app.models.support_ticket import SupportTicket as SupportTicket
 
@@ -16,6 +17,7 @@ __all__ = [
     "Booking",
     "Bookmark",
     "Guide",
+    "GuideApplication",
     "HostApplication",
     "SupportTicket",
 ]

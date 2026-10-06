@@ -43,6 +43,7 @@ import ImpactReportPage from './pages/ImpactReportPage';
 import ExplorePage from './pages/ExplorePage';
 import BecomeHostPage from './pages/host/BecomeHostPage';
 import HostApplicationWizard from './pages/host/HostApplicationWizard';
+import BecomeGuidePage from './pages/guide/BecomeGuidePage';
 import BookingsPage from './pages/user/BookingsPage';
 import ProfilePage from './pages/user/ProfilePage';
 import AccountSettingsPage from './pages/user/AccountSettingsPage';
@@ -114,6 +115,8 @@ function App() {
             <Route path="/explore" element={<ExplorePage />} />
             <Route path="/become-host" element={<BecomeHostPage />} />
             <Route path="/host-application" element={<HostApplicationWizard />} />
+            <Route path="/become-guide" element={<BecomeGuidePage />} />
+            <Route path="/guide-application" element={<BecomeGuidePage />} />
             <Route path="/bookings" element={<BookingsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/account" element={<AccountSettingsPage />} />

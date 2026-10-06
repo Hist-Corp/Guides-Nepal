@@ -5,5 +5,6 @@ from .booking import HostTour as HostTour
 from .booking import HostExperience as HostExperience
 from .bookmark import Bookmark as Bookmark
 from .guide import Guide as Guide
+from .guide_application import GuideApplication as GuideApplication
 from .host_application import HostApplication as HostApplication
 from .support_ticket import SupportTicket as SupportTicket

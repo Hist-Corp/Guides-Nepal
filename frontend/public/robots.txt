@@ -7,5 +7,7 @@ Disallow: /profile
 Disallow: /bookings
 Disallow: /chat
 Disallow: /host-application
+Disallow: /become-guide
+Disallow: /guide-application
 
 Sitemap: https://guides-nepal-nine.vercel.app/sitemap.xml

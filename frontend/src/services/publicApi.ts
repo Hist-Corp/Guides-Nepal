@@ -53,6 +53,7 @@ export async function flushPendingSubmissions() {
 
 function pathFor(kind: string) {
   if (kind === 'host-application') return '/host-applications';
+  if (kind === 'guide-application') return '/guide-applications';
   if (kind === 'support-ticket') return '/operations/support-tickets';
   return '/inquiries';
 }
@@ -93,4 +94,15 @@ export function submitHostApplication(payload: {
   documents?: string;
 }) {
   return submit('host-application', '/host-applications', payload);
+}
+
+export function submitGuideApplication(payload: {
+  full_name: string;
+  email: string;
+  phone?: string;
+  city?: string;
+  nin_number?: string;
+  documents?: string;
+}) {
+  return submit('guide-application', '/guide-applications', payload);
 }

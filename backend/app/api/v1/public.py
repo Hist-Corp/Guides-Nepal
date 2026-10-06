@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.models.guide import Guide
+from app.models.guide_application import GuideApplication
 from app.models.host_application import HostApplication
 from app.models.support_ticket import SupportTicket
 from app.schemas.public import ExperienceResponse, GuideResponse
@@ -58,14 +59,54 @@ class PublicHostApplicationCreate(BaseModel):
 def submit_host_application(
     payload: PublicHostApplicationCreate, db: Session = Depends(get_db)
 ):
-    """Public guide/host registration form from the marketing website."""
+    """Public host registration form from the marketing website.
+
+    Host-only: experience providers that list and manage experiences.
+    Guide signups use ``POST /guide-applications`` and land in the
+    ``guide_applications`` table, never here.
+    """
     application = HostApplication(
         host_name=payload.full_name,
         email=payload.email,
         city=payload.city,
         region=payload.city,
         phone=payload.phone,
-        experience=payload.documents or "Guide registration via website",
+        experience=payload.documents or "Host registration via website",
+        status="pending",
+    )
+    db.add(application)
+    db.commit()
+    db.refresh(application)
+    return {"status": "ok", "id": application.id, "message": "Application received"}
+
+
+class PublicGuideApplicationCreate(BaseModel):
+    full_name: str
+    email: str
+    phone: Optional[str] = None
+    city: Optional[str] = None
+    nin_number: Optional[str] = None
+    documents: Optional[str] = None  # names of uploaded documents
+
+
+@router.post("/guide-applications", status_code=status.HTTP_201_CREATED)
+def submit_guide_application(
+    payload: PublicGuideApplicationCreate, db: Session = Depends(get_db)
+):
+    """Public guide registration form from the marketing website.
+
+    Guide-only: individuals who lead tours. Stored in the dedicated
+    ``guide_applications`` table so guides are never mixed into the host
+    funnel (``host_applications``).
+    """
+    application = GuideApplication(
+        full_name=payload.full_name,
+        email=payload.email,
+        phone=payload.phone,
+        city=payload.city,
+        region=payload.city,
+        nin_number=payload.nin_number,
+        documents=payload.documents or "Guide registration via website",
         status="pending",
     )
     db.add(application)

@@ -138,6 +138,7 @@ export default function NavSidebar() {
             heading: "Governance",
             items: [
               { to: `${base}/host-applications`, label: "Host Applications", icon: "mail" },
+              { to: `${base}/guide-applications`, label: "Guide Applications", icon: "compass" },
               { to: `${base}/support-tickets`, label: "Support Tickets", icon: "ticket" },
               { to: `${base}/hierarchy`, label: "Role Hierarchy", icon: "shield" },
               { to: `${base}/administration`, label: "Administration", icon: "settings" },

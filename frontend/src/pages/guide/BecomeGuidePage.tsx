@@ -4,9 +4,9 @@ import { Footer } from '../../components/common/Footer';
 import { Button } from '../../components/common/Button';
 import { ArrowLeft, CheckCircle2, Upload, Shield, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { submitHostApplication } from '../../services/publicApi';
+import { submitGuideApplication } from '../../services/publicApi';
 
-const HostApplicationPage: React.FC = () => {
+const BecomeGuidePage: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
@@ -43,11 +43,12 @@ const HostApplicationPage: React.FC = () => {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const result = await submitHostApplication({
+      const result = await submitGuideApplication({
         full_name: formData.fullName,
         email: formData.email,
         phone: formData.phone || undefined,
         city: undefined,
+        nin_number: formData.ninNumber || undefined,
         documents: Object.entries(files)
           .filter(([, f]) => f)
           .map(([k, f]) => `${k}: ${(f as File).name}`)
@@ -386,5 +387,5 @@ const HostApplicationPage: React.FC = () => {
   );
 };
 
-export default HostApplicationPage;
+export default BecomeGuidePage;
 

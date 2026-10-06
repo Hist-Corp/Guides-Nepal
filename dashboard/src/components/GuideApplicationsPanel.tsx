@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
-import { getHostApplications, reviewHostApplication } from "../services/api"
+import { getGuideApplications, reviewGuideApplication } from "../services/api"
 
-export default function HostApplicationsPanel() {
+export default function GuideApplicationsPanel() {
   const [apps, setApps] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>("")
@@ -10,7 +10,7 @@ export default function HostApplicationsPanel() {
   const load = async () => {
     setLoading(true)
     try {
-      const data = await getHostApplications(filter ? { status: filter } : undefined)
+      const data = await getGuideApplications(filter ? { status: filter } : undefined)
       setApps(Array.isArray(data) ? data : [])
     } catch {
       setApps([])
@@ -25,8 +25,8 @@ export default function HostApplicationsPanel() {
 
   const review = async (id: number, status: "approved" | "rejected") => {
     try {
-      await reviewHostApplication(id, status)
-      setMsg(`Host application #${id} ${status}`)
+      await reviewGuideApplication(id, status)
+      setMsg(`Guide application #${id} ${status}`)
       await load()
     } catch (e: any) {
       setMsg(e?.response?.data?.detail || "Action failed")
@@ -36,7 +36,7 @@ export default function HostApplicationsPanel() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="text-xl font-semibold text-darkBlue">Host Applications</div>
+        <div className="text-xl font-semibold text-darkBlue">Guide Applications</div>
         <select
           className="rounded-lg border px-3 py-2 text-sm"
           value={filter}
@@ -57,7 +57,7 @@ export default function HostApplicationsPanel() {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-gray-600 border-b">
-              <th className="p-3">Host</th>
+              <th className="p-3">Guide</th>
               <th className="p-3">Email</th>
               <th className="p-3">City</th>
               <th className="p-3">Region</th>
@@ -69,11 +69,11 @@ export default function HostApplicationsPanel() {
             {loading ? (
               <tr><td className="p-4 text-gray-500" colSpan={6}>Loading…</td></tr>
             ) : apps.length === 0 ? (
-              <tr><td className="p-4 text-gray-500" colSpan={6}>No host applications found</td></tr>
+              <tr><td className="p-4 text-gray-500" colSpan={6}>No guide applications found</td></tr>
             ) : (
               apps.map((a) => (
                 <tr key={a.id} className="border-b last:border-0">
-                  <td className="p-3 font-medium text-darkBlue">{a.host_name}</td>
+                  <td className="p-3 font-medium text-darkBlue">{a.full_name}</td>
                   <td className="p-3">{a.email}</td>
                   <td className="p-3">{a.city || "—"}</td>
                   <td className="p-3">{a.region || "—"}</td>
@@ -115,4 +115,3 @@ export default function HostApplicationsPanel() {
     </div>
   )
 }
-
