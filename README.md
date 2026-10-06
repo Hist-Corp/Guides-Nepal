@@ -199,7 +199,14 @@ After registration, hosts must be approved by an admin or regional head before t
 - JWT + OAuth authentication (Google, Facebook)
 - Booking management and host workflows
 - User profiles with avatar/photo uploads and bookmarks
-- AI chat assistant (Ollama local model or OpenAI) with streaming support
+- AI chat assistant (Maila Dai) — streaming chat with local LLM (Ollama) or OpenAI fallback, Kathmandu-aware (weather, time, food, culture, adventure)
+- Advanced search & discovery — filter by city, category, price range, sort by popularity/rating/price
+- Host application wizard — 5-step multi-page form with document upload, auto-save to localStorage, business/individual/agency host types
+- Host Center — resource hub for hosts (getting started, pricing, community, safety, support)
+- Become a Host page — landing page with Guides Nepal Originals (ready-made experience templates)
+- Guide workflow — guide bookings dashboard, become-a-guide application
+- 5 Nepal cities — Kathmandu, Pokhara, Lalitpur, Bhaktapur, Bharatpur with dedicated experience pages
+- Specialized experience categories — Cultural, Food Tours, Cooking Classes, Outdoor Activities, Wellness
 - Role-based admin dashboard with 5 consoles (Admin, Content Manager, Regional Head, Customer Support, Host)
 - Mobile-first responsive UI using Tailwind CSS
 
@@ -383,9 +390,23 @@ Guides Nepal/
 │   ├── src/
 │   │   ├── components/    # Reusable UI components
 │   │   ├── pages/         # Page components
+│   │   │   ├── auth/          # Auth pages (login, reset password, OAuth callback)
+│   │   │   ├── host/          # Host pages (BecomeHost, HostApplicationWizard)
+│   │   │   ├── user/          # User pages (Profile, Favorites, Chat, Bookings, Settings)
+│   │   │   ├── guide/         # Guide pages (GuideBookings, BecomeGuide)
+│   │   │   ├── kathmandu/     # Kathmandu city & experiences
+│   │   │   ├── pokhara/       # Pokhara city & experiences
+│   │   │   ├── lalitpur/      # Lalitpur city & experiences
+│   │   │   ├── bhaktapur/     # Bhaktapur city & experiences
+│   │   │   ├── bharatpur/     # Bharatpur city & experiences
+│   │   │   ├── cooking/       # Cooking experiences
+│   │   │   ├── food/          # Food tours
+│   │   │   └── ...            # Search, Explore, Experiences, Blog, etc.
 │   │   ├── contexts/      # React contexts (Currency, Cart)
 │   │   ├── services/      # API services
 │   │   ├── hooks/         # Custom hooks
+│   │   ├── utils/         # Utility functions (canonicalExperience, analytics)
+│   │   ├── config/        # Config (api.ts)
 │   │   ├── data/          # Static data files
 │   │   └── styles/        # CSS styles
 │   └── ...
@@ -403,7 +424,7 @@ Guides Nepal/
 │   └── ...
 ├── backend/               # FastAPI backend
 │   ├── app/
-│   │   ├── api/v1/        # API endpoints (auth, admin, content, host, guide, ...)
+│   │   ├── api/v1/        # API endpoints (auth, admin, content, host, guide, ai, bookings, profile, operations, host-applications)
 │   │   ├── models/        # SQLAlchemy models
 │   │   ├── core/          # Config, database, security, roles (RBAC), dependencies
 │   │   ├── schemas/       # Pydantic request/response models
@@ -412,13 +433,18 @@ Guides Nepal/
 │   ├── tests/             # pytest suite (test_roles.py, test_rbac.py, ...)
 │   ├── migrations/        # Alembic migrations
 │   ├── seed_credentials.py  # Idempotent dev seed: one account per dashboard role
+│   ├── seed_traveler_guide.py  # Idempotent seed for traveler + guide test accounts
+│   ├── seed_host_dashboard.py  # Host dashboard seed data
 │   └── ...
 ├── scripts/               # Utility scripts
 ├── docs/                  # Documentation
+├── documents/             # PRD and technical architecture
 ├── start-all.bat          # Start all services (Windows)
 ├── start-frontend.bat     # Start frontend only
 ├── start-backend.bat      # Start backend only
 ├── start-dashboard.bat    # Start dashboard only
+├── start-services.ps1     # Start services (PowerShell)
+├── docker-compose.yml     # Local Docker stack
 └── README.md              # This file
 ```
 
@@ -449,22 +475,42 @@ RBAC coverage lives in two backend suites worth knowing about:
   privileged role, and that `GET /api/v1/guide/me` is reachable by `guide` and `admin`
   only (the dashboard does not consume this endpoint).
 
+### Key Frontend Features
+
+- **AI Chat (Maila Dai)** — `frontend/src/pages/MailaDaiChatPage.tsx` with streaming via `POST /api/v1/ai/chat/stream`, fallback to non-streaming `/api/v1/ai/chat`
+- **Advanced Search** — `frontend/src/pages/SearchPage.tsx` with city/category/price filters, sort options, URL-synced query params
+- **Host Application Wizard** — `frontend/src/pages/host/HostApplicationWizard.tsx`: 5-step form, auto-save to `localStorage`, file uploads (PDF/JPG/PNG, max 10MB), validation per step
+- **Host Center** — `frontend/src/pages/HostCenterPage.tsx`: resource hub with 6 guide categories
+- **Become a Host** — `frontend/src/pages/host/BecomeHostPage.tsx`: landing page with Originals templates, testimonials, FAQ accordion
+- **User Dashboard** — `frontend/src/pages/user/*`: Profile, Favorites, Chat, Bookings, Account Settings
+- **Guide Pages** — `frontend/src/pages/guide/*`: Guide Bookings, Become Guide
+
 ### AI Chat Providers
 - **Ollama** (recommended for local, privacy-friendly usage)
   - Install and run: `brew install ollama && ollama serve && ollama pull llama3.2`
+  - Model configured via `OLLAMA_MODEL` (default: `llama3.2:latest`)
 - **OpenAI**: set `OPENAI_API_KEY` to enable
+- **AI Provider**: set `AI_PROVIDER=auto` (default), `ollama`, or `openai`
+- **Maila Dai** — the platform's AI assistant with Kathmandu-specific knowledge:
+  - Live weather (via Open-Meteo)
+  - Local time (UTC+5:45)
+  - Food recommendations (Newari cuisine, momos, thukpa)
+  - Culture & heritage walk suggestions
+  - Adventure ideas (hikes, paragliding, viewpoints)
+  - Streaming responses via `/api/v1/ai/chat/stream`
 
 ### API Endpoints
 - Base: `/api/v1`
 - Auth: `/api/v1/auth/*`
 - Bookings: `/api/v1/bookings/*`
 - Profile: `/api/v1/profile/*`
-- AI: `/api/v1/ai/chat` and `/api/v1/ai/chat/stream`
+- AI: `/api/v1/ai/chat` (non-streaming) and `/api/v1/ai/chat/stream` (streaming)
 - Admin: `/api/v1/admin/*`
 - Content: `/api/v1/content/*`
 - Operations: `/api/v1/operations/*`
 - Host: `/api/v1/host/*`
 - Guide: `/api/v1/guide/*`
+- Host Applications: `/api/v1/host-applications/*`
 
 ---
 
@@ -544,5 +590,5 @@ This project is licensed under MIT. See the LICENSE file for details.
 
 ---
 
-**Last updated:** 2026-10-05  
-**Version:** 1.1.0
+**Last updated:** 2026-10-06  
+**Version:** 1.2.0

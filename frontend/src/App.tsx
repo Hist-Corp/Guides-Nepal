@@ -45,6 +45,7 @@ import BecomeHostPage from './pages/host/BecomeHostPage';
 import HostApplicationWizard from './pages/host/HostApplicationWizard';
 import BecomeGuidePage from './pages/guide/BecomeGuidePage';
 import BookingsPage from './pages/user/BookingsPage';
+import GuideBookingsPage from './pages/guide/GuideBookingsPage';
 import ProfilePage from './pages/user/ProfilePage';
 import AccountSettingsPage from './pages/user/AccountSettingsPage';
 import FavoritesPage from './pages/user/FavoritesPage';
@@ -118,6 +119,7 @@ function App() {
             <Route path="/become-guide" element={<BecomeGuidePage />} />
             <Route path="/guide-application" element={<BecomeGuidePage />} />
             <Route path="/bookings" element={<BookingsPage />} />
+            <Route path="/guide/bookings" element={<GuideBookingsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/account" element={<AccountSettingsPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />

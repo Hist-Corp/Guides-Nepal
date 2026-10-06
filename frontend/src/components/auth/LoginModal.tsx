@@ -120,7 +120,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
         login({
           firstName: data.user.firstName || (userType === 'traveler' ? 'John' : 'Guide'),
           lastName: data.user.lastName || (userType === 'traveler' ? 'Doe' : 'Host'),
-          email: data.user.email || email
+          email: data.user.email || email,
+          role: data.user.role,
         });
         setTokens(data.access_token, data.refresh_token);
         onClose();

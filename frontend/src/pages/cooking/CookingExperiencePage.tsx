@@ -20,6 +20,7 @@ import { BookingCalendar } from '../../components/common/BookingCalendar';
 import { GuestPicker } from '../../components/common/GuestPicker';
 import { TimePicker } from '../../components/common/TimePicker';
 import { useBookingStore } from '../../store/bookingStore';
+import { useAuthStore } from '../../store/authStore';
 import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
 import { getAvailableGuides } from '../../utils/guides';
 
@@ -249,12 +250,17 @@ const CookingExperiencePage: React.FC = () => {
   // Active bookings decide which guides are still available to show/select
   const bookings = useBookingStore((s) => s.bookings);
   const addBooking = useBookingStore((s) => s.addBooking);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const availableGuides = useMemo(
     () => (data ? getAvailableGuides(data.guides ?? [], bookings, data.id, '') : []),
     [data, bookings]
   );
 
-  const handleBookNow = () => {
+const handleBookNow = async (): Promise<boolean> => {
+    if (!isAuthenticated) {
+      alert('Please log in to book an experience');
+      return false;
+    }
     if (!checkIn) {
       const infoElement = document.getElementById('booking-info-message');
       if (infoElement) {
@@ -270,7 +276,7 @@ const CookingExperiencePage: React.FC = () => {
         checkInInput.classList.add('ring-2', 'ring-primary');
         setTimeout(() => checkInInput.classList.remove('ring-2', 'ring-primary'), 2000);
       }
-      return;
+      return false;
     }
 
     if (!checkOut) {
@@ -287,7 +293,7 @@ const CookingExperiencePage: React.FC = () => {
         checkOutInput.classList.add('ring-2', 'ring-primary');
         setTimeout(() => checkOutInput.classList.remove('ring-2', 'ring-primary'), 2000);
       }
-      return;
+      return false;
     }
 
     // Clear error message if valid
@@ -296,9 +302,9 @@ const CookingExperiencePage: React.FC = () => {
       infoElement.classList.add('hidden');
     }
 
-    if (!data) return;
+    if (!data) return false;
     // Persist the booking so the reserved chef is hidden from "Who you'll meet"
-    addBooking({
+    const success = await addBooking({
       id: Math.random().toString(36).substr(2, 9),
       experienceId: data.id,
       experienceTitle: data.title,
@@ -312,17 +318,24 @@ const CookingExperiencePage: React.FC = () => {
       guideName: selectedGuide?.name,
     });
 
-    // Set confirmation state
-    setIsBookingConfirmed(true);
+    // Only set confirmation state if booking succeeded
+    if (success) {
+      setIsBookingConfirmed(true);
 
-    // Scroll to top of card to ensure confirmation is visible
-    const cardElement = document.getElementById('booking-card-desktop');
-    if (cardElement) {
-      cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Scroll to top of card to ensure confirmation is visible
+      const cardElement = document.getElementById('booking-card-desktop');
+      if (cardElement) {
+        cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     }
+    return success;
   };
 
-  const handleSheetConfirm = () => {
+  const handleSheetConfirm = async () => {
+    if (!isAuthenticated) {
+      setSheetError('Please log in to book an experience');
+      return;
+    }
     if (!checkIn) {
       setSheetError('Please select a check-in date');
       return;
@@ -332,8 +345,10 @@ const CookingExperiencePage: React.FC = () => {
       return;
     }
     setSheetError(null);
-    handleBookNow();
-    setSheetConfirmed(true);
+    const success = await handleBookNow();
+    if (success) {
+      setSheetConfirmed(true);
+    }
   };
 
   useEffect(() => {

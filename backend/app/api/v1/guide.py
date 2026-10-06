@@ -12,6 +12,7 @@ from app.core.database import get_db
 from app.core.dependencies import require_role
 from app.core.roles import GUIDE, GUIDE_CAPABILITIES, role_rank
 from app.models.user import User
+from app.models.booking import Booking
 
 router = APIRouter(prefix="/guide", tags=["guide"])
 
@@ -35,3 +36,30 @@ def guide_profile(guide: User = Depends(GUIDE_ONLY), db: Session = Depends(get_d
         "rank": role_rank(guide.role),
         "capabilities": sorted(GUIDE_CAPABILITIES),
     }
+
+
+@router.get("/bookings")
+def guide_bookings(guide: User = Depends(GUIDE_ONLY), db: Session = Depends(get_db)) -> list[dict]:
+    """Booking requests assigned to the signed-in guide only."""
+    rows = (
+        db.query(Booking, User)
+        .join(User, Booking.user_id == User.id)
+        .filter(Booking.guide_user_id == guide.id)
+        .order_by(Booking.date)
+        .all()
+    )
+    return [
+        {
+            "id": booking.id,
+            "experience_title": booking.experience_title,
+            "city": booking.city,
+            "date": booking.date,
+            "guests": booking.guests,
+            "price": booking.price,
+            "image": booking.image,
+            "status": booking.status.value if hasattr(booking.status, "value") else booking.status,
+            "traveler_name": f"{traveler.firstName or ''} {traveler.lastName or ''}".strip(),
+            "traveler_email": traveler.email,
+        }
+        for booking, traveler in rows
+    ]
