@@ -90,7 +90,7 @@ const PokharaExperiencePage: React.FC = () => {
     [data, bookings]
   );
 
-const handleBookNow = async (): Promise<boolean> => {
+  const handleBookNow = async (): Promise<boolean> => {
     if (!isAuthenticated) {
       alert('Please log in to book an experience');
       return false;
@@ -365,18 +365,32 @@ const handleBookNow = async (): Promise<boolean> => {
                   <h3 className="text-secondary font-bold mb-2 uppercase text-sm tracking-wide">
                     Tour Structure
                   </h3>
-                  <div className="flex flex-col md:flex-row gap-4 justify-between items-center text-center">
-                    {data.tourStructure.steps.map((step, index) => (
-                      <React.Fragment key={index}>
-                        <div className="bg-white p-4 rounded-lg shadow-sm w-full">
-                          <span className="block font-bold text-gray-900">{step.name}</span>
-                          <span className="text-xs text-gray-500">{step.label}</span>
+                  <div className="flex flex-col gap-4">
+                    {Array.from({ length: Math.ceil(data.tourStructure.steps.length / 4) }).map(
+                      (_, rowIndex) => (
+                        <div
+                          key={rowIndex}
+                          className="flex flex-wrap items-center justify-center gap-2"
+                        >
+                          {data.tourStructure.steps
+                            .slice(rowIndex * 4, rowIndex * 4 + 4)
+                            .map((step, index) => (
+                              <React.Fragment key={index}>
+                                <div className="bg-white p-3 rounded-lg shadow-sm min-w-[120px] text-center">
+                                  <span className="block font-bold text-gray-900 text-sm">
+                                    {step.name}
+                                  </span>
+                                  <span className="text-xs text-gray-500">{step.label}</span>
+                                </div>
+                                {index <
+                                  data.tourStructure.steps.slice(rowIndex * 4, rowIndex * 4 + 4)
+                                    .length -
+                                    1 && <ArrowRight className="text-secondary flex-shrink-0" />}
+                              </React.Fragment>
+                            ))}
                         </div>
-                        {index < data.tourStructure.steps.length - 1 && (
-                          <ArrowRight className="text-secondary hidden md:block" />
-                        )}
-                      </React.Fragment>
-                    ))}
+                      )
+                    )}
                   </div>
                 </div>
 
