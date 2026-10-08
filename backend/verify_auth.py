@@ -1,6 +1,7 @@
 """
 End-to-end verification of the sign-in / sign-up auth flow.
-Run with:  .venv/Scripts/Activate.ps1 ; python verify_auth.py
+Run with:  node scripts/run-py.js verify_auth.py   (from the repo root;
+finds backend/.venv on every OS - no manual venv activation needed)
 """
 
 import sys
@@ -26,13 +27,18 @@ def check(name: str, condition: bool) -> None:
     print(f"[{'PASS' if condition else 'FAIL'}] {name}")
 
 
-# Ensure a clean slate for the test email
-import sqlite3
+# Ensure a clean slate for the test email.
+# Talk to the *configured* engine (works for SQLite AND Postgres) instead of
+# hardcoding a guides_nepal.db sqlite file, which crashed on Postgres setups.
+from sqlalchemy import text as _sa_text
 
-db = sqlite3.connect(os.path.join(os.path.dirname(__file__), "guides_nepal.db"))
-db.execute("DELETE FROM users WHERE email IN ('test1@example.com','test2@example.com')")
-db.commit()
-db.close()
+with engine.begin() as _conn:
+    _conn.execute(
+        _sa_text(
+            "DELETE FROM users WHERE email IN "
+            "('test1@example.com','test2@example.com')"
+        )
+    )
 
 # 1) Sign up a new user
 r = client.post(

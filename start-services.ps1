@@ -1,7 +1,12 @@
 # Guides Nepal - Start Frontend and Dashboard
 # This script starts both frontend and dashboard services
+# Portable: resolves repo root from this script's location (no hardcoded user path)
+#
+# Windows-only: uses `powershell` + `netstat -ano [...] LISTENING` parsing.
+# On macOS/Linux use `./start-all.sh` or `npm run dev` (works on every OS).
 
 $ErrorActionPreference = "SilentlyContinue"
+$rootDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  Starting Frontend & Dashboard" -ForegroundColor Cyan
@@ -15,15 +20,18 @@ Start-Sleep -Seconds 2
 
 # Clear Vite cache
 Write-Host "Clearing Vite cache..." -ForegroundColor Yellow
-$frontendViteCache = "c:\Users\poude\Desktop\Guides Nepal\frontend\node_modules\.vite"
-$dashboardViteCache = "c:\Users\poude\Desktop\Guides Nepal\dashboard\node_modules\.vite"
+# Cross-platform: build paths with Join-Path (forward slashes work on every OS,
+# backslashes break PowerShell Core on macOS/Linux).
+$frontendViteCache = Join-Path $rootDir "frontend" | Join-Path -ChildPath "node_modules" | Join-Path -ChildPath ".vite"
+$dashboardViteCache = Join-Path $rootDir "dashboard" | Join-Path -ChildPath "node_modules" | Join-Path -ChildPath ".vite"
 Remove-Item -Path $frontendViteCache -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item -Path $dashboardViteCache -Recurse -Force -ErrorAction SilentlyContinue
 
 # Start Frontend as a background job
 Write-Host "Starting Frontend on port 5175..." -ForegroundColor Green
+$frontendDir = Join-Path $rootDir "frontend"
 $frontendScript = @"
-cd 'c:\Users\poude\Desktop\Guides Nepal\frontend'
+cd '$frontendDir'
 npm run dev -- --port 5175 --host
 "@
 $frontendJob = Start-Process powershell -ArgumentList "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", $frontendScript -PassThru -WindowStyle Hidden
@@ -39,8 +47,9 @@ if ($frontendRunning) {
 
 # Start Dashboard as a background job
 Write-Host "Starting Dashboard on port 5176..." -ForegroundColor Cyan
+$dashboardDir = Join-Path $rootDir "dashboard"
 $dashboardScript = @"
-cd 'c:\Users\poude\Desktop\Guides Nepal\dashboard'
+cd '$dashboardDir'
 npm run dev -- --port 5176 --host
 "@
 $dashboardJob = Start-Process powershell -ArgumentList "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", $dashboardScript -PassThru -WindowStyle Hidden

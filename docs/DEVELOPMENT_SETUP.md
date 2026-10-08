@@ -26,7 +26,7 @@ npm run prepare      # installs husky git hooks
 ```bash
 cd frontend
 npm install
-cp .env.example .env   # see Environment section below
+cp .env.example .env   # macOS/Linux/Git Bash; Windows cmd: copy .env.example .env
 npm run dev            # http://localhost:5175
 ```
 
@@ -35,9 +35,12 @@ npm run dev            # http://localhost:5175
 ```bash
 cd backend
 python -m venv .venv
-.venv\Scripts\activate          # Windows (bash: source .venv/bin/activate)
+# Activate the venv (pick the line for your OS):
+#   Windows (PowerShell):  .\.venv\Scripts\Activate.ps1
+#   Windows (cmd):         .venv\Scripts\activate.bat
+#   macOS / Linux (bash):  source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env
+cp .env.example .env        # macOS/Linux; Windows: copy .env.example .env
 uvicorn app.main:app --reload    # http://localhost:8000
 ```
 
@@ -50,7 +53,7 @@ OpenAPI docs are available at `http://localhost:8000/api/v1/docs` when `ENV=deve
 ```bash
 cd dashboard
 npm install
-cp .env.example .env
+cp .env.example .env   # macOS/Linux/Git Bash; Windows cmd: copy .env.example .env
 npm run dev            # http://localhost:5176
 ```
 
@@ -62,7 +65,10 @@ From the repo root:
 npm run dev            # frontend + backend + dashboard via concurrently
 ```
 
-Also available: `start-all.bat` / `start-frontend.bat` / `start-backend.bat` / `start-dashboard.bat`, `run-project.ps1`, and a `Makefile`.
+Also available: on Windows `start-all.bat` / `start-frontend.bat` / `start-backend.bat` /
+`start-dashboard.bat` and `run-project.ps1`; on macOS/Linux `./start-all.sh`
+(`start-all-mac.sh` is kept as an alias). `npm run dev` and the `Makefile`
+work on every OS.
 
 ### 5. Docker Compose (alternative)
 
@@ -157,7 +163,7 @@ E2E specs live in `tests/e2e/specs/` (auth, dashboard, home-buttons, navigation)
 | Port already in use | Kill the process, or change the port in the respective `vite.config.ts` |
 | DB connection fails | Check `DATABASE_URL`; ensure PostgreSQL is running or use Supabase |
 | AI chat unavailable | Install Ollama and pull `llama3.2`, or set `OPENAI_API_KEY` |
-| Node modules broken | `rm -rf node_modules package-lock.json && npm install` |
+| Node modules broken | `npm run clean` (cross-platform), or `rm -rf node_modules package-lock.json && npm install` on macOS/Linux |
 | Python env broken | Delete `backend/.venv` and recreate |
 
 ## Documentation Map

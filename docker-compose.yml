@@ -55,7 +55,11 @@ services:
     environment:
       - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
       - VITE_SUPABASE_PUBLISHABLE_KEY=${VITE_SUPABASE_PUBLISHABLE_KEY}
-      - VITE_API_URL=http://localhost:8000/api/v1
+      # Inside Docker, the backend is reachable as http://backend:8000 (service
+      # name), NOT localhost. The Vite dev proxy must forward there; see
+      # frontend/vite.config.ts (VITE_BACKEND_URL override).
+      - VITE_BACKEND_URL=http://backend:8000
+      - VITE_API_URL=/api/v1
     ports:
       - "5175:5175"
     volumes:
@@ -74,7 +78,11 @@ services:
     environment:
       - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
       - VITE_SUPABASE_PUBLISHABLE_KEY=${VITE_SUPABASE_PUBLISHABLE_KEY}
-      - VITE_API_BASE_URL=http://localhost:8000/api/v1
+      # Inside Docker, the backend is reachable as http://backend:8000 (service
+      # name), NOT localhost. The Vite dev proxy must forward there; see
+      # dashboard/vite.config.ts (VITE_BACKEND_URL override).
+      - VITE_BACKEND_URL=http://backend:8000
+      - VITE_API_BASE_URL=/api/v1
     ports:
       - "5176:5176"
     volumes:

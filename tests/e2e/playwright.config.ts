@@ -4,12 +4,12 @@ import path from 'path';
 /**
  * Playwright E2E configuration for Guides Nepal.
  *
- * Dev servers (backend :8000, frontend :5173, dashboard :5176) are brought up
+ * Dev servers (backend :8000, frontend :5175, dashboard :5176) are brought up
  * automatically if not already running (reuseExistingServer: true), so this
  * suite can be run on its own. The bundled Chromium build is used; if it is
  * missing, set USE_SYSTEM_CHROME=true to launch Google Chrome instead.
  */
-const projectRoot = path.resolve(__dirname, '..');
+const projectRoot = path.resolve(__dirname, '..', '..'); // repo root (config lives in tests/e2e/)
 const useSystemChrome = !!process.env.USE_SYSTEM_CHROME;
 
 export default defineConfig({
@@ -35,9 +35,9 @@ export default defineConfig({
       name: 'frontend',
       use: {
         ...devices['Desktop Chrome'],
-        baseURL: 'http://localhost:5173',
+        baseURL: 'http://localhost:5175',
       },
-      testMatch: /specs\/(home-buttons|auth|navigation)\.spec\.ts$/,
+      testMatch: /specs[/\\](home-buttons|auth|navigation)\.spec\.ts$/,
     },
     {
       name: 'dashboard',
@@ -45,7 +45,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         baseURL: 'http://localhost:5176',
       },
-      testMatch: /specs\/dashboard\.spec\.ts$/,
+      testMatch: /specs[/\\]dashboard\.spec\.ts$/,
     },
   ],
   webServer: [
@@ -58,7 +58,7 @@ export default defineConfig({
     },
     {
       command: 'npm run dev:frontend',
-      url: 'http://localhost:5173',
+      url: 'http://localhost:5175',
       reuseExistingServer: true,
       cwd: projectRoot,
       timeout: 120_000,

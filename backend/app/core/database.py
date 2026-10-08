@@ -18,14 +18,31 @@ def _normalize_db_url(url: str) -> str:
     if url.startswith(("postgresql", "postgres")):
         parsed = urlparse(url)
         qs = parse_qs(parsed.query)
-        is_local = parsed.hostname in ("localhost", "127.0.0.1", "::1")
+        # Local hostnames that never use SSL: localhost variants, Docker Compose
+        # service names (`db`, `postgres`, `database`), and Docker Desktop's
+        # host gateway. Forcing sslmode=require on any of these breaks local dev
+        # with "server does not support SSL, but SSL was required".
+        is_local = parsed.hostname in (
+            "localhost",
+            "127.0.0.1",
+            "::1",
+            "db",
+            "postgres",
+            "database",
+            "host.docker.internal",
+        )
+        # Map bare "postgresql://" to explicit psycopg2 driver so SQLAlchemy 2.x
+        # doesn't default to the (not installed) psycopg v3 driver.
+        scheme = parsed.scheme
+        if scheme in ("postgresql", "postgres"):
+            scheme = "postgresql+psycopg2"
         if is_local:
             qs.setdefault("sslmode", ["disable"])
         else:
             qs.setdefault("sslmode", ["require"])
         qs.setdefault("connect_timeout", ["10"])
         new_query = urlencode(qs, doseq=True)
-        return urlunparse(parsed._replace(query=new_query))
+        return urlunparse(parsed._replace(scheme=scheme, query=new_query))
     return url
 
 

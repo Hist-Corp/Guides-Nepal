@@ -49,5 +49,29 @@ module.exports = {
     runEslint('dashboard', filenames),
     runPrettier(filenames),
   ],
-  'backend/**/*.py': ['black', 'ruff check --fix'],
+  // Run Python tools as `node scripts/run-py.js -m <tool>` so they use the
+  // backend venv on every OS. Bare `black` / `ruff` fail on machines where
+  // the venv is not activated (Windows especially) or where the shims are
+  // not on PATH.
+  //
+  // These MUST be functions (not strings): lint-staged appends the staged
+  // filenames to string tasks, but run-py.js always runs with cwd=backend/,
+  // so root-relative paths like `backend/app/x.py` would resolve to the
+  // non-existent `backend/backend/app/x.py`. Functions take control of the
+  // filenames and relativize them to backend/ first.
+  'backend/**/*.py': (filenames) => {
+    const files = filenames
+      .map((f) => path.relative('backend', path.resolve(f)).split(path.sep).join('/'))
+      .map((f) => `"${f}"`)
+      .join(' ');
+    return [
+      `node scripts/run-py.js -m black ${files}`,
+      // `verify_auth.py` is excluded via [tool.ruff] extend-exclude in
+      // pyproject.toml, but ruff ignores exclusions for files passed
+      // explicitly on the command line. --force-exclude restores the
+      // configured exclusion so E402 (intentional late imports in
+      // verify_auth.py) no longer fails the pre-commit hook.
+      `node scripts/run-py.js -m ruff check --force-exclude --fix ${files}`,
+    ];
+  },
 };

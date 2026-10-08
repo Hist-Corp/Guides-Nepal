@@ -1,5 +1,5 @@
 fastapi
-uvicorn
+uvicorn[standard]
 pydantic
 email-validator
 pydantic-settings
@@ -11,10 +11,11 @@ bcrypt
 python-multipart
 python-dotenv
 Pillow
-black==26.5.1
-ruff==0.15.21
-mypy==2.3.0
+black
+ruff
+mypy
 pytest
+pytest-cov
 httpx
 bandit
 safety

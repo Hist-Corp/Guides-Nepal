@@ -1,3 +1,6 @@
+# Makefile (POSIX: macOS / Linux / Git Bash / WSL).
+# Windows cmd/PowerShell do NOT ship `make` — use the equivalent `npm run ...`
+# scripts from package.json instead (they work on every OS).
 .PHONY: help setup dev build test lint format typecheck clean
 
 # Default target
@@ -47,7 +50,7 @@ build-backend: ## Build backend Docker image
 
 # Testing
 test: ## Run all tests
-	🧪 Running all tests..."
+	@echo "Running all tests..."
 	npm test
 
 test-frontend: ## Run frontend tests
@@ -136,18 +139,18 @@ clean-dashboard: ## Clean dashboard build artifacts
 	@echo "📊 Cleaning dashboard..."
 	npm run clean:dashboard
 
-# Database
+# Database (cross-platform via run-py.js — no .venv\Scripts hardcoding)
 db-migrate: ## Run database migrations
 	@echo "🗄️ Running database migrations..."
-	cd backend && .venv\Scripts\alembic upgrade head
+	node scripts/run-py.js -m alembic upgrade head
 
 db-downgrade: ## Downgrade database
 	@echo "🗄️ Downgrading database..."
-	cd backend && .venv\Scripts\alembic downgrade -1
+	node scripts/run-py.js -m alembic downgrade -1
 
 db-revision: ## Create new database migration
 	@echo "🗄️ Creating new migration..."
-	cd backend && .venv\Scripts\alembic revision --autogenerate -m "$(message)"
+	node scripts/run-py.js -m alembic revision --autogenerate -m "$(message)"
 
 # Docker
 docker-up: ## Start all Docker containers

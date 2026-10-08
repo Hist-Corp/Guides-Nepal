@@ -1,8 +1,12 @@
 # Guides Nepal - Start Services Script
 # Uses PowerShell jobs to run services in background
+# Portable: resolves repo root from this script's location (no hardcoded user path)
+#
+# Windows launcher (Windows PowerShell 5.1+ / PowerShell 7+).
+# On macOS/Linux use `./start-all.sh` or `npm run dev` (works on every OS).
 
 $ErrorActionPreference = "SilentlyContinue"
-$rootDir = "c:\Users\poude\Desktop\Guides Nepal"
+$rootDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  Guides Nepal - Starting Services" -ForegroundColor Cyan
@@ -17,24 +21,28 @@ Start-Sleep -Seconds 2
 # Start Backend as background job
 Write-Host "Starting Backend (port 8000)..." -ForegroundColor Magenta
 $backendJob = Start-Job -ScriptBlock {
-    Set-Location "c:\Users\poude\Desktop\Guides Nepal\backend"
-    & ".\.venv\Scripts\activate.ps1"
-    & uvicorn app.main:app --reload --port 8000
-}
+    param($rootDir)
+    Set-Location $rootDir
+    # run-py.js finds backend/.venv (or a system Python) on every OS,
+    # so the backend starts even when the venv was never activated.
+    & node scripts/run-py.js -m uvicorn app.main:app --reload --port 8000
+} -ArgumentList $rootDir
 
 # Start Frontend as background job  
 Write-Host "Starting Frontend (port 5175)..." -ForegroundColor Green
 $frontendJob = Start-Job -ScriptBlock {
-    Set-Location "c:\Users\poude\Desktop\Guides Nepal\frontend"
+    param($rootDir)
+    Set-Location (Join-Path $rootDir "frontend")
     & npm run dev -- --port 5175 --host
-}
+} -ArgumentList $rootDir
 
 # Start Dashboard as background job
 Write-Host "Starting Dashboard (port 5176)..." -ForegroundColor Cyan
 $dashboardJob = Start-Job -ScriptBlock {
-    Set-Location "c:\Users\poude\Desktop\Guides Nepal\dashboard"
+    param($rootDir)
+    Set-Location (Join-Path $rootDir "dashboard")
     & npm run dev -- --port 5176 --host
-}
+} -ArgumentList $rootDir
 
 Write-Host ""
 Write-Host "Waiting for services to start..." -ForegroundColor Yellow

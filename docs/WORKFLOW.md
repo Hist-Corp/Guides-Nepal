@@ -77,6 +77,36 @@ guides-nepal/
 │   │   ├── services/      # API services
 │   │   ├── data/          # Static data
 │   │   └── test/          # Unit tests
+│   └── ...
+├── dashboard/             # Admin dashboard React app
+│   ├── src/
+│   │   ├── admin/         # Admin pages
+│   │   ├── host/          # Host pages
+│   │   ├── guide/         # Guide pages
+│   │   ├── writer/        # Content writer pages
+│   │   ├── components/    # Reusable components
+│   │   ├── layouts/       # Layout components
+│   │   ├── guards/        # Route guards
+│   │   ├── hooks/         # Custom hooks
+│   │   ├── state/         # State management
+│   │   └── test/          # Unit tests
+│   └── ...
+├── backend/               # FastAPI backend
+│   ├── app/
+│   │   ├── api/v1/        # API routes
+│   │   ├── core/          # Core configuration
+│   │   ├── models/        # SQLAlchemy models
+│   │   ├── schemas/      # Pydantic schemas
+│   │   ├── services/      # Business logic
+│   │   └── middleware/    # Custom middleware
+│   ├── tests/             # Backend tests
+│   └── ...
+├── tests/e2e/             # End-to-end tests
+├── scripts/               # Automation scripts
+├── docs/                  # Documentation
+└── ...
+```
+
 ## Development Commands
 
 ### Using npm
@@ -157,6 +187,17 @@ docker compose build
 
 ```bash
 # Frontend unit tests
+cd frontend
+npm test
+
+# Backend unit tests (no manual venv activation needed)
+npm run test:backend
+
+# Dashboard unit tests
+cd dashboard
+npm test
+```
+
 ## Deployment
 
 ### Frontend (Vercel)
@@ -189,7 +230,7 @@ vercel --prod
 2. **Database connection issues**:
    - Verify PostgreSQL is running
    - Check DATABASE_URL in `backend/.env`
-   - Run migrations: `cd backend && .venv\Scripts\alembic upgrade head`
+   - Run migrations: `npm run db:migrate` (works on every OS; needs `backend/.env`)
 
 3. **Module not found errors**:
    - Run `npm run setup` to reinstall dependencies
@@ -232,18 +273,6 @@ We use conventional commits:
 
 **Last Updated**: 2025
 **Version**: 1.0.0
-cd frontend
-npm test
-
-# Backend unit tests
-cd backend
-.venv\Scripts\activate
-pytest
-
-# Dashboard unit tests
-cd dashboard
-npm test
-```
 
 ### Test Coverage
 
@@ -252,10 +281,8 @@ npm test
 cd frontend
 npm run test:coverage
 
-# Backend coverage
-cd backend
-.venv\Scripts\activate
-pytest --cov=app --cov-report=html
+# Backend coverage (no manual venv activation needed)
+npm run test:backend -- --cov=app --cov-report=html
 ```
 
 ### E2E Tests
@@ -314,33 +341,4 @@ npm run typecheck
 npm run typecheck:frontend
 npm run typecheck:backend
 npm run typecheck:dashboard
-```
-│   └── ...
-├── dashboard/             # Admin dashboard React app
-│   ├── src/
-│   │   ├── admin/         # Admin pages
-│   │   ├── host/          # Host pages
-│   │   ├── guide/         # Guide pages
-│   │   ├── writer/        # Content writer pages
-│   │   ├── components/    # Reusable components
-│   │   ├── layouts/       # Layout components
-│   │   ├── guards/        # Route guards
-│   │   ├── hooks/         # Custom hooks
-│   │   ├── state/         # State management
-│   │   └── test/          # Unit tests
-│   └── ...
-├── backend/               # FastAPI backend
-│   ├── app/
-│   │   ├── api/v1/        # API routes
-│   │   ├── core/          # Core configuration
-│   │   ├── models/        # SQLAlchemy models
-│   │   ├── schemas/       # Pydantic schemas
-│   │   ├── services/      # Business logic
-│   │   └── middleware/    # Custom middleware
-│   ├── tests/             # Backend tests
-│   └── ...
-├── tests/e2e/             # End-to-end tests
-├── scripts/               # Automation scripts
-├── docs/                  # Documentation
-└── ...
 ```

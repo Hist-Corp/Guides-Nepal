@@ -288,13 +288,20 @@ Prerequisites:
 
 ### Starting All Services
 
-The project includes batch files for easy startup on Windows:
+The project includes launchers per OS (plus `npm run dev`, which works everywhere):
 
 ```bash
-# Start all services (frontend, backend, dashboard)
+# Windows
 .\start-all.bat
+```
 
-# Or start individual services:
+```bash
+# macOS / Linux
+./start-all.sh
+```
+
+```bash
+# Or start individual services (Windows):
 .\start-frontend.bat    # Frontend on port 5175
 .\start-backend.bat     # Backend on port 8000
 .\start-dashboard.bat   # Dashboard on port 5176
@@ -311,7 +318,10 @@ npm run dev -- --port 5175 --host
 **Backend:**
 ```bash
 cd backend
-.venv\Scripts\activate
+# Activate the venv (pick the line for your OS):
+#   Windows (PowerShell):  .\.venv\Scripts\Activate.ps1
+#   Windows (cmd):         .venv\Scripts\activate.bat
+#   macOS / Linux (bash):  source .venv/bin/activate
 uvicorn app.main:app --reload --port 8000
 ```
 

@@ -44,7 +44,12 @@ If you prefer to set up manually:
    cd frontend && npm install
    cd ../dashboard && npm install
    cd ../backend && python -m venv .venv
-   .venv\Scripts\pip install -r requirements.txt
+   # Activate the venv, then install (pick the line for your OS):
+   #   Windows (PowerShell):  .\.venv\Scripts\Activate.ps1; pip install -r requirements.txt
+   #   Windows (cmd):         .venv\Scripts\activate.bat && pip install -r requirements.txt
+   #   macOS / Linux (bash):  source .venv/bin/activate && pip install -r requirements.txt
+   # Or skip manual activation entirely: npm run test:backend (uses scripts/run-py.js,
+   # which finds backend/.venv automatically on every OS).
    ```
 
 2. Create environment files:

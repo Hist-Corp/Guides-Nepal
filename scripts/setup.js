@@ -17,6 +17,31 @@ const rl = readline.createInterface({
 
 const question = (query) => new Promise((resolve) => rl.question(query, resolve));
 
+// Cross-platform Python: `python3` on macOS/Linux, `python`/`py` on Windows.
+// Returns the first interpreter that responds to `--version`.
+const getPythonCommand = () => {
+  const candidates =
+    process.platform === 'win32' ? ['python', 'py', 'python3'] : ['python3', 'python'];
+  for (const c of candidates) {
+    try {
+      execSync(`${c} --version`, { stdio: 'pipe' });
+      return c;
+    } catch { /* try next */ }
+  }
+  return process.platform === 'win32' ? 'python' : 'python3';
+};
+
+// Path to the backend venv's python, OS-aware:
+// Windows -> backend/.venv/Scripts/python.exe, macOS/Linux -> backend/.venv/bin/python
+// NOTE: callers must quote the result (paths may contain spaces).
+const venvBin = (...names) => {
+  const dir = process.platform === 'win32' ? 'Scripts' : 'bin';
+  if (process.platform === 'win32') {
+    names = names.map((n) => (n === 'python' ? 'python.exe' : n));
+  }
+  return path.join('backend', '.venv', dir, ...names);
+};
+
 const colors = {
   reset: '\x1b[0m',
   bright: '\x1b[1m',
@@ -39,8 +64,9 @@ const checkPrerequisites = async () => {
   const prerequisites = [
     { name: 'Node.js', command: 'node --version', minVersion: '18.0.0' },
     { name: 'npm', command: 'npm --version', minVersion: '8.0.0' },
-    { name: 'Python', command: 'python --version', minVersion: '3.9.0' },
-    { name: 'pip', command: 'pip --version', minVersion: '21.0.0' },
+    // Cross-platform: `python3` on macOS/Linux, `python`/`py` on Windows.
+    // run-py.js resolves this automatically; here we just need *some* python.
+    { name: 'Python', command: getPythonCommand() + ' --version', minVersion: '3.9.0' },
     { name: 'Git', command: 'git --version', minVersion: '2.0.0' }
   ];
 
@@ -102,7 +128,9 @@ const setupEnvironmentFiles = async () => {
 const installFrontendDependencies = async () => {
   log.step('Installing Frontend Dependencies');
 
-  if (runCommand('cd frontend && npm install')) {
+  // Cross-platform: run with cwd instead of `cd frontend && ...` so this
+  // works in cmd.exe, PowerShell, and POSIX shells alike.
+  if (runCommand('npm install', { cwd: path.join(__dirname, '..', 'frontend') })) {
     log.success('Frontend dependencies installed');
   } else {
     log.error('Failed to install frontend dependencies');
@@ -112,7 +140,8 @@ const installFrontendDependencies = async () => {
 const installDashboardDependencies = async () => {
   log.step('Installing Dashboard Dependencies');
 
-  if (runCommand('cd dashboard && npm install')) {
+  // Cross-platform: run with cwd instead of `cd dashboard && ...`.
+  if (runCommand('npm install', { cwd: path.join(__dirname, '..', 'dashboard') })) {
     log.success('Dashboard dependencies installed');
   } else {
     log.error('Failed to install dashboard dependencies');
@@ -126,7 +155,9 @@ const setupBackendEnvironment = async () => {
 
   if (!fs.existsSync(venvPath)) {
     log.info('Creating Python virtual environment...');
-    if (runCommand('cd backend && python -m venv .venv')) {
+    // Cross-platform: run `python -m venv` with cwd=backend/ instead of
+    // `cd backend && ...` (breaks cmd.exe quoting on Windows).
+    if (runCommand(`${getPythonCommand()} -m venv .venv`, { cwd: path.join(__dirname, '..', 'backend') })) {
       log.success('Virtual environment created');
     } else {
       log.error('Failed to create virtual environment');
@@ -137,7 +168,10 @@ const setupBackendEnvironment = async () => {
   }
 
   log.info('Installing backend dependencies...');
-  if (runCommand('cd backend && .venv\\Scripts\\pip install -r requirements.txt')) {
+  // `python -m pip` (not the bare pip shim): reliable when the repo path
+  // contains spaces and on Windows, where extensionless Scripts\pip may not
+  // resolve. venvBin() picks Scripts (Windows) vs bin (macOS/Linux).
+  if (runCommand(`"${venvBin('python')}" -m pip install -r backend/requirements.txt`)) {
     log.success('Backend dependencies installed');
   } else {
     log.error('Failed to install backend dependencies');
@@ -145,7 +179,11 @@ const setupBackendEnvironment = async () => {
 };
 const runCommand = (command, options = {}) => {
   try {
-    execSync(command, { stdio: 'inherit', ...options });
+    // Cross-platform: cmd.exe cannot parse single-quoted paths (e.g. a venv
+    // path with spaces), so strip single quotes on Windows before exec.
+    // POSIX shells need the quoting, so it is kept there.
+    const effective = process.platform === 'win32' ? command.replace(/'/g, '') : command;
+    execSync(effective, { stdio: 'inherit', ...options });
     return true;
   } catch (error) {
     log.error(`Command failed: ${command}`);
@@ -164,7 +202,9 @@ const setupDatabase = async () => {
     if (continueSetup.toLowerCase() !== 's') {
       try {
         log.info('Running database migrations...');
-        runCommand('cd backend && .venv\\Scripts\\alembic upgrade head');
+        // Cross-platform: run-py.js finds backend/.venv on every OS and runs
+        // from backend/, so no Scripts-vs-bin path handling is needed here.
+        runCommand('node scripts/run-py.js -m alembic upgrade head');
         log.success('Database migrations completed');
       } catch (error) {
         log.warning('Database migration failed. You may need to configure DATABASE_URL first.');
