@@ -281,18 +281,20 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
             <ChevronDown className="h-4 w-4 text-gray-400 transition-colors group-hover:text-primary" />
           </button>
 
-          {/* Cart Icon */}
-          <button
-            onClick={() => onCartOpen?.()}
-            className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <ShoppingCart className="h-6 w-6 text-gray-700" />
-            {getTotalItems() > 0 && (
-              <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {getTotalItems()}
-              </span>
-            )}
-          </button>
+          {/* Cart Icon — only for logged-in users */}
+          {isAuthenticated && (
+            <button
+              onClick={() => onCartOpen?.()}
+              className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <ShoppingCart className="h-6 w-6 text-gray-700" />
+              {getTotalItems() > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {getTotalItems()}
+                </span>
+              )}
+            </button>
+          )}
 
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -613,9 +615,7 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
                         suggestions
                           .filter(
                             (s) =>
-                              s.type === 'experience' ||
-                              s.type === 'city' ||
-                              s.type === 'category'
+                              s.type === 'experience' || s.type === 'city' || s.type === 'category'
                           )
                           .map((item, i) => (
                             <div
@@ -682,10 +682,14 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
                                     </div>
                                   )}
                                   {item.type === 'city' && item.description && (
-                                    <p className="text-xs text-gray-500 line-clamp-1">{item.description}</p>
+                                    <p className="text-xs text-gray-500 line-clamp-1">
+                                      {item.description}
+                                    </p>
                                   )}
                                   {item.type === 'category' && item.description && (
-                                    <p className="text-xs text-gray-500 line-clamp-1">{item.description}</p>
+                                    <p className="text-xs text-gray-500 line-clamp-1">
+                                      {item.description}
+                                    </p>
                                   )}
                                   {item.hostName && (
                                     <div className="flex items-center gap-2 mt-1">
@@ -754,9 +758,13 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
                                       </span>
                                     )}
                                   </div>
-                                  <p className="text-xs text-gray-500 font-medium">{item.subtitle}</p>
+                                  <p className="text-xs text-gray-500 font-medium">
+                                    {item.subtitle}
+                                  </p>
                                   {item.description && (
-                                    <p className="text-xs text-gray-500 line-clamp-2 mt-1">{item.description}</p>
+                                    <p className="text-xs text-gray-500 line-clamp-2 mt-1">
+                                      {item.description}
+                                    </p>
                                   )}
                                   {item.city && (
                                     <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">

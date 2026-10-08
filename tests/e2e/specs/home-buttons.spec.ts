@@ -62,10 +62,45 @@ test.describe('Frontend — Home page buttons and links', () => {
     await expect(page.locator('text=Join Guides-Nepal')).toBeVisible();
   });
 
-  test('header cart button is present and enabled', async ({ page }) => {
-    // The cart button is an icon-only button containing an svg in the header
-    const cartBtn = page.locator('header').locator('button').filter({ has: page.locator('svg') }).nth(0);
+  test('header cart button is hidden when logged out', async ({ page }) => {
+    // The cart icon only renders for authenticated users (Header.tsx).
+    // The cart button is an icon-only button in the header with no aria-label.
+    const cartBtn = page
+      .locator('header')
+      .locator('button:not([aria-label]):not([class*="md:hidden"])')
+      .filter({ has: page.locator('svg.lucide-shopping-cart') })
+      .first();
+    await expect(cartBtn).toHaveCount(0);
+  });
+
+  test('header cart button is present and enabled when logged in', async ({ page }) => {
+    // Seed a logged-in session (zustand persist store: "auth-storage").
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'auth-storage',
+        JSON.stringify({
+          state: {
+            isAuthenticated: true,
+            user: { firstName: 'Test', lastName: 'User', email: 'test@example.com' },
+            accessToken: 'e2e-token',
+            refreshToken: 'e2e-refresh-token',
+            rememberMe: false,
+          },
+          version: 0,
+        })
+      );
+    });
+    await page.reload();
+    // The cart button is an icon-only button in the header with no aria-label.
+    const cartBtn = page
+      .locator('header')
+      .locator('button:not([aria-label]):not([class*="md:hidden"])')
+      .filter({ has: page.locator('svg.lucide-shopping-cart') })
+      .first();
+    await expect(cartBtn).toBeVisible();
     await expect(cartBtn).toBeEnabled();
+    // Logged-in header swaps Login/Sign up for the avatar with the user's initial.
+    await expect(page.locator('header').getByRole('button', { name: 'T', exact: true })).toBeVisible();
   });
 
   test('header shows functional auth buttons', async ({ page }) => {

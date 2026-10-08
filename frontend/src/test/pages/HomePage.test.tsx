@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import HomePage from '../../pages/HomePage';
+import { useAuthStore } from '../../store/authStore';
 
 // Mock the contexts. Header reads `currencyInfo` through `useCurrency`, so the
 // hook has to be mocked alongside the provider.
@@ -51,5 +52,30 @@ describe('HomePage', () => {
     // (see FeaturedExperiences.tsx) and has id="featured-experiences".
     expect(screen.getByText(/Go local in Charming Cities/i)).toBeInTheDocument();
     expect(document.getElementById('featured-experiences')).not.toBeNull();
+  });
+
+  it('hides the header cart icon when the user is not logged in', () => {
+    useAuthStore.setState({ isAuthenticated: false, user: null });
+    const { container } = render(
+      <BrowserRouter>
+        <HomePage onCartOpen={() => {}} />
+      </BrowserRouter>
+    );
+    expect(container.querySelector('.lucide-shopping-cart')).toBeNull();
+  });
+
+  it('shows the header cart icon when the user is logged in', () => {
+    useAuthStore.setState({
+      isAuthenticated: true,
+      user: { firstName: 'Test', lastName: 'User', email: 'test@example.com' },
+    });
+    const { container } = render(
+      <BrowserRouter>
+        <HomePage onCartOpen={() => {}} />
+      </BrowserRouter>
+    );
+    expect(container.querySelector('.lucide-shopping-cart')).not.toBeNull();
+    // Reset to logged-out so later tests / other files see default state.
+    useAuthStore.setState({ isAuthenticated: false, user: null });
   });
 });
