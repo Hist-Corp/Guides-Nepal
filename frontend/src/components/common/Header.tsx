@@ -1,18 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import {
   AlignJustify,
   Search,
-  MapPin,
   ChevronRight,
   ChevronLeft,
   ChevronDown,
   X,
-  MessageSquare,
   Heart,
   User,
   ShoppingCart,
+  Star,
+  MapPin as MapPinIcon,
+  Sparkles,
 } from 'lucide-react';
 import { LoginModal } from '../auth/LoginModal';
 import { SignupModal } from '../auth/SignupModal';
@@ -22,6 +23,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useCart } from '../../contexts/CartContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { CurrencyPickerModal } from './CurrencyPickerModal';
+import { getAllSuggestions } from '../../utils/searchIndex';
 
 export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) => {
   const navigate = useNavigate();
@@ -30,7 +32,7 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
   const { isSearchOpen, openSearch, closeSearch, searchQuery, setSearchQuery } = useUIStore();
   const { isAuthenticated, user, logout } = useAuthStore();
   const { getTotalItems } = useCart();
-  const { currencyInfo } = useCurrency();
+  const { currencyInfo, formatPrice } = useCurrency();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
@@ -44,13 +46,15 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
   const isHomePage = location.pathname === '/';
   const isHostApplicationPage = location.pathname === '/host-application';
 
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
       closeSearch();
       setSearchQuery('');
     }
-  };
+  }, [searchQuery, navigate, closeSearch, setSearchQuery]);
+
+  const suggestions = useMemo(() => getAllSuggestions(searchQuery, 8), [searchQuery]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -119,36 +123,6 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Suggestions Data
-  const suggestions = [
-    {
-      title: 'Highlights & Hidden Gems of Kathmandu',
-      sub: 'City Highlight Tours, Kathmandu',
-      link: '/city/kathmandu/experience/kathmandu-highlights',
-    },
-    {
-      title: 'Sunrise at Sarangkot',
-      sub: 'Nature Tours, Pokhara',
-      link: '/city/pokhara/experience/sarangkot-sunrise',
-    },
-    {
-      title: 'Patan Durbar Square Walk',
-      sub: 'Heritage Tours, Lalitpur',
-      link: '/city/lalitpur/experience/patan-durbar',
-    },
-    { title: 'Kathmandu', sub: 'Nepal', link: '/city/kathmandu' },
-    { title: 'Pokhara', sub: 'Nepal', link: '/city/pokhara' },
-    { title: 'Bhaktapur', sub: 'Nepal', link: '/city/bhaktapur' },
-    { title: 'Lalitpur', sub: 'Nepal', link: '/city/lalitpur' },
-  ];
-
-  // Filtered Suggestions
-  const filteredSuggestions = suggestions.filter(
-    (item) =>
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.sub.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
     <header
       className={`sticky top-0 z-50 w-full border-b border-transparent transition-all duration-300 ${
@@ -166,8 +140,8 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
           </span>
         </Link>
 
-        {/* Search Bar (Visible on non-home pages) */}
-        {!isHomePage && !isHostApplicationPage && (
+        {/* Search Bar (Visible on all pages except host application) */}
+        {!isHostApplicationPage && (
           <div className="hidden md:flex flex-1 max-w-xl mx-8">
             <div className="relative w-full group">
               <input
@@ -214,15 +188,6 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
                   Dashboard
                 </Link>
               )}
-              <Link
-                to={user?.role === 'guide' ? '/guide/bookings' : '/bookings'}
-                className="text-sm font-bold text-gray-800 hover:text-primary transition-colors flex items-center gap-2"
-              >
-                Bookings
-              </Link>
-              <Link to="/chat" className="text-gray-800 hover:text-primary transition-colors">
-                <MessageSquare className="w-6 h-6" />
-              </Link>
               <Link to="/favorites" className="text-gray-800 hover:text-primary transition-colors">
                 <Heart className="w-6 h-6" />
               </Link>
@@ -462,20 +427,6 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
                           <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                         </div>
                         <Link
-                          to="/bookings"
-                          className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          Bookings
-                        </Link>
-                        <Link
-                          to="/chat"
-                          className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          Chat
-                        </Link>
-                        <Link
                           to="/favorites"
                           className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
                           onClick={() => setIsMenuOpen(false)}
@@ -579,7 +530,7 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
             ></div>
 
             {/* Search Modal Content */}
-            <div className="relative w-[600px] bg-[#FFF0E6] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 min-h-[500px]">
+            <div className="relative w-[600px] bg-[#FFF0E6] rounded-2xl shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200 min-h-[500px] max-h-[90vh]">
               {/* Header */}
               <div className="flex items-center justify-between p-4 relative">
                 <button
@@ -651,35 +602,110 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
                 </div>
 
                 {/* Content Area */}
-                <div className="bg-white rounded-xl min-h-[300px] -mx-6 -mb-6 p-6">
+                <div className="bg-white rounded-xl -mx-6 -mb-6 p-6 max-h-[420px] overflow-y-auto search-results-scroll">
                   {activeTab === 'experiences' ? (
                     <div className="space-y-1">
                       <h3 className="text-sm font-bold text-[#213448] mb-3 uppercase tracking-wider">
                         {searchQuery ? 'Search results:' : 'Experiences in:'}
                       </h3>
 
-                      {filteredSuggestions.length > 0 ? (
-                        filteredSuggestions.map((item, i) => (
-                          <div
-                            key={i}
-                            className="group cursor-pointer"
-                            onClick={() => {
-                              closeSearch();
-                              navigate(item.link);
-                            }}
-                          >
-                            <div className="flex items-center gap-4 p-3 rounded-r-xl transition-colors border-l-[4px] border-transparent hover:bg-[#FFF0E6] hover:border-brand-yellow">
-                              <div className="w-10 h-10 rounded-full flex items-center justify-center border bg-gray-50 text-gray-400 border-gray-100 group-hover:bg-brand-yellow group-hover:text-[#213448] group-hover:border-transparent group-hover:shadow-sm transition-all">
-                                <MapPin className="w-5 h-5" />
+                      {suggestions.length > 0 ? (
+                        suggestions
+                          .filter(
+                            (s) =>
+                              s.type === 'experience' ||
+                              s.type === 'city' ||
+                              s.type === 'category'
+                          )
+                          .map((item, i) => (
+                            <div
+                              key={`${item.id}-${i}`}
+                              className="group cursor-pointer"
+                              onClick={() => {
+                                closeSearch();
+                                navigate(item.link);
+                              }}
+                            >
+                              <div className="flex items-start gap-4 p-3 rounded-r-xl transition-colors border-l-[4px] border-transparent hover:bg-[#FFF0E6] hover:border-brand-yellow">
+                                {item.image && (
+                                  <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100 group-hover:scale-105 transition-transform duration-200">
+                                    <img
+                                      src={item.image}
+                                      alt={item.title}
+                                      className="w-full h-full object-cover"
+                                      loading="lazy"
+                                    />
+                                  </div>
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                    <h4 className="font-bold text-[#213448] text-base truncate">
+                                      {item.title}
+                                    </h4>
+                                    {item.type === 'experience' && item.rating && (
+                                      <span className="flex items-center gap-1 text-xs text-brand-yellow font-semibold whitespace-nowrap">
+                                        <Star className="w-3 h-3 fill-current" />
+                                        {item.rating}
+                                        {item.reviewCount && ` (${item.reviewCount})`}
+                                      </span>
+                                    )}
+                                    {item.type === 'city' && (
+                                      <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
+                                        {item.subtitle}
+                                      </span>
+                                    )}
+                                    {item.type === 'category' && (
+                                      <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
+                                        {item.subtitle}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {item.type === 'experience' && (
+                                    <div className="flex items-center gap-3 text-xs text-gray-500 mb-1">
+                                      {item.city && (
+                                        <span className="flex items-center gap-1 whitespace-nowrap">
+                                          <MapPinIcon className="w-3 h-3" />
+                                          {item.city}
+                                        </span>
+                                      )}
+                                      {item.category && (
+                                        <span className="flex items-center gap-1 whitespace-nowrap">
+                                          <Sparkles className="w-3 h-3" />
+                                          {item.category}
+                                        </span>
+                                      )}
+                                      {item.price && (
+                                        <span className="font-bold text-primary whitespace-nowrap">
+                                          {formatPrice(item.price, currencyInfo.code)}
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
+                                  {item.type === 'city' && item.description && (
+                                    <p className="text-xs text-gray-500 line-clamp-1">{item.description}</p>
+                                  )}
+                                  {item.type === 'category' && item.description && (
+                                    <p className="text-xs text-gray-500 line-clamp-1">{item.description}</p>
+                                  )}
+                                  {item.hostName && (
+                                    <div className="flex items-center gap-2 mt-1">
+                                      {item.hostImage && (
+                                        <img
+                                          src={item.hostImage}
+                                          alt={item.hostName}
+                                          className="w-5 h-5 rounded-full object-cover"
+                                        />
+                                      )}
+                                      <span className="text-xs text-gray-500">
+                                        Hosted by {item.hostName}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                                <ChevronRight className="w-5 h-5 transition-colors text-gray-300 group-hover:text-brand-yellow flex-shrink-0 mt-1" />
                               </div>
-                              <div className="flex-1">
-                                <h4 className="font-bold text-[#213448] text-base">{item.title}</h4>
-                                <p className="text-xs text-gray-500 font-medium">{item.sub}</p>
-                              </div>
-                              <ChevronRight className="w-5 h-5 transition-colors text-gray-300 group-hover:text-brand-yellow" />
                             </div>
-                          </div>
-                        ))
+                          ))
                       ) : (
                         <div className="text-center py-12 text-gray-400">
                           No results found for "{searchQuery}"
@@ -687,9 +713,67 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
                       )}
                     </div>
                   ) : (
-                    // Local Guides Empty State
-                    <div className="h-full flex flex-col items-center justify-center text-center pt-10">
-                      {/* Empty state per OCR image 2 (just white space) */}
+                    <div className="space-y-1">
+                      <h3 className="text-sm font-bold text-[#213448] mb-3 uppercase tracking-wider">
+                        {searchQuery ? 'Search results:' : 'Local guides in:'}
+                      </h3>
+
+                      {suggestions.length > 0 ? (
+                        suggestions
+                          .filter((s) => s.type === 'guide')
+                          .map((item, i) => (
+                            <div
+                              key={`${item.id}-${i}`}
+                              className="group cursor-pointer"
+                              onClick={() => {
+                                closeSearch();
+                                navigate(item.link);
+                              }}
+                            >
+                              <div className="flex items-start gap-4 p-3 rounded-r-xl transition-colors border-l-[4px] border-transparent hover:bg-[#FFF0E6] hover:border-brand-yellow">
+                                {item.image && (
+                                  <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 bg-gray-100 group-hover:scale-105 transition-transform duration-200 border-2 border-gray-100">
+                                    <img
+                                      src={item.image}
+                                      alt={item.title}
+                                      className="w-full h-full object-cover"
+                                      loading="lazy"
+                                    />
+                                  </div>
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                    <h4 className="font-bold text-[#213448] text-base truncate">
+                                      {item.title}
+                                    </h4>
+                                    {item.rating && (
+                                      <span className="flex items-center gap-1 text-xs text-brand-yellow font-semibold whitespace-nowrap">
+                                        <Star className="w-3 h-3 fill-current" />
+                                        {item.rating}
+                                        {item.reviewCount && ` (${item.reviewCount})`}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-gray-500 font-medium">{item.subtitle}</p>
+                                  {item.description && (
+                                    <p className="text-xs text-gray-500 line-clamp-2 mt-1">{item.description}</p>
+                                  )}
+                                  {item.city && (
+                                    <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
+                                      <MapPinIcon className="w-3 h-3" />
+                                      <span>Based in {item.city}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <ChevronRight className="w-5 h-5 transition-colors text-gray-300 group-hover:text-brand-yellow flex-shrink-0 mt-1" />
+                              </div>
+                            </div>
+                          ))
+                      ) : (
+                        <div className="text-center py-12 text-gray-400">
+                          No guides found for "{searchQuery}"
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

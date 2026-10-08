@@ -14,6 +14,31 @@ This repository contains a Vite + React frontend, an optional dashboard app, and
 
 ---
 
+## Changelog
+
+### v1.3.0 (2026-10-08)
+
+**Search & Discovery**
+- Centralized search index (`frontend/src/utils/searchIndex.ts`) combining all 5 cities' experiences, guides, cities, and categories
+- Word-by-word filtering with smart scoring (exact matches boosted, type-aware ranking)
+- Enhanced Header search modal with rich suggestions: experience cards (image, rating, price, city, category, host), city cards, category cards, guide cards
+- Search bar now visible on home page (previously hidden)
+- Scrollable results with custom branded scrollbar, max height 420px
+
+**Maila Dai AI Chat Widget**
+- Floating bottom-left widget (mirrors Customer Support on right) with person/guide icon
+- Full in-widget chat: streaming AI via `/api/v1/ai/chat/stream`, fallback to non-streaming
+- Resizable (drag grip handle, 300-600px), minimizable, persistent message history
+- Auto-hides when mobile booking sheet opens
+- Removed `/chat` and "Bookings" from header; Maila Dai widget is primary chat entry
+
+**UI Improvements**
+- Cleaner header: removed Chat and Bookings links from desktop and mobile menus
+- Support section in hamburger menu retains Help, Currency, Gift Cards, Become a Host, Consent, Privacy, Help
+- Both floating widgets (Support + Maila Dai) lift above sticky booking bar on mobile
+
+### v1.2.0 (2026-10-06)
+
 ## User Roles & Permissions
 
 Guides Nepal has a comprehensive role-based access control (RBAC) system with **5 dashboard
@@ -252,6 +277,10 @@ After registration, hosts must be approved by an admin or regional head before t
 
 ## Key features
 
+- Centralized search index with word-by-word filtering across all experiences, guides, cities, categories
+- Enhanced Header search modal with rich suggestion cards (images, ratings, prices, categories)
+- Floating Maila Dai AI chat widget (bottom-left): resizable, minimizable, streaming responses
+- Floating Customer Support widget (bottom-right): ticket submission
 - Experience browsing with consistent booking UI
 - JWT + OAuth authentication (Google, Facebook)
 - Booking management and host workflows
@@ -534,6 +563,10 @@ RBAC coverage lives in two backend suites worth knowing about:
 
 ### Key Frontend Features
 
+- **Centralized Search Index** — `frontend/src/utils/searchIndex.ts`: unified index across 5 cities' experiences, guides, cities, categories; word-by-word filtering with smart scoring
+- **Enhanced Search Modal** — `frontend/src/components/common/Header.tsx`: rich suggestion cards (experiences with images/ratings/prices, cities, categories, guides), scrollable results
+- **Maila Dai Widget** — `frontend/src/components/common/MailaDaiWidget.tsx`: floating bottom-left chat, resizable (300-600px), minimizable, streaming AI via `/api/v1/ai/chat/stream`
+- **Support Widget** — `frontend/src/components/common/SupportWidget.tsx`: floating bottom-right ticket submission
 - **AI Chat (Maila Dai)** — `frontend/src/pages/MailaDaiChatPage.tsx` with streaming via `POST /api/v1/ai/chat/stream`, fallback to non-streaming `/api/v1/ai/chat`
 - **Advanced Search** — `frontend/src/pages/SearchPage.tsx` with city/category/price filters, sort options, URL-synced query params
 - **Host Application Wizard** — `frontend/src/pages/host/HostApplicationWizard.tsx`: 5-step form, auto-save to `localStorage`, file uploads (PDF/JPG/PNG, max 10MB), validation per step
@@ -647,5 +680,5 @@ This project is licensed under MIT. See the LICENSE file for details.
 
 ---
 
-**Last updated:** 2026-10-06  
-**Version:** 1.2.0
+**Last updated:** 2026-10-08  
+**Version:** 1.3.0

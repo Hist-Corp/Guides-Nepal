@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 import ScrollToTop from './components/common/ScrollToTop';
 import SupportWidget from './components/common/SupportWidget';
+import MailaDaiWidget from './components/common/MailaDaiWidget';
 import CookieConsent from './components/common/CookieConsent';
 import Analytics from './components/common/Analytics';
 import PageReveal from './components/common/PageReveal';
@@ -196,6 +197,7 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
           <SupportWidget />
+          <MailaDaiWidget />
           <CookieConsent />
           <Analytics />
         </Router>
