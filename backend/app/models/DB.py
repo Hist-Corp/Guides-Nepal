@@ -13,6 +13,8 @@ from app.models.guide_listing import GuideProfile as GuideProfile
 from app.models.guide_listing import GuideStatusUpdate as GuideStatusUpdate
 from app.models.guide_application import GuideApplication as GuideApplication
 from app.models.host_application import HostApplication as HostApplication
+from app.models.host_guide import HostGuide as HostGuide
+from app.models.host_guide import HostExperienceGuide as HostExperienceGuide
 from app.models.support_ticket import SupportTicket as SupportTicket
 from app.models.experience_workflow import ExperienceProposal as ExperienceProposal
 from app.models.experience_workflow import ExperienceChangeRequest as ExperienceChangeRequest
@@ -27,6 +29,8 @@ __all__ = [
     "GuideStatusUpdate",
     "GuideApplication",
     "HostApplication",
+    "HostGuide",
+    "HostExperienceGuide",
     "SupportTicket",
     "ExperienceProposal",
     "ExperienceChangeRequest",

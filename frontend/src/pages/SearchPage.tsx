@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, Link, Navigate } from 'react-router-dom';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { Search, Star, Clock, MapPin, X, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { getCatalogSearchExperiences } from '../utils/canonicalExperience';
+import guidesApi from '../services/guidesApi';
 import { useCurrency } from '../contexts/CurrencyContext';
 
 const cities = ['All', 'Kathmandu', 'Pokhara', 'Lalitpur', 'Bhaktapur', 'Bharatpur'];
@@ -31,10 +32,39 @@ export const SearchPage: React.FC = () => {
   const { formatPrice } = useCurrency();
   const query = searchParams.get('q') || '';
 
-  // Search is a mixed-city discovery feed. Every card comes directly from the
-  // same catalog used by its city page and detail page.
-  const [experiences] = useState(() => shuffle(getCatalogSearchExperiences()));
+  // Search is a mixed-city discovery feed. Static catalog first, then live
+  // host experiences (with their assigned guide as host) merged from the API.
+  const [experiences, setExperiences] = useState(() => shuffle(getCatalogSearchExperiences()));
   const [loading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const live = await guidesApi.getExperiences();
+        if (cancelled || !Array.isArray(live)) return;
+        const hostRows = live
+          .filter((e: any) => typeof e.slug === 'string' && e.slug.startsWith('host-'))
+          .map((e: any) => ({
+            id: e.id, slug: e.slug, title: e.title, city: e.city ?? 'Kathmandu',
+            category: e.category ?? 'Experience', heroImage: e.heroImage, description: e.description,
+            price: e.price ?? 0, duration: e.duration ?? '', rating: e.rating ?? 4.8,
+            reviews: e.reviews ?? 0,
+            host: e.host ? { name: e.host.name, image: e.host.image } : undefined,
+            path: `/experience/${e.slug}`,
+          }));
+        if (hostRows.length > 0) {
+          setExperiences((current) => {
+            const known = new Set(current.map((c) => c.slug));
+            return [...current, ...hostRows.filter((h) => !known.has(h.slug))];
+          });
+        }
+      } catch {
+        /* offline — static catalog still renders */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
   const [searchQuery, setSearchQuery] = useState(query);
   const [selectedCity, setSelectedCity] = useState('All');
   const [selectedCategory, setSelectedCategory] = useState('All');

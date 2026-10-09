@@ -10,6 +10,8 @@ from .guide_listing import GuideProfile as GuideProfile
 from .guide_listing import GuideStatusUpdate as GuideStatusUpdate
 from .guide_application import GuideApplication as GuideApplication
 from .host_application import HostApplication as HostApplication
+from .host_guide import HostGuide as HostGuide
+from .host_guide import HostExperienceGuide as HostExperienceGuide
 from .support_ticket import SupportTicket as SupportTicket
 from .experience_workflow import ExperienceProposal as ExperienceProposal
 from .experience_workflow import ExperienceChangeRequest as ExperienceChangeRequest

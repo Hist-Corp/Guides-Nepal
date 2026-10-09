@@ -11,6 +11,8 @@ from app.core.database import get_db
 from app.models.guide import Guide
 from app.models.guide_application import GuideApplication
 from app.models.host_application import HostApplication
+from app.models.host_guide import HostExperienceGuide
+from app.models.booking import HostExperience
 from app.models.support_ticket import SupportTicket
 from app.schemas.public import ExperienceResponse, GuideResponse
 from app.services.guide_service import GuideService
@@ -382,6 +384,55 @@ MOCK_EXPERIENCES = [
 ]
 
 
+def _guide_to_host_payload(guide: Guide) -> dict:
+    return {
+        "id": guide.id,
+        "name": guide.name,
+        "image": guide.image,
+        "role": guide.role,
+        "rating": float(guide.rating or 0.0),
+        "reviews": int(guide.reviews or 0),
+        "bio": guide.bio,
+        "languages": list(guide.languages or []),
+        "verified": bool(guide.verified),
+        "livesIn": guide.lives_in,
+        "cities": list(guide.cities or []),
+        "gallery": list(guide.gallery or []),
+    }
+
+
+def _host_experience_to_public(db: Session, experience: HostExperience) -> Optional[dict]:
+    """Host-owned experience enriched with its assigned guide for travelers."""
+    rows = (
+        db.query(HostExperienceGuide, Guide)
+        .join(Guide, HostExperienceGuide.guide_id == Guide.id)
+        .filter(
+            HostExperienceGuide.experience_id == experience.id,
+            Guide.is_active.is_(True),
+        )
+        .order_by(HostExperienceGuide.is_primary.desc(), HostExperienceGuide.created_at.desc())
+        .all()
+    )
+    if not rows:
+        return None
+    _assignment, guide = rows[0]
+    return {
+        "id": 100000 + int(experience.id),
+        "slug": f"host-{experience.slug}",
+        "title": experience.title,
+        "heroImage": experience.hero_image or MOCK_GUIDES[0]["image"],
+        "description": experience.description,
+        "price": float(experience.price or 0.0),
+        "duration": experience.duration,
+        "rating": float(guide.rating or 4.8),
+        "reviews": int(guide.reviews or 0),
+        "city": experience.city,
+        "category": experience.category,
+        "host": _guide_to_host_payload(guide),
+        "guides": [_guide_to_host_payload(g) for _, g in rows],
+    }
+
+
 @router.get("/experiences", response_model=List[ExperienceResponse])
 def list_experiences(
     city: Optional[str] = None,
@@ -390,8 +441,19 @@ def list_experiences(
     min_price: Optional[float] = None,
     max_price: Optional[float] = None,
     sort: Optional[str] = None,
+    db: Session = Depends(get_db),
 ) -> List[dict]:
     results = MOCK_EXPERIENCES.copy()
+
+    # Live host experiences with an assigned guide surface alongside mocks.
+    try:
+        host_rows = db.query(HostExperience).filter(HostExperience.is_active.is_(True)).all()
+        for experience in host_rows:
+            public_row = _host_experience_to_public(db, experience)
+            if public_row:
+                results.append(public_row)
+    except Exception:
+        pass
 
     # Filter by city
     if city:
@@ -434,10 +496,24 @@ def list_experiences(
 
 
 @router.get("/experiences/{slug}", response_model=ExperienceResponse)
-def get_experience(slug: str) -> dict:
+def get_experience(slug: str, db: Session = Depends(get_db)) -> dict:
     for exp in MOCK_EXPERIENCES:
         if exp["slug"] == slug:
             return exp
+    # Live host experiences are addressed as host-{slug} on the frontend.
+    if slug.startswith("host-"):
+        try:
+            experience = (
+                db.query(HostExperience)
+                .filter(HostExperience.slug == slug.removeprefix("host-"), HostExperience.is_active.is_(True))
+                .first()
+            )
+            if experience:
+                public_row = _host_experience_to_public(db, experience)
+                if public_row:
+                    return public_row
+        except Exception:
+            pass
     raise HTTPException(status_code=404, detail="Experience not found")
 
 
