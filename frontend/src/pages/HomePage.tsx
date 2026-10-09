@@ -12,15 +12,11 @@ import { DiscoverRegions } from '../components/home/DiscoverRegions';
 import { PlanBookOnTheGo } from '../components/home/PlanBookOnTheGo';
 import { useSeoMeta } from '../hooks/useCms';
 
-interface HomePageProps {
-  onCartOpen: () => void;
-}
-
-export const HomePage: React.FC<HomePageProps> = ({ onCartOpen }) => {
+export const HomePage: React.FC = () => {
   useSeoMeta('homepage', 'Guides Nepal - Go Local in Charming Cities');
   return (
     <div className="min-h-screen flex flex-col font-sans">
-      <Header onCartOpen={onCartOpen} />
+      <Header />
       <main className="flex-grow">
         <HeroSection />
         <FeaturedExperiences />

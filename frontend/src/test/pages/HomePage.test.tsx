@@ -32,11 +32,26 @@ vi.mock('../../contexts/CartContext', () => ({
   }),
 }));
 
+vi.mock('../../store/uiStore', () => ({
+  useUIStore: () => ({
+    isSearchOpen: false,
+    searchQuery: '',
+    isCartOpen: false,
+    isBookingSheetOpen: false,
+    openSearch: vi.fn(),
+    closeSearch: vi.fn(),
+    setSearchQuery: vi.fn(),
+    openCart: vi.fn(),
+    closeCart: vi.fn(),
+    setBookingSheetOpen: vi.fn(),
+  }),
+}));
+
 describe('HomePage', () => {
   it('renders without crashing', () => {
     render(
       <BrowserRouter>
-        <HomePage onCartOpen={() => {}} />
+        <HomePage />
       </BrowserRouter>
     );
     expect(screen.getAllByText(/Guides Nepal/i).length).toBeGreaterThan(0);
@@ -45,7 +60,7 @@ describe('HomePage', () => {
   it('displays featured experiences section', () => {
     render(
       <BrowserRouter>
-        <HomePage onCartOpen={() => {}} />
+        <HomePage />
       </BrowserRouter>
     );
     // The featured experiences section renders this heading by default
@@ -58,7 +73,7 @@ describe('HomePage', () => {
     useAuthStore.setState({ isAuthenticated: false, user: null });
     const { container } = render(
       <BrowserRouter>
-        <HomePage onCartOpen={() => {}} />
+        <HomePage />
       </BrowserRouter>
     );
     expect(container.querySelector('.lucide-shopping-cart')).toBeNull();
@@ -71,7 +86,7 @@ describe('HomePage', () => {
     });
     const { container } = render(
       <BrowserRouter>
-        <HomePage onCartOpen={() => {}} />
+        <HomePage />
       </BrowserRouter>
     );
     expect(container.querySelector('.lucide-shopping-cart')).not.toBeNull();

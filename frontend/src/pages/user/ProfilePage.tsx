@@ -1,19 +1,19 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import { useBookingStore } from '../../store/bookingStore';
 import { useProfileStore } from '../../store/profileStore';
-import { Camera, Trash2, Bookmark, MapPin, Calendar, User as UserIcon } from 'lucide-react';
+import { Camera, Trash2, Bookmark, MapPin, Calendar, User as UserIcon, ArrowLeft } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
+  const navigate = useNavigate();
   const { user, login, accessToken } = useAuthStore();
   const { bookings } = useBookingStore();
   const { profile, updateProfile, addPhoto, removePhoto } = useProfileStore();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState({
     firstName: profile.firstName || user?.firstName || '',
     lastName: profile.lastName || user?.lastName || '',
@@ -21,6 +21,7 @@ const ProfilePage: React.FC = () => {
     phone: profile.phone || user?.phone || '',
     bio: profile.bio || ''
   });
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const API_BASE = `${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '/api/v1' : 'https://guides-nepal.onrender.com/api/v1')}/profile`;
 
   const upcoming = bookings.filter((b) => b.status === 'upcoming');
@@ -121,46 +122,13 @@ const ProfilePage: React.FC = () => {
           {/* Left: Profile Card */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <div className="flex flex-wrap items-center justify-end gap-2 mb-2">
-                {!isEditing ? (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="px-3 py-2 rounded-full bg-primary text-white text-sm font-bold"
-                  >
-                    Edit
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => {
-                      updateProfile(form);
-                      login({
-                        firstName: form.firstName,
-                        lastName: form.lastName,
-                        email: form.email,
-                        phone: form.phone
-                      });
-                      fetch(`${API_BASE}/me`, {
-                        method: 'PATCH',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
-                        },
-                        body: JSON.stringify({
-                          firstName: form.firstName,
-                          lastName: form.lastName,
-                          email: form.email,
-                          phone: form.phone,
-                      bio: form.bio,
-                      avatar_url: profile.avatarUrl
-                        })
-                      }).catch(() => {});
-                      setIsEditing(false);
-                    }}
-                    className="px-3 py-2 rounded-full bg-secondary text-white text-sm font-bold"
-                  >
-                    Save
-                  </button>
-                )}
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <button
+                  onClick={() => navigate(-1)}
+                  className="px-3 py-2 rounded-full bg-gray-100 text-gray-800 text-sm font-bold hover:bg-gray-200 transition-colors flex items-center gap-1"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Back
+                </button>
                 <Link
                   to="/account"
                   className="px-3 py-2 rounded-full bg-gray-100 text-gray-800 text-sm font-bold hover:bg-gray-200 transition-colors"
@@ -184,12 +152,6 @@ const ProfilePage: React.FC = () => {
                   <p className="text-gray-500 text-sm">{profile.email || user?.email || form.email || 'Add your email'}</p>
                 </div>
                 <div className="ml-auto">
-                  <button
-                    onClick={() => avatarInputRef.current?.click()}
-                    className="px-3 py-2 rounded-full bg-gray-100 text-gray-800 text-xs font-bold"
-                  >
-                    Change
-                  </button>
                   <input
                     ref={avatarInputRef}
                     type="file"
@@ -207,7 +169,7 @@ const ProfilePage: React.FC = () => {
                     value={form.firstName}
                     onChange={(e) => setForm({ ...form, firstName: e.target.value })}
                     className="w-full rounded-lg border border-gray-200 px-3 py-2 disabled:bg-gray-50"
-                    disabled={!isEditing}
+                    disabled
                     placeholder="Your first name"
                   />
                 </div>
@@ -217,7 +179,7 @@ const ProfilePage: React.FC = () => {
                     value={form.lastName}
                     onChange={(e) => setForm({ ...form, lastName: e.target.value })}
                     className="w-full rounded-lg border border-gray-200 px-3 py-2 disabled:bg-gray-50"
-                    disabled={!isEditing}
+                    disabled
                     placeholder="Your last name"
                   />
                 </div>
@@ -227,7 +189,7 @@ const ProfilePage: React.FC = () => {
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     className="w-full rounded-lg border border-gray-200 px-3 py-2 disabled:bg-gray-50"
-                    disabled={!isEditing}
+                    disabled
                     placeholder="you@example.com"
                   />
                 </div>
@@ -237,7 +199,7 @@ const ProfilePage: React.FC = () => {
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
                     className="w-full rounded-lg border border-gray-200 px-3 py-2 disabled:bg-gray-50"
-                    disabled={!isEditing}
+                    disabled
                     placeholder="+977-XXXXXXXXXX"
                   />
                 </div>
@@ -247,7 +209,7 @@ const ProfilePage: React.FC = () => {
                     value={form.bio}
                     onChange={(e) => setForm({ ...form, bio: e.target.value })}
                     className="w-full rounded-lg border border-gray-200 px-3 py-2 disabled:bg-gray-50"
-                    disabled={!isEditing}
+                    disabled
                     rows={3}
                     placeholder="Tell us about your travel preferences..."
                   />
@@ -286,7 +248,14 @@ const ProfilePage: React.FC = () => {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {profile.travelPhotos.map((src, i) => (
                     <div key={i} className="relative group">
-                      <img src={src} alt={`photo-${i}`} className="w-full h-32 object-cover rounded-lg border border-gray-100" />
+                      <button
+                        type="button"
+                        onClick={() => setLightboxSrc(src)}
+                        className="w-full h-32 rounded-lg overflow-hidden border border-gray-100 focus:outline-none focus:ring-2 focus:ring-primary"
+                        aria-label="View photo full size"
+                      >
+                        <img src={src} alt={`photo-${i}`} className="w-full h-full object-cover" />
+                      </button>
                       <button
                         onClick={() => removePhoto(i)}
                         className="absolute top-2 right-2 bg-white/90 rounded-full p-1 shadow hover:bg-white"
@@ -374,6 +343,27 @@ const ProfilePage: React.FC = () => {
         </div>
       </main>
       <Footer />
+      {lightboxSrc && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setLightboxSrc(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setLightboxSrc(null)}
+            className="absolute top-4 right-4 text-white text-3xl font-bold hover:text-gray-300"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+          <img
+            src={lightboxSrc}
+            alt="Full size travel photo"
+            className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 };
