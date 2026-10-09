@@ -13,13 +13,13 @@ Base: `/dashboard`
   - `guides`, `tours`, `bookings`, `earnings`, `performance`
 - `/dashboard/regional-head/*` — Regional Head routes
   - index — Overview
-  - `applications`, `region`, `customers`
+  - `applications`, `experiences` (SOP-GN-EXP-001 proposals + SOP-GN-EXP-002 change requests), `region`, `customers`
 - `/dashboard/customer-support/*` — Customer Support routes
   - index — Overview
   - `tickets`, `faq`, `customers`
 - `/dashboard/content-manager/*` — Content Manager routes
   - index — Overview
-  - `pages`, `blog`, `guides-content`, `website-content`, `media`, `seo`
+  - `pages`, `experiences` (SOP-GN-EXP-001 proposals only), `blog`, `guides-content`, `website-content`, `media`, `seo`
 
 Guards:
 - `RequireAuth` fetches role via `/auth/me`

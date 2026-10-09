@@ -199,6 +199,7 @@ export default function NavSidebar() {
             heading: "Regional ops",
             items: [
               { to: `${base}/applications`, label: "Applications", icon: "mail" },
+              { to: `${base}/experiences`, label: "Experience Reviews", icon: "compass" },
               { to: `${base}/region`, label: "My Region", icon: "map" },
               { to: `${base}/customers`, label: "Customers", icon: "user" },
             ],
@@ -222,6 +223,7 @@ export default function NavSidebar() {
           {
             heading: "Content",
             items: [
+              { to: `${base}/experiences`, label: "Experience Proposals", icon: "compass" },
               { to: `${base}/website-content`, label: "Website Content", icon: "globe" },
               { to: `${base}/pages`, label: "Pages", icon: "map" },
               { to: `${base}/blog`, label: "Blog", icon: "pen" },

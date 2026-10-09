@@ -49,6 +49,11 @@ import GuideOnboardingPage from './pages/guide/GuideOnboardingPage';
 import GuideDashboardPage from './pages/guide/GuideDashboardPage';
 import GuideListingsPage from './pages/guide/GuideListingsPage';
 import GuideListingFormPage from './pages/guide/GuideListingFormPage';
+import GuideProposalsPage from './pages/guide/GuideProposalsPage';
+import GuideProposalFormPage from './pages/guide/GuideProposalFormPage';
+import GuideProposalDetailPage from './pages/guide/GuideProposalDetailPage';
+import GuideChangeRequestFormPage from './pages/guide/GuideChangeRequestFormPage';
+import GuideChangeRequestDetailPage from './pages/guide/GuideChangeRequestDetailPage';
 import BookingsPage from './pages/user/BookingsPage';
 import GuideBookingsPage from './pages/guide/GuideBookingsPage';
 import ProfilePage from './pages/user/ProfilePage';
@@ -130,6 +135,12 @@ function App() {
             <Route path="/guide/listings" element={<GuideListingsPage />} />
             <Route path="/guide/listings/new" element={<GuideListingFormPage />} />
             <Route path="/guide/listings/:id/edit" element={<GuideListingFormPage />} />
+            <Route path="/guide/listings/:id/propose-change" element={<GuideChangeRequestFormPage />} />
+            <Route path="/guide/proposals" element={<GuideProposalsPage />} />
+            <Route path="/guide/proposals/new" element={<GuideProposalFormPage />} />
+            <Route path="/guide/proposals/:id" element={<GuideProposalDetailPage />} />
+            <Route path="/guide/proposals/:id/edit" element={<GuideProposalFormPage />} />
+            <Route path="/guide/change-requests/:id" element={<GuideChangeRequestDetailPage />} />
             <Route path="/guide/bookings" element={<GuideBookingsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/account" element={<AccountSettingsPage />} />

@@ -199,6 +199,38 @@ export async function updateSupportTicket(
   return res.data
 }
 
+// --- Experience workflow API (SOP-GN-EXP-001 new-experience proposals &
+// SOP-GN-EXP-002 change requests). The backend enforces the approval gates:
+// proposals by Regional Manager OR Content Writer, change requests by
+// Regional Manager ONLY (admin passes every guard implicitly).
+export async function getProposalQueue(status = "submitted") {
+  const res = await http.get("/experience-workflow/queue/proposals", { params: { status } })
+  return res.data
+}
+
+export async function decideProposal(
+  id: number,
+  action: "approve" | "request_changes" | "reject",
+  notes?: string
+) {
+  const res = await http.post(`/experience-workflow/proposals/${id}/decision`, { action, notes })
+  return res.data
+}
+
+export async function getChangeRequestQueue(status = "submitted") {
+  const res = await http.get("/experience-workflow/queue/change-requests", { params: { status } })
+  return res.data
+}
+
+export async function decideChangeRequest(
+  id: number,
+  action: "approve" | "request_changes" | "reject",
+  notes?: string
+) {
+  const res = await http.post(`/experience-workflow/change-requests/${id}/decision`, { action, notes })
+  return res.data
+}
+
 // --- Admin API functions ---
 export async function getAdminStats() {
   const res = await http.get("/admin/stats")

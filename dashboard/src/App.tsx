@@ -28,9 +28,11 @@ import WriterBlog from "./writer/Blog"
 import WriterGuidesContent from "./writer/GuidesContent"
 import WriterMedia from "./writer/Media"
 import WriterSeo from "./writer/Seo"
+import WriterExperienceReview from "./writer/ExperienceReview"
 import RegionalHeadOverview from "./regionalhead/Overview"
 import RegionalApplications from "./regionalhead/Applications"
 import RegionalInfo from "./regionalhead/Region"
+import RegionalExperienceReview from "./regionalhead/ExperienceReview"
 import SupportOverview from "./support/Overview"
 import SupportTickets from "./support/Tickets"
 import SupportFaq from "./support/Faq"
@@ -94,6 +96,7 @@ export default function App() {
         >
           <Route index element={<RegionalHeadOverview />} />
           <Route path="applications" element={<RegionalApplications />} />
+          <Route path="experiences" element={<RegionalExperienceReview />} />
           <Route path="region" element={<RegionalInfo />} />
           <Route path="customers" element={<Customers title="Customers" description="Travelers and bookings within your region." />} />
         </Route>
@@ -124,6 +127,7 @@ export default function App() {
         >
           <Route index element={<WriterOverview />} />
           <Route path="pages" element={<WriterPages />} />
+          <Route path="experiences" element={<WriterExperienceReview />} />
           <Route path="blog" element={<WriterBlog />} />
           <Route path="guides-content" element={<WriterGuidesContent />} />
           <Route path="website-content" element={<WebsiteContentManager area="content-manager" />} />

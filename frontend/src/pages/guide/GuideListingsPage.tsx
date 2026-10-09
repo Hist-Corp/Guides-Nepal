@@ -97,6 +97,9 @@ const GuideListingsPage: React.FC = () => {
                     <Link to={`/guide/listings/${l.id}/edit`} className="flex items-center gap-1 rounded-full border border-gray-300 px-4 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-100">
                       <Pencil className="h-3 w-3" /> Edit
                     </Link>
+                    <Link to={`/guide/listings/${l.id}/propose-change`} className="flex items-center gap-1 rounded-full bg-amber-50 px-4 py-1.5 text-xs font-bold text-amber-700 hover:bg-amber-100">
+                      Propose change
+                    </Link>
                     <button onClick={() => remove(l.id)} className="flex items-center gap-1 rounded-full bg-red-50 px-4 py-1.5 text-xs font-bold text-red-600 hover:bg-red-100">
                       <Trash2 className="h-3 w-3" /> Remove
                     </button>
