@@ -4,10 +4,9 @@ import { Card } from '../common/Card';
 import { Button } from '../common/Button';
 import { Reveal } from '../common/Reveal';
 import { NEPAL_IMAGES } from '../../data/images';
-import { Star } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCmsSection } from '../../hooks/useCms';
 import { cmsBackground } from '../../utils/cmsText';
-import { useCurrency } from '../../contexts/CurrencyContext';
 
 const experiences = [
   {
@@ -88,15 +87,17 @@ export const FeaturedExperiences: React.FC = () => {
           <div className="flex gap-2">
             <button
               onClick={() => scroll('left')}
-              className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:border-primary hover:text-primary hover:-translate-x-0.5 transition-all"
+              aria-label="Scroll to previous experiences"
+              className="w-10 h-10 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:border-brand-yellow hover:bg-brand-yellow hover:text-primary hover:-translate-x-0.5 shadow-sm transition-all"
             >
-              &lt;
+              <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={() => scroll('right')}
-              className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:border-primary hover:text-primary hover:translate-x-0.5 transition-all"
+              aria-label="Scroll to next experiences"
+              className="w-10 h-10 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-500 hover:border-brand-yellow hover:bg-brand-yellow hover:text-primary hover:translate-x-0.5 shadow-sm transition-all"
             >
-              &gt;
+              <ChevronRight className="w-5 h-5" />
             </button>
           </div>
         </Reveal>

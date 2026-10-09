@@ -29,7 +29,8 @@ export const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isSearchOpen, openSearch, closeSearch, searchQuery, setSearchQuery, openCart } = useUIStore();
+  const { isSearchOpen, openSearch, closeSearch, searchQuery, setSearchQuery, openCart } =
+    useUIStore();
   const { isAuthenticated, user, logout } = useAuthStore();
   const { getTotalItems } = useCart();
   const { currencyInfo, formatPrice } = useCurrency();
@@ -39,11 +40,23 @@ export const Header: React.FC = () => {
   const [isCurrencyPickerOpen, setIsCurrencyPickerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'experiences' | 'guides'>('experiences');
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
-  const [hasPassedFeatured, setHasPassedFeatured] = useState(false);
+  // Ref (not state) so the scroll effect can attach ONE stable listener and
+  // read the previous position without re-running/re-triggering on every scroll
+  const lastScrollYRef = useRef(0);
+  // True once the page's top hero block has been fully scrolled past. Drives
+  // the peach→white header background on every page and (on the home page)
+  // the header search-bar reveal.
+  const [hasPassedTopBlock, setHasPassedTopBlock] = useState(false);
 
   // Check if current page is Home Page
   const isHomePage = location.pathname === '/';
+  // Header search visibility: always on (except host pages); on the home page
+  // it fades/slides in after the hero section has been scrolled past
+  const showHeaderSearch = !isHomePage || hasPassedTopBlock;
+  // Header background: peach while the page's top hero block is still visible,
+  // solid white only once it has been completely scrolled past — on every
+  // page, matching the original design
+  const showSolidBackground = hasPassedTopBlock;
   const isHostApplicationPage = location.pathname === '/host-application';
 
   const handleSearch = useCallback(() => {
@@ -61,38 +74,57 @@ export const Header: React.FC = () => {
       const currentScrollY = window.scrollY;
 
       // Handle Navbar Visibility (Hide on scroll down, show on scroll up)
-      if (currentScrollY > lastScrollY && currentScrollY > 80) {
+      if (currentScrollY > lastScrollYRef.current && currentScrollY > 80) {
         setIsVisible(false);
       } else {
         setIsVisible(true);
       }
 
-      // Handle Background Color Change
-      // Only change color if we've scrolled past the "Featured Experiences" section
-      const featuredSection = document.getElementById('featured-experiences');
-      if (featuredSection) {
-        const offsetTop = featuredSection.offsetTop;
-        // Subtract header height (80px) to trigger slightly before/at the section
-        if (currentScrollY >= offsetTop - 80) {
-          setHasPassedFeatured(true);
-        } else {
-          setHasPassedFeatured(false);
+      // Background colour + (home) search reveal: peach & collapsed while the
+      // page's top hero block is still visible, solid white & expanded once
+      // it has been completely scrolled past — on every page, not just home.
+      // Block selection: the home page's CMS hero; otherwise the first content
+      // block after the header (<main> is a full-page container, so look at
+      // its first child — city/category pages place their hero before
+      // <main>, and are picked up as the header's next sibling directly).
+      const topBlock = (() => {
+        const homeHero = document.querySelector<HTMLElement>('[data-cms-id="home-hero"]');
+        if (homeHero) return homeHero;
+        const headerEl = document.querySelector('header');
+        let el: Element | null | undefined = headerEl?.nextElementSibling ?? null;
+        if (el && (el.tagName === 'MAIN' || el.tagName === 'FOOTER')) {
+          el = el.firstElementChild;
         }
+        return el instanceof HTMLElement ? el : null;
+      })();
+      if (topBlock && topBlock.offsetHeight > 0) {
+        // getBoundingClientRect() is viewport-relative (no offsetParent
+        // ambiguity), and the zero-height guard stops the flag latching to
+        // "passed" if the block is still hidden/unstyled when this first runs
+        // on mount — that latch showed a white header + search bar at the top.
+        // "Passed" = the block's bottom has reached the sticky header (80px).
+        setHasPassedTopBlock(topBlock.getBoundingClientRect().bottom <= 80);
       } else {
-        // Fallback for other pages: standard scroll behavior
-        if (currentScrollY > 10) {
-          setHasPassedFeatured(true);
-        } else {
-          setHasPassedFeatured(false);
-        }
+        // No identifiable top block: original fallback (white after 10px)
+        setHasPassedTopBlock(currentScrollY > 10);
       }
 
-      setLastScrollY(currentScrollY);
+      lastScrollYRef.current = currentScrollY;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+    // Run once on mount so a mid-page refresh shows the correct state
+    handleScroll();
+    // Late-loading assets (hero images) change section heights, so re-measure
+    // when everything has loaded — otherwise only a scroll would correct it
+    window.addEventListener('load', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('load', handleScroll);
+    };
+    // Empty deps: single stable listener for the component's lifetime;
+    // re-adding it per-scroll would race with rapid scroll events
+  }, []);
 
   // Disable body scroll when menu is open
   useEffect(() => {
@@ -127,7 +159,7 @@ export const Header: React.FC = () => {
     <header
       className={`sticky top-0 z-50 w-full border-b border-transparent transition-all duration-300 ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
-      } ${hasPassedFeatured ? 'bg-white shadow-md' : 'bg-peach'}`}
+      } ${showSolidBackground ? 'bg-white shadow-md' : 'bg-peach'}`}
     >
       <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-2">
         {/* Logo */}
@@ -140,19 +172,30 @@ export const Header: React.FC = () => {
           </span>
         </Link>
 
-        {/* Search Bar (Visible on all pages except host application) */}
+        {/* Search Bar (All pages; on the home page it animates in once the
+            user scrolls past the hero, which has its own search bar).
+            Kept mounted so it transitions smoothly instead of popping. */}
         {!isHostApplicationPage && (
-          <div className="hidden md:flex flex-1 max-w-xl mx-8">
-            <div className="relative w-full group">
+          <div
+            aria-hidden={!showHeaderSearch}
+            className={`hidden md:flex flex-1 overflow-hidden transition-all duration-300 ease-in-out ${
+              showHeaderSearch
+                ? 'max-w-xl opacity-100 mx-8'
+                : 'max-w-0 opacity-0 mx-0 pointer-events-none'
+            }`}
+          >
+            <div className="relative w-full group min-w-[22rem]">
               <input
                 type="text"
                 placeholder="Where are you going?"
                 readOnly
+                tabIndex={showHeaderSearch ? 0 : -1}
                 onClick={openSearch}
                 className="w-full h-12 pl-6 pr-12 rounded-full border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer text-gray-700 placeholder-gray-400 focus:outline-none"
               />
               <button
                 onClick={openSearch}
+                tabIndex={showHeaderSearch ? 0 : -1}
                 className="absolute right-1 top-1 bottom-1 w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center text-[#213448] transition-transform group-hover:scale-105"
               >
                 <Search className="w-4 h-4" />
@@ -306,13 +349,19 @@ export const Header: React.FC = () => {
 
         {/* Mobile Actions */}
         <div className="flex items-center gap-2 md:hidden">
-          {/* Mobile Search Icon (non-home) */}
-          {!isHomePage && !isHostApplicationPage && (
+          {/* Mobile Search Icon (on home page: animates in after scrolling past hero) */}
+          {!isHostApplicationPage && (
             <button
               onClick={openSearch}
-              className="w-10 h-10 bg-brand-yellow text-[#213448] rounded-full flex items-center justify-center shadow-sm"
+              tabIndex={showHeaderSearch ? 0 : -1}
+              aria-hidden={!showHeaderSearch}
+              className={`overflow-hidden flex items-center justify-center bg-brand-yellow text-[#213448] rounded-full shadow-sm transition-all duration-300 ease-in-out ${
+                showHeaderSearch
+                  ? 'w-10 h-10 opacity-100 scale-100'
+                  : 'w-0 h-0 opacity-0 scale-50 pointer-events-none'
+              }`}
             >
-              <Search className="w-5 h-5" />
+              <Search className="w-5 h-5 shrink-0" />
             </button>
           )}
           {!isAuthenticated && (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ArrowLeft, Mail, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { getApiUrl } from '../../config/api';
 
@@ -26,6 +26,17 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   const [emailError, setEmailError] = useState<string | null>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Freeze the page behind the modal so scrolling outside the card doesn't
+  // move the blurred background (same pattern as CurrencyPickerModal).
+  useEffect(() => {
+    if (!isOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -82,9 +93,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
       // backend unreachable), not for "email not found" cases.
       console.error('Failed to send password reset email:', err);
       setStatus('error');
-      setErrorMessage(
-        'We could not process your request at the moment. Please try again later.'
-      );
+      setErrorMessage('We could not process your request at the moment. Please try again later.');
     }
   };
 
@@ -106,16 +115,16 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex overflow-y-auto p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity"
         onClick={handleClose}
       ></div>
 
-      <div className="relative w-full max-w-[480px] bg-white rounded-3xl shadow-2xl animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+      <div className="relative m-auto w-full max-w-[560px] bg-white rounded-3xl shadow-2xl animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
         {/* Header */}
-        <div className="bg-[#FFF0E6] p-6 text-center relative">
+        <div className="bg-[#FFF0E6] px-6 py-5 text-center relative">
           <button
             onClick={handleClose}
             className="absolute top-4 right-4 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors"
@@ -123,9 +132,9 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
             <X className="w-4 h-4" />
           </button>
 
-          <div className="flex justify-center mb-3">
-            <div className="w-12 h-12 rounded-full bg-brand-yellow flex items-center justify-center text-[#213448] shadow-sm">
-              <Mail className="w-6 h-6" />
+          <div className="flex justify-center mb-2">
+            <div className="w-10 h-10 rounded-full bg-brand-yellow flex items-center justify-center text-[#213448] shadow-sm">
+              <Mail className="w-5 h-5" />
             </div>
           </div>
 
@@ -133,7 +142,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
           <p className="text-gray-600">We'll email you a link to reset it</p>
         </div>
 
-        <div className="p-8">
+        <div className="px-6 py-6 sm:px-8">
           {status === 'success' ? (
             <div className="text-center">
               <div className="flex justify-center mb-4">
@@ -141,7 +150,9 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
               </div>
-              <p className="text-gray-700 text-sm leading-relaxed mb-6">{GENERIC_SUCCESS_MESSAGE}</p>
+              <p className="text-gray-700 text-sm leading-relaxed mb-6">
+                {GENERIC_SUCCESS_MESSAGE}
+              </p>
               <button
                 onClick={handleSwitchToLogin}
                 className="w-full bg-brand-yellow hover:bg-[#E5A800] text-[#213448] font-bold py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
@@ -157,14 +168,14 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                 </span>
               </div>
 
-              <form className="space-y-4" onSubmit={handleSubmit}>
+              <form className="space-y-3" onSubmit={handleSubmit}>
                 <div className="relative">
                   <input
                     type="email"
                     placeholder="Email"
                     required
                     autoFocus
-                    className={`w-full px-4 py-3.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none transition-all placeholder:text-gray-400 text-gray-900 bg-gray-50 focus:bg-white ${
+                    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none transition-all placeholder:text-gray-400 text-gray-900 bg-gray-50 focus:bg-white ${
                       emailError ? 'border-red-500' : 'border-gray-200'
                     }`}
                     value={email}
@@ -183,7 +194,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
 
                 <button
                   type="submit"
-                  className="w-full bg-brand-yellow hover:bg-[#E5A800] text-[#213448] font-bold py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-lg flex items-center justify-center gap-2"
+                  className="w-full bg-brand-yellow hover:bg-[#E5A800] text-[#213448] font-bold py-3 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-lg flex items-center justify-center gap-2"
                   disabled={status === 'loading'}
                 >
                   {status === 'loading' ? (
@@ -197,7 +208,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                 </button>
               </form>
 
-              <div className="text-center mt-8 text-sm text-gray-500">
+              <div className="text-center mt-6 text-sm text-gray-500">
                 <button
                   onClick={handleSwitchToLogin}
                   className="inline-flex items-center gap-1 text-[#213448] font-bold hover:text-brand-yellow transition-colors hover:underline"

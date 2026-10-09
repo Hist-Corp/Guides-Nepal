@@ -16,6 +16,14 @@ import {
 } from 'lucide-react';
 import { pokharaRichData } from '../../data/pokharaRichData';
 import { Guide } from '../../data/types';
+import {
+  ABCSprite,
+  ABCHeading,
+  ABCStickyNav,
+  ABCGallery,
+  ABCTrustStrip,
+  ABCMain,
+} from './AnnapurnaReference';
 
 import { Price } from '../../components/common/Price';
 import { BookingCalendar } from '../../components/common/BookingCalendar';
@@ -63,6 +71,10 @@ const PokharaExperiencePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [data, setData] = useState(pokharaRichData.find((d) => d.slug === slug));
+  // The Annapurna Base Camp trek page is a port of the magicalnepal.com reference design
+  // (see AnnapurnaReference.tsx) — sections like Packing List / Why Book are intentionally
+  // not ported.
+  const isABC = slug === 'annapurna-base-camp-trek';
 
   // Guide Selection State
   const [selectedGuide, setSelectedGuide] = useState<Guide | null>(null);
@@ -234,9 +246,12 @@ const PokharaExperiencePage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white">
       <Header />
+      {isABC && <ABCSprite />}
 
-      <main className="flex-grow">
-        <div className="container mx-auto px-4 py-12 max-w-6xl">
+      <main className={`flex-grow${isABC ? ' mn-tt' : ''}`}>
+        <div
+          className={`container mx-auto px-4 md:px-8 lg:px-12 py-12 ${isABC ? 'max-w-[1320px]' : 'max-w-6xl'}`}
+        >
           <button
             onClick={() => navigate(-1)}
             className="flex items-center gap-2 text-gray-600 hover:text-[#213448] font-bold mb-6 transition-colors"
@@ -246,29 +261,40 @@ const PokharaExperiencePage: React.FC = () => {
           </button>
 
           {/* Title Section */}
-          <div className="mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">{data.title}</h1>
-            <div className="flex items-center gap-2 text-sm text-gray-500 uppercase tracking-wider font-medium">
-              <span>Pokhara</span>
-              <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-              <span>{data.host.type}</span>
+          {isABC ? (
+            <div className="mb-4">
+              <ABCHeading />
+              <ABCStickyNav />
+              <ABCGallery />
+              <ABCTrustStrip />
             </div>
-          </div>
+          ) : (
+            <div className="mb-8">
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">{data.title}</h1>
+              <div className="flex items-center gap-2 text-sm text-gray-500 uppercase tracking-wider font-medium">
+                <span>Pokhara</span>
+                <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                <span>{data.host.type}</span>
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2">
-              {/* Hero Image */}
-              <div className="relative rounded-2xl overflow-hidden mb-8 h-[400px] group">
-                <img
-                  src={data.heroImage}
-                  alt={data.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm">
-                  <Heart className="w-5 h-5 text-gray-700 hover:text-primary cursor-pointer transition-colors" />
+              {/* Hero Image (reference port renders its own gallery instead) */}
+              {!isABC && (
+                <div className="relative rounded-2xl overflow-hidden mb-8 h-[400px] group">
+                  <img
+                    src={data.heroImage}
+                    alt={data.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm">
+                    <Heart className="w-5 h-5 text-gray-700 hover:text-primary cursor-pointer transition-colors" />
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Guides Selection Section (Replaces single Author Block) */}
               <div className="mb-12 pb-8 border-b border-gray-100">
@@ -357,65 +383,73 @@ const PokharaExperiencePage: React.FC = () => {
               </div>
 
               {/* Article Content */}
-              <div className="prose prose-lg max-w-none text-gray-600">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">What is this experience?</h2>
-                <p className="mb-6 leading-relaxed">{data.description}</p>
+              {isABC ? (
+                <ABCMain />
+              ) : (
+                <div className="prose prose-lg max-w-none text-gray-600">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                    What is this experience?
+                  </h2>
+                  <p className="mb-6 leading-relaxed">{data.description}</p>
 
-                <div className="my-8 p-6 bg-secondary-light rounded-xl border border-secondary/20">
-                  <h3 className="text-secondary font-bold mb-2 uppercase text-sm tracking-wide">
-                    Tour Structure
-                  </h3>
-                  <div className="flex flex-col gap-4">
-                    {Array.from({ length: Math.ceil(data.tourStructure.steps.length / 4) }).map(
-                      (_, rowIndex) => (
-                        <div
-                          key={rowIndex}
-                          className="flex flex-wrap items-center justify-center gap-2"
-                        >
-                          {data.tourStructure.steps
-                            .slice(rowIndex * 4, rowIndex * 4 + 4)
-                            .map((step, index) => (
-                              <React.Fragment key={index}>
-                                <div className="bg-white p-3 rounded-lg shadow-sm min-w-[120px] text-center">
-                                  <span className="block font-bold text-gray-900 text-sm">
-                                    {step.name}
-                                  </span>
-                                  <span className="text-xs text-gray-500">{step.label}</span>
-                                </div>
-                                {index <
-                                  data.tourStructure.steps.slice(rowIndex * 4, rowIndex * 4 + 4)
-                                    .length -
-                                    1 && <ArrowRight className="text-secondary flex-shrink-0" />}
-                              </React.Fragment>
-                            ))}
-                        </div>
-                      )
-                    )}
+                  <div className="my-8 p-6 bg-secondary-light rounded-xl border border-secondary/20">
+                    <h3 className="text-secondary font-bold mb-2 uppercase text-sm tracking-wide">
+                      Tour Structure
+                    </h3>
+                    <div className="flex flex-col gap-4">
+                      {Array.from({ length: Math.ceil(data.tourStructure.steps.length / 4) }).map(
+                        (_, rowIndex) => (
+                          <div
+                            key={rowIndex}
+                            className="flex flex-wrap items-center justify-center gap-2"
+                          >
+                            {data.tourStructure.steps
+                              .slice(rowIndex * 4, rowIndex * 4 + 4)
+                              .map((step, index) => (
+                                <React.Fragment key={index}>
+                                  <div className="bg-white p-3 rounded-lg shadow-sm min-w-[120px] text-center">
+                                    <span className="block font-bold text-gray-900 text-sm">
+                                      {step.name}
+                                    </span>
+                                    <span className="text-xs text-gray-500">{step.label}</span>
+                                  </div>
+                                  {index <
+                                    data.tourStructure.steps.slice(rowIndex * 4, rowIndex * 4 + 4)
+                                      .length -
+                                      1 && <ArrowRight className="text-secondary flex-shrink-0" />}
+                                </React.Fragment>
+                              ))}
+                          </div>
+                        )
+                      )}
+                    </div>
                   </div>
+
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                    {data.exploration.title}
+                  </h2>
+                  <p className="mb-4">{data.exploration.description}</p>
+                  <ul className="space-y-3 mb-8">
+                    {data.exploration.points.map((item, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <div className="w-2 h-2 rounded-full bg-secondary mt-2.5 flex-shrink-0"></div>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">Friendly Atmosphere</h3>
+                  <p className="mb-6">{data.atmosphere}</p>
+
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">Hidden Gems</h3>
+                  <p className="mb-6">{data.hiddenGems}</p>
                 </div>
-
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">{data.exploration.title}</h2>
-                <p className="mb-4">{data.exploration.description}</p>
-                <ul className="space-y-3 mb-8">
-                  {data.exploration.points.map((item, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <div className="w-2 h-2 rounded-full bg-secondary mt-2.5 flex-shrink-0"></div>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Friendly Atmosphere</h3>
-                <p className="mb-6">{data.atmosphere}</p>
-
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Hidden Gems</h3>
-                <p className="mb-6">{data.hiddenGems}</p>
-              </div>
+              )}
             </div>
 
             {/* Right Column - Sidebar */}
             <div className="lg:col-span-1">
-              <div className="sticky top-24 space-y-8">
+              <div className="sticky top-24 space-y-8" id="booking">
                 <StickyBarPortal>
                   <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-2xl lg:hidden z-40 flex items-center justify-between">
                     <div className="flex flex-col">
@@ -670,7 +704,7 @@ const PokharaExperiencePage: React.FC = () => {
         </div>
 
         {/* Lead Capture / Contact Section */}
-        <div id="booking" className="bg-gray-100 py-16">
+        <div id="ask" className="bg-gray-100 py-16">
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               {/* Form */}
@@ -864,6 +898,177 @@ const PokharaExperiencePage: React.FC = () => {
             </div>
           </div>
         </div>
+        {/* Reviews Section */}
+        <section id="reviews" className="py-16 bg-white">
+          <div className="container mx-auto max-w-6xl">
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">Reviews</h2>
+            <p className="text-gray-500 max-w-2xl mb-10">
+              What fellow travelers say about this experience — from our local guides to the
+            </p>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-12">
+              <div className="flex items-center gap-2 text-5xl font-bold text-gray-900">
+                <Star className="w-10 h-10 text-amber-400 fill-amber-400" />
+                {data.rating != null ? data.rating.toFixed(1) : '4.5'}
+                <span className="text-2xl text-gray-400">/5</span>
+              </div>
+              <div className="flex-1 border-t border-gray-100 pt-4 sm:pt-0">
+                <p className="text-gray-500 text-sm">
+                  Based on <span className="font-semibold text-gray-900">{data.reviews ?? 0}</span>{' '}
+                  verified reviews
+                </p>
+                <div className="mt-3 flex items-center gap-2">
+                  <div className="flex items-center gap-0.5">
+                    {[...Array(5)].map((_, j) => (
+                      <Star
+                        key={j}
+                        className={`w-4 h-4 ${j < (data.rating ?? 0) ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-xs text-gray-400">
+                    {data.rating != null ? data.rating.toFixed(1) : '4.5'} / 5.0
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-6">
+              {[
+                {
+                  name: 'Sarah Johnson',
+                  role: 'Travel blogger, Kathmandu',
+                  rating: 5,
+                  text: 'An absolutely magical experience. The guide was incredibly knowledgeable and made the whole trip feel personal. The views from Pokhara were beyond anything I expected.',
+                  date: 'Dec 2025',
+                  guide: 'Sujal Basnet',
+                  guideImage:
+                    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80',
+                },
+                {
+                  name: 'Marcus Chen',
+                  role: 'Photography enthusiast, Singapore',
+                  rating: 5,
+                  text: 'Stunning location and a well-paced itinerary. Our guide went above and beyond to capture the best photos for us. Highly recommended for anyone visiting Pokhara.',
+                  date: 'Nov 2025',
+                  guide: 'Rohan Pradhan',
+                  guideImage:
+                    'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=128&q=80',
+                },
+                {
+                  name: 'Priya Patel',
+                  role: 'Adventure seeker, Dubai',
+                  rating: 4,
+                  text: 'A wonderful way to experience Pokhara beyond the tourist crowds. The hidden gems were truly special and the atmosphere was authentic and welcoming.',
+                  date: 'Oct 2025',
+                  guide: 'Sujal Basnet',
+                  guideImage:
+                    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80',
+                },
+              ].map((r, i) => (
+                <figure
+                  key={i}
+                  className="w-full rounded-2xl border border-gray-100 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start gap-4">
+                    <img
+                      src={r.guideImage}
+                      alt={r.guide}
+                      className="w-12 h-12 rounded-full object-cover border-2 border-gray-100"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <span className="font-bold text-gray-900">{r.name}</span>
+                        <span className="text-sm text-gray-500">{r.role}</span>
+                        <span className="text-xs text-gray-400">Travelled in {r.date}</span>
+                        <div className="flex items-center gap-0.5">
+                          {[...Array(r.rating)].map((_, j) => (
+                            <Star key={j} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                          ))}
+                          {[...Array(5 - r.rating)].map((_, j) => (
+                            <Star key={j} className="w-4 h-4 text-gray-200" />
+                          ))}
+                        </div>
+                      </div>
+                      <blockquote className="text-gray-600 leading-relaxed mt-3">
+                        “{r.text}”
+                      </blockquote>
+                      <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
+                        <User className="w-3.5 h-3.5" />
+                        <span>
+                          Guided by <strong className="text-gray-700">{r.guide}</strong>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* You might also like / Ready to book? Section */}
+        <section className="py-16 bg-gray-100">
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-3">You might also like</h2>
+              <p className="text-gray-500 max-w-2xl mx-auto">
+                Explore more of what Pokhara has to offer, or book this experience right away below.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {pokharaRichData
+                .filter((d) => d.id !== data.id)
+                .slice(0, 3)
+                .map((item, i) => (
+                  <div
+                    key={i}
+                    className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group"
+                  >
+                    <div className="h-40 overflow-hidden">
+                      <img
+                        src={item.heroImage}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        <span className="text-xs font-bold text-primary tracking-wider uppercase">
+                          {item.type || 'Experience'}
+                        </span>
+                        {item.duration && (
+                          <span className="text-xs text-gray-400">{item.duration}</span>
+                        )}
+                      </div>
+                      <h4 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-primary transition-colors">
+                        {item.title}
+                      </h4>
+                      <div className="flex items-center gap-1 mb-4">
+                        <Star className="w-4 h-4 fill-accent text-accent" />
+                        <span className="font-bold text-gray-900">
+                          {item.rating != null ? item.rating.toFixed(1) : '4.5'}
+                        </span>
+                        <span className="text-gray-400">
+                          ({item.reviews != null ? item.reviews.toLocaleString() : '124'} reviews)
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          navigate(`/city/pokhara/experience/${item.slug}`);
+                          window.scrollTo({ top: 0, behavior: 'instant' });
+                        }}
+                        className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98]"
+                      >
+                        Ready to book?
+                      </button>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* Mobile Configure-booking sheet (dates/guests/time/guide) */}

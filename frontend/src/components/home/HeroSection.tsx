@@ -82,7 +82,7 @@ export const HeroSection: React.FC = () => {
             </div>
 
             {/* Search Bar */}
-            {/* <Reveal variant="up" delay={260}>
+            <Reveal variant="up" delay={260}>
               <form onSubmit={handleSearch} className="relative max-w-lg w-full mx-auto md:mx-0">
                 <div className="relative group">
                   <input
@@ -103,7 +103,7 @@ export const HeroSection: React.FC = () => {
                   </div>
                 </div>
               </form>
-            </Reveal> */}
+            </Reveal>
 
             {/* Helper Banner (Ask Maila Dai) */}
             <Reveal variant="up" delay={380}>

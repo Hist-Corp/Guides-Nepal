@@ -172,8 +172,8 @@ export const PokharaPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {displayedTours.slice(0, 2).map((tour) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {displayedTours.slice(0, 3).map((tour) => (
               <div
                 key={tour.id}
                 className="group relative rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300"
@@ -182,32 +182,40 @@ export const PokharaPage: React.FC = () => {
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/10 z-10"></div>
                 <img
                   src={tour.heroImage}
                   alt={tour.title}
                   className="w-full h-[400px] object-cover group-hover:scale-105 transition-transform duration-500"
                 />
 
-                <div className="absolute bottom-0 left-0 right-0 p-8 z-20 text-white">
-                  <h3 className="text-2xl font-bold mb-2 leading-tight">{tour.title}</h3>
-                  <div className="flex items-center gap-4 text-sm font-medium text-white/90 mb-6">
-                    <span>{tour.type}</span>
-                    <span>•</span>
-                    <span>{tour.duration}</span>
+                <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col p-5 md:p-6 text-white">
+                  {/* Reserved 2-line title keeps meta + footer aligned across all cards */}
+                  <h3 className="text-lg md:text-xl font-bold leading-snug line-clamp-2 min-h-[2.75em]">
+                    {tour.title}
+                  </h3>
+
+                  <div className="mt-2 flex items-center gap-2 text-[13px] font-medium text-white/85">
+                    <span className="truncate">{tour.type}</span>
+                    <span aria-hidden="true">•</span>
+                    <span className="whitespace-nowrap">{tour.duration}</span>
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                  <div className="mt-4 flex items-center justify-between gap-2">
+                    <div className="flex min-w-0 items-center gap-1.5">
                       <img
                         src={tour.host.image}
-                        className="w-10 h-10 rounded-full border-2 border-white object-cover"
+                        alt={tour.host.name}
+                        className="h-8 w-8 shrink-0 rounded-full border-2 border-white object-cover"
                       />
-                      <span className="text-sm font-bold">Hosted by {tour.host.name}</span>
+                      <span className="min-w-0 truncate text-[13px]">
+                        <span className="hidden lg:inline">Hosted by </span>
+                        <span className="font-semibold">{tour.host.name}</span>
+                      </span>
                     </div>
-                    <div className="text-right">
-                      <div className="text-xs opacity-80">From</div>
-                      <div className="text-xl font-bold text-white">
+                    <div className="shrink-0 text-right leading-tight">
+                      <div className="text-[11px] font-medium text-white/75">From</div>
+                      <div className="text-base lg:text-lg font-bold text-white">
                         <Price amount={tour.price} />
                       </div>
                     </div>
