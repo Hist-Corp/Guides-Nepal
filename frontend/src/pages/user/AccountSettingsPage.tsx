@@ -15,6 +15,7 @@ import {
   UserCog,
   Eye,
   EyeOff,
+  ArrowLeft,
 } from 'lucide-react';
 
 const API_BASE = `${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '/api/v1' : 'https://guides-nepal.onrender.com/api/v1')}`;
@@ -198,6 +199,12 @@ const AccountSettingsPage: React.FC = () => {
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
           <div className="mb-2">
+            <button
+              onClick={() => navigate(-1)}
+              className="px-3 py-2 rounded-full bg-gray-100 text-gray-800 text-sm font-bold hover:bg-gray-200 transition-colors flex items-center gap-1 mb-3"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back
+            </button>
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
               <UserCog className="w-6 h-6 text-primary" /> Account Settings
             </h1>

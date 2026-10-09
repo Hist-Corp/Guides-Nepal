@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useState } from 'react';
 import ScrollToTop from './components/common/ScrollToTop';
 import SupportWidget from './components/common/SupportWidget';
 import MailaDaiWidget from './components/common/MailaDaiWidget';
@@ -11,6 +10,7 @@ import CmsPreviewBridge from './components/CmsPreviewBridge';
 import { GlobalImageFallback } from './components/common/GlobalImageFallback';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { CartProvider } from './contexts/CartContext';
+import { useUIStore } from './store/uiStore';
 import { flushPendingSubmissions } from './services/publicApi';
 
 // Re-deliver any form submissions queued while the backend was offline.
@@ -91,7 +91,8 @@ import HostingPage from './pages/HostingPage';
 import CommunityPage from './pages/CommunityPage';
 
 function App() {
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const isCartOpen = useUIStore((s) => s.isCartOpen);
+  const closeCart = useUIStore((s) => s.closeCart);
 
   const isCmsPreview =
     typeof window !== 'undefined' && window.location.search.includes('cms-preview=1');
@@ -105,9 +106,9 @@ function App() {
           <ScrollToTop />
           <PageReveal />
           <GlobalImageFallback />
-          <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+          <Cart isOpen={isCartOpen} onClose={closeCart} />
           <Routes>
-            <Route path="/" element={<HomePage onCartOpen={() => setIsCartOpen(true)} />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/most-popular" element={<MostPopularPage />} />
             <Route path="/most-delicious" element={<MostDeliciousPage />} />
             <Route path="/real-good-travel" element={<RealGoodTravelPage />} />

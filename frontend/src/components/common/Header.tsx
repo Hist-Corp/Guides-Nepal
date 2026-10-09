@@ -25,11 +25,11 @@ import { useCurrency } from '../../contexts/CurrencyContext';
 import { CurrencyPickerModal } from './CurrencyPickerModal';
 import { getAllSuggestions } from '../../utils/searchIndex';
 
-export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) => {
+export const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isSearchOpen, openSearch, closeSearch, searchQuery, setSearchQuery } = useUIStore();
+  const { isSearchOpen, openSearch, closeSearch, searchQuery, setSearchQuery, openCart } = useUIStore();
   const { isAuthenticated, user, logout } = useAuthStore();
   const { getTotalItems } = useCart();
   const { currencyInfo, formatPrice } = useCurrency();
@@ -284,7 +284,7 @@ export const Header: React.FC<{ onCartOpen?: () => void }> = ({ onCartOpen }) =>
           {/* Cart Icon — only for logged-in users */}
           {isAuthenticated && (
             <button
-              onClick={() => onCartOpen?.()}
+              onClick={openCart}
               className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ShoppingCart className="h-6 w-6 text-gray-700" />
