@@ -1,6 +1,6 @@
-import { act, render, screen, fireEvent, within } from '@testing-library/react';
+import { act, render, screen, fireEvent, within, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ExperiencePage from '../../pages/ExperiencePage';
 import { useAuthStore } from '../../store/authStore';
 import { useBookingStore } from '../../store/bookingStore';
@@ -61,9 +61,18 @@ const confirmButton = () => within(dialog()).getByRole('button', { name: 'Book N
 
 describe('ExperiencePage', () => {
   beforeEach(() => {
-    useAuthStore.setState({ isAuthenticated: false, user: null });
+    useAuthStore.setState({
+      isAuthenticated: false,
+      user: null,
+      accessToken: null,
+      refreshToken: null,
+    });
     useBookingStore.setState({ bookings: [] });
     useUIStore.setState({ isBookingSheetOpen: false });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it('renders the tour with the sticky mobile footer (price + Book Now)', () => {
@@ -84,7 +93,7 @@ describe('ExperiencePage', () => {
     expect(useUIStore.getState().isBookingSheetOpen).toBe(true);
   });
 
-  it('validates date and login in the sheet, then books and routes to bookings on Done', () => {
+  it('validates date and login in the sheet, then books and routes to bookings on Done', async () => {
     renderPage();
     openSheet();
 
@@ -99,12 +108,26 @@ describe('ExperiencePage', () => {
     expect(within(dialog()).getByText('Please log in to book this experience')).toBeInTheDocument();
 
     act(() => {
-      useAuthStore.setState({ isAuthenticated: true });
+      useAuthStore.setState({ isAuthenticated: true, accessToken: 'test-access-token' });
     });
+    // addBooking now persists the booking through POST /bookings/ with the
+    // bearer token, so stub the network call the sheet can confirm offline.
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({}) });
+    vi.stubGlobal('fetch', fetchMock);
     fireEvent.click(confirmButton());
 
-    expect(within(dialog()).getByText(/booking requested/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(within(dialog()).getByText(/booking requested/i)).toBeInTheDocument()
+    );
     expect(within(dialog()).getByText(/2026-06-01/)).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/bookings/'),
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ Authorization: 'Bearer test-access-token' }),
+      })
+    );
 
     const bookings = useBookingStore.getState().bookings;
     expect(bookings).toHaveLength(1);

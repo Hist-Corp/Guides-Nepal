@@ -13,6 +13,10 @@ import {
   X,
   Heart,
   User,
+  Clock,
+  MapPin,
+  Bookmark,
+  CheckCircle,
 } from 'lucide-react';
 import { pokharaRichData } from '../../data/pokharaRichData';
 import { Guide } from '../../data/types';
@@ -31,6 +35,7 @@ import { GuestPicker } from '../../components/common/GuestPicker';
 import { TimePicker } from '../../components/common/TimePicker';
 import { useBookingStore } from '../../store/bookingStore';
 import { useAuthStore } from '../../store/authStore';
+import { useProfileStore } from '../../store/profileStore';
 import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
 import { getAvailableGuides } from '../../utils/guides';
 
@@ -81,6 +86,9 @@ const PokharaExperiencePage: React.FC = () => {
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [viewingGuide, setViewingGuide] = useState<Guide | null>(null);
   const [isChangingGuide, setIsChangingGuide] = useState(false);
+  // Desktop booking-card pill has its own picker state — the form below shares
+  // the page, so one toggle would otherwise open both lists at once.
+  const [isCardChangingGuide, setIsCardChangingGuide] = useState(false);
   const [guestCount, setGuestCount] = useState(1);
   const [pricePerPerson, setPricePerPerson] = useState(45);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -97,10 +105,32 @@ const PokharaExperiencePage: React.FC = () => {
   const bookings = useBookingStore((s) => s.bookings);
   const addBooking = useBookingStore((s) => s.addBooking);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { profile, addBookmark, removeBookmark } = useProfileStore();
+  const bookmarkId = data ? `pokhara-${data.id}` : '';
+  const isSaved = bookmarkId ? profile.bookmarks.some((b) => b.id === bookmarkId) : false;
+  const [saveFlash, setSaveFlash] = useState(false);
   const availableGuides = useMemo(
     () => (data ? getAvailableGuides(data.guides ?? [], bookings, data.id, data.city ?? '') : []),
     [data, bookings]
   );
+
+  const handleSaveForLater = () => {
+    if (!data) return;
+    if (isSaved) {
+      removeBookmark(bookmarkId);
+    } else {
+      addBookmark({
+        id: bookmarkId,
+        title: data.title,
+        city: data.city ?? 'Pokhara',
+        image: data.heroImage,
+        createdAt: new Date().toISOString(),
+        link: `/city/pokhara/experience/${data.slug}`,
+      });
+      setSaveFlash(true);
+      setTimeout(() => setSaveFlash(false), 2500);
+    }
+  };
 
   const handleBookNow = async (): Promise<boolean> => {
     if (!isAuthenticated) {
@@ -110,7 +140,7 @@ const PokharaExperiencePage: React.FC = () => {
     if (!checkIn) {
       const infoElement = document.getElementById('booking-info-message');
       if (infoElement) {
-        infoElement.textContent = 'Please select a check-in date';
+        infoElement.textContent = isABC ? 'Please select a date' : 'Please select a check-in date';
         infoElement.classList.remove('hidden');
         infoElement.classList.add('text-red-500');
       }
@@ -123,7 +153,7 @@ const PokharaExperiencePage: React.FC = () => {
       }
       return false;
     }
-    if (!checkOut) {
+    if (!isABC && !checkOut) {
       const infoElement = document.getElementById('booking-info-message');
       if (infoElement) {
         infoElement.textContent = 'Please select a check-out date';
@@ -174,10 +204,10 @@ const PokharaExperiencePage: React.FC = () => {
       return;
     }
     if (!checkIn) {
-      setSheetError('Please select a check-in date');
+      setSheetError(isABC ? 'Please select a date' : 'Please select a check-in date');
       return;
     }
-    if (!checkOut) {
+    if (!isABC && !checkOut) {
       setSheetError('Please select a check-out date');
       return;
     }
@@ -249,6 +279,12 @@ const PokharaExperiencePage: React.FC = () => {
       {isABC && <ABCSprite />}
 
       <main className={`flex-grow${isABC ? ' mn-tt' : ''}`}>
+        {/* Sticky tab bar must sit OUTSIDE the reveal-animated container below:
+            PageReveal adds `animate-fade-in-up`, and a transformed ancestor would
+            become the containing block for the bar's position:fixed, pinning it to
+            the content instead of the viewport. Inside main.mn-tt it keeps all
+            `.mn-tt .sticky-navbar-*` styles while staying viewport-fixed. */}
+        {isABC && <ABCStickyNav />}
         <div
           className={`container mx-auto px-4 md:px-8 lg:px-12 py-12 ${isABC ? 'max-w-[1320px]' : 'max-w-6xl'}`}
         >
@@ -264,7 +300,6 @@ const PokharaExperiencePage: React.FC = () => {
           {isABC ? (
             <div className="mb-4">
               <ABCHeading />
-              <ABCStickyNav />
               <ABCGallery />
               <ABCTrustStrip />
             </div>
@@ -486,13 +521,13 @@ const PokharaExperiencePage: React.FC = () => {
 
                 <div
                   id="booking-card-desktop"
-                  className="hidden lg:block bg-white rounded-2xl shadow-xl border border-gray-100 p-6 overflow-visible relative"
+                  className={`hidden lg:block bg-white rounded-2xl shadow-xl border border-gray-100 overflow-visible relative ${isABC ? 'p-4' : 'p-6'}`}
                 >
                   <div className="absolute top-0 left-0 w-full h-1 bg-primary rounded-t-2xl"></div>
 
                   {!isBookingConfirmed ? (
                     <>
-                      <div className="flex items-center space-x-1 mb-2">
+                      <div className={`flex items-center space-x-1 ${isABC ? 'mb-1' : 'mb-2'}`}>
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
@@ -503,22 +538,27 @@ const PokharaExperiencePage: React.FC = () => {
                           ({data.reviews || 124} reviews)
                         </span>
                       </div>
-                      <div className="flex items-baseline space-x-2 mb-6">
-                        <span className="text-3xl font-bold text-secondary">
+                      <div className={`flex items-baseline space-x-2 ${isABC ? 'mb-3' : 'mb-6'}`}>
+                        <span
+                          className={`font-bold text-secondary ${isABC ? 'text-2xl' : 'text-3xl'}`}
+                        >
                           <Price amount={data.price || 45} />
                         </span>
                         <span className="text-gray-500">/ person</span>
                       </div>
 
-                      <div className="space-y-4 mb-6">
+                      <div className={isABC ? 'space-y-2.5 mb-4' : 'space-y-4 mb-6'}>
                         <BookingCalendar
                           checkIn={checkIn}
                           checkOut={checkOut}
                           onChange={(ci, co) => {
                             setCheckIn(ci);
-                            setCheckOut(co);
+                            setCheckOut(isABC ? '' : co);
                           }}
                           idPrefix="card"
+                          single={isABC}
+                          ariaLabel={isABC ? 'Select date, format DD/MM/YYYY' : undefined}
+                          compact={isABC}
                         />
 
                         <GuestPicker
@@ -528,42 +568,116 @@ const PokharaExperiencePage: React.FC = () => {
                           idPrefix="card"
                         />
 
-                        <TimePicker value={bookingTime} onChange={setBookingTime} idPrefix="card" />
+                        {!isABC && (
+                          <TimePicker
+                            value={bookingTime}
+                            onChange={setBookingTime}
+                            idPrefix="card"
+                          />
+                        )}
 
                         {selectedGuide && (
-                          <div className="p-3 bg-white rounded-xl border border-gray-200 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <img
-                                src={selectedGuide.image}
-                                alt={selectedGuide.name}
-                                className="w-10 h-10 rounded-full object-cover"
-                              />
-                              <div>
-                                <p className="text-[10px] font-bold text-gray-500 uppercase">
-                                  Selected Guide
-                                </p>
-                                <p className="text-sm font-bold text-gray-900">
-                                  {selectedGuide.name}
-                                </p>
+                          <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+                            <div className="p-3 flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <img
+                                  src={selectedGuide.image}
+                                  alt={selectedGuide.name}
+                                  className="w-10 h-10 rounded-full object-cover"
+                                />
+                                <div>
+                                  <p className="text-[10px] font-bold text-gray-500 uppercase">
+                                    Selected Guide
+                                  </p>
+                                  <p className="text-sm font-bold text-gray-900">
+                                    {selectedGuide.name}
+                                  </p>
+                                </div>
                               </div>
+                              <button
+                                type="button"
+                                aria-expanded={isCardChangingGuide}
+                                onClick={() => setIsCardChangingGuide((v) => !v)}
+                                className="text-xs font-bold underline text-gray-900"
+                              >
+                                {isCardChangingGuide ? 'Close' : 'Change'}
+                              </button>
                             </div>
-                            <button
-                              onClick={() => {
-                                const guideSection = document.querySelector(
-                                  'h2:contains("Who you\'ll meet")'
-                                )?.parentElement;
-                                if (guideSection)
-                                  guideSection.scrollIntoView({ behavior: 'smooth' });
-                              }}
-                              className="text-xs font-bold underline text-gray-900"
-                            >
-                              Change
-                            </button>
+
+                            {/* Inline picker — remaining guides available for
+                                  this route/trek (getAvailableGuides already
+                                  filters out guides with active bookings). */}
+                            {isCardChangingGuide && (
+                              <div
+                                role="group"
+                                aria-label="Select a guide"
+                                className="p-3 animate-in fade-in slide-in-from-top-2 duration-200"
+                              >
+                                <div className="flex justify-between items-center mb-2">
+                                  <span className="text-xs font-bold text-gray-900">
+                                    Available guides for this route
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setIsCardChangingGuide(false)}
+                                    className="text-xs text-gray-500 hover:text-gray-900"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                                {availableGuides.length > 0 ? (
+                                  <div className="space-y-1.5 max-h-52 overflow-y-auto custom-scrollbar pr-1">
+                                    {availableGuides.map((guide) => {
+                                      const active = selectedGuide.id === guide.id;
+                                      return (
+                                        <button
+                                          key={guide.id}
+                                          type="button"
+                                          aria-pressed={active}
+                                          onClick={() => {
+                                            setSelectedGuide(guide);
+                                            setIsCardChangingGuide(false);
+                                          }}
+                                          className={`w-full flex items-center gap-2.5 p-2 rounded-lg border text-left transition-all ${
+                                            active
+                                              ? 'border-gray-900 bg-gray-50 ring-1 ring-gray-900'
+                                              : 'border-gray-200 hover:border-gray-400 hover:bg-gray-50'
+                                          }`}
+                                        >
+                                          <img
+                                            src={guide.image}
+                                            alt={guide.name}
+                                            className="w-8 h-8 rounded-full object-cover shrink-0"
+                                          />
+                                          <div className="min-w-0">
+                                            <div className="text-xs font-bold text-gray-900 truncate">
+                                              {guide.name}
+                                            </div>
+                                            <div className="text-[10px] text-gray-500 flex items-center gap-1">
+                                              <Star className="w-2.5 h-2.5 fill-accent text-accent" />
+                                              {guide.rating} ({guide.reviews})
+                                            </div>
+                                          </div>
+                                          {active && (
+                                            <Check className="w-3.5 h-3.5 text-gray-900 ml-auto shrink-0" />
+                                          )}
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                ) : (
+                                  <p className="text-xs text-gray-500">
+                                    All other guides for this route are currently booked — new dates
+                                    open up regularly.
+                                  </p>
+                                )}
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
 
-                      <div className="space-y-3 mb-6">
+                      <div className={isABC ? 'space-y-2 mb-4' : 'space-y-3 mb-6'}>
                         <button
                           onClick={handleBookNow}
                           className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98]"
@@ -574,12 +688,40 @@ const PokharaExperiencePage: React.FC = () => {
                           id="booking-info-message"
                           className="text-center text-xs font-medium hidden transition-all duration-300"
                         ></p>
-                        <p className="text-center text-xs text-gray-500 font-medium">
-                          You won't be charged yet
-                        </p>
+                        {isABC ? (
+                          <div className="text-center text-xs text-slate-500 space-y-2">
+                            <p className="flex items-center justify-center gap-1.5">
+                              <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+                              Free cancellation up to 24h before
+                            </p>
+                            <p>No payment required today</p>
+                          </div>
+                        ) : (
+                          <p className="text-center text-xs text-gray-500 font-medium">
+                            You won't be charged yet
+                          </p>
+                        )}
+                        {isABC && (
+                          <button
+                            type="button"
+                            onClick={handleSaveForLater}
+                            aria-pressed={isSaved}
+                            className="w-full border border-gray-200 hover:border-primary text-primary font-bold py-3 rounded-xl mt-1 flex items-center justify-center gap-2 transition-colors"
+                          >
+                            <Bookmark
+                              className={`w-4 h-4 ${isSaved ? 'fill-primary text-primary' : ''}`}
+                            />
+                            {isSaved ? 'Saved' : 'Save for later'}
+                          </button>
+                        )}
+                        {isABC && saveFlash && (
+                          <p className="text-center text-xs font-medium text-green-600">
+                            Saved to your favorites
+                          </p>
+                        )}
                       </div>
 
-                      <div className="space-y-3 pt-6">
+                      <div className={isABC ? 'space-y-2 pt-4 text-sm' : 'space-y-3 pt-6'}>
                         <div className="flex justify-between text-sm text-gray-600">
                           <span className="underline decoration-gray-300 decoration-1 underline-offset-2">
                             <Price amount={pricePerPerson} /> x {guestCount} guests{' '}
@@ -626,21 +768,24 @@ const PokharaExperiencePage: React.FC = () => {
                           <span className="text-gray-500">Date</span>
                           <span className="font-bold text-gray-900">
                             {new Date(checkIn).toLocaleDateString()}
-                            {days > 1 &&
+                            {!isABC &&
+                              days > 1 &&
                               checkOut &&
                               ` - ${new Date(checkOut).toLocaleDateString()}`}
                           </span>
                         </div>
-                        {days > 1 && (
+                        {!isABC && days > 1 && (
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-500">Duration</span>
                             <span className="font-bold text-gray-900">{days} days</span>
                           </div>
                         )}
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-500">Time</span>
-                          <span className="font-bold text-gray-900">{bookingTime}</span>
-                        </div>
+                        {!isABC && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-500">Time</span>
+                            <span className="font-bold text-gray-900">{bookingTime}</span>
+                          </div>
+                        )}
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-500">Guests</span>
                           <span className="font-bold text-gray-900">{guestCount}</span>
@@ -704,7 +849,7 @@ const PokharaExperiencePage: React.FC = () => {
         </div>
 
         {/* Lead Capture / Contact Section */}
-        <div id="ask" className="bg-gray-100 py-16">
+        <div id="ask" className="bg-[#E0F2FE] py-16">
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               {/* Form */}
@@ -904,6 +1049,7 @@ const PokharaExperiencePage: React.FC = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-3">Reviews</h2>
             <p className="text-gray-500 max-w-2xl mb-10">
               What fellow travelers say about this experience — from our local guides to the
+              travelers who've been there.
             </p>
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-12">
@@ -1008,63 +1154,106 @@ const PokharaExperiencePage: React.FC = () => {
         </section>
 
         {/* You might also like / Ready to book? Section */}
-        <section className="py-16 bg-gray-100">
+        <section className="py-16 bg-[#E0F2FE]">
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-3">You might also like</h2>
+              <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-primary bg-primary/10 rounded-full px-4 py-1.5 mb-4">
+                Keep exploring
+              </span>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+                You might also like
+              </h2>
               <p className="text-gray-500 max-w-2xl mx-auto">
                 Explore more of what Pokhara has to offer, or book this experience right away below.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
               {pokharaRichData
                 .filter((d) => d.id !== data.id)
                 .slice(0, 3)
                 .map((item, i) => (
-                  <div
-                    key={i}
-                    className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group"
+                  <article
+                    key={item.id ?? i}
+                    onClick={() => {
+                      navigate(`/city/pokhara/experience/${item.slug}`);
+                      window.scrollTo({ top: 0, behavior: 'instant' });
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        navigate(`/city/pokhara/experience/${item.slug}`);
+                        window.scrollTo({ top: 0, behavior: 'instant' });
+                      }
+                    }}
+                    tabIndex={0}
+                    role="link"
+                    aria-label={`View ${item.title}`}
+                    className="group flex flex-col h-full bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1.5 hover:border-primary/20 transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                   >
-                    <div className="h-40 overflow-hidden">
+                    <div className="relative h-52 overflow-hidden">
                       <img
                         src={item.heroImage}
                         alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        loading="lazy"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       />
-                    </div>
-                    <div className="p-6">
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        <span className="text-xs font-bold text-primary tracking-wider uppercase">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                      <div className="absolute top-3 left-3 flex items-center gap-2">
+                        <span className="text-[11px] font-bold text-white tracking-wider uppercase bg-black/45 backdrop-blur-sm rounded-full px-3 py-1">
                           {item.type || 'Experience'}
                         </span>
-                        {item.duration && (
-                          <span className="text-xs text-gray-400">{item.duration}</span>
-                        )}
                       </div>
-                      <h4 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-primary transition-colors">
+                      {item.rating != null && (
+                        <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-white/95 backdrop-blur-sm rounded-full pl-2 pr-3 py-1 shadow">
+                          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                          <span className="font-bold text-sm text-gray-900">
+                            {item.rating.toFixed(1)}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            ({item.reviews != null ? item.reviews.toLocaleString() : '124'})
+                          </span>
+                        </div>
+                      )}
+                      {item.duration && (
+                        <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-black/45 backdrop-blur-sm text-white text-xs font-medium rounded-full px-3 py-1">
+                          <Clock className="w-3.5 h-3.5" />
+                          {item.duration}
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-6 flex flex-col flex-1">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-2">
+                        <MapPin className="w-3.5 h-3.5" />
+                        Pokhara, Nepal
+                      </div>
+                      <h4 className="font-bold text-lg text-gray-900 mb-2 leading-snug min-h-[3.25rem] line-clamp-2 group-hover:text-primary transition-colors">
                         {item.title}
                       </h4>
-                      <div className="flex items-center gap-1 mb-4">
-                        <Star className="w-4 h-4 fill-accent text-accent" />
-                        <span className="font-bold text-gray-900">
-                          {item.rating != null ? item.rating.toFixed(1) : '4.5'}
-                        </span>
-                        <span className="text-gray-400">
-                          ({item.reviews != null ? item.reviews.toLocaleString() : '124'} reviews)
+                      {item.description && (
+                        <p className="text-sm text-gray-500 leading-relaxed min-h-[2.625rem] line-clamp-2 mb-5">
+                          {item.description}
+                        </p>
+                      )}
+                      <div className="mt-auto flex items-center justify-between gap-3 pt-4 border-t border-gray-100">
+                        <div className="text-sm">
+                          {item.price != null ? (
+                            <>
+                              <span className="text-xs text-gray-400">from </span>
+                              <span className="font-bold text-lg text-gray-900">${item.price}</span>
+                              <span className="text-xs text-gray-400"> / person</span>
+                            </>
+                          ) : (
+                            <span className="font-semibold text-gray-700">View details</span>
+                          )}
+                        </div>
+                        <span className="inline-flex items-center gap-1.5 bg-primary group-hover:bg-primary-hover text-white text-sm font-bold pl-4 pr-3 py-2.5 rounded-xl transition-all shadow-lg shadow-primary/20 group-hover:shadow-primary/40 group-hover:gap-2.5">
+                          Book
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                         </span>
                       </div>
-                      <button
-                        onClick={() => {
-                          navigate(`/city/pokhara/experience/${item.slug}`);
-                          window.scrollTo({ top: 0, behavior: 'instant' });
-                        }}
-                        className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98]"
-                      >
-                        Ready to book?
-                      </button>
                     </div>
-                  </div>
+                  </article>
                 ))}
             </div>
           </div>
@@ -1087,15 +1276,17 @@ const PokharaExperiencePage: React.FC = () => {
           accentClass="bg-primary hover:bg-primary-hover"
           checkIn={checkIn}
           checkOut={checkOut}
+          singleDate={isABC}
           onDateChange={(ci, co) => {
             setCheckIn(ci);
-            setCheckOut(co);
+            setCheckOut(isABC ? '' : co);
           }}
           guests={guestCount}
           onGuestsChange={setGuestCount}
           maxGuests={6}
           bookingTime={bookingTime}
           onTimeChange={setBookingTime}
+          hideTime={isABC}
           guides={availableGuides}
           selectedGuide={selectedGuide}
           onSelectGuide={(g) => setSelectedGuide(g as Guide)}
@@ -1105,14 +1296,17 @@ const PokharaExperiencePage: React.FC = () => {
           confirmedSummary={
             <ul className="space-y-1">
               <li>
-                <span className="font-bold">Dates:</span> {checkIn} - {checkOut}
+                <span className="font-bold">{isABC ? 'Date:' : 'Dates:'}</span>{' '}
+                {isABC ? checkIn : `${checkIn} - ${checkOut}`}
               </li>
               <li>
                 <span className="font-bold">Guests:</span> {guestCount}
               </li>
-              <li>
-                <span className="font-bold">Start time:</span> {bookingTime}
-              </li>
+              {!isABC && (
+                <li>
+                  <span className="font-bold">Start time:</span> {bookingTime}
+                </li>
+              )}
               {selectedGuide && (
                 <li>
                   <span className="font-bold">Guide:</span> {selectedGuide.name}

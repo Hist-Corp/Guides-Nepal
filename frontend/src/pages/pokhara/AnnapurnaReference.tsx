@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import './annapurnaTrek.css';
 import {
   abcSprite,
@@ -67,6 +68,11 @@ export const ABCHeading: React.FC = () => {
     if (links[1]) links[1].href = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
     if (links[2] && !links[2].getAttribute('href'))
       links[2].href = `mailto:?subject=${title}&body=${url}`;
+
+    // Remove the third-party "950 reviews on Tripadvisor" badge — we show our own
+    // verified-review count instead and don't link out to Tripadvisor.
+    root.querySelectorAll('.th-ta').forEach((el) => el.remove());
+    root.querySelectorAll('.th-trust--line .th-dot').forEach((el) => el.remove());
 
     let tipTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -143,10 +149,66 @@ export const ABCStickyNav: React.FC = () => {
       ['reviews', 'Reviews'],
     ];
 
+    // Dock the bar directly BELOW the site header by tracking the header's
+    // LIVE viewport position every frame while it moves. Mirroring the header's
+    // scroll-direction rule with a CSS `top` transition desyncs: the header's
+    // slide is React-state-driven and lags the scroll event, so the bar rides
+    // up/down THROUGH the still-visible header and they overlap (worse with
+    // momentum scrolling, where direction flickers). Tracking the header's
+    // actual bottom edge follows its 300ms slide frame-perfectly instead.
+    // While the header is hidden (slid up) its bottom edge reads ~0, so the
+    // bar naturally takes the header's place at the very top.
+    const header = document.querySelector<HTMLElement>('header.sticky');
+    let rafId = 0;
+    let stableFrames = 0;
+    let lastTop = '';
+
+    const syncTop = () => {
+      const bottom = header ? header.getBoundingClientRect().bottom : 0;
+      // 0.5px precision: fine enough to track the slide, coarse enough to settle.
+      const next = `${Math.max(0, Math.round(bottom * 2) / 2)}px`;
+      if (next !== nav.style.top) nav.style.top = next;
+      return next;
+    };
+
+    const tick = () => {
+      const top = syncTop();
+      if (top === lastTop) {
+        // Stop a few frames after the bar matches the header's bottom edge —
+        // by then the header's slide animation has settled too.
+        if (++stableFrames >= 3) {
+          rafId = 0;
+          return;
+        }
+      } else {
+        stableFrames = 0;
+        lastTop = top;
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+
+    // Start a tracking run (idempotent): runs each frame until the bar's top
+    // has matched the header's bottom edge for a few consecutive frames.
+    const track = () => {
+      stableFrames = 0;
+      if (!rafId) rafId = requestAnimationFrame(tick);
+    };
+
+    // The header's slide is class-driven (React commits it a frame or two after
+    // the scroll event). If the rAF run happened to settle in that gap, the
+    // observer restarts it the moment the class flips, so the bar can never
+    // miss the start of a slide-in/slide-out.
+    const headerObserver = header ? new MutationObserver(() => track()) : null;
+    headerObserver?.observe(header!, { attributes: true, attributeFilter: ['class'] });
+
     const onScroll = () => {
-      nav.classList.toggle('hidden', window.scrollY < 520);
-      // A section counts as "current" once its heading has scrolled up near the fixed bar.
-      const threshold = 140;
+      const y = window.scrollY;
+      track(); // follow the header's slide-in/slide-out frame by frame
+
+      nav.classList.toggle('hidden', y < 520);
+      // A section counts as "current" once its heading has scrolled up near the fixed bar
+      // (bars stack to ~header 81px + nav ~56px = ~137px, so activate just past them).
+      const threshold = 150;
       let active = tabs[0];
       for (const tab of tabs) {
         const el = document.getElementById(tab[0]);
@@ -175,24 +237,49 @@ export const ABCStickyNav: React.FC = () => {
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', track);
     nav.addEventListener('click', onClick);
     onScroll();
     return () => {
       window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', track);
       nav.removeEventListener('click', onClick);
+      headerObserver?.disconnect();
+      if (rafId) cancelAnimationFrame(rafId);
     };
   }, []);
 
-  return <div ref={ref} dangerouslySetInnerHTML={{ __html: abcStickyHtml }} />;
+  // role="navigation" doubles as a PageReveal exclusion: revealPlan's
+  // isPersistentChrome() skips landmark roles, so this wrapper never receives
+  // `animate-fade-in-up`. A transformed ancestor would otherwise become the
+  // containing block for the bar's position:fixed and pin it to the content.
+  return (
+    <div
+      ref={ref}
+      role="navigation"
+      aria-label="Trip sections"
+      dangerouslySetInnerHTML={{ __html: abcStickyHtml }}
+    />
+  );
 };
 
-/* Photo gallery with the two reference tabs (Trek gallery / Traveller photos) + lightbox. */
+/* Photo gallery with the two reference tabs (Trek gallery / Traveller photos) + lightbox.
+ * Limits: 10 trek-gallery images, 15 traveller photos. The ported static markup
+ * (abcGalleryHtml) may reference larger indices — every data-gopen is remapped /
+ * clamped at runtime so the lightbox never points at a missing image. */
+const OUR_LIMIT = 10;
+const PHOTOS_LIMIT = 15;
+
+const ourItems = (DATA.our || []).slice(0, OUR_LIMIT);
+const photoItems = (DATA.photos || []).slice(0, PHOTOS_LIMIT);
+
 export const ABCGallery: React.FC = () => {
   const ref = useRef<HTMLDivElement>(null);
   const [tab, setTab] = useState<'our' | 'photos'>('our');
   const [lb, setLb] = useState<{ list: 'our' | 'photos'; index: number } | null>(null);
+  const [imgOk, setImgOk] = useState(true);
 
-  // tab visibility / active state
+  // tab visibility / active state + keep hardcoded counts in sync with limits
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
@@ -201,6 +288,32 @@ export const ABCGallery: React.FC = () => {
     });
     root.querySelectorAll<HTMLElement>('[data-gtab]').forEach((b) => {
       b.classList.toggle('is-active', b.dataset.gtab === tab);
+    });
+    // "photos:18" / "our:10" style triggers must stay inside the trimmed lists.
+    root.querySelectorAll<HTMLElement>('[data-gopen]').forEach((btn) => {
+      const raw = btn.dataset.gopen || '';
+      const [list, idxRaw] = raw.split(':');
+      const max = list === 'our' ? ourItems.length : photoItems.length;
+      const idx = Math.max(0, Math.min(Number(idxRaw) || 0, Math.max(0, max - 1)));
+      const fixed = `${list}:${idx}`;
+      if (raw !== fixed) btn.dataset.gopen = fixed;
+    });
+    root.querySelectorAll<HTMLElement>('.tg-switch__btn').forEach((b) => {
+      const count = b.querySelector('.tg-switch__count');
+      if (!count) return;
+      if (b.dataset.gtab === 'our') count.textContent = String(ourItems.length);
+      if (b.dataset.gtab === 'photos') count.textContent = String(photoItems.length);
+    });
+    const pills = root.querySelectorAll<HTMLElement>('.tg-allpill');
+    pills.forEach((pill) => {
+      pill.innerHTML = pill.innerHTML.replace(
+        /View all\s+\d+\s+photos?/i,
+        `View all ${ourItems.length} photos`
+      );
+    });
+    const mixMore = root.querySelectorAll<HTMLElement>('.tg-mixmore__n');
+    mixMore.forEach((el) => {
+      el.textContent = `+${Math.max(0, photoItems.length - 1)}`;
     });
   }, [tab]);
 
@@ -218,7 +331,10 @@ export const ABCGallery: React.FC = () => {
       const openBtn = t.closest('[data-gopen]') as HTMLElement | null;
       if (openBtn?.dataset.gopen) {
         const [list, idx] = openBtn.dataset.gopen.split(':');
-        setLb({ list: list as 'our' | 'photos', index: Number(idx) });
+        const max = list === 'our' ? ourItems.length : photoItems.length;
+        const safe = Math.max(0, Math.min(Number(idx) || 0, Math.max(0, max - 1)));
+        setImgOk(true);
+        setLb({ list: list as 'our' | 'photos', index: safe });
       }
     };
     root.addEventListener('click', onClick);
@@ -229,7 +345,7 @@ export const ABCGallery: React.FC = () => {
   useEffect(() => {
     if (!lb) return;
     document.body.style.overflow = 'hidden';
-    const items = lb.list === 'our' ? DATA.our : DATA.photos;
+    const items = lb.list === 'our' ? ourItems : photoItems;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setLb(null);
       if (e.key === 'ArrowRight' && lb.index < items.length - 1)
@@ -243,7 +359,12 @@ export const ABCGallery: React.FC = () => {
     };
   }, [lb]);
 
-  const items = lb ? (lb.list === 'our' ? DATA.our : DATA.photos) : [];
+  // reset the broken-image fallback whenever the slide changes
+  useEffect(() => {
+    setImgOk(true);
+  }, [lb?.list, lb?.index]);
+
+  const items = lb ? (lb.list === 'our' ? ourItems : photoItems) : [];
   const current = lb ? items[lb.index] : undefined;
   const reviewIndex = current?.review;
   const review =
@@ -257,7 +378,10 @@ export const ABCGallery: React.FC = () => {
   const step = (delta: number) => {
     if (!lb) return;
     const next = lb.index + delta;
-    if (next >= 0 && next < items.length) setLb({ ...lb, index: next });
+    if (next >= 0 && next < items.length) {
+      setImgOk(true);
+      setLb({ ...lb, index: next });
+    }
   };
 
   const personAvatar = (
@@ -280,102 +404,275 @@ export const ABCGallery: React.FC = () => {
     <>
       <div ref={ref} dangerouslySetInnerHTML={{ __html: abcGalleryHtml }} />
 
-      {lb && current && (
-        <div
-          className="tg-lb"
-          role="dialog"
-          aria-modal="true"
-          onClick={(e) => {
-            if ((e.target as HTMLElement).classList.contains('tg-lb')) setLb(null);
-          }}
-        >
-          <button type="button" className="tg-lb__x" onClick={() => setLb(null)} aria-label="Close">
-            &times;
-          </button>
-          <button
-            type="button"
-            className="tg-lb__nav tg-lb__prev"
-            onClick={() => step(-1)}
-            aria-label="Previous"
-            style={lb.index === 0 ? { display: 'none' } : undefined}
-          >
-            &#8249;
-          </button>
-          <div className={`tg-lb__inner${review ? ' is-review' : ''}`}>
-            <div className="tg-lb__media">
-              <img className="tg-lb__img" src={current.src} alt="" />
-            </div>
-            {review && (
-              <div className="tg-lb__review">
-                <div className="tg-lb__person">
-                  {review.avatar ? (
-                    <img className="tg-lb__ava" src={review.avatar} alt="" />
+      {lb &&
+        current &&
+        createPortal(
+          <div className="mn-tt">
+            <div
+              className="tg-lb"
+              role="dialog"
+              aria-modal="true"
+              aria-label={`Photo ${lb.index + 1} of ${items.length}`}
+              onClick={(e) => {
+                // Close when clicking the dimmed backdrop (anywhere outside the
+                // image card / buttons). Using currentTarget avoids the old bug
+                // where clicks on inner wrappers never matched '.tg-lb'.
+                if (e.target === e.currentTarget) setLb(null);
+              }}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 100000,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '1.25rem',
+                background: 'rgba(4,12,22,.92)',
+                backdropFilter: 'blur(5px)',
+                WebkitBackdropFilter: 'blur(5px)',
+              }}
+            >
+              <button
+                type="button"
+                className="tg-lb__x"
+                onClick={() => setLb(null)}
+                aria-label="Close"
+                style={{
+                  position: 'fixed',
+                  top: 18,
+                  right: 18,
+                  width: 44,
+                  height: 44,
+                  fontSize: '1.6rem',
+                  lineHeight: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: 0,
+                  cursor: 'pointer',
+                  color: '#fff',
+                  background: 'rgba(255,255,255,.18)',
+                  borderRadius: 999,
+                  zIndex: 2,
+                }}
+              >
+                &times;
+              </button>
+              <button
+                type="button"
+                className="tg-lb__nav tg-lb__prev"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  step(-1);
+                }}
+                aria-label="Previous"
+                disabled={lb.index === 0}
+                style={{
+                  position: 'fixed',
+                  left: 14,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: 46,
+                  height: 46,
+                  fontSize: '1.7rem',
+                  lineHeight: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: 0,
+                  cursor: lb.index === 0 ? 'default' : 'pointer',
+                  color: '#fff',
+                  background: 'rgba(255,255,255,.18)',
+                  borderRadius: 999,
+                  opacity: lb.index === 0 ? 0.35 : 1,
+                  zIndex: 2,
+                }}
+              >
+                &#8249;
+              </button>
+              <div
+                className={`tg-lb__inner${review ? ' is-review' : ''}`}
+                onClick={(e) => e.stopPropagation()}
+                style={{ position: 'relative', zIndex: 1 }}
+              >
+                <div className="tg-lb__media">
+                  {imgOk ? (
+                    <img
+                      key={current.src}
+                      className="tg-lb__img"
+                      src={current.src}
+                      alt={
+                        lb.list === 'our'
+                          ? 'Annapurna Base Camp trek photo'
+                          : 'Traveller photo of Annapurna Base Camp Trek'
+                      }
+                      referrerPolicy="no-referrer"
+                      onError={() => setImgOk(false)}
+                      style={{ maxWidth: 'min(1000px,88vw)', maxHeight: '78vh' }}
+                    />
                   ) : (
-                    personAvatar
-                  )}
-                  <div className="tg-lb__pmeta">
-                    <p className="tg-lb__name">
-                      <strong>{review.name}</strong>
-                      {review.country && <span> · {review.country}</span>}
-                    </p>
-                    {review.date && (
-                      <p className="tg-lb__booked">
-                        Travelled in <span>{review.date}</span>
+                    <div
+                      style={{
+                        color: '#fff',
+                        textAlign: 'center',
+                        padding: '3rem 2rem',
+                        maxWidth: 420,
+                      }}
+                    >
+                      <p style={{ fontSize: '2rem', margin: 0 }}>🖼️</p>
+                      <p style={{ fontWeight: 700 }}>This photo failed to load.</p>
+                      <p style={{ opacity: 0.75, fontSize: '.9rem' }}>
+                        Please check your connection and try the next photo.
                       </p>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
-                <div className="tg-lb__stars">{'★'.repeat(Number(review.rating) || 5)}</div>
-                <p className="tg-lb__text">{review.full}</p>
-                {review.guide && (
-                  <div className="tg-lb__guide">
-                    {review.gphoto ? (
-                      <img className="tg-lb__gava" src={review.gphoto} alt="" />
-                    ) : (
-                      <span className="tg-lb__gava tg-lb__ava--ph">
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.6"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <circle cx="12" cy="8" r="4" />
-                          <path d="M4 21a8 8 0 0 1 16 0" />
-                        </svg>
-                      </span>
+                {review && (
+                  <div className="tg-lb__review">
+                    <div className="tg-lb__person">
+                      {review.avatar ? (
+                        <img className="tg-lb__ava" src={review.avatar} alt="" />
+                      ) : (
+                        personAvatar
+                      )}
+                      <div className="tg-lb__pmeta">
+                        <p className="tg-lb__name">
+                          <strong>{review.name}</strong>
+                          {review.country && <span> · {review.country}</span>}
+                        </p>
+                        {review.date && (
+                          <p className="tg-lb__booked">
+                            Travelled in <span>{review.date}</span>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="tg-lb__stars">{'★'.repeat(Number(review.rating) || 5)}</div>
+                    <p className="tg-lb__text">{review.full}</p>
+                    {review.guide && (
+                      <div className="tg-lb__guide">
+                        {review.gphoto ? (
+                          <img className="tg-lb__gava" src={review.gphoto} alt="" />
+                        ) : (
+                          <span className="tg-lb__gava tg-lb__ava--ph">
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.6"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <circle cx="12" cy="8" r="4" />
+                              <path d="M4 21a8 8 0 0 1 16 0" />
+                            </svg>
+                          </span>
+                        )}
+                        <span className="tg-lb__gtext">
+                          Guided by <strong>{review.guide}</strong>
+                        </span>
+                      </div>
                     )}
-                    <span className="tg-lb__gtext">
-                      Guided by <strong>{review.guide}</strong>
-                    </span>
                   </div>
                 )}
               </div>
-            )}
-          </div>
-          <button
-            type="button"
-            className="tg-lb__nav tg-lb__next"
-            onClick={() => step(1)}
-            aria-label="Next"
-            style={lb.index >= items.length - 1 ? { display: 'none' } : undefined}
-          >
-            &#8250;
-          </button>
-          <div className="tg-lb__mnav">
-            <button type="button" onClick={() => step(-1)} disabled={lb.index === 0}>
-              &#8249; Prev
-            </button>
-            <span className="tg-lb__count">
-              {lb.index + 1} / {items.length}
-            </span>
-            <button type="button" onClick={() => step(1)} disabled={lb.index >= items.length - 1}>
-              Next &#8250;
-            </button>
-          </div>
-        </div>
-      )}
+              <button
+                type="button"
+                className="tg-lb__nav tg-lb__next"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  step(1);
+                }}
+                aria-label="Next"
+                disabled={lb.index >= items.length - 1}
+                style={{
+                  position: 'fixed',
+                  right: 14,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: 46,
+                  height: 46,
+                  fontSize: '1.7rem',
+                  lineHeight: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: 0,
+                  cursor: lb.index >= items.length - 1 ? 'default' : 'pointer',
+                  color: '#fff',
+                  background: 'rgba(255,255,255,.18)',
+                  borderRadius: 999,
+                  opacity: lb.index >= items.length - 1 ? 0.35 : 1,
+                  zIndex: 2,
+                }}
+              >
+                &#8250;
+              </button>
+              <div
+                className="tg-lb__mnav"
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  position: 'fixed',
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  zIndex: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '.75rem',
+                  padding: '.55rem 1rem calc(env(safe-area-inset-bottom,0px) + .55rem)',
+                  background: 'rgba(255,255,255,.97)',
+                  borderTop: '1px solid #e5e7eb',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => step(-1)}
+                  disabled={lb.index === 0}
+                  style={{
+                    border: 0,
+                    cursor: 'pointer',
+                    background: '#0f172a',
+                    color: '#fff',
+                    fontWeight: 700,
+                    fontSize: '.9rem',
+                    borderRadius: 999,
+                    padding: '.55rem 1.2rem',
+                    opacity: lb.index === 0 ? 0.4 : 1,
+                  }}
+                >
+                  &#8249; Prev
+                </button>
+                <span
+                  className="tg-lb__count"
+                  style={{ color: '#64748b', fontSize: '.82rem', fontWeight: 600 }}
+                >
+                  {lb.index + 1} / {items.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => step(1)}
+                  disabled={lb.index >= items.length - 1}
+                  style={{
+                    border: 0,
+                    cursor: 'pointer',
+                    background: '#0f172a',
+                    color: '#fff',
+                    fontWeight: 700,
+                    fontSize: '.9rem',
+                    borderRadius: 999,
+                    padding: '.55rem 1.2rem',
+                    opacity: lb.index >= items.length - 1 ? 0.4 : 1,
+                  }}
+                >
+                  Next &#8250;
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
     </>
   );
 };
@@ -394,6 +691,38 @@ export const ABCMain: React.FC = () => {
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
+
+    // Strip outbound links from the ported reference content, EXCEPT the ones the
+    // site owner chose to keep (original reference URLs): Pokhara, Kathmandu,
+    // the Immigration Department online-visa site and the Nepal Tourism Board.
+    // Everything else (Annapurna region/circuit, Dhaulagiri, Thorong La Pass,
+    // Machhapuchhre, Ghandruk, Poon Hill, trek maps, TripAdvisor, …) is
+    // unwrapped: inner content (e.g. <strong>) is kept so text still reads
+    // naturally without redirecting visitors away. In-page anchors (#...) and
+    // the share-menu links (Facebook/X/Email, wired at runtime in ABCHeading)
+    // are always kept.
+    const KEPT_OUTBOUND = new Set([
+      'https://www.magicalnepal.com/travel-guide/kathmandu/go-kathmandu-pokhara/',
+      'https://www.magicalnepal.com/nepal/kathmandu/tour/kathmandu-day-tour/',
+      'https://nepaliport.immigration.gov.np/onlinevisa-mission/application',
+      'https://ntb.gov.np/',
+    ]);
+    root.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
+      if (a.closest('.th-share__menu')) return; // share menu — wired intentionally
+      const href = a.getAttribute('href') || '';
+      if (href.startsWith('#')) return; // in-page tabs / review jumps
+      if (KEPT_OUTBOUND.has(href)) {
+        // Keep the chosen links, but open externals in a new tab safely.
+        if (/^https?:\/\//.test(href)) {
+          a.setAttribute('target', '_blank');
+          a.setAttribute('rel', 'noopener noreferrer');
+        }
+        return;
+      }
+      const frag = document.createElement('span');
+      frag.innerHTML = a.innerHTML;
+      a.replaceWith(frag);
+    });
 
     const setDet = (det: HTMLElement, open: boolean) => {
       if (open) {
@@ -436,8 +765,11 @@ export const ABCMain: React.FC = () => {
           .querySelectorAll('.block-itinerary__item__header')
           .forEach((h) => h.classList.toggle('active', show));
         const toggles = root.querySelectorAll<HTMLElement>('.itn-toggle');
-        toggles[0]?.classList.toggle('hidden', !show);
-        toggles[1]?.classList.toggle('hidden', show);
+        // [0] = "Show all", [1] = "Hide all" — hide the former whenever days are expanded.
+        toggles[0]?.classList.toggle('hidden', show);
+        toggles[1]?.classList.toggle('hidden', !show);
+        // Keep aria-expanded on both swap-in buttons in sync with the real state.
+        toggles.forEach((tb) => tb.setAttribute('aria-expanded', String(show)));
         return;
       }
 

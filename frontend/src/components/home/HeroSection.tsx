@@ -38,7 +38,7 @@ export const HeroSection: React.FC = () => {
     <section
       data-cms-id="home-hero"
       data-cms-label="Hero"
-      className="bg-peach py-12 md:py-20 relative overflow-hidden"
+      className="bg-peach pt-10 md:pt-14 pb-16 md:pb-24 relative overflow-hidden"
       style={cmsBackground(cmsHero?.style, '#F9E6D6')}
     >
       <div className="container mx-auto px-4">

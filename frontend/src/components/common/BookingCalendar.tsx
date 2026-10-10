@@ -14,6 +14,8 @@ interface BookingCalendarProps {
   maxDate?: string;
   /** Accessible label announced for the trigger buttons */
   ariaLabel?: string;
+  /** Compact trigger styling for narrow booking cards (smaller padding/text). */
+  compact?: boolean;
 }
 
 const toKey = (d: Date): string => {
@@ -133,6 +135,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
   minDate,
   maxDate,
   ariaLabel,
+  compact = false,
 }) => {
   const today = useMemo(() => {
     const t = new Date();
@@ -176,6 +179,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     setTypeErr(null);
     if (single) {
       onChange(key === checkIn ? '' : key, '');
+      if (key !== checkIn) setIsOpen(false);
       return;
     }
 
@@ -261,6 +265,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     if (single) {
       onChange(key, '');
       setTypeErr(null);
+      setIsOpen(false);
       return true;
     }
 
@@ -446,7 +451,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
                 onClick={() => pickDate(key)}
                 onMouseEnter={() => setHoverKey(key)}
                 className={`
-                  h-9 w-9 mx-auto rounded-full text-sm flex items-center justify-center
+                  ${single ? 'h-9 w-9 md:h-11 md:w-11' : 'h-9 w-9'} mx-auto rounded-full text-sm flex items-center justify-center
                   transition-colors duration-100
                   ${disabled ? 'text-gray-300 cursor-not-allowed line-through' : ''}
                   ${
@@ -505,7 +510,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
       variant === 'panel'
         ? `block min-w-[124px] flex-1 cursor-text rounded-lg border px-3 py-2 text-left transition-colors ${stateCls}`
         : variant === 'desktop'
-          ? `block flex-1 cursor-text rounded-xl border px-4 py-3 text-left transition-colors ${stateCls}`
+          ? `block flex-1 cursor-text rounded-xl border ${compact ? 'px-3 py-2' : 'px-4 py-3'} text-left transition-colors ${stateCls}`
           : `block cursor-text rounded-xl border px-3 py-2.5 text-left transition-colors ${stateCls}`;
 
     const labelCls = `block text-[11px] font-bold uppercase tracking-wider ${
@@ -573,12 +578,14 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
 
       {/* Nights / one-day summary */}
       <p className="text-xs text-gray-400">
-        {nights > 0 ? `${nights} night${nights === 1 ? '' : 's'}` : single ? 'One day' : ''}
+        {nights > 0 ? `${nights} night${nights === 1 ? '' : 's'}` : ''}
       </p>
 
       {/* Popup anchored directly beneath the fields (absolute, top-full) so it
-          scrolls one-for-one with them and can never cross over them. Wide
-          two-month panel is right-aligned to the fields via right-0. */}
+          scrolls one-for-one with them and can never cross over them. The panel
+          is right-aligned to the fields via right-0; single-date mode scales
+          from 340px (mobile) up to 520/600px on larger screens, two-month mode
+          stays at the wide 680px layout. */}
       {isOpen && (
         <div
           ref={panelRef}
@@ -587,7 +594,9 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
           aria-label="Choose dates"
           onMouseLeave={() => setHoverKey(null)}
           className={`${
-            single ? 'w-[340px] max-w-[calc(100vw-16px)]' : 'w-[680px] max-w-[calc(100vw-16px)]'
+            single
+              ? 'w-[340px] md:w-[520px] xl:w-[600px] max-w-[calc(100vw-16px)]'
+              : 'w-[680px] max-w-[calc(100vw-16px)]'
           } absolute left-0 md:left-auto md:right-0 top-full z-50 mt-2 max-h-[85vh] rounded-2xl border border-gray-200 bg-white shadow-2xl overflow-y-auto flex flex-col`}
         >
           {/* Popup header — Airbnb-style "Select dates" with typed

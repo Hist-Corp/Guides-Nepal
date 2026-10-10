@@ -621,11 +621,28 @@
 
 .mn-tt .block-itinerary .itn-headrow{margin:1.2em 0 .8em}
 
-.mn-tt .block-itinerary .itn-toggle{display:inline-flex;align-items:center;gap:.35rem;border:1.5px solid var(--wp--preset--color--primary,#00aeef);background:#fff;color:var(--wp--preset--color--primary,#00aeef);font-size:.82rem;font-weight:600;border-radius:999px;padding:.4rem .95rem;cursor:pointer;transition:all .2s;float:none;margin:0}
+.mn-tt .block-itinerary .itn-toggle{display:inline-flex;align-items:center;gap:.5rem;border:1.5px solid color-mix(in srgb,var(--trip-primary) 40%,#fff);background:color-mix(in srgb,var(--trip-primary) 9%,#fff);color:color-mix(in srgb,var(--trip-primary) 65%,#0c2438);font-size:.86rem;font-weight:700;letter-spacing:.01em;border-radius:999px;padding:.6rem 1.3rem;cursor:pointer;transition:background .2s ease,color .2s ease,border-color .2s ease,transform .2s ease,box-shadow .2s ease;box-shadow:0 4px 14px -10px rgba(2,32,56,.45);float:none;margin:0}
 
-.mn-tt .block-itinerary .itn-toggle:hover{background:var(--wp--preset--color--primary,#00aeef);color:#fff}
+.mn-tt .block-itinerary .itn-toggle:hover{background:var(--trip-primary);border-color:var(--trip-primary);color:#fff;transform:translateY(-1px);box-shadow:0 10px 22px -12px color-mix(in srgb,var(--trip-primary) 75%,transparent)}
 
 .mn-tt .block-itinerary .itn-toggle.hidden{display:none}
+
+.mn-tt .block-itinerary .itn-toggle:active{transform:translateY(0) scale(.97);box-shadow:0 3px 8px -6px rgba(2,32,56,.4)}
+
+.mn-tt .block-itinerary .itn-toggle:focus-visible{outline:2px solid var(--trip-primary);outline-offset:2px}
+
+.mn-tt .block-itinerary .itn-toggle svg{flex:none;transition:transform .2s ease}
+
+.mn-tt .block-itinerary>button[data-trigger*="Show"]:hover svg{transform:translateY(2px)}
+
+.mn-tt .block-itinerary>button[data-trigger*="Hide"]:hover svg{transform:translateY(-2px)}
+
+/* Gentle pop when the Show/Hide swap re-inserts the visible button */
+.mn-tt .block-itinerary .itn-toggle:not(.hidden){animation:itnPop .3s cubic-bezier(.34,1.56,.64,1)}
+
+@keyframes itnPop{from{opacity:0;transform:translateY(-4px) scale(.92)}to{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion:reduce){.mn-tt .block-itinerary .itn-toggle:not(.hidden){animation:none}}
 
 .mn-tt{--trip-primary:var(--wp--preset--color--primary,#00aeef)}
 
@@ -983,9 +1000,9 @@
 
 .mn-tt .block-itinerary__item__details{font-size:.95rem;line-height:1.7;color:#4b5a70}
 
-.mn-tt .block-itinerary>button[data-trigger]{font-weight:600;padding:.35rem .95rem;border:1px solid #e2e8f0;border-radius:999px;transition:border-color .2s ease,background .2s ease}
+.mn-tt .block-itinerary>button[data-trigger]{display:inline-flex;align-items:center;gap:.5rem;border:1.5px solid color-mix(in srgb,var(--trip-primary) 40%,#fff);background:color-mix(in srgb,var(--trip-primary) 9%,#fff);color:color-mix(in srgb,var(--trip-primary) 65%,#0c2438);font-size:.86rem;font-weight:700;letter-spacing:.01em;border-radius:999px;padding:.6rem 1.3rem;cursor:pointer;transition:background .2s ease,color .2s ease,border-color .2s ease,transform .2s ease,box-shadow .2s ease;box-shadow:0 4px 14px -10px rgba(2,32,56,.45);float:none;margin:0}
 
-.mn-tt .block-itinerary>button[data-trigger]:hover{border-color:color-mix(in srgb,var(--trip-primary) 45%,#e2e8f0);background:color-mix(in srgb,var(--trip-primary) 6%,#fff)}
+.mn-tt .block-itinerary>button[data-trigger]:hover{background:var(--trip-primary);border-color:var(--trip-primary);color:#fff;transform:translateY(-1px);box-shadow:0 10px 22px -12px color-mix(in srgb,var(--trip-primary) 75%,transparent)}
 
 @media (max-width: 600px){.mn-tt .block-itinerary__item__header{margin:-.25rem -.3rem;padding:.25rem 2.2rem .25rem .3rem}.mn-tt .block-itinerary__item__header h3{font-size:.95rem !important}.mn-tt .block-itinerary__item__header:after{width:24px;height:24px;margin-top:-12px}}
 
@@ -1369,7 +1386,7 @@
 
 .mn-tt .wp-container-core-group-is-layout-9790f0ff>*+*{margin-block-start:var(--wp--preset--spacing--30);margin-block-end:0}
 
-.mn-tt .block-itinerary .itn-toggle{display:inline-flex;align-items:center;gap:.35rem;border:1.5px solid var(--wp--preset--color--primary,#00aeef);background:#fff;color:var(--wp--preset--color--primary,#00aeef);font-size:.82rem;font-weight:600;border-radius:999px;padding:.4rem .95rem;float:none;margin:0}
+.mn-tt .block-itinerary .itn-toggle{display:inline-flex;align-items:center;gap:.5rem;border:1.5px solid color-mix(in srgb,var(--trip-primary) 40%,#fff);background:color-mix(in srgb,var(--trip-primary) 9%,#fff);color:color-mix(in srgb,var(--trip-primary) 65%,#0c2438);font-size:.86rem;font-weight:700;letter-spacing:.01em;border-radius:999px;padding:.6rem 1.3rem;cursor:pointer;transition:background .2s ease,color .2s ease,border-color .2s ease,transform .2s ease,box-shadow .2s ease;box-shadow:0 4px 14px -10px rgba(2,32,56,.45);float:none;margin:0}
 
 .mn-tt .wp-block-group:has(>.block-icon-text.is-includes){display:grid;grid-template-columns:1fr 1fr;gap:.65rem !important;align-items:stretch;margin-top:1.1rem}
 
@@ -1379,7 +1396,7 @@
 
 @media (max-width:700px){.mn-tt .wp-block-group:has(>.block-icon-text.is-includes){grid-template-columns:1fr;gap:.55rem !important}}
 
-.mn-tt .block-itinerary>button[data-trigger]{font-weight:600;padding:.35rem .95rem;border:1px solid #e2e8f0;border-radius:999px}
+.mn-tt .block-itinerary>button[data-trigger]{display:inline-flex;align-items:center;gap:.5rem;border:1.5px solid color-mix(in srgb,var(--trip-primary) 40%,#fff);background:color-mix(in srgb,var(--trip-primary) 9%,#fff);color:color-mix(in srgb,var(--trip-primary) 65%,#0c2438);font-size:.86rem;font-weight:700;letter-spacing:.01em;border-radius:999px;padding:.6rem 1.3rem;cursor:pointer;transition:background .2s ease,color .2s ease,border-color .2s ease,transform .2s ease,box-shadow .2s ease;box-shadow:0 4px 14px -10px rgba(2,32,56,.45);float:none;margin:0}
 
 .mn-tt .block-trip-gallery .tg-allpill{position:absolute;left:1rem;bottom:1rem;z-index:2;display:inline-flex;align-items:center;gap:.45rem;background:rgba(255,255,255,.94);color:#17222e;font-size:.86rem;font-weight:600;line-height:1;padding:.62rem .95rem;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.25);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 
@@ -2123,9 +2140,94 @@
 
 @media (max-width: 680px){.mn-tt .has-global-padding{padding-left:16px;padding-right:16px}.mn-tt .has-global-padding>.alignfull{margin-left:-16px;margin-right:-16px}.mn-tt .entry-content.has-global-padding{padding-left:0;padding-right:0}.mn-tt .entry-content.has-global-padding>.alignfull{margin-left:0;margin-right:0}}
 
+/* ---- distinctive accordion toggle (replaces the plain circular chevron) ----
+   A soft brand-tinted square badge with a thin chevron; on hover it lifts with a
+   ring, and when open it flips into a "minus" state on a filled brand pill. */
+.mn-tt .read-before-section .block-collapse__header:after,
+.mn-tt .block-collapse:not(.is-style-naked) .block-collapse__header:after{
+  content:"";
+  width:34px;height:34px;
+  right:1rem;top:50%;margin-top:-17px;
+  display:flex;align-items:center;justify-content:center;
+  border:0;
+  border-radius:12px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--trip-primary) 14%,#fff),color-mix(in srgb,var(--trip-primary) 7%,#fff));
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--trip-primary) 22%,#e8edf4);
+  transform:none;
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1),background .2s ease,box-shadow .2s ease;
+}
+/* the chevron drawn as two borders inside the badge */
+.mn-tt .read-before-section .block-collapse__header:after,
+.mn-tt .block-collapse:not(.is-style-naked) .block-collapse__header:after{
+  background-image:linear-gradient(45deg,transparent 50%,var(--trip-primary) 50%),linear-gradient(135deg,var(--trip-primary) 50%,transparent 50%);
+  background-position:calc(50% - 4px) calc(50% - 1px),calc(50% + 3px) calc(50% - 1px);
+  background-size:5px 5px,5px 5px;
+  background-repeat:no-repeat;
+}
+/* hover: lift + ring */
+.mn-tt .read-before-section .block-collapse__header:hover:after,
+.mn-tt .block-collapse:not(.is-style-naked) .block-collapse__header:hover:after{
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--trip-primary) 40%,#e8edf4),0 6px 14px -8px color-mix(in srgb,var(--trip-primary) 60%,transparent);
+  transform:translateY(-1px);
+}
+/* open state: filled brand pill, chevron becomes a minus, badge slides down slightly */
+.mn-tt .read-before-section .block-collapse__header.active:after,
+.mn-tt .block-collapse:not(.is-style-naked) .block-collapse__header.active:after{
+  background:var(--trip-primary);
+  background-image:linear-gradient(to bottom,transparent 44%,#fff 44%,#fff 56%,transparent 56%);
+  background-position:center;background-size:13px 12px;background-repeat:no-repeat;
+  box-shadow:0 8px 18px -8px color-mix(in srgb,var(--trip-primary) 75%,transparent);
+  transform:translateY(1px);
+}
+@media (max-width: 600px){
+  .mn-tt .read-before-section .block-collapse__header:after,
+  .mn-tt .block-collapse:not(.is-style-naked) .block-collapse__header:after{width:30px;height:30px;margin-top:-15px;right:.7rem}
+}
+/* ---- itinerary day toggles: same distinctive badge as the read-before accordions ----
+   Replaces the plain icomoon circle with the brand-tinted rounded-square badge; the
+   chevron is drawn with gradient borders, and the open state flips it into a minus on
+   a filled brand pill (mirrors .block-collapse__header:after above). */
+.mn-tt .block-itinerary__item__header:after{
+  content:"";
+  font-family:inherit;font-weight:normal;
+  width:28px;height:28px;
+  right:.35rem;top:50%;margin-top:-14px;
+  display:flex;align-items:center;justify-content:center;
+  border:0;
+  border-radius:10px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--trip-primary) 14%,#fff),color-mix(in srgb,var(--trip-primary) 7%,#fff));
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--trip-primary) 22%,#e8edf4);
+  transform:none;
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1),background .2s ease,box-shadow .2s ease;
+  background-image:linear-gradient(45deg,transparent 50%,var(--trip-primary) 50%),linear-gradient(135deg,var(--trip-primary) 50%,transparent 50%);
+  background-position:calc(50% - 4px) calc(50% - 1px),calc(50% + 3px) calc(50% - 1px);
+  background-size:5px 5px,5px 5px;
+  background-repeat:no-repeat;
+}
+/* hover: lift + ring */
+.mn-tt .block-itinerary__item__header:hover:after{
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--trip-primary) 40%,#e8edf4),0 6px 14px -8px color-mix(in srgb,var(--trip-primary) 60%,transparent);
+  transform:translateY(-1px);
+}
+/* open state: filled brand pill, chevron becomes a minus, badge slides down slightly */
+.mn-tt .block-itinerary__item__header.active:after{
+  background:var(--trip-primary);
+  background-image:linear-gradient(to bottom,transparent 44%,#fff 44%,#fff 56%,transparent 56%);
+  background-position:center;background-size:12px 11px;background-repeat:no-repeat;
+  box-shadow:0 8px 18px -8px color-mix(in srgb,var(--trip-primary) 75%,transparent);
+  transform:translateY(1px);
+}
+@media (max-width: 600px){
+  .mn-tt .block-itinerary__item__header:after{width:24px;height:24px;margin-top:-12px;border-radius:8px;background-position:calc(50% - 3px) calc(50% - 1px),calc(50% + 3px) calc(50% - 1px);background-size:4.5px 4.5px,4.5px 4.5px}
+  .mn-tt .block-itinerary__item__header.active:after{background-size:11px 10px,11px 10px}
+}
 /* ---- runtime overrides (must win) ---- */
 .mn-tt{font-family:Inter,"SF Pro Display",-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
 html:has(.mn-tt){scroll-behavior:smooth}
-.mn-tt [id]{scroll-margin-top:96px}
+/* The tab bar's `top` is driven per-frame by ABCStickyNav (AnnapurnaReference.tsx),
+   which glues it to the header's live bottom edge so the two never overlap while
+   the header slides in/out — no CSS transition on `top`, since easing would make
+   the bar lag the header and re-create the overlap. */
+.mn-tt [id]{scroll-margin-top:140px}
 .mn-tt .trip-mobile-cta{position:static !important;bottom:auto !important;left:auto !important;right:auto !important;box-shadow:none !important}
 .mn-tt .tg-lb__img{max-width:min(1100px,92vw);max-height:78vh;width:auto;height:auto;object-fit:contain;border-radius:8px}

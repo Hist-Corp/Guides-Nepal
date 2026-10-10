@@ -36,6 +36,8 @@ export interface MobileBookingSheetProps<TGuide extends SheetGuide = SheetGuide>
   maxGuests?: number;
   bookingTime: string;
   onTimeChange: (value: string) => void;
+  /** Hides the start-time section (e.g. multi-day treks with no fixed start). */
+  hideTime?: boolean;
   guides: TGuide[];
   selectedGuide: TGuide | null;
   onSelectGuide: (guide: TGuide) => void;
@@ -71,6 +73,7 @@ export function MobileBookingSheet<TGuide extends SheetGuide = SheetGuide>({
   maxGuests = 6,
   bookingTime,
   onTimeChange,
+  hideTime = false,
   guides,
   selectedGuide,
   onSelectGuide,
@@ -189,12 +192,14 @@ export function MobileBookingSheet<TGuide extends SheetGuide = SheetGuide>({
                     single={singleDate}
                   />
                 </section>
-                <section aria-label="Select start time">
-                  <p className="mb-1.5 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-500">
-                    <Clock3 className="h-4 w-4" /> Start time
-                  </p>
-                  <TimePicker value={bookingTime} onChange={onTimeChange} idPrefix="sheet" />
-                </section>
+                {!hideTime && (
+                  <section aria-label="Select start time">
+                    <p className="mb-1.5 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-500">
+                      <Clock3 className="h-4 w-4" /> Start time
+                    </p>
+                    <TimePicker value={bookingTime} onChange={onTimeChange} idPrefix="sheet" />
+                  </section>
+                )}
                 <section aria-label="Select guests">
                   <p className="mb-1.5 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-500">
                     <Users className="h-4 w-4" /> Guests
