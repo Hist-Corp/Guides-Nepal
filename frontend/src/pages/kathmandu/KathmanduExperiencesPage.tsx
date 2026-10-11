@@ -4,9 +4,11 @@ import { Footer } from '../../components/common/Footer';
 import { kathmanduTours } from '../../data/kathmanduTours';
 import { Star, Clock, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '../../utils/backNavigation';
 
 const KathmanduExperiencesPage: React.FC = () => {
   const navigate = useNavigate();
+  const goBack = useGoBack();
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white">
@@ -15,7 +17,7 @@ const KathmanduExperiencesPage: React.FC = () => {
       <main className="container mx-auto px-4 py-16 max-w-7xl flex-grow">
         <div className="mb-12">
           <button 
-            onClick={() => navigate(-1)} 
+            onClick={goBack} 
             className="flex items-center gap-2 text-gray-600 hover:text-brand-yellow font-bold mb-6 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { StickyBarPortal } from '../../components/common/StickyBarPortal';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useGoBack } from '../../utils/backNavigation';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import {
@@ -228,6 +229,7 @@ const ReadMoreText = ({
 const CookingExperiencePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [data, setData] = useState(cookingExperiencesData.find((d) => d.slug === slug));
 
   // Guide Selection State
@@ -430,7 +432,7 @@ const handleBookNow = async (): Promise<boolean> => {
         <div className="container mx-auto px-4 relative z-10 flex flex-col h-full justify-center">
           <div className="absolute top-8 left-4">
             <button
-              onClick={() => navigate(-1)}
+              onClick={goBack}
               className="flex items-center gap-2 text-white hover:text-brand-yellow font-bold transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />

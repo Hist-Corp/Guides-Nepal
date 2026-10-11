@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { useGoBack } from '../../utils/backNavigation';
 import { ArrowLeft, ArrowRight, CheckCircle2, Compass, MapPin, Users } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
@@ -45,6 +46,7 @@ const toggle = (list: string[], v: string) => (list.includes(v) ? list.filter((x
  */
 const GuideOnboardingPage: React.FC = () => {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { isAuthenticated, user, accessToken } = useAuthStore();
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
@@ -160,7 +162,7 @@ const GuideOnboardingPage: React.FC = () => {
     <div className="flex min-h-screen flex-col bg-gray-50 font-sans">
       <Header />
       <main className="container mx-auto max-w-4xl flex-grow px-4 py-10">
-        <button onClick={() => navigate(-1)} className="mb-6 flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-gray-900">
+        <button onClick={goBack} className="mb-6 flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-gray-900">
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
         <h1 className="text-3xl font-bold text-gray-900">Guide onboarding</h1>

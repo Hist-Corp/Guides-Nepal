@@ -4,10 +4,12 @@ import { Footer } from '../../components/common/Footer';
 import { Button } from '../../components/common/Button';
 import { ArrowLeft, CheckCircle2, Upload, Shield, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '../../utils/backNavigation';
 import { submitGuideApplication } from '../../services/publicApi';
 
 const BecomeGuidePage: React.FC = () => {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -97,7 +99,7 @@ const BecomeGuidePage: React.FC = () => {
       <main className="py-12 bg-gray-50">
         <div className="container mx-auto px-4 max-w-3xl">
           <button 
-            onClick={() => navigate(-1)} 
+            onClick={goBack} 
             className="flex items-center gap-2 text-gray-600 hover:text-[#213448] font-bold mb-8 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />

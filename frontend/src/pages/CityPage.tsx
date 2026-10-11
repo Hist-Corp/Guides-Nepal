@@ -1,5 +1,6 @@
 import React from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import { useGoBack } from '../utils/backNavigation';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { Button } from '../components/common/Button';
@@ -528,7 +529,7 @@ const cityData: Record<string, CityData> = {
 
 const CityPage: React.FC = () => {
   const { cityId } = useParams<{ cityId: string }>();
-  const navigate = useNavigate();
+  const goBack = useGoBack();
   const { formatPrice } = useCurrency();
   const city = cityData[cityId?.toLowerCase() || ''];
 
@@ -556,7 +557,7 @@ const CityPage: React.FC = () => {
       {/* City Hero */}
       <div className="relative h-[50vh] min-h-[400px]">
         <button
-          onClick={() => navigate(-1)}
+          onClick={goBack}
           className="absolute top-8 left-8 z-20 flex items-center gap-2 text-white hover:text-accent font-bold transition-colors bg-black/20 hover:bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full"
         >
           <ArrowLeft className="w-5 h-5" />

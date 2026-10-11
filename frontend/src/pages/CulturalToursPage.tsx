@@ -13,6 +13,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '../utils/backNavigation';
 import { useCurrency } from '../contexts/CurrencyContext';
 
 const culturalTourLocals = [
@@ -125,6 +126,7 @@ export const culturalTours = [
 
 export const CulturalToursPage: React.FC = () => {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { formatPrice } = useCurrency();
   const [showAllLocals, setShowAllLocals] = useState(false);
   const displayedLocals = showAllLocals ? culturalTourLocals : culturalTourLocals.slice(0, 5);
@@ -138,7 +140,7 @@ export const CulturalToursPage: React.FC = () => {
       <div className="relative pt-4 pb-16 overflow-hidden bg-[#FFF0E6]">
         <div className="container mx-auto px-4 relative z-10">
           <button
-            onClick={() => navigate(-1)}
+            onClick={goBack}
             className="flex items-center gap-2 text-gray-600 hover:text-[#213448] font-bold mb-6 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />

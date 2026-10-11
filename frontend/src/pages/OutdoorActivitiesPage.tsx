@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { getCanonicalExperienceBySlug } from '../utils/canonicalExperience';
 
 const outdoorLocals = [
   {
@@ -301,7 +302,10 @@ export const OutdoorActivitiesPage: React.FC = () => {
                 key={activity.id}
                 className="group relative rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300"
                 onClick={() => {
-                  navigate(`/experience/${activity.slug}`);
+                  navigate(
+                    getCanonicalExperienceBySlug(activity.slug)?.path ??
+                      `/experience/${activity.slug}`
+                  );
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >
@@ -479,7 +483,10 @@ export const OutdoorActivitiesPage: React.FC = () => {
                 key={activity.id}
                 className="flex flex-col border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 bg-white group cursor-pointer"
                 onClick={() => {
-                  navigate(`/experience/${activity.slug}`);
+                  navigate(
+                    getCanonicalExperienceBySlug(activity.slug)?.path ??
+                      `/experience/${activity.slug}`
+                  );
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >

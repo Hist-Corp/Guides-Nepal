@@ -14,6 +14,13 @@ const cityExperiences = [
 
 const normalize = (value: string) => value.trim().toLowerCase();
 
+// Legacy global experience slugs that never existed in a city catalog but
+// belong to a city-owned experience. Keyed by legacy slug, valued by the
+// canonical city slug.
+const legacySlugAliases: Record<string, string> = {
+  'annapurna-circuit-trek': 'annapurna-base-camp-trek',
+};
+
 export interface CanonicalExperience {
   path: string;
   heroImage: string;
@@ -86,8 +93,9 @@ export const getCanonicalExperience = (
 
 /** Finds a city experience from a globally-scoped legacy slug. */
 export const getCanonicalExperienceBySlug = (identifier: string): CanonicalExperience | undefined => {
+  const slug = legacySlugAliases[identifier] ?? identifier;
   for (const catalog of cityExperiences) {
-    const experience = catalog.experiences.find((item) => item.slug === identifier);
+    const experience = catalog.experiences.find((item) => item.slug === slug);
     if (experience) {
       return {
         path: `/city/${catalog.city}/experience/${experience.slug}`,

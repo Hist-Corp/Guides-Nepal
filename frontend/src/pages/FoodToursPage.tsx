@@ -4,11 +4,13 @@ import { Footer } from '../components/common/Footer';
 import { Button } from '../components/common/Button';
 import { ArrowLeft, Check, ShieldCheck, Users } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useGoBack } from '../utils/backNavigation';
 import { NEPAL_IMAGES } from '../data/images';
 import guidesApi, { Guide } from '../services/guidesApi';
 
 export const FoodToursPage: React.FC = () => {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [guides, setGuides] = useState<Guide[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -159,7 +161,7 @@ export const FoodToursPage: React.FC = () => {
       <div className="relative pt-4 pb-16 overflow-hidden bg-[#FFF0E6]">
         <div className="container mx-auto px-4 relative z-10">
           <button
-            onClick={() => navigate(-1)}
+            onClick={goBack}
             className="flex items-center gap-2 text-gray-600 hover:text-[#213448] font-bold mb-6 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />

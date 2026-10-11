@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useGoBack } from '../utils/backNavigation';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { ArrowLeft } from 'lucide-react';
@@ -8,7 +9,7 @@ import { Guide } from '../data/types';
 
 const GalleryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const goBack = useGoBack();
   const [guide, setGuide] = useState<Guide | null>(null);
 
   useEffect(() => {
@@ -28,7 +29,7 @@ const GalleryPage: React.FC = () => {
           {/* Header */}
           <div className="mb-8">
             <button 
-              onClick={() => navigate(-1)} 
+              onClick={goBack} 
               className="flex items-center gap-2 text-gray-600 hover:text-[#213448] font-bold mb-6 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useGoBack } from '../../utils/backNavigation';
 import { ArrowLeft } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
@@ -35,6 +36,7 @@ const GuideListingFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const editingId = id ? Number(id) : null;
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { accessToken, isAuthenticated, user } = useAuthStore();
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<Form>(initial);
@@ -97,7 +99,7 @@ const GuideListingFormPage: React.FC = () => {
     <div className="flex min-h-screen flex-col bg-gray-50 font-sans">
       <Header />
       <main className="container mx-auto max-w-4xl flex-grow px-4 py-10">
-        <button onClick={() => navigate(-1)} className="mb-6 flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-gray-900">
+        <button onClick={goBack} className="mb-6 flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-gray-900">
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
         <h1 className="text-3xl font-bold text-gray-900">{editingId ? 'Edit listing' : 'List a new experience'}</h1>

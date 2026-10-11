@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useGoBack } from '../utils/backNavigation';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import {
@@ -30,6 +31,7 @@ const allExperiences = [...kathmanduRichData, ...pokharaRichData, ...lalitpurRic
 const LocalProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { formatPrice } = useCurrency();
   const [guide, setGuide] = useState<Guide | null>(null);
   const [isBioExpanded, setIsBioExpanded] = useState(false);
@@ -115,7 +117,7 @@ const LocalProfilePage: React.FC = () => {
       <main className="flex-grow bg-gray-50/50">
         <div className="container mx-auto px-4 py-8 max-w-6xl">
           <button
-            onClick={() => navigate(-1)}
+            onClick={goBack}
             className="flex items-center gap-2 text-gray-600 hover:text-[#213448] font-bold mb-6 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />

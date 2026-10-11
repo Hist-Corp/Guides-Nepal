@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useGoBack } from '../../utils/backNavigation';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { ArrowLeft } from 'lucide-react';
@@ -345,6 +346,7 @@ const cultures: Record<string, CultureConfig> = {
 const FoodTourCulturePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const c = slug && cultures[slug] ? cultures[slug] : undefined;
 
   if (!c) {
@@ -387,7 +389,7 @@ const FoodTourCulturePage: React.FC = () => {
 
         {/* Navigation button */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={goBack}
           className="absolute top-8 left-4 z-20 flex items-center gap-2 text-white hover:text-brand-yellow font-bold transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
