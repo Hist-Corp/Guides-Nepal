@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '../utils/backNavigation';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { ArrowLeft, ArrowRight, X } from 'lucide-react';
@@ -7,6 +8,7 @@ import { Button } from '../components/common/Button';
 
 const ImpactReportPage: React.FC = () => {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [activeCard, setActiveCard] = useState<number | null>(null);
 
   const cardDetails = [
@@ -67,7 +69,7 @@ const ImpactReportPage: React.FC = () => {
       {/* Back Button (Fixed or Sticky) */}
       <div className="fixed top-24 left-4 z-50 md:left-8">
         <button 
-          onClick={() => navigate(-1)} 
+          onClick={goBack} 
           className="bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all group"
           aria-label="Go back"
         >

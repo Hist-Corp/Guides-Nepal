@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useGoBack } from '../../utils/backNavigation';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
@@ -8,7 +9,7 @@ import { useProfileStore } from '../../store/profileStore';
 import { Camera, Trash2, Bookmark, MapPin, Calendar, User as UserIcon, ArrowLeft } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
-  const navigate = useNavigate();
+  const goBack = useGoBack();
   const { user, login, accessToken } = useAuthStore();
   const { bookings } = useBookingStore();
   const { profile, updateProfile, addPhoto, removePhoto } = useProfileStore();
@@ -124,7 +125,7 @@ const ProfilePage: React.FC = () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                 <button
-                  onClick={() => navigate(-1)}
+                  onClick={goBack}
                   className="px-3 py-2 rounded-full bg-gray-100 text-gray-800 text-sm font-bold hover:bg-gray-200 transition-colors flex items-center gap-1"
                 >
                   <ArrowLeft className="w-4 h-4" /> Back

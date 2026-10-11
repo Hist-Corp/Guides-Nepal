@@ -3,10 +3,12 @@ import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { SlidersHorizontal, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '../../utils/backNavigation';
 import { lalitpurRichData } from '../../data/lalitpurRichData';
 
 export const LalitpurExperiencesPage: React.FC = () => {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [filterType, setFilterType] = useState('All');
 
   const filteredData = filterType === 'All' 
@@ -20,7 +22,7 @@ export const LalitpurExperiencesPage: React.FC = () => {
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-8">
            <button 
-             onClick={() => navigate(-1)} 
+             onClick={goBack} 
              className="flex items-center gap-2 text-gray-600 hover:text-brand-yellow font-bold mb-4 transition-colors"
            >
              <ArrowLeft className="w-5 h-5" />

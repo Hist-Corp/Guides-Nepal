@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useGoBack } from '../utils/backNavigation';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { 
@@ -56,6 +57,7 @@ const ReadMoreText = ({
 const SeoExperiencePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const data = seoExperiences[slug || ''];
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedCheckout, setSelectedCheckout] = useState('');
@@ -175,7 +177,7 @@ const SeoExperiencePage: React.FC = () => {
       <main className="flex-grow pt-8 pb-16">
         <div className="container mx-auto px-4 max-w-7xl">
           <button 
-            onClick={() => navigate(-1)} 
+            onClick={goBack} 
             className="flex items-center gap-2 text-gray-600 hover:text-primary font-bold mb-6 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />

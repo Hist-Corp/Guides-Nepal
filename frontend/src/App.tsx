@@ -19,6 +19,7 @@ import Cart from './components/common/Cart';
 import HomePage from './pages/HomePage';
 import SearchPage from './pages/SearchPage';
 import CanonicalExperienceRoute from './components/routing/CanonicalExperienceRoute';
+import BackNavigationTracker from './components/routing/BackNavigationTracker';
 import SeoExperiencePage from './pages/SeoExperiencePage';
 import CityPage from './pages/CityPage';
 import KathmanduPage from './pages/kathmandu/KathmanduPage';
@@ -109,6 +110,7 @@ function App() {
           <CmsEditMode />
           {isCmsPreview && <CmsPreviewBridge />}
           <ScrollToTop />
+          <BackNavigationTracker />
           <PageReveal />
           <GlobalImageFallback />
           <Cart isOpen={isCartOpen} onClose={closeCart} />

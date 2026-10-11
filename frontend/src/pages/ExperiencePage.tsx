@@ -25,6 +25,7 @@ import { MobileBookingSheet, SheetGuide } from '../components/common/MobileBooki
 import { NEPAL_IMAGES } from '../data/images';
 import { culturalTours } from './CulturalToursPage';
 import { outdoorActivities } from './OutdoorActivitiesPage';
+import { goBack } from '@/utils/backNavigation';
 
 interface Host {
   name: string;
@@ -537,11 +538,11 @@ const ExperiencePage: React.FC = () => {
         {/* Gallery Grid (Mobile: Carousel, Desktop: Grid) */}
         <div className="h-[40vh] md:h-[60vh] relative bg-slate-100">
           <button
-            onClick={() => navigate(cityPath)}
+            onClick={() => goBack(navigate)}
             className="absolute top-8 left-8 z-20 flex items-center gap-2 text-white hover:text-accent font-bold transition-colors bg-black/20 hover:bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full"
           >
             <ArrowLeft className="w-5 h-5" />
-            Back to {experience.city}
+            Back
           </button>
           {/* Simple single image for now, but could be a grid */}
           <img

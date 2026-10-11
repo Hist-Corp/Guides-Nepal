@@ -14,12 +14,14 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '../../utils/backNavigation';
 import { bhaktapurRichData } from '../../data/bhaktapurRichData';
 import { allGuides } from '../../data/guidesData';
 import { Price } from '../../components/common/Price';
 
 export const BhaktapurPage: React.FC = () => {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [showAllLocals, setShowAllLocals] = useState(false);
 
   // Filter guides who work in Bhaktapur
@@ -35,7 +37,7 @@ export const BhaktapurPage: React.FC = () => {
       <div className="relative pt-4 pb-16 overflow-hidden bg-[#FFF0E6]">
         <div className="container mx-auto px-4 relative z-10">
           <button
-            onClick={() => navigate(-1)}
+            onClick={goBack}
             className="flex items-center gap-2 text-gray-600 hover:text-[#213448] font-bold mb-6 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { StickyBarPortal } from '../../components/common/StickyBarPortal';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useGoBack } from '../../utils/backNavigation';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import {
@@ -62,6 +63,7 @@ const ReadMoreText = ({
 const BhaktapurExperiencePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [data, setData] = useState(bhaktapurRichData.find((d) => d.slug === slug));
 
   // Guide Selection State
@@ -92,7 +94,7 @@ const BhaktapurExperiencePage: React.FC = () => {
     [data, bookings]
   );
 
-const handleBookNow = async (): Promise<boolean> => {
+  const handleBookNow = async (): Promise<boolean> => {
     if (!isAuthenticated) {
       alert('Please log in to book an experience');
       return false;
@@ -174,7 +176,7 @@ const handleBookNow = async (): Promise<boolean> => {
     return success;
   };
 
-const handleSheetConfirm = async () => {
+  const handleSheetConfirm = async () => {
     if (!isAuthenticated) {
       setSheetError('Please log in to book an experience');
       return;
@@ -237,11 +239,8 @@ const handleSheetConfirm = async () => {
         <Header />
         <main className="flex-grow container mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold">Experience not found</h1>
-          <button
-            onClick={() => navigate('/city/bhaktapur')}
-            className="text-primary hover:underline mt-4"
-          >
-            Back to Bhaktapur
+          <button onClick={() => navigate('goBack')} className="text-primary hover:underline mt-4">
+            Back
           </button>
         </main>
         <Footer />
@@ -256,7 +255,7 @@ const handleSheetConfirm = async () => {
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12 max-w-6xl">
           <button
-            onClick={() => navigate(-1)}
+            onClick={goBack}
             className="flex items-center gap-2 text-gray-600 hover:text-[#213448] font-bold mb-6 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
