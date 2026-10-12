@@ -39,6 +39,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useProfileStore } from '../../store/profileStore';
 import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
 import { getAvailableGuides } from '../../utils/guides';
+import { isPredefinedTrip } from '../../utils/experienceBooking';
 
 const ReadMoreText = ({
   text,
@@ -82,6 +83,9 @@ const PokharaExperiencePage: React.FC = () => {
   // (see AnnapurnaReference.tsx) — sections like Packing List / Why Book are intentionally
   // not ported.
   const isABC = slug === 'annapurna-base-camp-trek';
+  // Pre-defined tours/trips (fixed multi-day itineraries) depart on a single
+  // chosen date, so they book one date instead of a check-in/check-out range.
+  const singleDateTrip = isPredefinedTrip(data);
 
   // Guide Selection State
   const [selectedGuide, setSelectedGuide] = useState<Guide | null>(null);
@@ -142,7 +146,7 @@ const PokharaExperiencePage: React.FC = () => {
     if (!checkIn) {
       const infoElement = document.getElementById('booking-info-message');
       if (infoElement) {
-        infoElement.textContent = isABC ? 'Please select a date' : 'Please select a check-in date';
+        infoElement.textContent = singleDateTrip ? 'Please select a date' : 'Please select a check-in date';
         infoElement.classList.remove('hidden');
         infoElement.classList.add('text-red-500');
       }
@@ -155,7 +159,7 @@ const PokharaExperiencePage: React.FC = () => {
       }
       return false;
     }
-    if (!isABC && !checkOut) {
+    if (!singleDateTrip && !checkOut) {
       const infoElement = document.getElementById('booking-info-message');
       if (infoElement) {
         infoElement.textContent = 'Please select a check-out date';
@@ -206,10 +210,10 @@ const PokharaExperiencePage: React.FC = () => {
       return;
     }
     if (!checkIn) {
-      setSheetError(isABC ? 'Please select a date' : 'Please select a check-in date');
+      setSheetError(singleDateTrip ? 'Please select a date' : 'Please select a check-in date');
       return;
     }
-    if (!isABC && !checkOut) {
+    if (!singleDateTrip && !checkOut) {
       setSheetError('Please select a check-out date');
       return;
     }
@@ -263,7 +267,7 @@ const PokharaExperiencePage: React.FC = () => {
         <Header />
         <main className="flex-grow container mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold">Experience not found</h1>
-          <button onClick={() => navigate('goBack')} className="text-primary hover:underline mt-4">
+          <button onClick={goBack} className="text-primary hover:underline mt-4">
             Back
           </button>
         </main>
@@ -552,11 +556,11 @@ const PokharaExperiencePage: React.FC = () => {
                           checkOut={checkOut}
                           onChange={(ci, co) => {
                             setCheckIn(ci);
-                            setCheckOut(isABC ? '' : co);
+                            setCheckOut(singleDateTrip ? '' : co);
                           }}
                           idPrefix="card"
-                          single={isABC}
-                          ariaLabel={isABC ? 'Select date, format DD/MM/YYYY' : undefined}
+                          single={singleDateTrip}
+                          ariaLabel={singleDateTrip ? 'Select date, format DD/MM/YYYY' : undefined}
                           compact={isABC}
                         />
 
@@ -567,7 +571,7 @@ const PokharaExperiencePage: React.FC = () => {
                           idPrefix="card"
                         />
 
-                        {!isABC && (
+                        {!singleDateTrip && (
                           <TimePicker
                             value={bookingTime}
                             onChange={setBookingTime}
@@ -687,7 +691,7 @@ const PokharaExperiencePage: React.FC = () => {
                           id="booking-info-message"
                           className="text-center text-xs font-medium hidden transition-all duration-300"
                         ></p>
-                        {isABC ? (
+                        {singleDateTrip ? (
                           <div className="text-center text-xs text-slate-500 space-y-2">
                             <p className="flex items-center justify-center gap-1.5">
                               <CheckCircle className="w-3.5 h-3.5 text-green-600" />
@@ -767,19 +771,19 @@ const PokharaExperiencePage: React.FC = () => {
                           <span className="text-gray-500">Date</span>
                           <span className="font-bold text-gray-900">
                             {new Date(checkIn).toLocaleDateString()}
-                            {!isABC &&
+                            {!singleDateTrip &&
                               days > 1 &&
                               checkOut &&
                               ` - ${new Date(checkOut).toLocaleDateString()}`}
                           </span>
                         </div>
-                        {!isABC && days > 1 && (
+                        {!singleDateTrip && days > 1 && (
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-500">Duration</span>
                             <span className="font-bold text-gray-900">{days} days</span>
                           </div>
                         )}
-                        {!isABC && (
+                        {!singleDateTrip && (
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-500">Time</span>
                             <span className="font-bold text-gray-900">{bookingTime}</span>
@@ -1275,17 +1279,17 @@ const PokharaExperiencePage: React.FC = () => {
           accentClass="bg-primary hover:bg-primary-hover"
           checkIn={checkIn}
           checkOut={checkOut}
-          singleDate={isABC}
+          singleDate={singleDateTrip}
           onDateChange={(ci, co) => {
             setCheckIn(ci);
-            setCheckOut(isABC ? '' : co);
+            setCheckOut(singleDateTrip ? '' : co);
           }}
           guests={guestCount}
           onGuestsChange={setGuestCount}
           maxGuests={6}
           bookingTime={bookingTime}
           onTimeChange={setBookingTime}
-          hideTime={isABC}
+          hideTime={singleDateTrip}
           guides={availableGuides}
           selectedGuide={selectedGuide}
           onSelectGuide={(g) => setSelectedGuide(g as Guide)}
@@ -1295,13 +1299,13 @@ const PokharaExperiencePage: React.FC = () => {
           confirmedSummary={
             <ul className="space-y-1">
               <li>
-                <span className="font-bold">{isABC ? 'Date:' : 'Dates:'}</span>{' '}
-                {isABC ? checkIn : `${checkIn} - ${checkOut}`}
+                <span className="font-bold">{singleDateTrip ? 'Date:' : 'Dates:'}</span>{' '}
+                {singleDateTrip ? checkIn : `${checkIn} - ${checkOut}`}
               </li>
               <li>
                 <span className="font-bold">Guests:</span> {guestCount}
               </li>
-              {!isABC && (
+              {!singleDateTrip && (
                 <li>
                   <span className="font-bold">Start time:</span> {bookingTime}
                 </li>

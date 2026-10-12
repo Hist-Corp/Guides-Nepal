@@ -1,6 +1,7 @@
 import React from 'react';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
+import { PageBackButton } from '../components/common/PageBackButton';
 import { Users, MapPin, Award, Heart } from 'lucide-react';
 import { useCmsSection, useSeoMeta } from '../hooks/useCms';
 
@@ -12,6 +13,7 @@ const AboutPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      <PageBackButton />
       <main className="flex-grow">
         {/* Hero Section */}
         <section data-cms-id="about-hero" data-cms-label="About Hero" className="bg-primary py-20 text-white">

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
+import { PageBackButton } from '../components/common/PageBackButton';
 import { Mail, Phone, MapPin, MessageCircle } from 'lucide-react';
 import { useCmsSection, useSeoMeta } from '../hooks/useCms';
 import { sendContactMessage } from '../services/publicApi';
@@ -37,6 +38,7 @@ const ContactPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      <PageBackButton />
       <main className="flex-grow">
         <section data-cms-id="contact-hero" data-cms-label="Contact Hero" className="bg-primary py-20 text-white">
           <div className="container mx-auto px-4 text-center">

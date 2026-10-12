@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
+import { PageBackButton } from '../../components/common/PageBackButton';
 import { Button } from '../../components/common/Button';
 import {
   Calendar,
@@ -64,6 +65,7 @@ const BecomeHostPage: React.FC = () => {
   return (
     <div className="min-h-screen font-sans bg-white text-gray-900">
       <Header />
+      <PageBackButton />
 
       <main className="flex-grow">
         {/* Hero Section */}

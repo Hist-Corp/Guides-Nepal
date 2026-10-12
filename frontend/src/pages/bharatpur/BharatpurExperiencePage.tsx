@@ -26,6 +26,7 @@ import { useBookingStore } from '../../store/bookingStore';
 import { useAuthStore } from '../../store/authStore';
 import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
 import { getAvailableGuides } from '../../utils/guides';
+import { isPredefinedTrip } from '../../utils/experienceBooking';
 
 const ReadMoreText = ({
   text,
@@ -65,6 +66,9 @@ const BharatpurExperiencePage: React.FC = () => {
   const navigate = useNavigate();
   const goBack = useGoBack();
   const [data, setData] = useState(bharatpurRichData.find((d) => d.slug === slug));
+  // Pre-defined tours/trips (fixed multi-day itineraries) depart on a single
+  // chosen date, so they book one date instead of a check-in/check-out range.
+  const singleDateTrip = isPredefinedTrip(data);
 
   // Guide Selection State
   const [selectedGuide, setSelectedGuide] = useState<Guide | null>(null);
@@ -102,7 +106,7 @@ const BharatpurExperiencePage: React.FC = () => {
     if (!checkIn) {
       const infoElement = document.getElementById('booking-info-message');
       if (infoElement) {
-        infoElement.textContent = 'Please select a check-in date';
+        infoElement.textContent = singleDateTrip ? 'Please select a date' : 'Please select a check-in date';
         infoElement.classList.remove('hidden');
         infoElement.classList.add('text-red-500');
       }
@@ -117,7 +121,7 @@ const BharatpurExperiencePage: React.FC = () => {
       return false;
     }
 
-    if (!checkOut) {
+    if (!singleDateTrip && !checkOut) {
       const infoElement = document.getElementById('booking-info-message');
       if (infoElement) {
         infoElement.textContent = 'Please select a check-out date';
@@ -173,10 +177,10 @@ const BharatpurExperiencePage: React.FC = () => {
       return;
     }
     if (!checkIn) {
-      setSheetError('Please select a check-in date');
+      setSheetError(singleDateTrip ? 'Please select a date' : 'Please select a check-in date');
       return;
     }
-    if (!checkOut) {
+    if (!singleDateTrip && !checkOut) {
       setSheetError('Please select a check-out date');
       return;
     }
@@ -229,7 +233,7 @@ const BharatpurExperiencePage: React.FC = () => {
         <Header />
         <main className="flex-grow container mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold">Experience not found</h1>
-          <button onClick={() => navigate('goBack')} className="text-primary hover:underline mt-4">
+          <button onClick={goBack} className="text-primary hover:underline mt-4">
             Backr
           </button>
         </main>
@@ -477,9 +481,10 @@ const BharatpurExperiencePage: React.FC = () => {
                           checkOut={checkOut}
                           onChange={(ci, co) => {
                             setCheckIn(ci);
-                            setCheckOut(co);
+                            setCheckOut(singleDateTrip ? '' : co);
                           }}
                           idPrefix="card"
+                          single={singleDateTrip}
                         />
 
                         <GuestPicker
@@ -489,7 +494,9 @@ const BharatpurExperiencePage: React.FC = () => {
                           idPrefix="card"
                         />
 
-                        <TimePicker value={bookingTime} onChange={setBookingTime} idPrefix="card" />
+                        {!singleDateTrip && (
+                          <TimePicker value={bookingTime} onChange={setBookingTime} idPrefix="card" />
+                        )}
 
                         {/* Selected Guide Preview */}
                         {selectedGuide && (
@@ -589,21 +596,24 @@ const BharatpurExperiencePage: React.FC = () => {
                           <span className="text-gray-500">Date</span>
                           <span className="font-bold text-gray-900">
                             {new Date(checkIn).toLocaleDateString()}
-                            {days > 1 &&
+                            {!singleDateTrip &&
+                              days > 1 &&
                               checkOut &&
                               ` - ${new Date(checkOut).toLocaleDateString()}`}
                           </span>
                         </div>
-                        {days > 1 && (
+                        {!singleDateTrip && days > 1 && (
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-500">Duration</span>
                             <span className="font-bold text-gray-900">{days} days</span>
                           </div>
                         )}
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-500">Time</span>
-                          <span className="font-bold text-gray-900">{bookingTime}</span>
-                        </div>
+                        {!singleDateTrip && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-500">Time</span>
+                            <span className="font-bold text-gray-900">{bookingTime}</span>
+                          </div>
+                        )}
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-500">Guests</span>
                           <span className="font-bold text-gray-900">{guestCount}</span>
@@ -883,15 +893,17 @@ const BharatpurExperiencePage: React.FC = () => {
           accentClass="bg-primary hover:bg-primary-hover"
           checkIn={checkIn}
           checkOut={checkOut}
+          singleDate={singleDateTrip}
           onDateChange={(ci, co) => {
             setCheckIn(ci);
-            setCheckOut(co);
+            setCheckOut(singleDateTrip ? '' : co);
           }}
           guests={guestCount}
           onGuestsChange={setGuestCount}
           maxGuests={6}
           bookingTime={bookingTime}
           onTimeChange={setBookingTime}
+          hideTime={singleDateTrip}
           guides={availableGuides}
           selectedGuide={selectedGuide}
           onSelectGuide={(g) => setSelectedGuide(g as Guide)}
@@ -901,14 +913,17 @@ const BharatpurExperiencePage: React.FC = () => {
           confirmedSummary={
             <ul className="space-y-1">
               <li>
-                <span className="font-bold">Dates:</span> {checkIn} - {checkOut}
+                <span className="font-bold">{singleDateTrip ? 'Date:' : 'Dates:'}</span>{' '}
+                {singleDateTrip ? checkIn : `${checkIn} - ${checkOut}`}
               </li>
               <li>
                 <span className="font-bold">Guests:</span> {guestCount}
               </li>
-              <li>
-                <span className="font-bold">Start time:</span> {bookingTime}
-              </li>
+              {!singleDateTrip && (
+                <li>
+                  <span className="font-bold">Start time:</span> {bookingTime}
+                </li>
+              )}
               {selectedGuide && (
                 <li>
                   <span className="font-bold">Guide:</span> {selectedGuide.name}

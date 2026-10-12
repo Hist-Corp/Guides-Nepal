@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, Link, Navigate } from 'react-router-dom';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
+import { PageBackButton } from '../components/common/PageBackButton';
 import { Search, Star, Clock, MapPin, X, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { getCatalogSearchExperiences } from '../utils/canonicalExperience';
 import guidesApi from '../services/guidesApi';
@@ -136,6 +137,7 @@ export const SearchPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
+      <PageBackButton />
       <main className="flex-grow">
         <section className="bg-primary py-12">
           <div className="container mx-auto px-4">
