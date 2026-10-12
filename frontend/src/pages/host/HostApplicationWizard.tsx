@@ -6,6 +6,7 @@ import { Footer } from '../../components/common/Footer';
 import { Button } from '../../components/common/Button';
 import { API_BASE_URL } from '../../config/api';
 import { trackEvent } from '../../utils/analytics';
+import { useGoBack } from '../../utils/backNavigation';
 import { ArrowLeft, ArrowRight, CheckCircle2, Lock, Upload as UploadIcon } from 'lucide-react';
 
 type Draft = {
@@ -107,6 +108,7 @@ const validStep = (step: number, d: Draft) =>
 
 export default function HostApplicationWizard() {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState(loadDraft);
   const [files, setFiles] = useState<Record<FileKey, File | null>>({
@@ -212,7 +214,7 @@ export default function HostApplicationWizard() {
   return (
     <Shell>
       <button
-        onClick={() => navigate('/become-host')}
+        onClick={goBack}
         className="mb-5 inline-flex items-center gap-2 text-sm text-gray-600"
       >
         <ArrowLeft className="h-4 w-4" />

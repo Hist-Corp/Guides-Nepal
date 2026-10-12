@@ -1,4 +1,8 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from 'react';
+import { useBookingStore } from '../store/bookingStore';
+import { buildBookingCartItem } from '../utils/bookingCart';
+
+const BOOKING_CART_PREFIX = 'booking-';
 
 export interface CartItem {
   id: string;
@@ -38,6 +42,37 @@ interface CartProviderProps {
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
+
+  // Mirror confirmed bookings into the cart. Any upcoming booking not yet
+  // shown in the cart is added, and a line whose booking is no longer upcoming
+  // (cancelled) drops out, so the cart always reflects the traveler's bookings.
+  const bookings = useBookingStore((state) => state.bookings);
+  const trackedBookings = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    const upcomingIds = new Set(
+      bookings.filter((booking) => booking.status === 'upcoming').map((booking) => booking.id)
+    );
+    const fresh = bookings.filter(
+      (booking) => upcomingIds.has(booking.id) && !trackedBookings.current.has(booking.id)
+    );
+    trackedBookings.current = upcomingIds;
+
+    setItems((prev) => {
+      const kept = prev.filter((item) => {
+        if (!item.id.startsWith(BOOKING_CART_PREFIX)) return true;
+        return upcomingIds.has(item.id.slice(BOOKING_CART_PREFIX.length));
+      });
+      const existingIds = new Set(kept.map((item) => item.id));
+      const additions = fresh
+        .map(buildBookingCartItem)
+        .filter((item) => !existingIds.has(item.id));
+      if (additions.length === 0 && kept.length === prev.length && kept.every((item, i) => item === prev[i])) {
+        return prev;
+      }
+      return [...kept, ...additions];
+    });
+  }, [bookings]);
 
   const addItem = useCallback((newItem: Omit<CartItem, 'id' | 'quantity'>) => {
     setItems(prevItems => {

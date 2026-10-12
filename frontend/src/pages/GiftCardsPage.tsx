@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
+import { PageBackButton } from '../components/common/PageBackButton';
 import { Gift, Heart, PartyPopper, Sparkles } from 'lucide-react';
 
 const giftCardAmounts = [25, 50, 100, 200];
@@ -14,6 +15,7 @@ const GiftCardsPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      <PageBackButton />
       <main className="flex-grow">
         <section className="bg-gradient-to-r from-primary to-primary-hover py-20 text-white">
           <div className="container mx-auto px-4 text-center">

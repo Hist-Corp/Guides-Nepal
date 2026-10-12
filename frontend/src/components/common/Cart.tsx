@@ -51,51 +51,60 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
               </div>
             ) : (
               <div className="space-y-4">
-                {items.map((item) => (
-                  <div key={item.id} className="flex items-center space-x-4 p-4 border rounded-lg">
-                    {item.image && (
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="h-16 w-16 object-cover rounded"
-                      />
-                    )}
-                    
-                    <div className="flex-1">
-                      <h3 className="font-medium">{item.title}</h3>
-                      {item.description && (
-                        <p className="text-sm text-gray-600">{item.description}</p>
+                {items.map((item) => {
+                  const isBookingLine = item.id.startsWith('booking-');
+                  return (
+                    <div key={item.id} className="flex items-center space-x-4 p-4 border rounded-lg">
+                      {item.image && (
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="h-16 w-16 object-cover rounded"
+                        />
                       )}
-                      <p className="text-sm text-gray-500 capitalize">{item.category}</p>
-                      <p className="font-semibold text-primary">
-                        {formatPrice(item.price, item.currency)} each
-                      </p>
-                    </div>
 
-                    <div className="flex items-center space-x-2">
+                      <div className="flex-1">
+                        <h3 className="font-medium">{item.title}</h3>
+                        {item.description && (
+                          <p className="text-sm text-gray-600">{item.description}</p>
+                        )}
+                        <p className="text-sm text-gray-500 capitalize">{item.category}</p>
+                        <p className="font-semibold text-primary">
+                          {formatPrice(item.price, item.currency)}
+                          {item.quantity > 1 && ' each'}
+                        </p>
+                      </div>
+
+                      {/* Booking lines have a fixed guest count, so the quantity
+                          stepper only applies to regular cart items. */}
+                      {!isBookingLine && (
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            className="p-1 hover:bg-gray-100 rounded"
+                          >
+                            <Minus className="h-4 w-4" />
+                          </button>
+                          <span className="w-8 text-center">{item.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            className="p-1 hover:bg-gray-100 rounded"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </button>
+                        </div>
+                      )}
+
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="p-1 hover:bg-gray-100 rounded"
+                        onClick={() => removeItem(item.id)}
+                        className="p-1 hover:bg-gray-100 rounded text-red-500"
+                        title="Remove from cart"
                       >
-                        <Minus className="h-4 w-4" />
-                      </button>
-                      <span className="w-8 text-center">{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="p-1 hover:bg-gray-100 rounded"
-                      >
-                        <Plus className="h-4 w-4" />
+                        <X className="h-4 w-4" />
                       </button>
                     </div>
-
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className="p-1 hover:bg-gray-100 rounded text-red-500"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

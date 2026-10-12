@@ -16,6 +16,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { getCanonicalExperienceBySlug } from '../utils/canonicalExperience';
+import { useGoBack } from '../utils/backNavigation';
 
 const outdoorLocals = [
   {
@@ -127,6 +128,7 @@ export const outdoorActivities = [
 
 export const OutdoorActivitiesPage: React.FC = () => {
   const navigate = useNavigate();
+  const goBack = useGoBack();
   const { formatPrice } = useCurrency();
   const [showAllLocals, setShowAllLocals] = useState(false);
   const displayedLocals = showAllLocals ? outdoorLocals : outdoorLocals.slice(0, 5);
@@ -140,7 +142,7 @@ export const OutdoorActivitiesPage: React.FC = () => {
       <div className="relative pt-4 pb-16 overflow-hidden bg-[#E0F2FE]">
         <div className="container mx-auto px-4 relative z-10">
           <button
-            onClick={() => navigate(-1)}
+            onClick={goBack}
             className="flex items-center gap-2 text-gray-600 hover:text-[#213448] font-bold mb-6 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />

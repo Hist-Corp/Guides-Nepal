@@ -1,11 +1,13 @@
 import React from 'react';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
+import { PageBackButton } from '../components/common/PageBackButton';
 
 const TermsPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      <PageBackButton />
       <main className="flex-grow">
         <section className="bg-primary py-20 text-white">
           <div className="container mx-auto px-4 text-center">
