@@ -74,6 +74,7 @@ import RealGoodTravelPage from './pages/RealGoodTravelPage';
 import { FoodToursPage } from './pages/FoodToursPage';
 import CulturalToursPage from './pages/CulturalToursPage';
 import OutdoorActivitiesPage from './pages/OutdoorActivitiesPage';
+import TrekHikingPage from './pages/TrekHikingPage';
 import CookingClassesPage from './pages/CookingClassesPage';
 import CookingExperiencePage from './pages/cooking/CookingExperiencePage';
 import CookingExperiencesPage from './pages/cooking/CookingExperiencesPage';
@@ -123,6 +124,7 @@ function App() {
             <Route path="/food-tours/culture/:slug" element={<FoodTourCulturePage />} />
             <Route path="/cultural-tours" element={<CulturalToursPage />} />
             <Route path="/outdoor-activities" element={<OutdoorActivitiesPage />} />
+            <Route path="/trek-hiking" element={<TrekHikingPage />} />
             <Route path="/cooking-classes" element={<CookingClassesPage />} />
             <Route path="/cooking-classes/experiences" element={<CookingExperiencesPage />} />
             <Route path="/cooking-classes/experience/:slug" element={<CookingExperiencePage />} />

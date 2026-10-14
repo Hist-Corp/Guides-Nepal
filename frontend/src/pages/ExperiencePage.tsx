@@ -23,8 +23,10 @@ import { BookingCalendar } from '../components/common/BookingCalendar';
 import { GuestPicker } from '../components/common/GuestPicker';
 import { MobileBookingSheet, SheetGuide } from '../components/common/MobileBookingSheet';
 import { NEPAL_IMAGES } from '../data/images';
+import { trekRouteContent, type TrekRouteContent } from '../data/trekRoutesData';
 import { culturalTours } from './CulturalToursPage';
 import { outdoorActivities } from './OutdoorActivitiesPage';
+import { trekRoutes } from './TrekHikingPage';
 import { goBack } from '@/utils/backNavigation';
 
 interface Host {
@@ -47,6 +49,15 @@ interface Experience {
   description: string;
   highlights: string[];
   host: Host;
+  // Trek route extras — only set for the /trek-hiking catalog.
+  tagline?: string;
+  itinerary?: TrekRouteContent['itinerary'];
+  includes?: string[];
+  meetingPoint?: string;
+  bestSeason?: string;
+  grade?: string;
+  maxAltitude?: string;
+  region?: string;
 }
 
 // Extended mock data for experiences
@@ -269,10 +280,16 @@ const experiencesData: Record<string, Experience> = {
 const inferCityFromSlug = (slug: string): string => {
   if (slug.includes('pokhara')) return 'Pokhara';
   if (slug.includes('bhaktapur')) return 'Bhaktapur';
+  if (slug.includes('changu')) return 'Bhaktapur';
   if (slug.includes('patan') || slug.includes('lalitpur')) return 'Lalitpur';
   if (slug.includes('chitwan') || slug.includes('bharatpur')) return 'Bharatpur';
   if (slug.includes('everest')) return 'Everest Region';
-  if (slug.includes('annapurna')) return 'Annapurna Region';
+  if (slug.includes('khopra') || slug.includes('mardi')) return 'Annapurna Region';
+  if (slug.includes('annapurna') || slug.includes('poon')) return 'Annapurna Region';
+  if (slug.includes('langtang')) return 'Langtang Region';
+  if (slug.includes('helambu') || slug.includes('gosainkunda')) return 'Helambu & Langtang';
+  if (slug.includes('shivapuri')) return 'Shivapuri National Park';
+  if (slug.includes('dhulikhel')) return 'Dhulikhel';
   if (slug.includes('trishuli')) return 'Trishuli River';
   if (slug.includes('nagarkot')) return 'Nagarkot';
   return 'Kathmandu';
@@ -284,6 +301,50 @@ const categoryPortraits = [
   'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&h=200&q=80',
   'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&h=200&q=80',
 ];
+
+// Resolve the Trek/Hiking catalog (exported from the /trek-hiking page) into
+// full detail entries with editorial content from trekRoutesData, so every
+// trek card links to a complete route page with itinerary and inclusions.
+const trekHostPortraits = [
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&h=200&q=80',
+  'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=200&h=200&q=80',
+  'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&h=200&q=80',
+  'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&h=200&q=80',
+];
+
+trekRoutes.forEach((trek, index) => {
+  if (!trek?.slug || experiencesData[trek.slug]) return;
+  const content = trekRouteContent[trek.slug];
+  if (!content) return;
+  const hostName = trek.locals?.[0] ?? 'Local guide';
+  experiencesData[trek.slug] = {
+    id: trek.id,
+    title: trek.title,
+    city: inferCityFromSlug(trek.slug),
+    rating: trek.rating,
+    reviews: trek.reviews,
+    price: trek.price,
+    duration: trek.duration,
+    images: [trek.image, ...content.gallery],
+    description: content.description,
+    highlights: content.highlights,
+    host: {
+      name: hostName,
+      image: trekHostPortraits[index % trekHostPortraits.length],
+      rating: trek.rating,
+      reviews: trek.reviews,
+      about: `${hostName} is a licensed trekking guide who leads this route in ${trek.region}. Expect a safe acclimatisation plan, honest pace-setting and the teahouses and viewpoints that don't make it into the guidebooks.`,
+    },
+    tagline: content.tagline,
+    itinerary: content.itinerary,
+    includes: content.includes,
+    meetingPoint: content.meetingPoint,
+    bestSeason: content.bestSeason,
+    grade: trek.grade,
+    maxAltitude: trek.maxAltitude,
+    region: trek.region,
+  };
+});
 
 [...culturalTours, ...outdoorActivities].forEach((tour, index) => {
   if (!tour?.slug || experiencesData[tour.slug]) return;
@@ -387,7 +448,7 @@ const ExperiencePage: React.FC = () => {
   const { addBooking } = useBookingStore();
   const { isAuthenticated } = useAuthStore();
   const [isBooked, setIsBooked] = useState(false);
-  const { addBookmark } = useProfileStore();
+  const { profile, addBookmark, removeBookmark } = useProfileStore();
 
   // Booking form state (date + guests)
   const [selectedDate, setSelectedDate] = useState('');
@@ -479,10 +540,17 @@ const ExperiencePage: React.FC = () => {
     if (wasConfirmed) navigate('/bookings');
   };
 
+  const bookmarkId = experience ? `exp-${experience.id}` : '';
+  const isBookmarked = profile.bookmarks.some((bookmark) => bookmark.id === bookmarkId);
+
   const handleBookmark = () => {
     if (!experience) return;
+    if (isBookmarked) {
+      removeBookmark(bookmarkId);
+      return;
+    }
     addBookmark({
-      id: `exp-${experience.id}`,
+      id: bookmarkId,
       title: experience.title,
       city: experience.city,
       image: experience.images[0],
@@ -556,6 +624,24 @@ const ExperiencePage: React.FC = () => {
           </div>
         </div>
 
+        {/* Gallery thumbnails (routes with extra images, e.g. treks) */}
+        {experience.images.length > 1 && (
+          <div className="container mx-auto px-4 pt-4">
+            <div className="grid grid-cols-4 gap-2">
+              {experience.images.slice(0, 4).map((image, index) => (
+                <div key={index} className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100">
+                  <img
+                    src={image}
+                    alt={`${experience.title} photo ${index + 1}`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col lg:flex-row gap-12">
             {/* Left Content */}
@@ -568,6 +654,9 @@ const ExperiencePage: React.FC = () => {
                 <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4">
                   {experience.title}
                 </h1>
+                {experience.tagline && (
+                  <p className="text-lg text-slate-600 mb-4 leading-relaxed">{experience.tagline}</p>
+                )}
                 <div className="flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-1 font-bold">
                     <Star className="w-4 h-4 fill-secondary text-secondary" />
@@ -621,6 +710,75 @@ const ExperiencePage: React.FC = () => {
                   ))}
                 </ul>
               </div>
+
+              {/* Trek route facts: grade, altitude, season, meeting point */}
+              {(experience.grade || experience.maxAltitude || experience.region) && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { label: 'Difficulty', value: experience.grade },
+                    { label: 'Max altitude', value: experience.maxAltitude },
+                    { label: 'Region', value: experience.region },
+                    { label: 'Best season', value: experience.bestSeason },
+                  ]
+                    .filter((fact) => fact.value)
+                    .map((fact) => (
+                      <div
+                        key={fact.label}
+                        className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm"
+                      >
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                          {fact.label}
+                        </p>
+                        <p className="font-bold text-slate-900">{fact.value}</p>
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              {/* Day-by-day itinerary */}
+              {experience.itinerary && experience.itinerary.length > 0 && (
+                <div>
+                  <h2 className="text-2xl font-bold mb-6">Day by day itinerary</h2>
+                  <ol className="relative border-l-2 border-slate-200 ml-3 space-y-8">
+                    {experience.itinerary.map((day, index) => (
+                      <li key={index} className="ml-6">
+                        <span className="absolute -left-[11px] flex items-center justify-center w-5 h-5 rounded-full bg-secondary ring-4 ring-background-cream" />
+                        <p className="text-xs font-bold uppercase tracking-wider text-secondary mb-1">
+                          {day.day}
+                        </p>
+                        <h3 className="font-bold text-lg text-slate-900 mb-1">{day.title}</h3>
+                        <p className="text-slate-600 leading-relaxed">{day.detail}</p>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+
+              {/* What's included + meeting point */}
+              {(experience.includes?.length || experience.meetingPoint) && (
+                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                  <h2 className="text-2xl font-bold mb-6">What&apos;s included</h2>
+                  {experience.includes && (
+                    <ul className="grid md:grid-cols-2 gap-3">
+                      {experience.includes.map((item: string, index: number) => (
+                        <li key={index} className="flex items-start gap-3 text-slate-700">
+                          <CheckCircle className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {experience.meetingPoint && (
+                    <div className="mt-6 pt-6 border-t border-slate-100 flex items-start gap-3">
+                      <MapPin className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold text-sm text-slate-900">Meeting point</p>
+                        <p className="text-slate-600 text-sm">{experience.meetingPoint}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Host Section */}
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
@@ -763,9 +921,15 @@ const ExperiencePage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleBookmark}
-                  className="w-full border border-gray-200 hover:border-primary text-primary font-bold py-3 rounded-xl mt-3 flex items-center justify-center gap-2"
+                  aria-pressed={isBookmarked}
+                  className={`w-full border font-bold py-3 rounded-xl mt-3 flex items-center justify-center gap-2 transition-colors ${
+                    isBookmarked
+                      ? 'border-primary bg-primary/5 text-primary'
+                      : 'border-gray-200 hover:border-primary text-primary'
+                  }`}
                 >
-                  <Bookmark className="w-4 h-4" /> Save for later
+                  <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
+                  {isBookmarked ? 'Saved — remove bookmark' : 'Save for later'}
                 </button>
               </div>
             </div>

@@ -4,9 +4,10 @@ import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { Button } from '../components/common/Button';
 import { Price } from '../components/common/Price';
-import { Star, ChevronLeft, ChevronRight, Heart, ArrowRight } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { NEPAL_IMAGES } from '../data/images';
 import { getCatalogSearchExperiences } from '../utils/canonicalExperience';
+import { BookmarkButton } from '../components/common/BookmarkButton';
 
 // --- Mock Data ---
 
@@ -163,8 +164,15 @@ const ExplorePage: React.FC = () => {
                 to={item.link}
                 className="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group relative flex flex-col focus:outline-none focus:ring-2 focus:ring-brand-yellow focus:ring-offset-2"
               >
-                <div className="absolute top-3 right-3 z-10 bg-white/80 backdrop-blur-sm p-1.5 rounded-full">
-                  <Heart className="w-4 h-4 text-slate-500 group-hover:text-red-500 transition-colors" />
+                <div className="absolute top-3 right-3 z-10">
+                  <BookmarkButton
+                    id={`explore-${item.id}`}
+                    title={item.title}
+                    image={item.image}
+                    link={item.link}
+                    className="bg-white/80 backdrop-blur-sm p-1.5 rounded-full hover:bg-white transition-colors"
+                    iconClassName="w-4 h-4 text-slate-500"
+                  />
                 </div>
                 <div className="h-40 sm:h-44 overflow-hidden">
                   <img

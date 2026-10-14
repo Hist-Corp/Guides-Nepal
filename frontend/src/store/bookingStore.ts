@@ -22,6 +22,9 @@ interface BookingStore {
   bookings: Booking[];
   addBooking: (booking: Booking) => Promise<boolean>;
   cancelBooking: (id: string) => void;
+  /** Fully removes the booking record — the cancel step keeps its own status
+   * transition, so cancelling and deleting a booking are separate intents. */
+  deleteBooking: (id: string) => void;
   archiveBooking: (id: string) => void;
 }
 
@@ -70,6 +73,10 @@ export const useBookingStore = create<BookingStore>()(
           bookings: state.bookings.map((b) => 
             b.id === id ? { ...b, status: 'cancelled' } : b
           )
+        })),
+      deleteBooking: (id) =>
+        set((state) => ({
+          bookings: state.bookings.filter((b) => b.id !== id)
         })),
       archiveBooking: (id) =>
         set((state) => ({

@@ -14,6 +14,7 @@ const registeredRoutes: string[] = [
   '/food-tours/culture/:slug',
   '/cultural-tours',
   '/outdoor-activities',
+  '/trek-hiking',
   '/cooking-classes',
   '/cooking-classes/experiences',
   '/cooking-classes/experience/:slug',

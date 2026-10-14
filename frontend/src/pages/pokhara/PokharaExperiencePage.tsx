@@ -12,7 +12,6 @@ import {
   ShieldCheck,
   Globe,
   X,
-  Heart,
   User,
   Clock,
   MapPin,
@@ -40,6 +39,7 @@ import { useProfileStore } from '../../store/profileStore';
 import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
 import { getAvailableGuides } from '../../utils/guides';
 import { isPredefinedTrip } from '../../utils/experienceBooking';
+import { BookmarkButton } from '../../components/common/BookmarkButton';
 
 const ReadMoreText = ({
   text,
@@ -112,7 +112,7 @@ const PokharaExperiencePage: React.FC = () => {
   const addBooking = useBookingStore((s) => s.addBooking);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { profile, addBookmark, removeBookmark } = useProfileStore();
-  const bookmarkId = data ? `pokhara-${data.id}` : '';
+  const bookmarkId = data ? `exp-${data.slug}` : '';
   const isSaved = bookmarkId ? profile.bookmarks.some((b) => b.id === bookmarkId) : false;
   const [saveFlash, setSaveFlash] = useState(false);
   const availableGuides = useMemo(
@@ -328,8 +328,16 @@ const PokharaExperiencePage: React.FC = () => {
                     alt={data.title}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm">
-                    <Heart className="w-5 h-5 text-gray-700 hover:text-primary cursor-pointer transition-colors" />
+                  <div className="absolute top-4 right-4 z-10">
+                    <BookmarkButton
+                      variant="badge"
+                      id={`exp-${data.slug}`}
+                      title={data.title}
+                      city={data.city}
+                      image={data.heroImage}
+                      link={`/city/pokhara/experience/${data.slug}`}
+                      iconClassName="w-5 h-5"
+                    />
                   </div>
                 </div>
               )}
