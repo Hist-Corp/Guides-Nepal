@@ -67,6 +67,7 @@ const CATEGORY_LINKS: { text: string; to: string }[] = [
   { text: 'Food Tours', to: '/food-tours' },
   { text: 'Cultural Tours', to: '/cultural-tours' },
   { text: 'Outdoor Activities', to: '/outdoor-activities' },
+  { text: 'Trek/Hiking', to: '/trek-hiking' },
   { text: 'Cooking Classes', to: '/cooking-classes' },
 ];
 

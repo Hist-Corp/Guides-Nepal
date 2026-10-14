@@ -2,6 +2,9 @@ import React from 'react';
 import { X, Plus, Minus, ShoppingCart } from 'lucide-react';
 import { useCart } from '../../contexts/CartContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
+import { useBookingStore } from '../../store/bookingStore';
+
+const BOOKING_CART_PREFIX = 'booking-';
 
 interface CartProps {
   isOpen: boolean;
@@ -11,8 +14,22 @@ interface CartProps {
 const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
   const { items, removeItem, updateQuantity, getTotalItems, getTotalPrice } = useCart();
   const { formatPrice } = useCurrency();
+  const cancelBooking = useBookingStore((state) => state.cancelBooking);
+  const deleteBooking = useBookingStore((state) => state.deleteBooking);
 
   if (!isOpen) return null;
+
+  // Booking lines mirror real bookings: removing one cancels the booking
+  // (status → cancelled, releasing the reserved guide) and deletes the booking
+  // record, so "Remove from cart" is a true cancellation, not just a UI hide.
+  const handleRemove = (itemId: string) => {
+    if (itemId.startsWith(BOOKING_CART_PREFIX)) {
+      const bookingId = itemId.slice(BOOKING_CART_PREFIX.length);
+      cancelBooking(bookingId);
+      deleteBooking(bookingId);
+    }
+    removeItem(itemId);
+  };
 
   const handleCheckout = () => {
     // Implement checkout logic here
@@ -96,9 +113,18 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                       )}
 
                       <button
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => handleRemove(item.id)}
                         className="p-1 hover:bg-gray-100 rounded text-red-500"
-                        title="Remove from cart"
+                        title={
+                          isBookingLine
+                            ? 'Cancel and delete this booking'
+                            : 'Remove from cart'
+                        }
+                        aria-label={
+                          isBookingLine
+                            ? 'Cancel and delete this booking'
+                            : 'Remove from cart'
+                        }
                       >
                         <X className="h-4 w-4" />
                       </button>

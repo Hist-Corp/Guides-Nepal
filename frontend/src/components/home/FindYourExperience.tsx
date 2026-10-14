@@ -17,6 +17,7 @@ const tiles: ExperienceTypeTile[] = [
   { emoji: '🍕', word: 'Delicious', label: 'Food tours', path: '/food-tours' },
   { emoji: '🚶', word: 'Amazing', label: 'Walking tour', path: '/cultural-tours' },
   { emoji: '⛰️', word: 'Gorgeous', label: 'Day trips', path: '/outdoor-activities' },
+  { emoji: '🥾', word: 'Adventurous', label: 'Trek/Hiking', path: '/trek-hiking' },
   { emoji: '👨‍👩‍👧', word: 'Memories', label: 'With the family', path: '/most-popular' },
   { emoji: '🌙', word: 'Enchanting', label: 'Night tour', path: '/explore' },
   { emoji: '🚴', word: 'Active', label: 'Bike tour', path: '/outdoor-activities' },
@@ -80,7 +81,10 @@ export const FindYourExperience: React.FC = () => {
           {tiles.map((tile, index) => (
             <div
               key={tile.label}
-              className={'w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-1rem)] max-w-[430px] ' + (inView ? 'animate-fade-in-up' : 'opacity-0')}
+              className={
+                'w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-1rem)] max-w-[430px] ' +
+                (inView ? 'animate-fade-in-up' : 'opacity-0')
+              }
               style={{ animationDelay: index * 90 + 'ms' }}
             >
               <Link
@@ -88,19 +92,23 @@ export const FindYourExperience: React.FC = () => {
                 className="group flex h-full items-center gap-4 rounded-2xl border border-peach bg-peach/25 px-5 py-4 text-left transition-all duration-300 ease-out hover:-translate-y-1 hover:border-brand-yellow/70 hover:bg-peach/40 hover:shadow-[0_10px_26px_rgba(33,52,72,0.12)]"
                 aria-label={tile.word + ' — ' + tile.label}
               >
-                <span aria-hidden className="text-3xl leading-none transition-transform duration-300 group-hover:scale-110">
+                <span
+                  aria-hidden
+                  className="text-3xl leading-none transition-transform duration-300 group-hover:scale-110"
+                >
                   {tile.emoji}
                 </span>
                 <span className="flex flex-col">
                   <span className="text-sm font-semibold leading-tight text-secondary">
                     {tile.word}
                   </span>
-                  <span className="text-lg font-bold leading-snug text-primary">
-                    {tile.label}
-                  </span>
+                  <span className="text-lg font-bold leading-snug text-primary">{tile.label}</span>
                 </span>
                 <span className="ml-auto grid h-8 w-8 shrink-0 place-items-center rounded-full text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-white">
-                  <ChevronRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-0.5" strokeWidth={2.5} />
+                  <ChevronRight
+                    className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-0.5"
+                    strokeWidth={2.5}
+                  />
                 </span>
               </Link>
             </div>

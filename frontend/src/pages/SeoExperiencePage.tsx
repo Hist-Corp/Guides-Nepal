@@ -5,7 +5,7 @@ import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { 
   Check, MapPin, Wifi, Wind, Coffee, 
-  Ban, ShieldCheck, Star, Heart, Award,
+  Ban, ShieldCheck, Star, Award,
   Utensils, Camera, Ticket, Bus, Home, 
   Gift, Globe, X, ArrowLeft, User
 } from 'lucide-react';
@@ -16,6 +16,7 @@ import { GuestPicker } from '../components/common/GuestPicker';
 import { useBookingStore } from '../store/bookingStore';
 import { useAuthStore } from '../store/authStore';
 import { getAvailableGuides } from '../utils/guides';
+import { BookmarkButton } from '../components/common/BookmarkButton';
 
 const ReadMoreText = ({ 
   text, 
@@ -212,10 +213,15 @@ const SeoExperiencePage: React.FC = () => {
               alt={data.title} 
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <button className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm hover:bg-white p-2 rounded-full shadow-sm transition-all flex items-center gap-2 px-4 group/btn">
-              <Heart className="w-4 h-4 text-gray-700 group-hover/btn:text-primary transition-colors" />
-              <span className="text-xs font-bold text-gray-700 underline group-hover/btn:text-primary transition-colors">Save</span>
-            </button>
+            <BookmarkButton
+              variant="save"
+              id={`exp-${data.id}`}
+              title={data.title}
+              city={data.location}
+              image={data.heroImage}
+              link={`/experience/seo/${data.id}`}
+              className="absolute top-4 right-4 group/btn"
+            />
           </div>
 
           {/* Anchor Tabs (OCR Requirement) */}
@@ -674,9 +680,15 @@ const SeoExperiencePage: React.FC = () => {
                 <div key={i} className="group cursor-pointer">
                   <div className="relative aspect-[4/3] rounded-xl overflow-hidden mb-3">
                     <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    <button className="absolute top-3 right-3 bg-white/80 p-1.5 rounded-full hover:bg-white">
-                      <Heart className="w-4 h-4 text-gray-600" />
-                    </button>
+                    <BookmarkButton
+                      id={`seo-${data.id}-${i}`}
+                      title={item.title}
+                      city={item.location}
+                      image={item.image}
+                      link={`/experience/seo/${data.id}`}
+                      className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm p-1.5 rounded-full hover:bg-white transition-colors"
+                      iconClassName="w-4 h-4 text-gray-600"
+                    />
                   </div>
                   <div className="space-y-1">
                     <div className="flex justify-between items-start">
