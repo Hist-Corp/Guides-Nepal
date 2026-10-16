@@ -65,7 +65,7 @@ describe('HomePage', () => {
     );
     // The featured experiences section renders this heading by default
     // (see FeaturedExperiences.tsx) and has id="featured-experiences".
-    expect(screen.getByText(/Go local in Charming Cities/i)).toBeInTheDocument();
+    expect(screen.getByText(/Trek \/ Hiking/i)).toBeInTheDocument();
     expect(document.getElementById('featured-experiences')).not.toBeNull();
   });
 

@@ -470,7 +470,7 @@ const LocalProfilePage: React.FC = () => {
                             <div className="text-right">
                               <span className="text-xs text-gray-400 uppercase mr-2">From</span>
                               <span className="text-xl font-bold text-gray-900">
-                                {formatPrice(tour.price, 'EUR')}
+                                {formatPrice(tour.price, 'USD')}
                               </span>
                               <span className="text-xs text-gray-400"> pp</span>
                             </div>
