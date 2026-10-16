@@ -5,10 +5,12 @@ import { kathmanduTours } from '../../data/kathmanduTours';
 import { Star, Clock, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useGoBack } from '../../utils/backNavigation';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 const KathmanduExperiencesPage: React.FC = () => {
   const navigate = useNavigate();
   const goBack = useGoBack();
+  const { formatPrice } = useCurrency();
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white">
@@ -68,7 +70,9 @@ const KathmanduExperiencesPage: React.FC = () => {
                    </div>
                    <div className="text-right">
                       <div className="text-[10px] text-gray-400 uppercase">From</div>
-                      <div className="text-lg font-bold text-secondary">${Math.floor(tour.price)}</div>
+                      <div className="text-lg font-bold text-secondary">
+                        {formatPrice(tour.price)}
+                      </div>
                    </div>
                 </div>
               </div>

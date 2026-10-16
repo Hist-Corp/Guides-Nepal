@@ -267,8 +267,221 @@ const experiencesData: Record<string, Experience> = {
         'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
       rating: 5.0,
       reviews: 98,
+      about: "Bhaktapur is not just a city, it's a lifestyle. I want to show you the traditions that have been kept alive for centuries.",
+    },
+  },
+  // Night tours
+  'kathmandu-thamel-night-walk': {
+    id: 701,
+    title: 'Kathmandu Thamel Night Walk',
+    city: 'Kathmandu',
+    rating: 4.9,
+    reviews: 342,
+    price: 28,
+    duration: '2 hours',
+    images: [
+      'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+    ],
+    description:
+      "Experience Kathmandu after dark on a lantern-lit walk through Thamel's lively streets, hidden courtyards, and night food stalls. Your local guide shares stories you won't find in guidebooks and takes you to the best evening spots.",
+    highlights: [
+      'Lantern-lit Thamel street walk',
+      'Hidden courtyards and local shrines',
+      'Taste night market snacks and tea',
+      'Stories of Kathmandu nightlife and culture',
+    ],
+    host: {
+      name: 'Lhakpa',
+      image:
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
+      rating: 4.9,
+      reviews: 214,
       about:
-        "Bhaktapur is not just a city, it's a lifestyle. I want to show you the traditions that have been kept alive for centuries.",
+        "I'm Lhakpa, a Kathmandu local who loves showing travelers the evening side of my city. Join me for lantern-lit alleys, night bites, and real stories after sunset.",
+    },
+  },
+  'bhaktapur-lantern-evening-tour': {
+    id: 702,
+    title: 'Bhaktapur Lantern Evening Tour',
+    city: 'Bhaktapur',
+    rating: 4.8,
+    reviews: 219,
+    price: 32,
+    duration: '2.5 hours',
+    images: [
+      'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1465101162946-4377e57745c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+    ],
+    description:
+      "Explore Bhaktapur's ancient squares, temples, and pottery lanes under lantern light. A peaceful heritage tour with a local guide who brings the nighttime city to life.",
+    highlights: [
+      'Ancient temples under lantern light',
+      'Pottery squares after dark',
+      'Quiet heritage lanes away from crowds',
+      'Local evening stories and rituals',
+    ],
+    host: {
+      name: 'Tashi',
+      image:
+        'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
+      rating: 4.9,
+      reviews: 98,
+      about:
+        "Bhaktapur at night is peaceful and magical. I love sharing the stories of our temples and squares when the day crowds have gone.",
+    },
+  },
+  'phewa-lake-sunset-night-boating': {
+    id: 703,
+    title: 'Phewa Lake Sunset & Night Boating',
+    city: 'Pokhara',
+    rating: 4.9,
+    reviews: 278,
+    price: 35,
+    duration: '2 hours',
+    images: [
+      'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+    ],
+    description:
+      'Row across Phewa Lake at sunset and watch the city lights reflect on the water. A calm night boating experience with views of Pokhara and the mountains in the distance.',
+    highlights: [
+      'Sunset rowboat ride on Phewa Lake',
+      'City lights reflecting on the water',
+      'Views of Pokhara and distant peaks',
+      'Peaceful evening on the water',
+    ],
+    host: {
+      name: 'Ang',
+      image:
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
+      rating: 4.9,
+      reviews: 42,
+      about:
+        'Phewa Lake is my favorite place in Pokhara, especially at sunset and night. Let me show you the calm side of the lake after dark.',
+    },
+  },
+  // Bike tours
+  'pokhara-lakeside-bike-ride': {
+    id: 801,
+    title: 'Pokhara Lakeside Bike Ride',
+    city: 'Pokhara',
+    rating: 4.9,
+    reviews: 342,
+    price: 32,
+    duration: '3 hours',
+    images: [
+      'https://images.unsplash.com/photo-1533245707348-571b8e16f54b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+    ],
+    description:
+      'Ride along the peaceful Phewa Lake shore with mountain views in the distance. A relaxed lakeside bike tour with a local Pokhara cyclist who knows the best quiet roads and photo spots.',
+    highlights: [
+      'Lakeside bike ride along Phewa Lake',
+      'Quiet roads with mountain views',
+      'Local cycling guide',
+      'Photo stops and tea break',
+    ],
+    host: {
+      name: 'Pema',
+      image:
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
+      rating: 4.9,
+      reviews: 214,
+      about:
+        'I am Pema, a Pokhara local and cycling enthusiast. The lakeside roads are my favorite place to ride, and I love sharing them with visitors.',
+    },
+  },
+  'kathmandu-valley-cycling-tour': {
+    id: 802,
+    title: 'Kathmandu Valley Cycling Tour',
+    city: 'Kathmandu',
+    rating: 4.8,
+    reviews: 219,
+    price: 38,
+    duration: '4 hours',
+    images: [
+      'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1465101162946-4377e57745c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+    ],
+    description:
+      'Cycle through Kathmandu Valley villages, quiet backroads, and heritage lanes. A cultural bike tour led by a local who knows the safe routes and hidden village stops.',
+    highlights: [
+      'Village backroads cycling',
+      'Heritage lanes and temples',
+      'Local village tea stop',
+      'Safe, guided cycling route',
+    ],
+    host: {
+      name: 'Lhakpa',
+      image:
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
+      rating: 4.9,
+      reviews: 178,
+      about:
+        "I'm Lhakpa, a Kathmandu Valley cyclist. Let me take you on quiet roads through villages and heritage sites you won't see by car.",
+    },
+  },
+  'bhaktapur-heritage-bike-tour': {
+    id: 803,
+    title: 'Bhaktapur Heritage Bike Tour',
+    city: 'Bhaktapur',
+    rating: 4.7,
+    reviews: 184,
+    price: 35,
+    duration: '3 hours',
+    images: [
+      'https://images.unsplash.com/photo-1533107812167-e1e2f52b9867?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1465101162946-4377e57745c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+    ],
+    description:
+      "Explore Bhaktapur's ancient squares, temples, and pottery lanes on two wheels. A relaxed heritage bike tour through lanes best seen by bike.",
+    highlights: [
+      'Ancient squares by bike',
+      'Pottery lanes and temples',
+      'Quiet heritage lanes away from crowds',
+      'Local heritage guide',
+    ],
+    host: {
+      name: 'Tashi',
+      image:
+        'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
+      rating: 4.9,
+      reviews: 98,
+      about:
+        'Bhaktapur is best explored at a slow pace. I love showing visitors the heritage lanes by bike.',
+    },
+  },
+  'nagarkot-hill-cycling-tour': {
+    id: 804,
+    title: 'Nagarkot Hill Cycling Tour',
+    city: 'Nagarkot',
+    rating: 4.9,
+    reviews: 156,
+    price: 45,
+    duration: '5 hours',
+    images: [
+      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+    ],
+    description:
+      'Cycle up to Nagarkot hill for sunrise views of the Himalayas. A scenic hill cycling tour with a local guide who knows the best viewpoints and quiet roads.',
+    highlights: [
+      'Hill cycling to Nagarkot',
+      'Himalaya sunrise views',
+      'Quiet mountain roads',
+      'Local cycling guide',
+    ],
+    host: {
+      name: 'Mingma',
+      image:
+        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
+      rating: 5.0,
+      reviews: 156,
+      about:
+        'The hill roads around Nagarkot are my home. Let me show you the best Himalayan views by bike.',
     },
   },
 };
@@ -374,7 +587,6 @@ trekRoutes.forEach((trek, index) => {
     },
   };
 });
-
 const ExperiencePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -441,10 +653,6 @@ const ExperiencePage: React.FC = () => {
     };
   }, [id, staticExperience]);
 
-  const cityPath = experience
-    ? `/city/${experience.city.toLowerCase().replace(/\s+/g, '-')}`
-    : '/destinations';
-
   const { addBooking } = useBookingStore();
   const { isAuthenticated } = useAuthStore();
   const [isBooked, setIsBooked] = useState(false);
@@ -454,8 +662,13 @@ const ExperiencePage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [guests, setGuests] = useState(2);
   const [bookingError, setBookingError] = useState<string | null>(null);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   // Set after saving a bookmark (the card button feedback lives in handleBookmark).
   const [, setBookmarkSaved] = useState(false);
+  // Booking confirmation popup shown just before confirming.
+  const [confirmPopup, setConfirmPopup] = useState(false);
 
   // Mobile sticky footer: configure-booking sheet state (same flow as the
   // city experience pages - dates, guests, start time and host in a sheet).
@@ -507,7 +720,13 @@ const ExperiencePage: React.FC = () => {
 
     if (experience) {
       setBookingError(null);
-      if (await persistBooking()) setTimeout(() => navigate('/bookings'), 1000);
+      setConfirmPopup(true);
+    }
+  };
+
+  const confirmBooking = async () => {
+    if (await persistBooking()) {
+      setConfirmPopup(false);
     }
   };
 
@@ -559,6 +778,10 @@ const ExperiencePage: React.FC = () => {
     });
     setBookmarkSaved(true);
     setTimeout(() => setBookmarkSaved(false), 2500);
+  };
+
+  const closeLightbox = () => {
+    setLightboxOpen(false);
   };
 
   if (loading) {
@@ -616,8 +839,13 @@ const ExperiencePage: React.FC = () => {
           <img
             src={experience.images[0]}
             alt={experience.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
             onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+            onClick={() => {
+              setLightboxImages(experience.images);
+              setLightboxIndex(0);
+              setLightboxOpen(true);
+            }}
           />
           <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur px-3 py-1.5 rounded-md text-sm font-bold shadow-sm">
             View all photos
@@ -629,12 +857,17 @@ const ExperiencePage: React.FC = () => {
           <div className="container mx-auto px-4 pt-4">
             <div className="grid grid-cols-4 gap-2">
               {experience.images.slice(0, 4).map((image, index) => (
-                <div key={index} className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100">
+                <div key={index} className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 cursor-pointer hover:opacity-90 transition-opacity">
                   <img
                     src={image}
                     alt={`${experience.title} photo ${index + 1}`}
                     className="w-full h-full object-cover"
                     onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+                    onClick={() => {
+                      setLightboxImages(experience.images);
+                      setLightboxIndex(index);
+                      setLightboxOpen(true);
+                    }}
                   />
                 </div>
               ))}
@@ -788,8 +1021,13 @@ const ExperiencePage: React.FC = () => {
                     <img
                       src={experience.host.image}
                       alt={experience.host.name}
-                      className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md mb-2"
+                      className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md mb-2 cursor-pointer hover:opacity-90 transition-opacity"
                       onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+                      onClick={() => {
+                        setLightboxImages([experience.host.image]);
+                        setLightboxIndex(0);
+                        setLightboxOpen(true);
+                      }}
                     />
                     <div className="font-bold text-lg">{experience.host.name}</div>
                     <div className="text-secondary font-bold text-sm flex items-center justify-center gap-1">
@@ -820,7 +1058,7 @@ const ExperiencePage: React.FC = () => {
                   <div className="flex flex-col">
                     <div className="flex items-baseline gap-1">
                       <span className="text-xl font-bold text-gray-900">
-                        {formatPrice(experience.price, 'EUR')}
+                        {formatPrice(experience.price, 'USD')}
                       </span>
                       <span className="text-gray-500 text-xs">/ person</span>
                     </div>
@@ -854,7 +1092,7 @@ const ExperiencePage: React.FC = () => {
 
                 <div className="flex items-baseline space-x-2 mb-6">
                   <span className="text-3xl font-bold text-secondary">
-                    {formatPrice(experience.price, 'EUR')}
+                    {formatPrice(experience.price, 'USD')}
                   </span>
                   <span className="text-gray-500">/ person</span>
                 </div>
@@ -885,10 +1123,10 @@ const ExperiencePage: React.FC = () => {
                   {guests > 1 && experience && (
                     <div className="flex justify-between text-sm text-slate-600 border-t border-slate-100 pt-3">
                       <span>
-                        {formatPrice(experience.price, 'EUR')} × {guests} guests
+                        {formatPrice(experience.price, 'USD')} × {guests} guests
                       </span>
                       <span className="font-bold text-secondary">
-                        {formatPrice(experience.price * guests, 'EUR')}
+                        {formatPrice(experience.price * guests, 'USD')}
                       </span>
                     </div>
                   )}
@@ -898,9 +1136,15 @@ const ExperiencePage: React.FC = () => {
                     </p>
                   )}
                   {isBooked && (
-                    <p className="text-sm text-green-700 bg-green-50 border border-green-100 rounded-lg px-3 py-2">
-                      Booking confirmed! Taking you to your bookings…
-                    </p>
+                    <div className="text-sm text-green-700 bg-green-50 border border-green-100 rounded-lg px-3 py-2 space-y-1">
+                      <p className="font-bold">Booking confirmed!</p>
+                      <p>{experience.title}</p>
+                      <p>Date: {selectedDate}</p>
+                      <p>Guests: {guests}</p>
+                      <p>Total: {formatPrice(experience.price * guests, 'USD')}</p>
+                      <p>City: {experience.city}</p>
+                      <p>Host: {experience.host.name}</p>
+                    </div>
                   )}
                 </div>
 
@@ -986,6 +1230,141 @@ const ExperiencePage: React.FC = () => {
         />
       )}
 
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={closeLightbox}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Image gallery"
+        >
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              closeLightbox();
+            }}
+            className="absolute top-6 right-6 z-20 text-white text-2xl font-bold"
+          >
+            ×
+          </button>
+          <div className="relative max-w-5xl max-h-[85vh] flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={lightboxImages[lightboxIndex]}
+              alt={experience.title}
+              className="max-h-[70vh] max-w-full object-contain rounded-lg shadow-2xl"
+              onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+            />
+            <div className="mt-2 text-white text-sm">
+              {lightboxIndex + 1} of {lightboxImages.length}
+            </div>
+            {lightboxImages.length > 1 && (
+              <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4 pointer-events-none">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLightboxIndex((i) => (i - 1 + lightboxImages.length) % lightboxImages.length);
+                  }}
+                  className="pointer-events-auto z-20 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full"
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLightboxIndex((i) => (i + 1) % lightboxImages.length);
+                  }}
+                  className="pointer-events-auto z-20 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full"
+                >
+                  ›
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Booking confirmation popup with all details */}
+      {confirmPopup && experience && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Confirm booking"
+        >
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setConfirmPopup(false)}
+          />
+          <div
+            className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">Confirm booking</h2>
+              <button
+                type="button"
+                onClick={() => setConfirmPopup(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src={experience.images[0]}
+                alt={experience.title}
+                className="w-16 h-16 rounded-xl object-cover"
+                onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+              />
+              <div>
+                <h3 className="font-bold text-gray-900">{experience.title}</h3>
+                <p className="text-sm text-gray-500">{experience.city}</p>
+              </div>
+            </div>
+            <div className="space-y-3 text-sm text-gray-700 mb-6">
+              <div className="flex justify-between border-b pb-2">
+                <span>Date</span>
+                <span className="font-medium">{selectedDate}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span>Guests</span>
+                <span className="font-medium">{guests}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span>Host</span>
+                <span className="font-medium">{experience.host.name}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span>Price per person</span>
+                <span className="font-medium">{formatPrice(experience.price, 'USD')}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2 font-bold text-primary">
+                <span>Total</span>
+                <span className="font-bold">{formatPrice(experience.price * guests, 'USD')}</span>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setConfirmPopup(false)}
+                className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-bold hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmBooking}
+                className="flex-1 py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20"
+              >
+                Confirm booking
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <Footer />
     </div>
   );

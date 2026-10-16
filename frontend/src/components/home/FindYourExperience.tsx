@@ -19,8 +19,8 @@ const tiles: ExperienceTypeTile[] = [
   { emoji: '⛰️', word: 'Gorgeous', label: 'Day trips', path: '/outdoor-activities' },
   { emoji: '🥾', word: 'Adventurous', label: 'Trek/Hiking', path: '/trek-hiking' },
   { emoji: '👨‍👩‍👧', word: 'Memories', label: 'With the family', path: '/most-popular' },
-  { emoji: '🌙', word: 'Enchanting', label: 'Night tour', path: '/explore' },
-  { emoji: '🚴', word: 'Active', label: 'Bike tour', path: '/outdoor-activities' },
+  { emoji: '🌙', word: 'Enchanting', label: 'Night tour', path: '/night-tour' },
+  { emoji: '🚴', word: 'Active', label: 'Bike tour', path: '/bike-tour' },
 ];
 
 export const FindYourExperience: React.FC = () => {

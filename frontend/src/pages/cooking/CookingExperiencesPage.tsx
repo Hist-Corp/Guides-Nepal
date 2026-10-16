@@ -4,10 +4,12 @@ import { ArrowLeft, Star, Clock, ChevronRight } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { cookingExperiencesData } from './CookingExperiencePage';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 // Listing page for all cooking experiences — the target of the
 // "View all" buttons on /cooking-classes (route: /cooking-classes/experiences).
 export const CookingExperiencesPage: React.FC = () => {
+  const { formatPrice } = useCurrency();
   return (
     <div className="min-h-screen flex flex-col font-sans bg-background-cream">
       <Header />
@@ -64,7 +66,7 @@ export const CookingExperiencesPage: React.FC = () => {
                         <Clock className="w-4 h-4" /> {exp.duration}
                       </span>
                       <span className="font-bold text-gray-900">
-                        ${exp.price}
+                        {formatPrice(exp.price)}
                         <span className="text-xs text-gray-400 font-normal"> / person</span>
                       </span>
                     </div>
