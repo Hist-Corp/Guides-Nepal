@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
-import PageShell from "../components/PageShell";
-import Button from "../components/Button";
-import Loading from "../components/Loading";
-import Modal from "../components/Modal";
+import { useState, useEffect } from 'react';
+import PageShell from '../components/PageShell';
+import Button from '../components/Button';
+import Loading from '../components/Loading';
+import Modal from '../components/Modal';
+import { compressImage } from '../utils/imageCompressor';
 import {
   uploadMedia,
   uploadMediaFromUrl,
@@ -11,7 +12,7 @@ import {
   getPlacements,
   setPlacement,
   clearPlacement,
-} from "../services/api";
+} from '../services/api';
 
 type MediaItem = {
   id: number;
@@ -32,12 +33,12 @@ export default function WriterMedia() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [openPreview, setOpenPreview] = useState<MediaItem | null>(null);
-  const [previewSrc, setPreviewSrc] = useState("");
+  const [previewSrc, setPreviewSrc] = useState('');
   const [placeTarget, setPlaceTarget] = useState<MediaItem | null>(null);
   const [replaceTarget, setReplaceTarget] = useState<MediaItem | null>(null);
   const [replacing, setReplacing] = useState(false);
   const [openUrlUpload, setOpenUrlUpload] = useState(false);
-  const [urlInput, setUrlInput] = useState("");
+  const [urlInput, setUrlInput] = useState('');
   const [urlUploading, setUrlUploading] = useState(false);
 
   const loadMedia = async () => {
@@ -46,7 +47,7 @@ export default function WriterMedia() {
       const data = await getMedia();
       setMedia(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error("Error fetching media:", error);
+      console.error('Error fetching media:', error);
     } finally {
       setLoading(false);
     }
@@ -58,7 +59,7 @@ export default function WriterMedia() {
       setSlots(data.slots || []);
       setPlacements(data.placements || {});
     } catch (error) {
-      console.error("Error fetching placements:", error);
+      console.error('Error fetching placements:', error);
     }
   };
 
@@ -73,14 +74,14 @@ export default function WriterMedia() {
     setUploading(true);
     try {
       const compressed = await compressImage(file);
-      await uploadMedia(compressed);
+      await uploadMedia(compressed.file);
       await loadMedia();
     } catch (error) {
-      console.error("Upload failed:", error);
-      alert("Upload failed");
+      console.error('Upload failed:', error);
+      alert('Upload failed');
     } finally {
       setUploading(false);
-      e.target.value = "";
+      e.target.value = '';
     }
   };
 
@@ -92,9 +93,9 @@ export default function WriterMedia() {
       await uploadMediaFromUrl(trimmed);
       await loadMedia();
       setOpenUrlUpload(false);
-      setUrlInput("");
+      setUrlInput('');
     } catch {
-      alert("Could not upload from URL");
+      alert('Could not upload from URL');
     } finally {
       setUrlUploading(false);
     }
@@ -107,16 +108,16 @@ export default function WriterMedia() {
     setReplacing(true);
     try {
       const compressed = await compressImage(file);
-      await uploadMedia(compressed, replaceTarget.id);
+      await uploadMedia(compressed.file, replaceTarget.id);
       await loadMedia();
       await loadPlacements();
       setReplaceTarget(null);
     } catch (error) {
-      console.error("Replace failed:", error);
-      alert("Replace failed");
+      console.error('Replace failed:', error);
+      alert('Replace failed');
     } finally {
       setReplacing(false);
-      e.target.value = "";
+      e.target.value = '';
     }
   };
 
@@ -127,8 +128,8 @@ export default function WriterMedia() {
       await loadPlacements();
       await loadMedia();
     } catch (error) {
-      console.error("Placement failed:", error);
-      alert("Could not place image");
+      console.error('Placement failed:', error);
+      alert('Could not place image');
     }
   };
 
@@ -138,7 +139,7 @@ export default function WriterMedia() {
       await loadPlacements();
       await loadMedia();
     } catch (error) {
-      console.error("Clear placement failed:", error);
+      console.error('Clear placement failed:', error);
     }
   };
 
@@ -156,11 +157,11 @@ export default function WriterMedia() {
             <span
               className={`inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium transition ${
                 uploading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-primary text-white hover:opacity-90"
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-primary text-white hover:opacity-90'
               }`}
             >
-              {uploading ? "Uploading…" : "Upload from device"}
+              {uploading ? 'Uploading…' : 'Upload from device'}
             </span>
           </label>
           <button
@@ -174,7 +175,13 @@ export default function WriterMedia() {
       }
     >
       {/* Hidden input used by the per-item Replace action */}
-      <input type="file" accept="image/*" className="hidden" id="replace-input" onChange={handleReplace} />
+      <input
+        type="file"
+        accept="image/*"
+        className="hidden"
+        id="replace-input"
+        onChange={handleReplace}
+      />
 
       {loading ? (
         <Loading label="Loading media…" />
@@ -191,15 +198,19 @@ export default function WriterMedia() {
               <div key={item.id} className="group relative">
                 <div
                   className={`aspect-square flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden cursor-zoom-in ${
-                    item.type.startsWith("image/") ? "p-0" : "p-3"
+                    item.type.startsWith('image/') ? 'p-0' : 'p-3'
                   }`}
                   onClick={() => {
                     setOpenPreview(item);
                     setPreviewSrc(item.url);
                   }}
                 >
-                  {item.type.startsWith("image/") ? (
-                    <img src={item.url} alt={item.original_name || item.filename} className="w-full h-full object-cover" />
+                  {item.type.startsWith('image/') ? (
+                    <img
+                      src={item.url}
+                      alt={item.original_name || item.filename}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <span className="text-3xl">📎</span>
                   )}
@@ -210,20 +221,35 @@ export default function WriterMedia() {
                   </span>
                 )}
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-1 flex-wrap p-2">
-                  <Button variant="ghost" size="sm" className="text-white" onClick={() => setOpenPreview(item)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-white"
+                    onClick={() => setOpenPreview(item)}
+                  >
                     Preview
                   </Button>
-                  <Button variant="ghost" size="sm" className="text-white" onClick={() => setReplaceTarget(item)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-white"
+                    onClick={() => setReplaceTarget(item)}
+                  >
                     Replace
                   </Button>
-                  <Button variant="ghost" size="sm" className="text-white" onClick={() => setPlaceTarget(item)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-white"
+                    onClick={() => setPlaceTarget(item)}
+                  >
                     Place
                   </Button>
                   <Button
                     variant="danger"
                     size="sm"
                     onClick={async () => {
-                      if (!confirm("Delete this media item?")) return;
+                      if (!confirm('Delete this media item?')) return;
                       await deleteMedia(item.id);
                       loadMedia();
                       loadPlacements();
@@ -232,19 +258,36 @@ export default function WriterMedia() {
                     Remove
                   </Button>
                 </div>
-                <p className="mt-1 text-xs text-gray-500 truncate">{item.original_name || item.filename}</p>
+                <p className="mt-1 text-xs text-gray-500 truncate">
+                  {item.original_name || item.filename}
+                </p>
               </div>
             );
           })}
         </div>
       )}
 
-      <Modal open={openPreview !== null} title={openPreview?.original_name || openPreview?.filename || "Preview"} onClose={() => { setOpenPreview(null); setPreviewSrc(""); }}>
+      <Modal
+        open={openPreview !== null}
+        title={openPreview?.original_name || openPreview?.filename || 'Preview'}
+        onClose={() => {
+          setOpenPreview(null);
+          setPreviewSrc('');
+        }}
+      >
         <div className="flex justify-center">
-          {previewSrc && openPreview?.type.startsWith("image/") ? (
-            <img src={previewSrc} alt={openPreview?.original_name || openPreview?.filename} className="max-w-full max-h-96 rounded" />
+          {previewSrc && openPreview?.type.startsWith('image/') ? (
+            <img
+              src={previewSrc}
+              alt={openPreview?.original_name || openPreview?.filename}
+              className="max-w-full max-h-96 rounded"
+            />
           ) : previewSrc ? (
-            <iframe src={previewSrc} title={openPreview?.filename} className="w-full h-96 rounded" />
+            <iframe
+              src={previewSrc}
+              title={openPreview?.filename}
+              className="w-full h-96 rounded"
+            />
           ) : null}
         </div>
       </Modal>
@@ -256,16 +299,16 @@ export default function WriterMedia() {
         onClose={() => setReplaceTarget(null)}
       >
         <p className="text-sm text-gray-600 mb-4">
-          Choose a new image file — it will replace this library item in place. Every
-          spot on the website currently using it will show the new image automatically.
+          Choose a new image file — it will replace this library item in place. Every spot on the
+          website currently using it will show the new image automatically.
         </p>
         <label
           htmlFor="replace-input"
           className={`inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium cursor-pointer ${
-            replacing ? "bg-gray-400 pointer-events-none" : "bg-primary text-white hover:opacity-90"
+            replacing ? 'bg-gray-400 pointer-events-none' : 'bg-primary text-white hover:opacity-90'
           }`}
         >
-          {replacing ? "Replacing…" : "Choose new image"}
+          {replacing ? 'Replacing…' : 'Choose new image'}
         </label>
       </Modal>
 
@@ -276,26 +319,33 @@ export default function WriterMedia() {
         onClose={() => setPlaceTarget(null)}
       >
         <p className="text-sm text-gray-600 mb-3">
-          Pick where this image should appear on the website. Click a slot to place it;
-          click "Clear" to remove an existing placement.
+          Pick where this image should appear on the website. Click a slot to place it; click
+          "Clear" to remove an existing placement.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto">
           {slots.map((slot) => {
             const isCurrent = (placeTarget?.placements || []).includes(slot.key);
             return (
-              <div key={slot.key} className="flex items-center justify-between gap-2 border rounded-lg px-3 py-2">
+              <div
+                key={slot.key}
+                className="flex items-center justify-between gap-2 border rounded-lg px-3 py-2"
+              >
                 <span className="text-sm truncate">{slot.label}</span>
                 <div className="flex gap-1 flex-shrink-0">
                   <Button
                     size="sm"
-                    variant={isCurrent ? "ghost" : "primary"}
+                    variant={isCurrent ? 'ghost' : 'primary'}
                     disabled={isCurrent}
                     onClick={() => handlePlace(slot.key)}
                   >
-                    {isCurrent ? "Placed" : "Place here"}
+                    {isCurrent ? 'Placed' : 'Place here'}
                   </Button>
                   {isCurrent && (
-                    <Button size="sm" variant="danger" onClick={() => handleClearPlacement(slot.key)}>
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      onClick={() => handleClearPlacement(slot.key)}
+                    >
                       Clear
                     </Button>
                   )}
@@ -310,11 +360,14 @@ export default function WriterMedia() {
       <Modal
         open={openUrlUpload}
         title="Add image from URL"
-        onClose={() => { setOpenUrlUpload(false); setUrlInput(""); }}
+        onClose={() => {
+          setOpenUrlUpload(false);
+          setUrlInput('');
+        }}
       >
         <p className="text-sm text-gray-600 mb-3">
-          Paste a direct link to an image (e.g. from Unsplash, your website, etc.).
-          The image will be fetched, compressed, and added to your media library.
+          Paste a direct link to an image (e.g. from Unsplash, your website, etc.). The image will
+          be fetched, compressed, and added to your media library.
         </p>
         <div className="flex gap-2">
           <input
@@ -323,14 +376,13 @@ export default function WriterMedia() {
             className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") handleUrlUpload(); }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleUrlUpload();
+            }}
             disabled={urlUploading}
           />
-          <Button
-            disabled={urlUploading || !urlInput.trim()}
-            onClick={handleUrlUpload}
-          >
-            {urlUploading ? "Adding…" : "Add image"}
+          <Button disabled={urlUploading || !urlInput.trim()} onClick={handleUrlUpload}>
+            {urlUploading ? 'Adding…' : 'Add image'}
           </Button>
         </div>
       </Modal>
