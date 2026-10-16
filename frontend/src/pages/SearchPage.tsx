@@ -348,7 +348,7 @@ export const SearchPage: React.FC = () => {
                               {exp.reviews} reviews
                             </span>
                           </div>
-                          <div className="font-bold text-primary">{formatPrice(exp.price, 'EUR')}</div>
+                          <div className="font-bold text-primary">{formatPrice(exp.price, 'USD')}</div>
                         </div>
                         {exp.host && (
                           <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2">

@@ -42,6 +42,8 @@ import GalleryPage from './pages/GalleryPage';
 import GuidePortfolioPage from './pages/GuidePortfolioPage';
 import ContactGuidePage from './pages/ContactGuidePage';
 import ImpactReportPage from './pages/ImpactReportPage';
+import NightTourPage from './pages/NightTourPage';
+import BikeTourPage from './pages/BikeTourPage';
 import ExplorePage from './pages/ExplorePage';
 import BecomeHostPage from './pages/host/BecomeHostPage';
 import HostApplicationWizard from './pages/host/HostApplicationWizard';
@@ -123,8 +125,10 @@ function App() {
             <Route path="/food-tours" element={<FoodToursPage />} />
             <Route path="/food-tours/culture/:slug" element={<FoodTourCulturePage />} />
             <Route path="/cultural-tours" element={<CulturalToursPage />} />
-            <Route path="/outdoor-activities" element={<OutdoorActivitiesPage />} />
-            <Route path="/trek-hiking" element={<TrekHikingPage />} />
+<Route path="/outdoor-activities" element={<OutdoorActivitiesPage />} />
+<Route path="/trek-hiking" element={<TrekHikingPage />} />
+<Route path="/night-tour" element={<NightTourPage />} />
+<Route path="/bike-tour" element={<BikeTourPage />} />
             <Route path="/cooking-classes" element={<CookingClassesPage />} />
             <Route path="/cooking-classes/experiences" element={<CookingExperiencesPage />} />
             <Route path="/cooking-classes/experience/:slug" element={<CookingExperiencePage />} />

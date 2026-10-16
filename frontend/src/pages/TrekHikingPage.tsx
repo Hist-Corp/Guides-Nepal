@@ -586,7 +586,7 @@ export const TrekHikingPage: React.FC = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-xs opacity-80">From</div>
-                      <div className="text-xl font-bold">{formatPrice(trek.price, 'EUR')}</div>
+                      <div className="text-xl font-bold">{formatPrice(trek.price, 'USD')}</div>
                     </div>
                   </div>
                 </div>
@@ -690,7 +690,7 @@ export const TrekHikingPage: React.FC = () => {
                     <div className="text-right">
                       <div className="text-[10px] text-gray-400 uppercase">From</div>
                       <div className="text-lg font-bold text-gray-900">
-                        {formatPrice(Math.floor(trek.price), 'EUR')}
+                        {formatPrice(Math.floor(trek.price), 'USD')}
                       </div>
                     </div>
                   </div>

@@ -725,7 +725,7 @@ export const Header: React.FC = () => {
                                       )}
                                       {item.price && (
                                         <span className="font-bold text-primary whitespace-nowrap">
-                                          {formatPrice(item.price, currencyInfo.code)}
+                                          {formatPrice(item.price)}
                                         </span>
                                       )}
                                     </div>

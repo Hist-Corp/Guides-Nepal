@@ -96,7 +96,7 @@ export const FRONTEND_CONTENT: Record<string, FrontendSection[]> = {
       label: 'Featured Experiences',
       type: 'featured',
       content: {
-        heading: 'Go local in Charming Cities',
+        heading: 'Trek / Hiking',
         subtitle: 'Find unforgettable experiences with locals',
         buttonText: 'View all',
         image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800',

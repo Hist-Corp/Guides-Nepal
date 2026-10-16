@@ -485,7 +485,7 @@ DEFAULT_SECTIONS = {
          "content": {"heading": "Enchanting experiences,\nwith incredible locals", "subtitle": "Book unique and memorable travel\nexperiences guided by locals", "buttonText": "Search", "primaryText": "Guides Nepal", "tagline": "Guides Nepal"},
          "style": {"backgroundColor": "#F9E6D6", "textColor": "#547792", "accentColor": "#F4B400", "alignment": "left", "headingSize": "4rem", "padding": "4rem"}},
         {"id": "home-featured", "title": "Featured Experiences", "type": "featured",
-         "content": {"heading": "Go local in Charming Cities", "subtitle": "Find unforgettable experiences with locals", "buttonText": "View all"},
+         "content": {"heading": "Trek / Hiking", "subtitle": "Find unforgettable experiences with locals", "buttonText": "View all"},
          "style": {"backgroundColor": "#ffffff", "textColor": "#213448", "alignment": "left"}},
         {"id": "home-promo", "title": "Promo Banner", "type": "promo",
          "content": {"heading": "We have released our 2024\nImpact Report!", "subtitle": "Discover the true power of your travel with our 2024 Impact Report. See how responsible tourism supports local communities, preserves culture, and protects the planet.", "buttonText": "Read our report"},

@@ -650,7 +650,7 @@ const CityPage: React.FC = () => {
                       <div className="text-xs text-slate-500">
                         Starting price <br />
                         <span className="text-lg font-bold text-primary">
-                          {formatPrice(tour.price, 'EUR')}
+                          {formatPrice(tour.price, 'USD')}
                         </span>{' '}
                         <span className="text-slate-400">pp</span>
                       </div>

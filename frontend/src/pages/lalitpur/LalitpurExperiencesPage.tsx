@@ -4,11 +4,13 @@ import { Footer } from '../../components/common/Footer';
 import { SlidersHorizontal, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useGoBack } from '../../utils/backNavigation';
+import { useCurrency } from '../../contexts/CurrencyContext';
 import { lalitpurRichData } from '../../data/lalitpurRichData';
 
 export const LalitpurExperiencesPage: React.FC = () => {
   const navigate = useNavigate();
   const goBack = useGoBack();
+  const { formatPrice } = useCurrency();
   const [filterType, setFilterType] = useState('All');
 
   const filteredData = filterType === 'All' 
@@ -97,7 +99,7 @@ export const LalitpurExperiencesPage: React.FC = () => {
                      </div>
                      <div className="text-right shrink-0">
                         <div className="text-[10px] text-gray-400 uppercase">From</div>
-                        <div className="text-lg font-bold text-secondary">${tour.price}</div>
+                        <div className="text-lg font-bold text-secondary">                        {formatPrice(tour.price)}</div>
                      </div>
                   </div>
                 </div>
