@@ -8,4 +8,30 @@ echo "🔍 Running pre-commit checks..."
 # that shell, and this lint-staged install is a repo-root devDependency.
 node node_modules/lint-staged/bin/lint-staged.js
 
+# Typecheck whenever any TypeScript sources are staged. ESLint + Prettier do
+# NOT catch type errors, so without this a broken `tsc -b` could slip through to
+# `npm run build` and crash an app on startup (the exact failure the dashboard
+# guard was added for). We only pay the typecheck cost when TS code changed.
+#
+# tsc is invoked via `node <path>` rather than `npm run <script>`: husky runs
+# hooks with Git Bash on Windows, where npm's `.cmd` shims fail with
+# '"node"' is not recognized (the same reason lint-staged is run via `node`
+# above). TypeScript is hoisted to the root node_modules, so `../node_modules`
+# resolves correctly from either workspace.
+if git diff --cached --name-only | grep -q '^dashboard/.*\.tsx\?$'; then
+  echo "🔎 Dashboard TypeScript changed — running typecheck..."
+  if ! (cd dashboard && node ../node_modules/typescript/bin/tsc --noEmit); then
+    echo "❌ Dashboard typecheck failed. Fix the TypeScript errors before committing."
+    exit 1
+  fi
+fi
+
+if git diff --cached --name-only | grep -q '^frontend/.*\.tsx\?$'; then
+  echo "🔎 Frontend TypeScript changed — running typecheck..."
+  if ! (cd frontend && node ../node_modules/typescript/bin/tsc -b --noEmit); then
+    echo "❌ Frontend typecheck failed. Fix the TypeScript errors before committing."
+    exit 1
+  fi
+fi
+
 echo "✅ Pre-commit checks passed!"
