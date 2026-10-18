@@ -34,6 +34,8 @@ type Draft = {
   maxGuests: string;
   price: string;
   availability: string;
+  password: string;
+  confirmPassword: string;
   terms: boolean;
   privacy: boolean;
   accuracy: boolean;
@@ -64,6 +66,8 @@ const empty: Draft = {
   maxGuests: '8',
   price: '',
   availability: '',
+  password: '',
+  confirmPassword: '',
   terms: false,
   privacy: false,
   accuracy: false,
@@ -89,7 +93,16 @@ const validStep = (step: number, d: Draft) =>
         d.city,
         d.district,
         d.languages,
-      ].every((x) => x.trim()) && /^\S+@\S+\.\S+$/.test(d.email)
+      ].every((x) => x.trim()) &&
+      /^\S+@\S+\.\S+$/.test(d.email) &&
+      // These credentials only become active once a regional head approves
+      // the application — but they must meet policy up front so approval
+      // never fails on a weak password. Mirrors backend strength rules.
+      d.password.length >= 8 &&
+      /[A-Z]/.test(d.password) &&
+      /[0-9]/.test(d.password) &&
+      /[!@#$%^&*()_+\-=[\]{};:,.<>?]/.test(d.password) &&
+      d.password === d.confirmPassword
     : step === 1
       ? !!d.primaryCity &&
         !!d.yearsExperience &&
@@ -176,6 +189,7 @@ export default function HostApplicationWizard() {
       body.append('maxGuests', draft.maxGuests);
       body.append('price', draft.price);
       body.append('availability', draft.availability);
+      body.append('password', draft.password);
       body.append('terms', String(draft.terms));
       body.append('privacy', String(draft.privacy));
       body.append('accuracy', String(draft.accuracy));
@@ -203,7 +217,8 @@ export default function HostApplicationWizard() {
           <h1 className="text-3xl font-bold text-[#213448]">Application received</h1>
           <p className="mt-4 text-gray-600">
             Thank you, {draft.firstName}. Your reference is GH-{String(complete).padStart(6, '0')}.
-            We will contact you at {draft.email} after review.
+            We will contact you at {draft.email} after a regional manager reviews your application.
+            Your login becomes active once you are approved.
           </p>
           <Button className="mt-8" onClick={() => navigate('/')}>
             Back
@@ -288,6 +303,19 @@ export default function HostApplicationWizard() {
               value={draft.languages}
               onChange={(v) => update('languages', v)}
               placeholder="Nepali, English"
+            />
+            <Input
+              label="Create a password *"
+              type="password"
+              value={draft.password}
+              onChange={(v) => update('password', v)}
+              placeholder="At least 8 chars, 1 uppercase, 1 number, 1 symbol"
+            />
+            <Input
+              label="Confirm password *"
+              type="password"
+              value={draft.confirmPassword}
+              onChange={(v) => update('confirmPassword', v)}
             />
           </div>
         )}

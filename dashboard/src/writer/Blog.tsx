@@ -25,6 +25,8 @@ type BlogPost = {
   date?: string;
   status?: string;
   content?: string;
+  category?: string;
+  image?: string;
   featuredImage?: string;
 };
 
@@ -41,7 +43,15 @@ export default function WriterBlog() {
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState<BlogPost | null>(null);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
-  const [form, setForm] = useState({ title: '', slug: '', featuredImage: '' });
+  const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
+  const [form, setForm] = useState({
+    title: '',
+    slug: '',
+    author: '',
+    category: '',
+    status: 'draft',
+    featuredImage: '',
+  });
   const [liveEdit, setLiveEdit] = useState<BlogPost | null>(null);
 
   const fetchBlog = async () => {
@@ -61,7 +71,7 @@ export default function WriterBlog() {
   }, []);
 
   const resetForm = () => {
-    setForm({ title: '', slug: '', featuredImage: '' });
+    setForm({ title: '', slug: '', author: '', category: '', status: 'draft', featuredImage: '' });
   };
 
   const handleCreate = async () => {
@@ -71,6 +81,9 @@ export default function WriterBlog() {
       await createContentBlog({
         title: form.title,
         slug: form.slug || slugify(form.title),
+        author: form.author || undefined,
+        category: form.category || undefined,
+        status: form.status,
         featuredImage: form.featuredImage || undefined,
       });
       setOpenCreate(false);
@@ -91,6 +104,9 @@ export default function WriterBlog() {
       await updateContentBlog(openEdit.id, {
         title: form.title,
         slug: form.slug || slugify(form.title),
+        author: form.author || undefined,
+        category: form.category || undefined,
+        status: form.status,
         featuredImage: form.featuredImage || undefined,
       });
       setOpenEdit(null);
@@ -120,8 +136,20 @@ export default function WriterBlog() {
 
   const openEditModal = (post: BlogPost) => {
     setOpenEdit(post);
-    setForm({ title: post.title, slug: post.slug, featuredImage: post.featuredImage || '' });
+    setForm({
+      title: post.title,
+      slug: post.slug,
+      author: post.author || '',
+      category: post.category || '',
+      status: post.status || 'draft',
+      featuredImage: post.featuredImage || post.image || '',
+    });
   };
+
+  const visiblePosts =
+    statusFilter === 'all'
+      ? posts
+      : posts.filter((p) => (p.status || 'draft').toLowerCase() === statusFilter);
 
   const columns: Column<BlogPost>[] = [
     { key: 'title', label: 'Title' },
@@ -136,6 +164,11 @@ export default function WriterBlog() {
       render: (r) => <span className="text-sm text-gray-500">{r.date || '—'}</span>,
     },
     {
+      key: 'category',
+      label: 'Category',
+      render: (r) => <span className="text-sm text-gray-600">{r.category || '—'}</span>,
+    },
+    {
       key: 'status',
       label: 'Status',
       render: (r) => (
@@ -143,6 +176,20 @@ export default function WriterBlog() {
           {r.status || 'draft'}
         </Badge>
       ),
+    },
+    {
+      key: 'visible',
+      label: 'On frontend',
+      render: (r) =>
+        (r.status || 'draft').toLowerCase() === 'published' ? (
+          <Badge variant="success" size="sm">
+            Live
+          </Badge>
+        ) : (
+          <Badge variant="default" size="sm">
+            Hidden
+          </Badge>
+        ),
     },
     {
       key: 'actions',
@@ -198,11 +245,29 @@ export default function WriterBlog() {
       {loading ? (
         <Loading label="Loading articles…" />
       ) : (
-        <Table
-          columns={columns}
-          rows={posts}
-          emptyMessage="No articles found. Start by writing your first article."
-        />
+        <>
+          <div className="mb-4 flex items-center gap-2 text-sm">
+            <span className="text-gray-500">Show:</span>
+            {(['all', 'published', 'draft'] as const).map((s) => (
+              <Button
+                key={s}
+                variant={statusFilter === s ? 'primary' : 'ghost'}
+                size="sm"
+                onClick={() => setStatusFilter(s)}
+              >
+                {s === 'all' ? `All (${posts.length})` : s[0].toUpperCase() + s.slice(1)}
+              </Button>
+            ))}
+            <span className="ml-2 text-xs text-gray-400">
+              Only “published” articles appear on the frontend blog page.
+            </span>
+          </div>
+          <Table
+            columns={columns}
+            rows={visiblePosts}
+            emptyMessage="No articles found. Start by writing your first article."
+          />
+        </>
       )}
 
       <Modal open={openCreate} title="Write Article" onClose={() => setOpenCreate(false)}>
@@ -223,6 +288,33 @@ export default function WriterBlog() {
               setForm({ ...form, slug: e.target.value })
             }
           />
+          <Field
+            label="Author"
+            placeholder="Author name"
+            value={form.author}
+            onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+              setForm({ ...form, author: e.target.value })
+            }
+          />
+          <Field
+            label="Category"
+            placeholder="e.g. Travel Tips"
+            value={form.category}
+            onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+              setForm({ ...form, category: e.target.value })
+            }
+          />
+          <Field
+            label="Status"
+            as="select"
+            value={form.status}
+            onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+              setForm({ ...form, status: e.target.value })
+            }
+          >
+            <option value="draft">Draft — hidden from frontend</option>
+            <option value="published">Published — live on frontend</option>
+          </Field>
           <ImagePicker
             label="Featured Image (optional)"
             currentImageUrl={form.featuredImage}
@@ -239,7 +331,7 @@ export default function WriterBlog() {
             onClick={handleCreate}
             disabled={!form.title.trim() || actionLoading === -1}
           >
-            {actionLoading === -1 ? 'Publishing…' : 'Publish Article'}
+            {form.status === 'published' ? 'Publish Article' : 'Save Draft'}
           </Button>
         </div>
       </Modal>
@@ -261,6 +353,43 @@ export default function WriterBlog() {
             onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
               setForm({ ...form, slug: e.target.value })
             }
+          />
+          <Field
+            label="Author"
+            placeholder="Author name"
+            value={form.author}
+            onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+              setForm({ ...form, author: e.target.value })
+            }
+          />
+          <Field
+            label="Category"
+            placeholder="e.g. Travel Tips"
+            value={form.category}
+            onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+              setForm({ ...form, category: e.target.value })
+            }
+          />
+          <Field
+            label="Status"
+            as="select"
+            value={form.status}
+            onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+              setForm({ ...form, status: e.target.value })
+            }
+          >
+            <option value="draft">Draft — hidden from frontend</option>
+            <option value="published">Published — live on frontend</option>
+          </Field>
+          <ImagePicker
+            label="Featured Image (optional)"
+            currentImageUrl={form.featuredImage}
+            onImageSelected={(url) => {
+              setForm({ ...form, featuredImage: url });
+            }}
+            onCancel={() => {
+              setForm({ ...form, featuredImage: '' });
+            }}
           />
           <Button
             variant="primary"

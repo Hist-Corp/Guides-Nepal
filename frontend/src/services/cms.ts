@@ -17,6 +17,9 @@ export interface CmsBlogPost {
   date?: string
   status?: string
   content?: string
+  category?: string
+  image?: string
+  featuredImage?: string
 }
 
 export interface CmsSeoEntry {

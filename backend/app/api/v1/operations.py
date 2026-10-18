@@ -7,17 +7,26 @@ Role guards (via ``has_access``):
   ``guide_applications`` table, separate from ``host_applications``.
 - Support tickets: admin / customer-support.
 Admin is the highest role and is authorized on both guard groups.
+
+Host credential lifecycle (unified login): the applicant's password is
+captured as a bcrypt hash on the *application* row; the ``users`` login
+row (role=host) is minted only when regional-head/admin approves. One
+row then works on the Host Dashboard and the Host Frontend.
 """
 
+import hashlib
+import secrets
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
+from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.dependencies import require_role
-from app.core.roles import ADMIN, CUSTOMER_SUPPORT, REGIONAL_HEAD
+from app.core.dependencies import get_current_user, require_role
+from app.core.roles import ADMIN, CUSTOMER_SUPPORT, HOST, REGIONAL_HEAD
+from app.core.security import get_password_hash, validate_password_strength
 from app.models.guide_application import GuideApplication
 from app.models.host_application import HostApplication
 from app.models.support_ticket import SupportTicket
@@ -31,16 +40,102 @@ TICKET_STAFF = [ADMIN, CUSTOMER_SUPPORT]
 
 class HostApplicationCreate(BaseModel):
     host_name: str
-    email: str
+    email: EmailStr
     city: Optional[str] = None
     region: Optional[str] = None
     phone: Optional[str] = None
     experience: Optional[str] = None
+    # Chosen by the applicant at registration. Stored only as a bcrypt hash
+    # on the application row; the real login account is minted at approval.
+    # Optional so staff can also create applications by hand (those need a
+    # password invite before login can be issued).
+    password: Optional[str] = None
 
 
 class HostApplicationReview(BaseModel):
     status: str  # approved / rejected / pending
     review_note: Optional[str] = None
+
+
+class HostCredentialSetup(BaseModel):
+    """Password captured with the application (plain, hashed server-side)."""
+
+    password: str
+
+
+def _ensure_host_application_columns(db: Session) -> None:
+    """Add credential-lifecycle columns to pre-existing SQLite tables."""
+    try:
+        inspector = inspect(db.bind)
+        if "host_applications" not in inspector.get_table_names():
+            return
+        existing = {c["name"] for c in inspector.get_columns("host_applications")}
+        for name, ddl in {
+            "credential_token_hash": "VARCHAR",
+            "credential_password_hash": "VARCHAR",
+            "details_json": "TEXT",
+            "user_id": "INTEGER",
+            "reviewed_by": "VARCHAR",
+            "review_note": "VARCHAR",
+            "reviewed_at": "DATETIME",
+        }.items():
+            if name not in existing:
+                db.execute(text(f"ALTER TABLE host_applications ADD COLUMN {name} {ddl}"))
+        db.commit()
+    except Exception:
+        db.rollback()
+
+
+def _hash_setup_token(token: str) -> str:
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def _provision_host_user(db: Session, app: HostApplication) -> User:
+    """Mint (or re-link) the login account for an approved application.
+
+    Idempotent: re-approving returns the linked user. Raises 409 when the
+    email belongs to a *different* user, so approval can never hijack
+    another account.
+    """
+    if app.user_id is not None:
+        user = db.get(User, app.user_id)
+        if user is not None:
+            if user.role != HOST:
+                user.role = HOST
+            user.is_active = True
+            db.commit()
+            db.refresh(user)
+            return user
+    email = (app.email or "").strip().lower()
+    if not email:
+        raise HTTPException(status_code=422, detail="Application has no email address")
+    if db.query(User).filter(User.email == email).first() is not None:
+        raise HTTPException(
+            status_code=409,
+            detail="This email is already registered to another account.",
+        )
+    if not app.credential_password_hash:
+        raise HTTPException(
+            status_code=422,
+            detail="No password was captured with this application.",
+        )
+    parts = (app.host_name or "").strip().split(" ", 1)
+    user = User(
+        email=email,
+        firstName=parts[0] if parts[0] else "Host",
+        lastName=parts[1] if len(parts) > 1 else "",
+        hashed_password=app.credential_password_hash,
+        phone=app.phone,
+        role=HOST,
+        region=app.region,
+        is_active=True,
+    )
+    db.add(user)
+    db.flush()
+    app.user_id = user.id
+    db.commit()
+    db.refresh(user)
+    return user
 
 
 class GuideApplicationCreate(BaseModel):
@@ -110,7 +205,15 @@ def list_host_applications(
 
 @router.post("/host-applications", status_code=status.HTTP_201_CREATED)
 def create_host_application(payload: HostApplicationCreate, db: Session = Depends(get_db)):
-    app = HostApplication(**payload.model_dump(), status="pending")
+    _ensure_host_application_columns(db)
+    data = payload.model_dump()
+    plaintext_password = data.pop("password", None)
+    app = HostApplication(**data, status="pending")
+    if plaintext_password:
+        valid, msg = validate_password_strength(plaintext_password)
+        if not valid:
+            raise HTTPException(status_code=422, detail=msg)
+        app.credential_password_hash = get_password_hash(plaintext_password)
     db.add(app)
     db.commit()
     db.refresh(app)
@@ -126,15 +229,61 @@ def review_host_application(
 ):
     if payload.status not in ("approved", "rejected", "pending"):
         raise HTTPException(status_code=422, detail="Invalid status")
+    _ensure_host_application_columns(db)
     app = db.get(HostApplication, application_id)
     if app is None:
         raise HTTPException(status_code=404, detail="Host application not found")
     # Regional heads may only act within their own region.
     if current_user.role == REGIONAL_HEAD and current_user.region and app.region != current_user.region:
         raise HTTPException(status_code=403, detail="Application outside your region")
+
+    # Record the reviewer's decision on the application row itself.
     app.status = payload.status
+    app.reviewed_by = current_user.email
+    app.review_note = payload.review_note
+    from datetime import datetime, timezone
+
+    app.reviewed_at = datetime.now(timezone.utc)
+
+    user = None
+    if payload.status == "approved":
+        # Approval is the single moment the login account is minted and
+        # activated. Before this, the applicant has no usable credentials.
+        user = _provision_host_user(db, app)
     db.commit()
-    return {"id": app.id, "status": app.status}
+    return {
+        "id": app.id,
+        "status": app.status,
+        "login_email": user.email if user else None,
+        "user_id": user.id if user else app.user_id,
+    }
+
+
+@router.get("/host/me/application")
+def get_my_host_application(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Return the current user's host application status for the dashboard.
+
+    A host can only reach this endpoint once they have a login account
+    (minted at approval), so the linked application is guaranteed to exist
+    and be approved.
+    """
+    _ensure_host_application_columns(db)
+    app = (
+        db.query(HostApplication)
+        .filter(HostApplication.email == current_user.email)
+        .order_by(HostApplication.created_at.desc())
+        .first()
+    )
+    if app is None:
+        raise HTTPException(status_code=404, detail="No host application found")
+    return {
+        "status": app.status,
+        "reviewed_by": app.reviewed_by,
+        "reviewed_at": app.reviewed_at.isoformat() if app.reviewed_at else None,
+    }
 
 
 # ---------------- Guide applications (separate from Hosts) ----------------

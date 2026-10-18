@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File
 from app.core.dependencies import require_role, get_optional_user
+from app.core.roles import has_access
 from app.models.user import User
 import copy
 import json
@@ -44,9 +45,16 @@ DB: dict[str, list] = {
         {"id": 16, "title": "Help", "slug": "help", "status": "published", "path": "/help", "description": "Help center — hero and body copy."},
     ],
     "blog": [
-        {"id": 1, "title": "Top 10 Treks in Nepal", "slug": "top-10-treks-in-nepal", "author": "Priya Sharma", "date": "2026-08-12", "status": "published", "content": "Nepal is home to some of the world's best trekking routes. From the Everest Base Camp trail to the Annapurna Circuit, here are our top picks."},
-        {"id": 2, "title": "A Foodie's Guide to Kathmandu", "slug": "foodies-guide-kathmandu", "author": "Rohan Thapa", "date": "2026-08-20", "status": "published", "content": "From steaming momos to Newari samay baji, Kathmandu's street food scene is a journey in itself."},
-        {"id": 3, "title": "Pokhara Beyond the Lake", "slug": "pokhara-beyond-the-lake", "author": "Sujal Karki", "date": "2026-09-01", "status": "draft", "content": "While Phewa Lake gets the fame, Pokhara offers caves, waterfalls and mountain viewpoints worth exploring."},
+        # Canonical source of truth for the frontend BlogPage static posts
+        # (matched by slug — ids must never be assumed to line up). Only
+        # "published" posts are served to anonymous visitors; drafts stay
+        # visible in the dashboard for writers/admins.
+        {"id": 1, "title": "10 Hidden Gems in Kathmandu You Must Visit", "slug": "hidden-gems-kathmandu", "author": "Ram Bahadur", "date": "2026-01-15", "status": "published", "category": "Travel Tips", "image": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80", "content": "Discover the secret spots that only locals know about. From hidden temples to underground cafes."},
+        {"id": 2, "title": "A Foodie's Guide to Newari Cuisine", "slug": "foodie-guide-newari-cuisine", "author": "Priya Sharma", "date": "2026-01-10", "status": "published", "category": "Food & Culture", "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80", "content": "Explore the rich flavors of traditional Newari dishes and where to find the best ones."},
+        {"id": 3, "title": "Pokhara: Beyond the Tourist Trail", "slug": "pokhara-beyond-tourist-trail", "author": "Sujal Thapa", "date": "2026-01-05", "status": "published", "category": "Adventure", "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80", "content": "Go beyond Phewa Lake and discover what makes Pokhara truly special."},
+        {"id": 4, "title": "Sustainable Travel in Nepal: A Complete Guide", "slug": "sustainable-travel-nepal-guide", "author": "Rohan KC", "date": "2025-12-28", "status": "published", "category": "Sustainability", "image": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=800&q=80", "content": "Learn how to travel responsibly and support local communities while exploring Nepal."},
+        {"id": 5, "title": "Bhaktapur: Walking Through Living History", "slug": "bhaktapur-walking-living-history", "author": "Apicha Maharjan", "date": "2025-12-20", "status": "published", "category": "Culture", "image": "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=800&q=80", "content": "Experience the medieval charm of Bhaktapur and its preserved Newari architecture."},
+        {"id": 6, "title": "How to Become a Local Guide in Nepal", "slug": "how-to-become-local-guide-nepal", "author": "Guides Nepal Team", "date": "2025-12-15", "status": "published", "category": "Community", "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=800&q=80", "content": "Interested in sharing your culture? Here's everything you need to know about becoming a guide."},
     ],
     "guides": [
         {"id": 1, "title": "Kathmandu Heritage Walk", "type": "description", "status": "published", "body": "Walk through the ancient streets of Kathmandu Durbar Square with a local historian."},
@@ -458,8 +466,71 @@ def clear_placement(key: str, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)
     return {"status": "ok"}
 
 
+# --- Blog: public read of published posts, staff read of everything --------
+# The generic _crud_routes("blog", ...) helper below registers an auth-gated
+# GET /blog which anonymous frontend visitors can never reach (they get a
+# 401 and silently fall back to stale hardcoded posts — the desync this
+# module fixes). So blog list/detail are declared explicitly here, BEFORE
+# the generic registration further down, and the generic helper is only
+# used for the other keys:
+#
+# - GET /blog (anonymous or non-CMS user): only status == "published".
+# - GET /blog (admin / content-manager): everything, drafts included, so
+#   the dashboard table shows exactly what the writer created.
+# - Writes (POST/PATCH/DELETE): admin / content-manager only.
+
+@router.get("/blog")
+def list_blog(current_user: Optional[User] = Depends(get_optional_user)) -> list:
+    """Public read of published blog posts; staff see drafts too."""
+    items = _clone(DB["blog"])
+    if current_user is not None and has_access(current_user.role, "admin", "content-manager"):
+        return items
+    return [it for it in items if (it.get("status") or "published").lower() == "published"]
+
+
+@router.get("/blog/{item_id}")
+def get_blog_post(item_id: int, current_user: Optional[User] = Depends(get_optional_user)) -> dict:
+    """Public read of a single published post; staff may read drafts too."""
+    item = _clone(_find("blog", item_id))
+    if (item.get("status") or "published").lower() == "published":
+        return item
+    if current_user is not None and has_access(current_user.role, "admin", "content-manager"):
+        return item
+    raise HTTPException(status_code=404, detail="blog not found")
+
+
+@router.post("/blog")
+def create_blog_post(payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)) -> dict:
+    """Create a blog post (dashboard writers/admins only)."""
+    global NEXT_ID
+    item = {**payload, "id": NEXT_ID}
+    NEXT_ID += 1
+    if not item.get("status"):
+        item["status"] = "draft"
+    if not item.get("date"):
+        from datetime import date as _date
+        item["date"] = _date.today().isoformat()
+    DB["blog"].append(item)
+    return _clone(item)
+
+
+@router.patch("/blog/{item_id}")
+def update_blog_post(item_id: int, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)) -> dict:
+    """Update a blog post (dashboard writers/admins only)."""
+    item = _find("blog", item_id)
+    item.update(payload)
+    return _clone(item)
+
+
+@router.delete("/blog/{item_id}")
+def delete_blog_post(item_id: int, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)) -> dict:
+    """Delete a blog post (dashboard writers/admins only)."""
+    item = _find("blog", item_id)
+    DB["blog"].remove(item)
+    return {"status": "ok", "message": "Deleted"}
+
+
 _crud_routes("pages", "pages", CMS_MANAGER_OR_ADMIN)
-_crud_routes("blog", "blog", CMS_MANAGER_OR_ADMIN)
 _crud_routes("guides", "guides-content", CMS_MANAGER_OR_ADMIN)
 _crud_routes("media", "media", CMS_MANAGER_OR_ADMIN)
 

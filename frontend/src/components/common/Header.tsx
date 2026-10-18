@@ -163,10 +163,12 @@ export const Header: React.FC = () => {
     >
       <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-2">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
-            <span className="font-bold text-xs">:)</span>
-          </div>
+        <Link to="/" className="flex items-center gap-2 shrink-0" aria-label="Guides Nepal - Home">
+          <img
+            src="/images/logo.png"
+            alt="Guides Nepal logo"
+            className="w-10 h-10 object-contain shrink-0"
+          />
           <span className="text-2xl font-bold text-primary tracking-tight hidden sm:block">
             guides-nepal
           </span>
