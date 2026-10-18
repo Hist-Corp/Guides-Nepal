@@ -17,9 +17,8 @@ const normalize = (value: string) => value.trim().toLowerCase();
 // Legacy global experience slugs that never existed in a city catalog but
 // belong to a city-owned experience. Keyed by legacy slug, valued by the
 // canonical city slug.
-const legacySlugAliases: Record<string, string> = {
-  'annapurna-circuit-trek': 'annapurna-base-camp-trek',
-};
+// (annapurna-circuit-trek now has its own dedicated pokharaRichData entry.)
+const legacySlugAliases: Record<string, string> = {};
 
 export interface CanonicalExperience {
   path: string;
@@ -65,22 +64,25 @@ export const getCatalogSearchExperiences = (): CatalogSearchExperience[] =>
         image: experience.host.image,
       },
       path: `/city/${city}/experience/${experience.slug}`,
-    })),
+    }))
   );
 
 /** Returns the city detail route and image for a catalogued experience. */
 export const getCanonicalExperience = (
   city: string | undefined,
-  identifiers: Array<string | number | undefined>,
+  identifiers: Array<string | number | undefined>
 ): CanonicalExperience | undefined => {
   const cityCatalog = cityExperiences.find((entry) => entry.city === normalize(city ?? ''));
   if (!cityCatalog) return undefined;
 
   const identifierSet = new Set(
-    identifiers.filter((value): value is string | number => value !== undefined).map(String),
+    identifiers.filter((value): value is string | number => value !== undefined).map(String)
   );
   const experience = cityCatalog.experiences.find(
-    (item) => identifierSet.has(item.slug) || identifierSet.has(item.title) || identifierSet.has(String(item.id)),
+    (item) =>
+      identifierSet.has(item.slug) ||
+      identifierSet.has(item.title) ||
+      identifierSet.has(String(item.id))
   );
 
   return experience
@@ -92,7 +94,9 @@ export const getCanonicalExperience = (
 };
 
 /** Finds a city experience from a globally-scoped legacy slug. */
-export const getCanonicalExperienceBySlug = (identifier: string): CanonicalExperience | undefined => {
+export const getCanonicalExperienceBySlug = (
+  identifier: string
+): CanonicalExperience | undefined => {
   const slug = legacySlugAliases[identifier] ?? identifier;
   for (const catalog of cityExperiences) {
     const experience = catalog.experiences.find((item) => item.slug === slug);

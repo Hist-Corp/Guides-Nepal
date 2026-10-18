@@ -36,6 +36,54 @@ import {
   EverestTrustStrip,
   EverestMain,
 } from './EverestReference';
+import {
+  AnnapurnaCircuitSprite,
+  AnnapurnaCircuitHeading,
+  AnnapurnaCircuitStickyNav,
+  AnnapurnaCircuitGallery,
+  AnnapurnaCircuitTrustStrip,
+  AnnapurnaCircuitMain,
+} from './AnnapurnaCircuitReference';
+import {
+  GhorepaniPoonHillSprite,
+  GhorepaniPoonHillHeading,
+  GhorepaniPoonHillStickyNav,
+  GhorepaniPoonHillGallery,
+  GhorepaniPoonHillTrustStrip,
+  GhorepaniPoonHillMain,
+} from './GhorepaniPoonHillReference';
+import {
+  LangtangValleySprite,
+  LangtangValleyHeading,
+  LangtangValleyStickyNav,
+  LangtangValleyGallery,
+  LangtangValleyTrustStrip,
+  LangtangValleyMain,
+} from './LangtangValleyReference';
+import {
+  MardiHimalSprite,
+  MardiHimalHeading,
+  MardiHimalStickyNav,
+  MardiHimalGallery,
+  MardiHimalTrustStrip,
+  MardiHimalMain,
+} from './MardiHimalReference';
+import {
+  KhopraRidgeSprite,
+  KhopraRidgeHeading,
+  KhopraRidgeStickyNav,
+  KhopraRidgeGallery,
+  KhopraRidgeTrustStrip,
+  KhopraRidgeMain,
+} from './KhopraRidgeReference';
+import {
+  HelambuGosainkundaSprite,
+  HelambuGosainkundaHeading,
+  HelambuGosainkundaStickyNav,
+  HelambuGosainkundaGallery,
+  HelambuGosainkundaTrustStrip,
+  HelambuGosainkundaMain,
+} from './HelambuGosainkundaReference';
 
 import { Price } from '../../components/common/Price';
 import { BookingCalendar } from '../../components/common/BookingCalendar';
@@ -87,14 +135,88 @@ const PokharaExperiencePage: React.FC = () => {
   const navigate = useNavigate();
   const goBack = useGoBack();
   const [data, setData] = useState(pokharaRichData.find((d) => d.slug === slug));
-  // The Annapurna Base Camp trek page is a port of the magicalnepal.com reference design
-  // (see AnnapurnaReference.tsx) — sections like Packing List / Why Book are intentionally
-  // not ported.
-  const isABC = slug === 'annapurna-base-camp-trek';
-  const isEverest = slug === 'everest-base-camp-trek';
-  // Everest reuses the Annapurna reference design 1:1 — every layout branch
-  // below keys off this shared flag so both pages render identical code.
-  const isTrekPort = isABC || isEverest;
+  // Each base-camp-style trek page is a port of the magicalnepal.com reference
+  // design (see AnnapurnaReference.tsx and its per-trek clones) — sections like
+  // Packing List / Why Book are intentionally not ported. Every ported trek maps
+  // its slug to the matching React sub-components rendered in the branches below.
+  const trekPorts: Record<
+    string,
+    {
+      Sprite: React.FC;
+      Heading: React.FC;
+      StickyNav: React.FC;
+      Gallery: React.FC;
+      TrustStrip: React.FC;
+      Main: React.FC;
+    }
+  > = {
+    'annapurna-base-camp-trek': {
+      Sprite: ABCSprite,
+      Heading: ABCHeading,
+      StickyNav: ABCStickyNav,
+      Gallery: ABCGallery,
+      TrustStrip: ABCTrustStrip,
+      Main: ABCMain,
+    },
+    'everest-base-camp-trek': {
+      Sprite: EverestSprite,
+      Heading: EverestHeading,
+      StickyNav: EverestStickyNav,
+      Gallery: EverestGallery,
+      TrustStrip: EverestTrustStrip,
+      Main: EverestMain,
+    },
+    'annapurna-circuit-trek': {
+      Sprite: AnnapurnaCircuitSprite,
+      Heading: AnnapurnaCircuitHeading,
+      StickyNav: AnnapurnaCircuitStickyNav,
+      Gallery: AnnapurnaCircuitGallery,
+      TrustStrip: AnnapurnaCircuitTrustStrip,
+      Main: AnnapurnaCircuitMain,
+    },
+    'ghorepani-poon-hill-trek': {
+      Sprite: GhorepaniPoonHillSprite,
+      Heading: GhorepaniPoonHillHeading,
+      StickyNav: GhorepaniPoonHillStickyNav,
+      Gallery: GhorepaniPoonHillGallery,
+      TrustStrip: GhorepaniPoonHillTrustStrip,
+      Main: GhorepaniPoonHillMain,
+    },
+    'langtang-valley-trek': {
+      Sprite: LangtangValleySprite,
+      Heading: LangtangValleyHeading,
+      StickyNav: LangtangValleyStickyNav,
+      Gallery: LangtangValleyGallery,
+      TrustStrip: LangtangValleyTrustStrip,
+      Main: LangtangValleyMain,
+    },
+    'mardi-himal-trek': {
+      Sprite: MardiHimalSprite,
+      Heading: MardiHimalHeading,
+      StickyNav: MardiHimalStickyNav,
+      Gallery: MardiHimalGallery,
+      TrustStrip: MardiHimalTrustStrip,
+      Main: MardiHimalMain,
+    },
+    'khopra-ridge-trek': {
+      Sprite: KhopraRidgeSprite,
+      Heading: KhopraRidgeHeading,
+      StickyNav: KhopraRidgeStickyNav,
+      Gallery: KhopraRidgeGallery,
+      TrustStrip: KhopraRidgeTrustStrip,
+      Main: KhopraRidgeMain,
+    },
+    'helambu-gosainkunda-trek': {
+      Sprite: HelambuGosainkundaSprite,
+      Heading: HelambuGosainkundaHeading,
+      StickyNav: HelambuGosainkundaStickyNav,
+      Gallery: HelambuGosainkundaGallery,
+      TrustStrip: HelambuGosainkundaTrustStrip,
+      Main: HelambuGosainkundaMain,
+    },
+  };
+  const port = slug ? trekPorts[slug] : undefined;
+  const isTrekPort = !!port;
   // Pre-defined tours/trips (fixed multi-day itineraries) depart on a single
   // chosen date, so they book one date instead of a check-in/check-out range.
   const singleDateTrip = isPredefinedTrip(data);
@@ -293,8 +415,7 @@ const PokharaExperiencePage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white">
       <Header />
-      {isABC && <ABCSprite />}
-      {isEverest && <EverestSprite />}
+      {port && <port.Sprite />}
 
       <main className={`flex-grow${isTrekPort ? ' mn-tt' : ''}`}>
         {/* Sticky tab bar must sit OUTSIDE the reveal-animated container below:
@@ -302,8 +423,7 @@ const PokharaExperiencePage: React.FC = () => {
             become the containing block for the bar's position:fixed, pinning it to
             the content instead of the viewport. Inside main.mn-tt it keeps all
             `.mn-tt .sticky-navbar-*` styles while staying viewport-fixed. */}
-        {isABC && <ABCStickyNav />}
-        {isEverest && <EverestStickyNav />}
+        {port && <port.StickyNav />}
         <div
           className={`container mx-auto px-4 md:px-8 lg:px-12 py-12 ${isTrekPort ? 'max-w-[1320px]' : 'max-w-6xl'}`}
         >
@@ -318,17 +438,11 @@ const PokharaExperiencePage: React.FC = () => {
           {/* Title Section */}
           {isTrekPort ? (
             <div className="mb-4">
-              {isABC ? (
+              {port && (
                 <>
-                  <ABCHeading />
-                  <ABCGallery />
-                  <ABCTrustStrip />
-                </>
-              ) : (
-                <>
-                  <EverestHeading />
-                  <EverestGallery />
-                  <EverestTrustStrip />
+                  <port.Heading />
+                  <port.Gallery />
+                  <port.TrustStrip />
                 </>
               )}
             </div>
@@ -456,11 +570,7 @@ const PokharaExperiencePage: React.FC = () => {
 
               {/* Article Content */}
               {isTrekPort ? (
-                isABC ? (
-                  <ABCMain />
-                ) : (
-                  <EverestMain />
-                )
+                port && <port.Main />
               ) : (
                 <div className="prose prose-lg max-w-none text-gray-600">
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">
