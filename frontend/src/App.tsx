@@ -19,6 +19,7 @@ import Cart from './components/common/Cart';
 import HomePage from './pages/HomePage';
 import SearchPage from './pages/SearchPage';
 import CanonicalExperienceRoute from './components/routing/CanonicalExperienceRoute';
+import { CityExperienceRoute, ExperienceKindRoute } from './components/routing/ExperienceKindRoute';
 import BackNavigationTracker from './components/routing/BackNavigationTracker';
 import SeoExperiencePage from './pages/SeoExperiencePage';
 import CityPage from './pages/CityPage';
@@ -163,33 +164,38 @@ function App() {
             <Route path="/impact-report-2024" element={<ImpactReportPage />} />
             <Route path="/experience/seo/:slug" element={<SeoExperiencePage />} />
             <Route path="/experience/:id" element={<CanonicalExperienceRoute />} />
+
+            {/* Trek & hike detail pages: /trek/<name> and /hike/<name> — the
+                same city experience workflow under kind-canonical URLs. */}
+            <Route path="/trek/:slug" element={<ExperienceKindRoute kind="trek" />} />
+            <Route path="/hike/:slug" element={<ExperienceKindRoute kind="hike" />} />
             <Route path="/auth/callback" element={<OAuthCallback />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             {/* Kathmandu Routes */}
             <Route path="/city/kathmandu" element={<KathmanduPage />} />
             <Route path="/city/kathmandu/experiences" element={<KathmanduExperiencesPage />} />
-            <Route path="/city/kathmandu/experience/:slug" element={<KathmanduExperiencePage />} />
+            <Route path="/city/kathmandu/experience/:slug" element={<CityExperienceRoute Page={KathmanduExperiencePage} />} />
 
             {/* Pokhara Routes */}
             <Route path="/city/pokhara" element={<PokharaPage />} />
             <Route path="/city/pokhara/experiences" element={<PokharaExperiencesPage />} />
-            <Route path="/city/pokhara/experience/:slug" element={<PokharaExperiencePage />} />
+            <Route path="/city/pokhara/experience/:slug" element={<CityExperienceRoute Page={PokharaExperiencePage} />} />
 
             {/* Lalitpur Routes */}
             <Route path="/city/lalitpur" element={<LalitpurPage />} />
             <Route path="/city/lalitpur/experiences" element={<LalitpurExperiencesPage />} />
-            <Route path="/city/lalitpur/experience/:slug" element={<LalitpurExperiencePage />} />
+            <Route path="/city/lalitpur/experience/:slug" element={<CityExperienceRoute Page={LalitpurExperiencePage} />} />
 
             {/* Bhaktapur Routes */}
             <Route path="/city/bhaktapur" element={<BhaktapurPage />} />
             <Route path="/city/bhaktapur/experiences" element={<BhaktapurExperiencesPage />} />
-            <Route path="/city/bhaktapur/experience/:slug" element={<BhaktapurExperiencePage />} />
+            <Route path="/city/bhaktapur/experience/:slug" element={<CityExperienceRoute Page={BhaktapurExperiencePage} />} />
 
             {/* Bharatpur Routes */}
             <Route path="/city/bharatpur" element={<BharatpurPage />} />
             <Route path="/city/bharatpur/experiences" element={<BharatpurExperiencesPage />} />
-            <Route path="/city/bharatpur/experience/:slug" element={<BharatpurExperiencePage />} />
+            <Route path="/city/bharatpur/experience/:slug" element={<CityExperienceRoute Page={BharatpurExperiencePage} />} />
 
             <Route path="/local/:id" element={<LocalProfilePage />} />
             <Route path="/local/:id/gallery" element={<GalleryPage />} />

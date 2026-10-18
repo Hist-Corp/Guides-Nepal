@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGoBack } from '../../utils/backNavigation';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { lalitpurRichData } from '../../data/lalitpurRichData';
+import { experienceDetailPath } from '../../utils/canonicalExperience';
 
 export const LalitpurExperiencesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -61,7 +62,7 @@ export const LalitpurExperiencesPage: React.FC = () => {
                 key={tour.id} 
                 className="flex flex-col bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer"
                 onClick={() => {
-                  navigate(`/city/lalitpur/experience/${tour.slug}`);
+                  navigate(experienceDetailPath('lalitpur', tour.slug));
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >

@@ -18,6 +18,7 @@ import { useGoBack } from '../../utils/backNavigation';
 import { pokharaRichData } from '../../data/pokharaRichData';
 import { allGuides } from '../../data/guidesData';
 import { Price } from '../../components/common/Price';
+import { experienceDetailPath } from '../../utils/canonicalExperience';
 
 export const PokharaPage: React.FC = () => {
   const navigate = useNavigate();
@@ -180,7 +181,7 @@ export const PokharaPage: React.FC = () => {
                 key={tour.id}
                 className="group relative rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300"
                 onClick={() => {
-                  navigate(`/city/pokhara/experience/${tour.slug}`);
+                  navigate(experienceDetailPath('pokhara', tour.slug));
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >
@@ -356,7 +357,7 @@ export const PokharaPage: React.FC = () => {
                 key={tour.id}
                 className="flex flex-col border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 bg-white group cursor-pointer"
                 onClick={() => {
-                  navigate(`/city/pokhara/experience/${tour.slug}`);
+                  navigate(experienceDetailPath('pokhara', tour.slug));
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >

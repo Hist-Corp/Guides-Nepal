@@ -9,12 +9,15 @@ import {
 } from 'lucide-react';
 import { allGuides } from '../data/guidesData';
 import { Guide } from '../data/types';
+import { ImageLightbox } from '../components/common/ImageLightbox';
 
 const GuidePortfolioPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const goBack = useGoBack();
   const [guide, setGuide] = useState<Guide | null>(null);
+  // Fullscreen viewer for the hero and project photos; null when closed.
+  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
 
   useEffect(() => {
     const guideId = id ? parseInt(id) : 1;
@@ -85,7 +88,15 @@ const GuidePortfolioPage: React.FC = () => {
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2">
               {/* Hero Image */}
-              <div className="relative rounded-2xl overflow-hidden mb-8 h-[400px] group">
+              <div
+                className="relative rounded-2xl overflow-hidden mb-8 h-[400px] group cursor-zoom-in"
+                onClick={() =>
+                  setLightbox({
+                    src: guide.gallery?.[0] || guide.image,
+                    alt: `${guide.name} cover photo`,
+                  })
+                }
+              >
                 <img 
                   src={guide.gallery?.[0] || guide.image} 
                   alt={guide.name} 
@@ -126,7 +137,10 @@ const GuidePortfolioPage: React.FC = () => {
                 <div className="space-y-8">
                    {portfolioHighlights.map((item, index) => (
                       <div key={index} className="flex flex-col md:flex-row gap-6 bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
-                         <div className="md:w-1/3 h-48 md:h-auto">
+                         <div
+                            className="md:w-1/3 h-48 md:h-auto cursor-zoom-in"
+                            onClick={() => setLightbox({ src: item.image, alt: item.title })}
+                         >
                             <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                          </div>
                          <div className="p-6 md:w-2/3 flex flex-col justify-center">
@@ -217,6 +231,14 @@ const GuidePortfolioPage: React.FC = () => {
         </div>
       </main>
       
+      {lightbox && (
+        <ImageLightbox
+          src={lightbox.src}
+          alt={lightbox.alt}
+          onClose={() => setLightbox(null)}
+        />
+      )}
+
       <Footer />
     </div>
   );

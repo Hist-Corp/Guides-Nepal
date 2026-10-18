@@ -6,6 +6,7 @@ import { Star, Clock, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useGoBack } from '../../utils/backNavigation';
 import { Price } from '../../components/common/Price';
+import { experienceDetailPath } from '../../utils/canonicalExperience';
 
 const BhaktapurExperiencesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const BhaktapurExperiencesPage: React.FC = () => {
               key={tour.id} 
               className="flex flex-col border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 bg-white group cursor-pointer"
               onClick={() => {
-                navigate(`/city/bhaktapur/experience/${tour.slug}`);
+                navigate(experienceDetailPath('bhaktapur', tour.slug));
                 window.scrollTo({ top: 0, behavior: 'instant' });
               }}
             >

@@ -14,6 +14,23 @@ const cityExperiences = [
 
 const normalize = (value: string) => value.trim().toLowerCase();
 
+// Detail URL kinds: treks live at /trek/<slug> and hikes at /hike/<slug>;
+// everything else keeps the city-owned /city/<city>/experience/<slug> route.
+export type ExperienceKind = 'trek' | 'hike';
+
+export const getExperienceKind = (slug: string): ExperienceKind | undefined =>
+  slug.endsWith('-trek') ? 'trek' : slug.endsWith('-hike') ? 'hike' : undefined;
+
+/** Canonical detail path for an experience owned by a city catalog. */
+export const experienceDetailPath = (city: string, slug: string): string => {
+  const kind = getExperienceKind(slug);
+  return kind ? `/${kind}/${slug}` : `/city/${city}/experience/${slug}`;
+};
+
+/** City that owns a slug's detail page, when it is part of a catalog. */
+export const getExperienceCity = (slug: string): string | undefined =>
+  cityExperiences.find((catalog) => catalog.experiences.some((item) => item.slug === slug))?.city;
+
 // Legacy global experience slugs that never existed in a city catalog but
 // belong to a city-owned experience. Keyed by legacy slug, valued by the
 // canonical city slug.
@@ -63,7 +80,7 @@ export const getCatalogSearchExperiences = (): CatalogSearchExperience[] =>
         name: experience.host.name,
         image: experience.host.image,
       },
-      path: `/city/${city}/experience/${experience.slug}`,
+      path: experienceDetailPath(city, experience.slug),
     }))
   );
 
@@ -87,7 +104,7 @@ export const getCanonicalExperience = (
 
   return experience
     ? {
-        path: `/city/${cityCatalog.city}/experience/${experience.slug}`,
+        path: experienceDetailPath(cityCatalog.city, experience.slug),
         heroImage: experience.heroImage,
       }
     : undefined;
@@ -102,11 +119,22 @@ export const getCanonicalExperienceBySlug = (
     const experience = catalog.experiences.find((item) => item.slug === slug);
     if (experience) {
       return {
-        path: `/city/${catalog.city}/experience/${experience.slug}`,
+        path: experienceDetailPath(catalog.city, experience.slug),
         heroImage: experience.heroImage,
       };
     }
   }
 
   return undefined;
+};
+
+/**
+ * Detail path from a bare slug (no city context): kind-first so every
+ * trek/hike slug gets its /trek/... or /hike/... URL, then the canonical
+ * city path, then the legacy global experience route.
+ */
+export const experienceSlugPath = (slug: string): string => {
+  const kind = getExperienceKind(slug);
+  if (kind) return `/${kind}/${slug}`;
+  return getCanonicalExperienceBySlug(slug)?.path ?? `/experience/${slug}`;
 };

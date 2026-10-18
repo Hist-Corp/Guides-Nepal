@@ -38,6 +38,7 @@ export const allGuides: Guide[] = [
     gallery: [
       'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1740&q=80',
       'https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1740&q=80',
     ],
   },
   {
@@ -57,6 +58,7 @@ export const allGuides: Guide[] = [
     gallery: [
       'https://images.unsplash.com/photo-1554188248-986adbb73be4?auto=format&fit=crop&w=1740&q=80',
       'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80',
     ],
   },
   {
@@ -76,6 +78,7 @@ export const allGuides: Guide[] = [
     gallery: [
       'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1740&q=80',
       'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1740&q=80',
     ],
   },
 ];

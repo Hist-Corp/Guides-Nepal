@@ -5,6 +5,7 @@ import { lalitpurRichData } from '../data/lalitpurRichData';
 import { bharatpurRichData } from '../data/bharatpurRichData';
 import { allGuides } from '../data/guidesData';
 import { RichExperienceData } from '../data/types';
+import { experienceDetailPath } from './canonicalExperience';
 
 export interface SearchIndexEntry {
   id: string;
@@ -68,7 +69,7 @@ const createIndexEntries = (): SearchIndexEntry[] => {
 
   for (const exp of allExperiences) {
     const cityKey = exp.city?.toLowerCase() || '';
-    const experiencePath = `/city/${cityKey}/experience/${exp.slug}`;
+    const experiencePath = experienceDetailPath(cityKey, exp.slug);
 
     entries.push({
       id: `exp-${exp.id}`,

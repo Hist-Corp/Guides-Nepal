@@ -3,10 +3,12 @@ import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { PageBackButton } from '../components/common/PageBackButton';
 import { Gift, Heart, PartyPopper, Sparkles } from 'lucide-react';
+import { useCurrency } from '../contexts/CurrencyContext';
 
 const giftCardAmounts = [25, 50, 100, 200];
 
 const GiftCardsPage: React.FC = () => {
+  const { formatPrice } = useCurrency();
   const [selectedAmount, setSelectedAmount] = useState(50);
   const [recipientName, setRecipientName] = useState('');
   const [recipientEmail, setRecipientEmail] = useState('');
@@ -37,7 +39,7 @@ const GiftCardsPage: React.FC = () => {
                       <span className="font-bold text-lg">Guides Nepal</span>
                     </div>
                     <div>
-                      <div className="text-3xl font-bold">${selectedAmount}</div>
+                      <div className="text-3xl font-bold">{formatPrice(selectedAmount, 'USD')}</div>
                       <div className="text-sm text-white/80">Gift Card</div>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
@@ -64,7 +66,7 @@ const GiftCardsPage: React.FC = () => {
                                 : 'bg-gray-100 text-slate-700 hover:bg-gray-200'
                             }`}
                           >
-                            ${amount}
+                            {formatPrice(amount, 'USD')}
                           </button>
                         ))}
                       </div>
@@ -99,7 +101,7 @@ const GiftCardsPage: React.FC = () => {
                       />
                     </div>
                     <button className="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary-hover transition-colors">
-                      Purchase Gift Card - ${selectedAmount}
+                      Purchase Gift Card - {formatPrice(selectedAmount, 'USD')}
                     </button>
                   </div>
                 </div>

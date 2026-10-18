@@ -20,6 +20,7 @@ import { SignupModal } from '../auth/SignupModal';
 import { ForgotPasswordModal } from '../auth/ForgotPasswordModal';
 import { useUIStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
+import { useProfileStore } from '../../store/profileStore';
 import { useCart } from '../../contexts/CartContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { CurrencyPickerModal } from './CurrencyPickerModal';
@@ -33,6 +34,10 @@ export const Header: React.FC = () => {
     useUIStore();
   const { isAuthenticated, user, logout } = useAuthStore();
   const { getTotalItems } = useCart();
+  // Favourites shown on /favorites: the header heart turns red only while the
+  // user actually has saved bookmarks — null/empty keeps the plain outline icon.
+  const bookmarks = useProfileStore((state) => state.profile.bookmarks);
+  const hasFavorites = Array.isArray(bookmarks) && bookmarks.length > 0;
   const { currencyInfo, formatPrice } = useCurrency();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
@@ -167,11 +172,9 @@ export const Header: React.FC = () => {
           <img
             src="/images/logo.png"
             alt="Guides Nepal logo"
-            className="w-10 h-10 object-contain shrink-0"
+            className=" object-contain shrink-0"
+            style={{ maxWidth: '180px' }}
           />
-          <span className="text-2xl font-bold text-primary tracking-tight hidden sm:block">
-            guides-nepal
-          </span>
         </Link>
 
         {/* Search Bar (All pages; on the home page it animates in once the
@@ -234,7 +237,7 @@ export const Header: React.FC = () => {
                 </Link>
               )}
               <Link to="/favorites" className="text-gray-800 hover:text-primary transition-colors">
-                <Heart className="w-6 h-6" />
+                <Heart className={`w-6 h-6 ${hasFavorites ? 'text-red-500 fill-red-500' : ''}`} />
               </Link>
               <div
                 ref={profileDropdownRef}

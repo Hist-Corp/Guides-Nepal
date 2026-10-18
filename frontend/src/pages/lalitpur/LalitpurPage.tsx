@@ -18,6 +18,7 @@ import { useGoBack } from '../../utils/backNavigation';
 import { lalitpurRichData } from '../../data/lalitpurRichData';
 import { allGuides } from '../../data/guidesData';
 import { Price } from '../../components/common/Price';
+import { experienceDetailPath } from '../../utils/canonicalExperience';
 
 export const LalitpurPage: React.FC = () => {
   const navigate = useNavigate();
@@ -182,7 +183,7 @@ export const LalitpurPage: React.FC = () => {
                 key={tour.id}
                 className="group relative rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300"
                 onClick={() => {
-                  navigate(`/city/lalitpur/experience/${tour.slug}`);
+                  navigate(experienceDetailPath('lalitpur', tour.slug));
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >
@@ -350,7 +351,7 @@ export const LalitpurPage: React.FC = () => {
                 key={tour.id}
                 className="flex flex-col border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 bg-white group cursor-pointer"
                 onClick={() => {
-                  navigate(`/city/lalitpur/experience/${tour.slug}`);
+                  navigate(experienceDetailPath('lalitpur', tour.slug));
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >

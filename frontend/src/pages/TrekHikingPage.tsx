@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { getCanonicalExperienceBySlug } from '../utils/canonicalExperience';
+import { experienceSlugPath } from '../utils/canonicalExperience';
 import { useGoBack } from '../utils/backNavigation';
 
 type TrekGrade = 'Easy' | 'Moderate' | 'Challenging';
@@ -375,7 +375,7 @@ export const TrekHikingPage: React.FC = () => {
       : trekRoutes.filter((route) => route.grade === activeGrade);
 
   const openRoute = (slug: string) => {
-    navigate(getCanonicalExperienceBySlug(slug)?.path ?? `/experience/${slug}`);
+    navigate(experienceSlugPath(slug));
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 

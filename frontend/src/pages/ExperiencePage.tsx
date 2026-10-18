@@ -588,13 +588,17 @@ trekRoutes.forEach((trek, index) => {
   };
 });
 const ExperiencePage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, slug } = useParams<{ id: string; slug: string }>();
+  // :id on the legacy /experience/:id route; :slug when this page is rendered
+  // from a kind URL (/trek/:slug or /hike/:slug) for slugs that live outside
+  // the city catalogs.
+  const experienceId = id ?? slug;
   const navigate = useNavigate();
   const { formatPrice } = useCurrency();
   // Derive this from the URL on every render. React Router can reuse this
   // component when only :id changes (for example, from a related experience),
   // so storing it in state would leave the previous experience on screen.
-  const staticExperience = id ? experiencesData[id] : undefined;
+  const staticExperience = experienceId ? experiencesData[experienceId] : undefined;
   const [apiExperience, setApiExperience] = useState<Experience | undefined>(undefined);
   const [loading, setLoading] = useState(!staticExperience);
   const experience = staticExperience ?? apiExperience;
@@ -604,7 +608,7 @@ const ExperiencePage: React.FC = () => {
   useEffect(() => {
     setApiExperience(undefined);
 
-    if (staticExperience || !id) {
+    if (staticExperience || !experienceId) {
       setLoading(false);
       return;
     }
@@ -615,7 +619,7 @@ const ExperiencePage: React.FC = () => {
       try {
         const list = await guidesApi.getExperiences();
         if (cancelled) return;
-        const match = list.find((e) => String(e.id) === id || e.slug === id);
+        const match = list.find((e) => String(e.id) === experienceId || e.slug === experienceId);
         if (match) {
           setApiExperience({
             ...match,
@@ -651,7 +655,7 @@ const ExperiencePage: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [id, staticExperience]);
+  }, [experienceId, staticExperience]);
 
   const { addBooking } = useBookingStore();
   const { isAuthenticated } = useAuthStore();

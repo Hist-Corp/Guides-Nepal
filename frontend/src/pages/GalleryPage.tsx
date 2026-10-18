@@ -6,11 +6,25 @@ import { Footer } from '../components/common/Footer';
 import { ArrowLeft } from 'lucide-react';
 import { allGuides } from '../data/guidesData';
 import { Guide } from '../data/types';
+import { ImageLightbox } from '../components/common/ImageLightbox';
+import { NEPAL_IMAGES } from '../data/images';
+
+// Extra masonry tiles beyond the guide's own photos, drawn from the verified
+// Nepal image pool so the grid feels alive instead of repeating one photo.
+const extraGallery: { src: string; alt: string }[] = [
+  { src: NEPAL_IMAGES.himalayanPeaks, alt: 'Himalayan peaks above the clouds' },
+  { src: NEPAL_IMAGES.temples, alt: 'Nepali temple architecture' },
+  { src: NEPAL_IMAGES.phewaLake, alt: 'Phewa Lake, Pokhara' },
+  { src: NEPAL_IMAGES.trekking, alt: 'Trekking a mountain trail' },
+  { src: NEPAL_IMAGES.oldTown, alt: 'Old town lanes of the Kathmandu Valley' },
+  { src: NEPAL_IMAGES.forestHills, alt: 'Forest-covered hills' },
+];
 
 const GalleryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const goBack = useGoBack();
   const [guide, setGuide] = useState<Guide | null>(null);
+  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
 
   useEffect(() => {
     const guideId = id ? parseInt(id) : 1;
@@ -42,7 +56,12 @@ const GalleryPage: React.FC = () => {
           {/* Masonry Grid */}
           <div className="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
             {/* Hero Image First */}
-            <div className="break-inside-avoid rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative">
+            <div
+              className="break-inside-avoid rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative cursor-zoom-in"
+              onClick={() =>
+                setLightbox({ src: guide.image, alt: `${guide.name} profile photo` })
+              }
+            >
               <img 
                 src={guide.image} 
                 alt={`${guide.name} Profile`}
@@ -55,7 +74,8 @@ const GalleryPage: React.FC = () => {
             {guide.gallery.map((img, index) => (
               <div 
                 key={index} 
-                className="break-inside-avoid rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative"
+                onClick={() => setLightbox({ src: img, alt: `${guide.name} gallery photo ${index + 1}` })}
+                className="break-inside-avoid rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative cursor-zoom-in"
               >
                 <img 
                   src={img} 
@@ -66,15 +86,16 @@ const GalleryPage: React.FC = () => {
               </div>
             ))}
 
-            {/* Additional Generated Placeholders for Demo (to show masonry effect) */}
-            {[...Array(6)].map((_, i) => (
+            {/* Additional photos from the verified Nepal image pool (masonry effect) */}
+            {extraGallery.map((photo, i) => (
               <div 
                 key={`extra-${i}`} 
-                className="break-inside-avoid rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative"
+                onClick={() => setLightbox({ src: photo.src, alt: photo.alt })}
+                className="break-inside-avoid rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative cursor-zoom-in"
               >
                 <img 
-                  src="https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=400&q=80"
-                  alt={`Extra Gallery ${i}`}
+                  src={photo.src}
+                  alt={photo.alt}
                   className="w-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none" />
@@ -83,6 +104,14 @@ const GalleryPage: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {lightbox && (
+        <ImageLightbox
+          src={lightbox.src}
+          alt={lightbox.alt}
+          onClose={() => setLightbox(null)}
+        />
+      )}
 
       <Footer />
     </div>

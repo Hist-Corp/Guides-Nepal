@@ -24,6 +24,8 @@ import { kathmanduRichData } from '../data/kathmanduRichData';
 import { pokharaRichData } from '../data/pokharaRichData';
 import { lalitpurRichData } from '../data/lalitpurRichData';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { experienceDetailPath } from '../utils/canonicalExperience';
+import { ImageLightbox } from '../components/common/ImageLightbox';
 
 // Combine all experiences for lookup
 const allExperiences = [...kathmanduRichData, ...pokharaRichData, ...lalitpurRichData];
@@ -38,6 +40,8 @@ const LocalProfilePage: React.FC = () => {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showHowItWorksModal, setShowHowItWorksModal] = useState(false);
   const [selectedRating, setSelectedRating] = useState(0);
+  // Fullscreen viewer for guide photos (hero + gallery); null when closed.
+  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
 
   useEffect(() => {
     const fetchGuide = async () => {
@@ -259,7 +263,15 @@ const LocalProfilePage: React.FC = () => {
             <div className="lg:w-2/3 space-y-12">
               {/* Bio Section with Portfolio Style */}
               <section>
-                <div className="relative rounded-2xl overflow-hidden mb-8 h-[400px] group shadow-sm">
+                <div
+                  className="relative rounded-2xl overflow-hidden mb-8 h-[400px] group shadow-sm cursor-zoom-in"
+                  onClick={() =>
+                    setLightbox({
+                      src: guide.gallery?.[0] || guide.image,
+                      alt: `${guide.name} cover photo`,
+                    })
+                  }
+                >
                   <img
                     src={guide.gallery?.[0] || guide.image}
                     alt={guide.name}
@@ -385,7 +397,8 @@ const LocalProfilePage: React.FC = () => {
                     {guide.gallery.slice(1).map((img, i) => (
                       <div
                         key={i}
-                        className="aspect-[4/3] rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
+                        onClick={() => setLightbox({ src: img, alt: `Gallery ${i + 1}` })}
+                        className="aspect-[4/3] rounded-xl overflow-hidden cursor-zoom-in hover:opacity-90 transition-opacity shadow-sm"
                       >
                         <img
                           src={img}
@@ -428,7 +441,7 @@ const LocalProfilePage: React.FC = () => {
                         key={tour.id}
                         onClick={() => {
                           const citySlug = tour.city?.toLowerCase() || 'kathmandu';
-                          navigate(`/city/${citySlug}/experience/${tour.slug}`);
+                          navigate(experienceDetailPath(citySlug, tour.slug));
                           window.scrollTo({ top: 0, behavior: 'instant' });
                         }}
                         className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md border border-gray-100 transition-all cursor-pointer flex flex-col md:flex-row gap-6 group"
@@ -793,6 +806,14 @@ const LocalProfilePage: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {lightbox && (
+        <ImageLightbox
+          src={lightbox.src}
+          alt={lightbox.alt}
+          onClose={() => setLightbox(null)}
+        />
       )}
 
       <Footer />

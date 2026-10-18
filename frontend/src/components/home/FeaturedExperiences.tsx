@@ -7,6 +7,7 @@ import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCmsSection } from '../../hooks/useCms';
 import { cmsBackground } from '../../utils/cmsText';
 import { trekRoutes } from '../../pages/TrekHikingPage';
+import { experienceSlugPath } from '../../utils/canonicalExperience';
 
 const experiences = trekRoutes.map((t) => ({
   id: t.id,
@@ -48,7 +49,7 @@ export const FeaturedExperiences: React.FC = () => {
         <div ref={scrollContainerRef} className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {experiences.map((exp, index) => (
             <Reveal key={exp.id} delay={index * 110} className="min-w-[300px] md:min-w-[calc(33.333%-1rem)] snap-start block h-full">
-              <Link to={`/experience/${exp.slug}`} className="group block h-full">
+              <Link to={experienceSlugPath(exp.slug)} className="group block h-full">
                 <Card hoverEffect className="h-full flex flex-col transition-all duration-300 hover:-translate-y-2">
                   <div className="relative h-80 overflow-hidden">
                     <img src={exp.image} alt={exp.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')} />
