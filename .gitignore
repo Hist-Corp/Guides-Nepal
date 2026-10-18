@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 
+# macOS metadata sidecars (created when zips are extracted on macOS)
+._*
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
