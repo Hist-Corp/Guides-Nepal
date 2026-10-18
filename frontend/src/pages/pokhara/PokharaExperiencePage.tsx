@@ -28,6 +28,14 @@ import {
   ABCTrustStrip,
   ABCMain,
 } from './AnnapurnaReference';
+import {
+  EverestSprite,
+  EverestHeading,
+  EverestStickyNav,
+  EverestGallery,
+  EverestTrustStrip,
+  EverestMain,
+} from './EverestReference';
 
 import { Price } from '../../components/common/Price';
 import { BookingCalendar } from '../../components/common/BookingCalendar';
@@ -83,6 +91,10 @@ const PokharaExperiencePage: React.FC = () => {
   // (see AnnapurnaReference.tsx) — sections like Packing List / Why Book are intentionally
   // not ported.
   const isABC = slug === 'annapurna-base-camp-trek';
+  const isEverest = slug === 'everest-base-camp-trek';
+  // Everest reuses the Annapurna reference design 1:1 — every layout branch
+  // below keys off this shared flag so both pages render identical code.
+  const isTrekPort = isABC || isEverest;
   // Pre-defined tours/trips (fixed multi-day itineraries) depart on a single
   // chosen date, so they book one date instead of a check-in/check-out range.
   const singleDateTrip = isPredefinedTrip(data);
@@ -146,7 +158,9 @@ const PokharaExperiencePage: React.FC = () => {
     if (!checkIn) {
       const infoElement = document.getElementById('booking-info-message');
       if (infoElement) {
-        infoElement.textContent = singleDateTrip ? 'Please select a date' : 'Please select a check-in date';
+        infoElement.textContent = singleDateTrip
+          ? 'Please select a date'
+          : 'Please select a check-in date';
         infoElement.classList.remove('hidden');
         infoElement.classList.add('text-red-500');
       }
@@ -280,16 +294,18 @@ const PokharaExperiencePage: React.FC = () => {
     <div className="min-h-screen flex flex-col font-sans bg-white">
       <Header />
       {isABC && <ABCSprite />}
+      {isEverest && <EverestSprite />}
 
-      <main className={`flex-grow${isABC ? ' mn-tt' : ''}`}>
+      <main className={`flex-grow${isTrekPort ? ' mn-tt' : ''}`}>
         {/* Sticky tab bar must sit OUTSIDE the reveal-animated container below:
             PageReveal adds `animate-fade-in-up`, and a transformed ancestor would
             become the containing block for the bar's position:fixed, pinning it to
             the content instead of the viewport. Inside main.mn-tt it keeps all
             `.mn-tt .sticky-navbar-*` styles while staying viewport-fixed. */}
         {isABC && <ABCStickyNav />}
+        {isEverest && <EverestStickyNav />}
         <div
-          className={`container mx-auto px-4 md:px-8 lg:px-12 py-12 ${isABC ? 'max-w-[1320px]' : 'max-w-6xl'}`}
+          className={`container mx-auto px-4 md:px-8 lg:px-12 py-12 ${isTrekPort ? 'max-w-[1320px]' : 'max-w-6xl'}`}
         >
           <button
             onClick={goBack}
@@ -300,11 +316,21 @@ const PokharaExperiencePage: React.FC = () => {
           </button>
 
           {/* Title Section */}
-          {isABC ? (
+          {isTrekPort ? (
             <div className="mb-4">
-              <ABCHeading />
-              <ABCGallery />
-              <ABCTrustStrip />
+              {isABC ? (
+                <>
+                  <ABCHeading />
+                  <ABCGallery />
+                  <ABCTrustStrip />
+                </>
+              ) : (
+                <>
+                  <EverestHeading />
+                  <EverestGallery />
+                  <EverestTrustStrip />
+                </>
+              )}
             </div>
           ) : (
             <div className="mb-8">
@@ -321,7 +347,7 @@ const PokharaExperiencePage: React.FC = () => {
             {/* Left Column - Main Content */}
             <div className="lg:col-span-2">
               {/* Hero Image (reference port renders its own gallery instead) */}
-              {!isABC && (
+              {!isTrekPort && (
                 <div className="relative rounded-2xl overflow-hidden mb-8 h-[400px] group">
                   <img
                     src={data.heroImage}
@@ -429,8 +455,12 @@ const PokharaExperiencePage: React.FC = () => {
               </div>
 
               {/* Article Content */}
-              {isABC ? (
-                <ABCMain />
+              {isTrekPort ? (
+                isABC ? (
+                  <ABCMain />
+                ) : (
+                  <EverestMain />
+                )
               ) : (
                 <div className="prose prose-lg max-w-none text-gray-600">
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -532,13 +562,15 @@ const PokharaExperiencePage: React.FC = () => {
 
                 <div
                   id="booking-card-desktop"
-                  className={`hidden lg:block bg-white rounded-2xl shadow-xl border border-gray-100 overflow-visible relative ${isABC ? 'p-4' : 'p-6'}`}
+                  className={`hidden lg:block bg-white rounded-2xl shadow-xl border border-gray-100 overflow-visible relative ${isTrekPort ? 'p-4' : 'p-6'}`}
                 >
                   <div className="absolute top-0 left-0 w-full h-1 bg-primary rounded-t-2xl"></div>
 
                   {!isBookingConfirmed ? (
                     <>
-                      <div className={`flex items-center space-x-1 ${isABC ? 'mb-1' : 'mb-2'}`}>
+                      <div
+                        className={`flex items-center space-x-1 ${isTrekPort ? 'mb-1' : 'mb-2'}`}
+                      >
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
@@ -549,16 +581,18 @@ const PokharaExperiencePage: React.FC = () => {
                           ({data.reviews || 124} reviews)
                         </span>
                       </div>
-                      <div className={`flex items-baseline space-x-2 ${isABC ? 'mb-3' : 'mb-6'}`}>
+                      <div
+                        className={`flex items-baseline space-x-2 ${isTrekPort ? 'mb-3' : 'mb-6'}`}
+                      >
                         <span
-                          className={`font-bold text-secondary ${isABC ? 'text-2xl' : 'text-3xl'}`}
+                          className={`font-bold text-secondary ${isTrekPort ? 'text-2xl' : 'text-3xl'}`}
                         >
                           <Price amount={data.price || 45} />
                         </span>
                         <span className="text-gray-500">/ person</span>
                       </div>
 
-                      <div className={isABC ? 'space-y-2.5 mb-4' : 'space-y-4 mb-6'}>
+                      <div className={isTrekPort ? 'space-y-2.5 mb-4' : 'space-y-4 mb-6'}>
                         <BookingCalendar
                           checkIn={checkIn}
                           checkOut={checkOut}
@@ -569,7 +603,7 @@ const PokharaExperiencePage: React.FC = () => {
                           idPrefix="card"
                           single={singleDateTrip}
                           ariaLabel={singleDateTrip ? 'Select date, format DD/MM/YYYY' : undefined}
-                          compact={isABC}
+                          compact={isTrekPort}
                         />
 
                         <GuestPicker
@@ -688,7 +722,7 @@ const PokharaExperiencePage: React.FC = () => {
                         )}
                       </div>
 
-                      <div className={isABC ? 'space-y-2 mb-4' : 'space-y-3 mb-6'}>
+                      <div className={isTrekPort ? 'space-y-2 mb-4' : 'space-y-3 mb-6'}>
                         <button
                           onClick={handleBookNow}
                           className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98]"
@@ -712,7 +746,7 @@ const PokharaExperiencePage: React.FC = () => {
                             You won't be charged yet
                           </p>
                         )}
-                        {isABC && (
+                        {isTrekPort && (
                           <button
                             type="button"
                             onClick={handleSaveForLater}
@@ -725,14 +759,14 @@ const PokharaExperiencePage: React.FC = () => {
                             {isSaved ? 'Saved' : 'Save for later'}
                           </button>
                         )}
-                        {isABC && saveFlash && (
+                        {isTrekPort && saveFlash && (
                           <p className="text-center text-xs font-medium text-green-600">
                             Saved to your favorites
                           </p>
                         )}
                       </div>
 
-                      <div className={isABC ? 'space-y-2 pt-4 text-sm' : 'space-y-3 pt-6'}>
+                      <div className={isTrekPort ? 'space-y-2 pt-4 text-sm' : 'space-y-3 pt-6'}>
                         <div className="flex justify-between text-sm text-gray-600">
                           <span className="underline decoration-gray-300 decoration-1 underline-offset-2">
                             <Price amount={pricePerPerson} /> x {guestCount} guests{' '}
