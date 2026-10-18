@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.security import get_password_hash, validate_password_strength
 from app.models.guide import Guide
 from app.models.guide_application import GuideApplication
 from app.models.host_application import HostApplication
@@ -126,6 +127,7 @@ async def submit_host_application_wizard(
     years_experience: str = Form(...), expertise: str = Form(...), experience: str = Form(...),
     proposedTitle: str = Form(...), proposedDescription: str = Form(...), proposedCategory: str = Form(...),
     proposedDuration: str = Form(...), maxGuests: str = Form("8"), price: str = Form(...), availability: str = Form(...),
+    password: str = Form(...),
     terms: bool = Form(False), privacy: bool = Form(False), accuracy: bool = Form(False),
     identity: UploadFile = File(None), photo: UploadFile = File(None), license: UploadFile = File(None), certificate: UploadFile = File(None),
     db: Session = Depends(get_db),
@@ -136,6 +138,13 @@ async def submit_host_application_wizard(
         raise HTTPException(status_code=422, detail="All declarations must be accepted")
     if len(experience.strip()) < 50 or len(proposedDescription.strip()) < 30:
         raise HTTPException(status_code=422, detail="Please provide more detail in the experience sections")
+    # Capture the applicant's chosen password now, but only as a hash on the
+    # application row. The real login account is minted when a regional head
+    # or admin approves (operations.review_host_application).
+    valid_pw, pw_msg = validate_password_strength(password)
+    if not valid_pw:
+        raise HTTPException(status_code=422, detail=pw_msg)
+    password_hash = get_password_hash(password)
     documents = {}
     upload_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../private_host_applications"))
     os.makedirs(upload_root, exist_ok=True)
@@ -147,7 +156,7 @@ async def submit_host_application_wizard(
         filename = f"{uuid.uuid4().hex}_{os.path.basename(upload.filename or 'document')}"
         with open(os.path.join(upload_root, filename), "wb") as target: target.write(content)
         documents[key] = filename
-    application = HostApplication(host_name=f"{first_name} {last_name}", email=email, phone=phone, city=city, region=district, experience=json.dumps({"host_type":host_type,"business_name":business_name,"registration_number":registration_number,"primary_city":primary_city,"years_experience":years_experience,"expertise":expertise,"languages":languages,"proposed_experience":{"title":proposedTitle,"description":proposedDescription,"category":proposedCategory,"duration":proposedDuration,"max_guests":maxGuests,"price":price,"availability":availability},"documents":documents}, ensure_ascii=False), status="pending")
+    application = HostApplication(host_name=f"{first_name} {last_name}", email=email, phone=phone, city=city, region=district, experience=json.dumps({"host_type":host_type,"business_name":business_name,"registration_number":registration_number,"primary_city":primary_city,"years_experience":years_experience,"expertise":expertise,"languages":languages,"proposed_experience":{"title":proposedTitle,"description":proposedDescription,"category":proposedCategory,"duration":proposedDuration,"max_guests":maxGuests,"price":price,"availability":availability},"documents":documents}, ensure_ascii=False), credential_password_hash=password_hash, status="pending")
     db.add(application); db.commit(); db.refresh(application)
     return {"id": application.id, "status": application.status, "message": "Application received"}
 

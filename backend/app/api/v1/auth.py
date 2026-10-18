@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session
+from typing import Optional
 from app.core.database import get_db
 from app.schemas.auth import (
     PrivilegedUserCreate,
@@ -14,13 +15,23 @@ from app.schemas.auth import (
 from app.services.auth_service import AuthService
 from app.core.config import settings, Settings
 from app.core.dependencies import get_current_user
-from app.core.roles import ADMIN
+from app.core.roles import ADMIN, normalize_role
 from app.models.user import User
 import httpx
 import urllib.parse
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def user_role_for(db: Session, email: str) -> Optional[str]:
+    """Return the stored role for an email, or None if no such user.
+
+    Used by the login error path to distinguish "host awaiting approval"
+    (403) from a genuine bad-credential failure (401).
+    """
+    user = db.query(User).filter(User.email == str(email).strip().lower()).first()
+    return user.role if user else None
 
 
 def _ensure_supabase_user_exists(email: str, settings: "Settings") -> None:
@@ -140,6 +151,19 @@ def login(login_data: UserLogin, db: Session = Depends(get_db)) -> dict:
     auth_service = AuthService(db)
     user = auth_service.authenticate_user(login_data.email, login_data.password)
     if not user:
+        # Host accounts are gated on an approved registration. If the password
+        # is correct but the application is still pending or was rejected, say
+        # so explicitly instead of a generic credential error — the applicant
+        # needs to know they're waiting on a regional head/admin.
+        if normalize_role(user_role_for(db, login_data.email)) == "host":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=(
+                    "Your host account is not active yet. It is activated once "
+                    "a regional manager approves your registration."
+                ),
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",

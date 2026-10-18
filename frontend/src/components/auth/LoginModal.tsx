@@ -19,7 +19,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 }) => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [userType, setUserType] = useState<'traveler' | 'guide'>('traveler');
+  const [userType, setUserType] = useState<'traveler' | 'guide' | 'host'>('traveler');
   const { login, setTokens, setRememberMe } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -147,6 +147,12 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         if (data.user?.role === 'guide') {
           navigate('/guide/dashboard');
         }
+        // Approved hosts land on the Host Frontend. Their account only
+        // exists once a regional head/admin approved the application, so a
+        // successful login here means they are already active.
+        if (data.user?.role === 'host') {
+          navigate('/host/dashboard');
+        }
       } else {
         try {
           const errData = await resp.json();
@@ -211,6 +217,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               }`}
             >
               Guide
+            </button>
+            <button
+              onClick={() => setUserType('host')}
+              className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
+                userType === 'host'
+                  ? 'bg-brand-yellow text-[#213448] shadow-md'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Host
             </button>
           </div>
 

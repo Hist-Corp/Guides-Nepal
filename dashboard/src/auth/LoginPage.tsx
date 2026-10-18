@@ -185,9 +185,16 @@ export default function LoginPage() {
       }
       navigate(`/dashboard/${normalized}`, { replace: true });
     } catch (err: any) {
-      // Show the actual error from the API when available
-      const detail = err?.response?.data?.detail;
-      setError(detail || 'Login failed. Please check your credentials.');
+      // Show the actual error from the API when available. When the backend
+      // is unreachable there is no response at all — say so explicitly
+      // instead of blaming the credentials (the old generic message sent
+      // users resetting passwords for a server that was simply down).
+      if (!err?.response) {
+        setError('Cannot reach the server. Please check the backend is running and try again.');
+      } else {
+        const detail = err?.response?.data?.detail;
+        setError(detail || 'Login failed. Please check your credentials.');
+      }
     } finally {
       setLoading(false);
     }

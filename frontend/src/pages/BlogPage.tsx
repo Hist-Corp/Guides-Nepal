@@ -11,6 +11,7 @@ import { useImagePlacement } from '../hooks/useCms';
 const staticBlogPosts = [
   {
     id: 1,
+    slug: 'hidden-gems-kathmandu',
     title: '10 Hidden Gems in Kathmandu You Must Visit',
     excerpt:
       'Discover the secret spots that only locals know about. From hidden temples to underground cafes.',
@@ -19,9 +20,11 @@ const staticBlogPosts = [
     image:
       'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80',
     category: 'Travel Tips',
+    status: 'published',
   },
   {
     id: 2,
+    slug: 'foodie-guide-newari-cuisine',
     title: "A Foodie's Guide to Newari Cuisine",
     excerpt:
       'Explore the rich flavors of traditional Newari dishes and where to find the best ones.',
@@ -30,9 +33,11 @@ const staticBlogPosts = [
     image:
       'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80',
     category: 'Food & Culture',
+    status: 'published',
   },
   {
     id: 3,
+    slug: 'pokhara-beyond-tourist-trail',
     title: 'Pokhara: Beyond the Tourist Trail',
     excerpt: 'Go beyond Phewa Lake and discover what makes Pokhara truly special.',
     author: 'Sujal Thapa',
@@ -40,9 +45,11 @@ const staticBlogPosts = [
     image:
       'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80',
     category: 'Adventure',
+    status: 'published',
   },
   {
     id: 4,
+    slug: 'sustainable-travel-nepal-guide',
     title: 'Sustainable Travel in Nepal: A Complete Guide',
     excerpt: 'Learn how to travel responsibly and support local communities while exploring Nepal.',
     author: 'Rohan KC',
@@ -50,9 +57,11 @@ const staticBlogPosts = [
     image:
       'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=800&q=80',
     category: 'Sustainability',
+    status: 'published',
   },
   {
     id: 5,
+    slug: 'bhaktapur-walking-living-history',
     title: 'Bhaktapur: Walking Through Living History',
     excerpt: 'Experience the medieval charm of Bhaktapur and its preserved Newari architecture.',
     author: 'Apicha Maharjan',
@@ -60,9 +69,11 @@ const staticBlogPosts = [
     image:
       'https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=800&q=80',
     category: 'Culture',
+    status: 'published',
   },
   {
     id: 6,
+    slug: 'how-to-become-local-guide-nepal',
     title: 'How to Become a Local Guide in Nepal',
     excerpt:
       "Interested in sharing your culture? Here's everything you need to know about becoming a guide.",
@@ -71,6 +82,7 @@ const staticBlogPosts = [
     image:
       'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=800&q=80',
     category: 'Community',
+    status: 'published',
   },
 ];
 
@@ -83,11 +95,15 @@ const BlogPage: React.FC = () => {
     getCmsBlogPosts().then(setCmsPosts);
   }, []);
 
-  // Merge CMS-edited posts over the static defaults by id, so dashboard edits show live
+  // Merge CMS posts over the static defaults by slug (ids are backend-local
+  // and must never be assumed to line up with the frontend list). A CMS
+  // post with status != "published" is hidden from the public page;
+  // dashboard staff still see it in their own table.
   const blogPosts = staticBlogPosts
     .map((p) => {
-      const cms = cmsPosts.find((c) => c.id === p.id);
+      const cms = cmsPosts.find((c) => c.slug === p.slug);
       if (!cms) return p;
+      if ((cms.status || 'published').toLowerCase() !== 'published') return null;
       return {
         ...p,
         title: cms.title || p.title,
@@ -96,20 +112,31 @@ const BlogPage: React.FC = () => {
           : p.excerpt,
         author: cms.author || p.author,
         date: cms.date || p.date,
+        category: cms.category || p.category,
+        image: cms.image || p.image,
+        status: cms.status || p.status,
       };
     })
+    .filter((p): p is typeof staticBlogPosts[number] => p !== null)
     .concat(
       cmsPosts
-        .filter((c) => !staticBlogPosts.some((p) => p.id === c.id))
+        .filter(
+          (c) =>
+            (c.status || 'published').toLowerCase() === 'published' &&
+            !staticBlogPosts.some((p) => p.slug === c.slug)
+        )
         .map((c) => ({
           id: c.id,
+          slug: c.slug,
           title: c.title,
           excerpt: (c.content || '').slice(0, 140),
           author: c.author || 'Guides Nepal Team',
           date: c.date || '',
           image:
+            c.image ||
             'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=800&q=80',
-          category: 'Community',
+          category: c.category || 'Community',
+          status: c.status || 'published',
         }))
     );
 

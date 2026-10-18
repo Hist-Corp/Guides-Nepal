@@ -47,6 +47,7 @@ import BikeTourPage from './pages/BikeTourPage';
 import ExplorePage from './pages/ExplorePage';
 import BecomeHostPage from './pages/host/BecomeHostPage';
 import HostApplicationWizard from './pages/host/HostApplicationWizard';
+import HostDashboardPage from './pages/host/HostDashboardPage';
 import BecomeGuidePage from './pages/guide/BecomeGuidePage';
 import GuideOnboardingPage from './pages/guide/GuideOnboardingPage';
 import GuideDashboardPage from './pages/guide/GuideDashboardPage';
@@ -135,6 +136,7 @@ function App() {
             <Route path="/explore" element={<ExplorePage />} />
             <Route path="/become-host" element={<BecomeHostPage />} />
             <Route path="/host-application" element={<HostApplicationWizard />} />
+            <Route path="/host/dashboard" element={<HostDashboardPage />} />
             <Route path="/become-guide" element={<BecomeGuidePage />} />
             <Route path="/guide-application" element={<BecomeGuidePage />} />
             <Route path="/bookings" element={<BookingsPage />} />

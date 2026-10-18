@@ -189,6 +189,26 @@ class AuthService:
 
         return db_user
 
+    def _host_approval_ok(self, email: str) -> bool:
+        """True when a ``host`` account is backed by an *approved* application.
+
+        Host credentials are minted only at approval time (see
+        ``operations.review_host_application``), so any host row without a
+        linked, approved application is treated as unauthorised and refused.
+        This is a defence-in-depth check: the primary control is that no
+        host user row is created until a regional-head/admin approves.
+        """
+        from app.models.host_application import HostApplication
+
+        email_l = (email or "").strip().lower()
+        app = (
+            self.db.query(HostApplication)
+            .filter(HostApplication.email == email_l)
+            .order_by(HostApplication.id.desc())
+            .first()
+        )
+        return bool(app and (app.status or "").lower() == "approved")
+
     def authenticate_user(self, email: str, password: str) -> Optional[User]:
         user = self.get_user_by_email(email)
         if not user:
@@ -196,6 +216,11 @@ class AuthService:
         if not user.is_active:
             return None
         if not verify_password(password, str(user.hashed_password)):
+            return None
+        # Unified host login: a host may only sign in once a regional-head or
+        # admin has approved their registration. Wrong password and
+        # not-yet-approved both return None so we never leak account state.
+        if normalize_role(user.role) == "host" and not self._host_approval_ok(email):
             return None
         return user
 
