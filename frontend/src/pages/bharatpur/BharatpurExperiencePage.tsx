@@ -27,6 +27,7 @@ import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
 import { getAvailableGuides } from '../../utils/guides';
 import { isPredefinedTrip } from '../../utils/experienceBooking';
 import { BookmarkButton } from '../../components/common/BookmarkButton';
+import { experienceDetailPath } from '../../utils/canonicalExperience';
 
 const ReadMoreText = ({
   text,
@@ -283,7 +284,7 @@ const BharatpurExperiencePage: React.FC = () => {
                     title={data.title}
                     city={data.city}
                     image={data.heroImage}
-                    link={`/city/${data.city?.toLowerCase()}/experience/${data.slug}`}
+                    link={experienceDetailPath('bharatpur', data.slug)}
                     iconClassName="w-5 h-5"
                   />
                 </div>
@@ -659,7 +660,7 @@ const BharatpurExperiencePage: React.FC = () => {
                           key={i}
                           className="flex gap-4 group cursor-pointer"
                           onClick={() => {
-                            navigate(`/city/bharatpur/experience/${item.slug}`);
+                            navigate(experienceDetailPath('bharatpur', item.slug));
                             window.scrollTo({ top: 0, behavior: 'instant' });
                           }}
                         >

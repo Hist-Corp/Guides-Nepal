@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGoBack } from '../../utils/backNavigation';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { pokharaRichData } from '../../data/pokharaRichData';
+import { experienceDetailPath } from '../../utils/canonicalExperience';
 
 export const PokharaExperiencesPage: React.FC = () => {
   const navigate = useNavigate();
@@ -61,7 +62,7 @@ export const PokharaExperiencesPage: React.FC = () => {
                 key={tour.id} 
                 className="flex flex-col bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer"
                 onClick={() => {
-                  navigate(`/city/pokhara/experience/${tour.slug}`);
+                  navigate(experienceDetailPath('pokhara', tour.slug));
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >

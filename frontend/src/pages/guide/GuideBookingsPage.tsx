@@ -5,6 +5,7 @@ import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { getApiUrl } from '../../config/api';
 import { useAuthStore } from '../../store/authStore';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 interface GuideBooking {
   id: number;
@@ -21,6 +22,7 @@ interface GuideBooking {
 
 const GuideBookingsPage: React.FC = () => {
   const { accessToken, isAuthenticated, user } = useAuthStore();
+  const { formatPrice } = useCurrency();
   const [bookings, setBookings] = useState<GuideBooking[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -56,7 +58,7 @@ const GuideBookingsPage: React.FC = () => {
                 <div className="flex-1">
                   <div className="flex flex-wrap items-start justify-between gap-2"><h2 className="text-lg font-bold text-gray-900">{booking.experience_title}</h2><span className="rounded-full bg-brand-yellow/20 px-3 py-1 text-xs font-bold capitalize text-gray-700">{booking.status}</span></div>
                   <p className="mt-1 text-sm text-gray-600">{booking.traveler_name} · {booking.traveler_email}</p>
-                  <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-500"><span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{booking.city}</span><span className="flex items-center gap-1"><Calendar className="h-4 w-4" />{new Date(booking.date).toLocaleDateString()}</span><span className="flex items-center gap-1"><Users className="h-4 w-4" />{booking.guests} guests</span><strong className="text-primary">${booking.price}</strong></div>
+                  <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-500"><span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{booking.city}</span><span className="flex items-center gap-1"><Calendar className="h-4 w-4" />{new Date(booking.date).toLocaleDateString()}</span><span className="flex items-center gap-1"><Users className="h-4 w-4" />{booking.guests} guests</span><strong className="text-primary">{formatPrice(booking.price, 'USD')}</strong></div>
                 </div>
               </article>
             ))}

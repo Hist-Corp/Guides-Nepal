@@ -5,10 +5,12 @@ import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import { guideDashboardApi, type GuideListing } from '../../services/guideDashboardApi';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 /** Full CRUD table for a guide's own listings + inline max-guest capacity edits. */
 const GuideListingsPage: React.FC = () => {
   const { accessToken, isAuthenticated, user } = useAuthStore();
+  const { formatPrice } = useCurrency();
   const [listings, setListings] = useState<GuideListing[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -91,7 +93,7 @@ const GuideListingsPage: React.FC = () => {
                   <div>
                     <p className="text-xs font-bold uppercase text-gray-500">{l.category} - {l.city}{l.area ? ` - ${l.area}` : ''}</p>
                     <h2 className="mt-1 text-lg font-bold text-gray-900">{l.title}</h2>
-                    <p className="mt-1 flex items-center gap-1 text-sm text-gray-600"><Users className="h-4 w-4" />{l.booked_guests}/{l.max_guests} guests - {l.available_spots} spots left - ${l.price}</p>
+                    <p className="mt-1 flex items-center gap-1 text-sm text-gray-600"><Users className="h-4 w-4" />{l.booked_guests}/{l.max_guests} guests - {l.available_spots} spots left - {formatPrice(l.price, 'USD')}</p>
                   </div>
                   <div className="flex gap-2">
                     <Link to={`/guide/listings/${l.id}/edit`} className="flex items-center gap-1 rounded-full border border-gray-300 px-4 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-100">

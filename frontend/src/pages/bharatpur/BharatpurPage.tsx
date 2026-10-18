@@ -18,6 +18,7 @@ import { useGoBack } from '../../utils/backNavigation';
 import { bharatpurRichData } from '../../data/bharatpurRichData';
 import { allGuides } from '../../data/guidesData';
 import { Price } from '../../components/common/Price';
+import { experienceDetailPath } from '../../utils/canonicalExperience';
 
 export const BharatpurPage: React.FC = () => {
   const navigate = useNavigate();
@@ -186,7 +187,7 @@ export const BharatpurPage: React.FC = () => {
                 key={tour.id}
                 className="group relative rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300"
                 onClick={() => {
-                  navigate(`/city/bharatpur/experience/${tour.slug}`);
+                  navigate(experienceDetailPath('bharatpur', tour.slug));
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >
@@ -352,7 +353,7 @@ export const BharatpurPage: React.FC = () => {
                 key={tour.id}
                 className="flex flex-col border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 bg-white group cursor-pointer"
                 onClick={() => {
-                  navigate(`/city/bharatpur/experience/${tour.slug}`);
+                  navigate(experienceDetailPath('bharatpur', tour.slug));
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >

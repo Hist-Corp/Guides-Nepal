@@ -247,7 +247,7 @@ export const SearchPage: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Price: ${priceRange[0]} - ${priceRange[1]}
+                      Price: {formatPrice(priceRange[0], 'USD')} - {formatPrice(priceRange[1], 'USD')}
                     </label>
                     <div className="space-y-2">
                       <input

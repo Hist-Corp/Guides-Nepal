@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useBookingStore } from '../../store/bookingStore';
+import { Price } from '../../components/common/Price';
 import { Calendar, MapPin, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -73,7 +74,7 @@ const BookingsPage: React.FC = () => {
                                 {new Date(booking.date).toLocaleDateString()}
                               </div>
                               <div className="flex items-center justify-between">
-                                <span className="font-bold text-primary">${booking.price}</span>
+                                <span className="font-bold text-primary"><Price amount={booking.price} /></span>
                                 <button 
                                   onClick={() => cancelBooking(booking.id)}
                                   className="text-xs text-red-500 hover:text-red-700 font-medium flex items-center gap-1"

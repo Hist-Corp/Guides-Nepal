@@ -5,6 +5,7 @@ import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import { experienceWorkflowApi, type ExperienceProposal } from '../../services/experienceWorkflowApi';
+import { useCurrency } from '../../contexts/CurrencyContext';
 import { StatusBadge } from './workflowUi';
 
 /** Proposal detail: SOP-GN-EXP-001 status timeline + gate actions. */
@@ -12,6 +13,7 @@ const GuideProposalDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const proposalId = Number(id);
   const { accessToken, isAuthenticated, user } = useAuthStore();
+  const { formatPrice } = useCurrency();
   const [proposal, setProposal] = useState<ExperienceProposal | null>(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -73,7 +75,7 @@ const GuideProposalDetailPage: React.FC = () => {
                 </p>
                 <h1 className="mt-1 text-3xl font-bold text-gray-900">{proposal.title}</h1>
                 <p className="mt-1 text-gray-600">
-                  ${proposal.price} · {proposal.duration} · {proposal.difficulty} · max{' '}
+                  {formatPrice(proposal.price, 'USD')} · {proposal.duration} · {proposal.difficulty} · max{' '}
                   {proposal.max_guests} guests
                 </p>
               </div>

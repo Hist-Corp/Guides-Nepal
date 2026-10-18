@@ -10,6 +10,7 @@ import {
   type ExperienceProposal,
 } from '../../services/experienceWorkflowApi';
 import { StatusBadge } from './workflowUi';
+import { useCurrency } from '../../contexts/CurrencyContext';
 
 /**
  * SOP hub for guides: track new-experience proposals (SOP-GN-EXP-001) and
@@ -17,6 +18,7 @@ import { StatusBadge } from './workflowUi';
  */
 const GuideProposalsPage: React.FC = () => {
   const { accessToken, isAuthenticated, user } = useAuthStore();
+  const { formatPrice } = useCurrency();
   const [tab, setTab] = useState<'proposals' | 'changes'>('proposals');
   const [proposals, setProposals] = useState<ExperienceProposal[]>([]);
   const [changes, setChanges] = useState<ExperienceChangeRequest[]>([]);
@@ -107,7 +109,7 @@ const GuideProposalsPage: React.FC = () => {
                       </p>
                       <h2 className="mt-1 text-lg font-bold text-gray-900">{p.title}</h2>
                       <p className="mt-1 text-sm text-gray-600">
-                        ${p.price} · {p.duration} · max {p.max_guests} guests
+                        {formatPrice(p.price, 'USD')} · {p.duration} · max {p.max_guests} guests
                       </p>
                     </div>
                     <StatusBadge status={p.status} />

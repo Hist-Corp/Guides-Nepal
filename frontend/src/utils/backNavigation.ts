@@ -47,6 +47,8 @@ const registeredRoutes: string[] = [
   '/impact-report-2024',
   '/experience/seo/:slug',
   '/experience/:id',
+  '/trek/:slug',
+  '/hike/:slug',
   '/auth/callback',
   '/reset-password',
   '/city/:cityId',

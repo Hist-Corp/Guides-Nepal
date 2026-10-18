@@ -96,6 +96,7 @@ import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
 import { getAvailableGuides } from '../../utils/guides';
 import { isPredefinedTrip } from '../../utils/experienceBooking';
 import { BookmarkButton } from '../../components/common/BookmarkButton';
+import { experienceDetailPath } from '../../utils/canonicalExperience';
 
 const ReadMoreText = ({
   text,
@@ -265,7 +266,7 @@ const PokharaExperiencePage: React.FC = () => {
         city: data.city ?? 'Pokhara',
         image: data.heroImage,
         createdAt: new Date().toISOString(),
-        link: `/city/pokhara/experience/${data.slug}`,
+        link: experienceDetailPath('pokhara', data.slug),
       });
       setSaveFlash(true);
       setTimeout(() => setSaveFlash(false), 2500);
@@ -475,7 +476,7 @@ const PokharaExperiencePage: React.FC = () => {
                       title={data.title}
                       city={data.city}
                       image={data.heroImage}
-                      link={`/city/pokhara/experience/${data.slug}`}
+                      link={experienceDetailPath('pokhara', data.slug)}
                       iconClassName="w-5 h-5"
                     />
                   </div>
@@ -975,7 +976,7 @@ const PokharaExperiencePage: React.FC = () => {
                         key={i}
                         className="flex gap-4 group cursor-pointer"
                         onClick={() => {
-                          navigate(`/city/pokhara/experience/${item.slug}`);
+                          navigate(experienceDetailPath('pokhara', item.slug));
                           window.scrollTo({ top: 0, behavior: 'instant' });
                         }}
                       >
@@ -1331,13 +1332,13 @@ const PokharaExperiencePage: React.FC = () => {
                   <article
                     key={item.id ?? i}
                     onClick={() => {
-                      navigate(`/city/pokhara/experience/${item.slug}`);
+                      navigate(experienceDetailPath('pokhara', item.slug));
                       window.scrollTo({ top: 0, behavior: 'instant' });
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        navigate(`/city/pokhara/experience/${item.slug}`);
+                        navigate(experienceDetailPath('pokhara', item.slug));
                         window.scrollTo({ top: 0, behavior: 'instant' });
                       }
                     }}
@@ -1395,7 +1396,7 @@ const PokharaExperiencePage: React.FC = () => {
                           {item.price != null ? (
                             <>
                               <span className="text-xs text-gray-400">from </span>
-                              <span className="font-bold text-lg text-gray-900">${item.price}</span>
+                              <span className="font-bold text-lg text-gray-900"><Price amount={item.price} /></span>
                               <span className="text-xs text-gray-400"> / person</span>
                             </>
                           ) : (
