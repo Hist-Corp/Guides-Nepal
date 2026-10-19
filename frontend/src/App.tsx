@@ -88,6 +88,7 @@ import FoodTourCulturePage from './pages/food/FoodTourCulturePage';
 import AboutPage from './pages/AboutPage';
 import JobsPage from './pages/JobsPage';
 import BlogPage from './pages/BlogPage';
+import BlogDetailPage from './pages/BlogDetailPage';
 import PressPage from './pages/PressPage';
 import SustainabilityPage from './pages/SustainabilityPage';
 import DestinationsPage from './pages/DestinationsPage';
@@ -127,10 +128,10 @@ function App() {
             <Route path="/food-tours" element={<FoodToursPage />} />
             <Route path="/food-tours/culture/:slug" element={<FoodTourCulturePage />} />
             <Route path="/cultural-tours" element={<CulturalToursPage />} />
-<Route path="/outdoor-activities" element={<OutdoorActivitiesPage />} />
-<Route path="/trek-hiking" element={<TrekHikingPage />} />
-<Route path="/night-tour" element={<NightTourPage />} />
-<Route path="/bike-tour" element={<BikeTourPage />} />
+            <Route path="/outdoor-activities" element={<OutdoorActivitiesPage />} />
+            <Route path="/trek-hiking" element={<TrekHikingPage />} />
+            <Route path="/night-tour" element={<NightTourPage />} />
+            <Route path="/bike-tour" element={<BikeTourPage />} />
             <Route path="/cooking-classes" element={<CookingClassesPage />} />
             <Route path="/cooking-classes/experiences" element={<CookingExperiencesPage />} />
             <Route path="/cooking-classes/experience/:slug" element={<CookingExperiencePage />} />
@@ -146,7 +147,10 @@ function App() {
             <Route path="/guide/listings" element={<GuideListingsPage />} />
             <Route path="/guide/listings/new" element={<GuideListingFormPage />} />
             <Route path="/guide/listings/:id/edit" element={<GuideListingFormPage />} />
-            <Route path="/guide/listings/:id/propose-change" element={<GuideChangeRequestFormPage />} />
+            <Route
+              path="/guide/listings/:id/propose-change"
+              element={<GuideChangeRequestFormPage />}
+            />
             <Route path="/guide/proposals" element={<GuideProposalsPage />} />
             <Route path="/guide/proposals/new" element={<GuideProposalFormPage />} />
             <Route path="/guide/proposals/:id" element={<GuideProposalDetailPage />} />
@@ -175,27 +179,42 @@ function App() {
             {/* Kathmandu Routes */}
             <Route path="/city/kathmandu" element={<KathmanduPage />} />
             <Route path="/city/kathmandu/experiences" element={<KathmanduExperiencesPage />} />
-            <Route path="/city/kathmandu/experience/:slug" element={<CityExperienceRoute Page={KathmanduExperiencePage} />} />
+            <Route
+              path="/city/kathmandu/experience/:slug"
+              element={<CityExperienceRoute Page={KathmanduExperiencePage} />}
+            />
 
             {/* Pokhara Routes */}
             <Route path="/city/pokhara" element={<PokharaPage />} />
             <Route path="/city/pokhara/experiences" element={<PokharaExperiencesPage />} />
-            <Route path="/city/pokhara/experience/:slug" element={<CityExperienceRoute Page={PokharaExperiencePage} />} />
+            <Route
+              path="/city/pokhara/experience/:slug"
+              element={<CityExperienceRoute Page={PokharaExperiencePage} />}
+            />
 
             {/* Lalitpur Routes */}
             <Route path="/city/lalitpur" element={<LalitpurPage />} />
             <Route path="/city/lalitpur/experiences" element={<LalitpurExperiencesPage />} />
-            <Route path="/city/lalitpur/experience/:slug" element={<CityExperienceRoute Page={LalitpurExperiencePage} />} />
+            <Route
+              path="/city/lalitpur/experience/:slug"
+              element={<CityExperienceRoute Page={LalitpurExperiencePage} />}
+            />
 
             {/* Bhaktapur Routes */}
             <Route path="/city/bhaktapur" element={<BhaktapurPage />} />
             <Route path="/city/bhaktapur/experiences" element={<BhaktapurExperiencesPage />} />
-            <Route path="/city/bhaktapur/experience/:slug" element={<CityExperienceRoute Page={BhaktapurExperiencePage} />} />
+            <Route
+              path="/city/bhaktapur/experience/:slug"
+              element={<CityExperienceRoute Page={BhaktapurExperiencePage} />}
+            />
 
             {/* Bharatpur Routes */}
             <Route path="/city/bharatpur" element={<BharatpurPage />} />
             <Route path="/city/bharatpur/experiences" element={<BharatpurExperiencesPage />} />
-            <Route path="/city/bharatpur/experience/:slug" element={<CityExperienceRoute Page={BharatpurExperiencePage} />} />
+            <Route
+              path="/city/bharatpur/experience/:slug"
+              element={<CityExperienceRoute Page={BharatpurExperiencePage} />}
+            />
 
             <Route path="/local/:id" element={<LocalProfilePage />} />
             <Route path="/local/:id/gallery" element={<GalleryPage />} />
@@ -207,6 +226,7 @@ function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/jobs" element={<JobsPage />} />
             <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogDetailPage />} />
             <Route path="/press" element={<PressPage />} />
             <Route path="/sustainability" element={<SustainabilityPage />} />
             <Route path="/destinations" element={<DestinationsPage />} />
