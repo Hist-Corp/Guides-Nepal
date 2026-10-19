@@ -192,8 +192,13 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
           </button>
 
           <div className="flex justify-center mb-2">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-              <span className="font-bold text-lg">:)</span>
+            <div className="flex items-center gap-2 shrink-0" aria-label="Guides Nepal - Home">
+              <img
+                src="/images/logo.png"
+                alt="Guides Nepal logo"
+                className=" object-contain shrink-0"
+                style={{ maxWidth: '180px', maxHeight: '80px' }}
+              />
             </div>
           </div>
 

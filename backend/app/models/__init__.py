@@ -3,6 +3,7 @@ from .booking import Booking as Booking
 from .booking import HostBooking as HostBooking
 from .booking import HostTour as HostTour
 from .booking import HostExperience as HostExperience
+from .review import Review as Review
 from .bookmark import Bookmark as Bookmark
 from .guide import Guide as Guide
 from .guide_listing import GuideListing as GuideListing
