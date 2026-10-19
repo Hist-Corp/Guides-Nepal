@@ -1,138 +1,73 @@
-export const pokharaBeyondTouristTrail =
-  `
+export const pokharaBeyondTouristTrail = `## Why Go Beyond Lakeside?
 
-## Introduction
+Phewa Lake, the Peace Pagoda, and Lakeside are wonderful, but they are only the cover. Pokhara sits at about **827 metres** beneath the Annapurna range, with **Machhapuchhre (6,993 m)**, Annapurna South, and Hiunchuli filling the northern sky. Slip off the promenade and you find village trails, quiet waterfalls, cave shrines, and shoreline villages where fishermen still work at dawn.
 
-Phewa Lake, the World Peace Pagoda, and Lakeside are Pokhara's postcard highlights — but there is so much more to discover. Venture beyond the tourist trail and you will find quiet village trails, hidden waterfalls, lesser-known caves, and lakeside spots where you can watch the Annapurna range reflect in the water without the crowds. This guide takes you off the beaten path to experience the Pokhara that truly matters, including recommended day hikes, local eateries, and quiet viewpoints most visitors miss.
+This guide moves in a sensible order: lake, waterfalls, Sarangkot without crowds, caves, nearby lakes, food streets, flight options, and where to base yourself.
 
-` +
-  `
+![Phewa Lake and the Annapurnas](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80 "Calm mornings on Phewa Lake can mirror Machhapuchhre and the Annapurnas.")
 
+## At a Glance
+
+- **Best views:** October to April. May and June turn hazy; July to September is monsoon green with limited peaks.
+- **Getting around:** The centre is walkable. Taxis are cheap, local buses reach Begnas and Sarangkot, and bicycles or scooters rent easily in Lakeside.
+- **Money:** ATMs cluster in Lakeside. Carry cash for villages, homestays, and trail snacks.
+- **Altitude:** No altitude worry in town, but rest here a day or two before heading higher.
 
 ## Beyond Phewa Lake
 
-Phewa Lake is Pokhara's centerpiece, but most visitors only see it from the Lakeside promenade or from a tourist boat. Rent a kayak or rowboat and head to the quieter eastern shore, where local fishermen still cast their nets and the water is calm enough to see reflections of Machhapuchhre (Fishtail Mountain) on still mornings.
+Most visitors see the lake from the promenade or a tourist boat. Instead, rent a kayak or rowboat and aim for the quieter **eastern shore**, where fishermen cast nets and still mornings reflect Machhapuchhre perfectly. Roadside stalls sell chiya while women wash clothes at the water's edge and children walk to school.
 
-The eastern shore is home to small villages where you can stop for chiya at roadside stalls and watch daily life unfold — women washing clothes at the water's edge, children walking to school, farmers tending their fields. This is Pokhara as it has existed for generations, long before tourism arrived.
-
-For a different perspective, hike up to the Peace Pagoda from the back side. Most tourists take the boat across the lake and climb the main path, but the trail from the southern side through the forest is quieter and offers more varied views of the lake and city below.
-
-` +
-  `
-
+For the Peace Pagoda, skip the standard boat-plus-main-path and climb the **quieter southern forest trail**. It is shadier, less busy, and layers lake, city, and mountain views. The stupa itself is a Japanese-built peace pagoda; dawn is magical as mist lifts off the water.
 
 ## Hidden Waterfalls
 
-Pokhara is surrounded by waterfalls, but the famous ones — Davis Falls and Gupteshwor Cave — can be crowded. For a quieter experience, head to Batulechour, a village about 30 minutes from the city center, where several small waterfalls cascade through forested gullies.
+Famous Davis Falls and Gupteshwor Cave draw crowds. For space, head to **Batulechour**, about 30 minutes out, where small falls thread forested gullies past terraced fields. Weekdays you may have them alone. Bring a swimsuit for the cold plunge pools.
 
-The path to Batulechour's waterfalls winds through terraced fields and small hamlets. You will likely have the falls to yourself, especially on weekdays. Bring a swimsuit if you want to take a dip in the natural pools at the base of the falls — the water is cold but refreshing after a hike.
-
-Another option is the waterfall near Sarangkot's lower trails. Most visitors go to Sarangkot for sunrise views, but the hiking paths below the viewpoint lead to several seasonal waterfalls that flow during and after the monsoon (June to September).
-
-` +
-  `
-
+Around Sarangkot's lower paths, seasonal falls run during and after monsoon (June to September). They are easy add-ons to a sunrise trip if you descend on foot.
 
 ## Sarangkot Without the Crowds
 
-Sarangkot is famous for sunrise views over the Annapurna range, but the main viewpoint can host hundreds of tourists during peak season. For a quieter experience, hike up to Sarangkot instead of driving — the trail from Pokhara takes about 2-3 hours and passes through villages and rhododendron forests.
+Sarangkot's main platform can hold hundreds at sunrise in peak season. Better options:
 
-Start your hike at 3:00 AM to reach the summit before sunrise. You will share the trail with a few other early hikers rather than crowds of jeep tourists. Once at the top, walk a few minutes beyond the main viewpoint to find quieter spots with equally stunning views of Machhapuchhre, Annapurna South, and Hiunchuli.
+- **Hike up:** The village-to-summit trail takes **2 to 3 hours** through farms and rhododendron. Leave Pokhara around 3:00 AM to arrive before dawn with a handful of hikers instead of jeep convoys.
+- **Walk past the platform:** A few minutes beyond the main viewpoint are equally fine ridges with room to breathe.
+- **Come at sunset:** Softer light, thinner crowds, and peaks shifting colour as the sun drops.
 
-Alternatively, visit Sarangkot in the late afternoon rather than at sunrise. The light is softer, the crowds have dispersed, and you can watch the mountains change color as the sun sets behind them.
+> Trivia: Sarangkot doubles as Pokhara's main **paragliding launch**. Morning thermals lift pilots right over the viewpoint.
 
+## Caves, Falls, and Underground Rivers
 
-` +
-  `
+**Davis Falls (Patale Chhango)** is strange and worth seeing: the stream vanishes into an underground tunnel. Rather than stopping at the crowded platform, cross to **Gupteshwor Cave**, which runs deep underground to a small Shiva shrine. The air is cool, the walls damp, and the sound of hidden water follows you inward. Wear grippy shoes; steps get slippery.
 
+![Waterfall country around Pokhara](https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&w=1200&q=80 "Small falls near Batulechour and Sarangkot run strongest after the monsoon.")
 
-## The Gupteshwor Cave and Davis Falls Area
+## Begnas and Rupa: The Calmer Lakes
 
-Davis Falls (Patale Chhango) is unique because the water disappears into an underground tunnel — but the viewing platform is often crowded. Instead of just looking at the falls from above, explore the area around Gupteshwor Cave, which is right next door.
+**Begnas Lake**, 30 to 45 minutes east, is Phewa without the buzz: farm terraces, paddle boats, lakeside homestays, and fish restaurants. Smaller **Rupa Lake** nearby is quieter still and excellent for birdwatching. Come for lunch, stay for sunset, and consider a night in a family homestay to learn trail recommendations no brochure lists.
 
-The cave extends deep underground and has a small shrine to Shiva at its innermost point. The cave walls are damp and the air is cool, making it a pleasant escape from the heat. Few tourists venture far into the cave, so if you walk past the main shrine, you can find quiet corners for reflection.
+## Eat Where Locals Eat
 
-After visiting the cave and falls, explore the nearby village of Hemja. This agricultural area on the outskirts of Pokhara offers views of the mountains without the tourist infrastructure. Local farms grow rice, vegetables, and fruit, and you can often buy fresh produce directly from farmers.
+Lakeside feeds tourists well, but the old bazaar and **Chipledhunga** feed locals better: dal bhat, momos, thukpa, and Newari bara and yomari at local prices. Try the dhaba on the Sarangkot road for hearty trail fuel, morning sel roti near the old bus park, and the southern-slope restaurants where expats and Nepali families split the views.
 
-` +
-  `
+## Flight Options, Minus the Hype
 
+Pokhara is among the world's great paragliding bowls. For a calmer experience, pick a smaller operator, ask about less-crowded launch windows, and confirm what is included: transport, insurance, photos, and landing fees.
 
-## Begnas and Rupa Lakes
-
-Most visitors focus on Phewa Lake, but Pokhara has several other lakes worth visiting. Begnas Lake, about 15 kilometers east of the city, is quieter and less developed. The surrounding villages offer homestays where you can experience rural Nepali life, and the lake is excellent for boating and birdwatching.
-
-Rupa Lake, near Begnas, is smaller and even quieter. The area around both lakes is ideal for cycling — the roads are relatively flat and traffic is light. You can rent bicycles in Pokhara and cycle between the lakes, stopping at village teahouses along the way.
-
-Both lakes offer mountain views on clear days, and the water is calm enough for swimming in designated areas. Local fishermen use traditional nets, and you can often buy fresh fish directly from them.
-
-` +
-  `
-
-
-## World Peace Pagoda's Hidden Trails
-
-The World Peace Pagoda sits on a hill overlooking Phewa Lake and offers panoramic views of Pokhara and the Annapurna range. While most visitors take the boat and hike up the main path, there are several lesser-known trails around the pagoda that lead to quieter viewpoints.
-
-One trail descends from the pagoda through the forest to the southern shore of Phewa Lake, passing through small villages and terraced fields. Another leads to a ridge with views of both the lake and the city, perfect for sunset photography.
-
-The pagoda itself is a beautiful white stupa built by Japanese Buddhists as a symbol of peace. The best time to visit is early morning, when the mist rises from the lake and the mountains are clearest.
-
-` +
-  `
-
-
-## Local Eateries Beyond Lakeside
-
-Lakeside is full of restaurants catering to tourists, but for authentic local food, head to the old Pokhara bazaar area or the Chipledhunga neighborhood. Here you will find small eateries serving dal bhat, momos, thukpa, and Newari dishes at local prices.
-
-Try the local Newari eatery near Chipledhunga for bara and yomari, or the small dhaba (roadside restaurant) on the road to Sarangkot for hearty Nepali meals. For breakfast, look for the small stalls selling sel roti and chiya near the old bus park.
-
-For dinner with a view, head to one of the restaurants on the southern slopes of the city. These places overlook Pokhara and the lake, and they are mostly frequented by locals and expats rather than tourists.
-
-
-
-` +
-  `
-
-
-## Paragliding and Ultraflight Alternatives
-
-Pokhara is one of the world's best paragliding destinations, but the main takeoff point at Sarangkot can be commercialized. For a more authentic experience, consider flying with a local operator who uses smaller launch sites or offers tandem flights at less crowded times of day.
-
-Ultraflights (small aircraft that fly close to the mountains) operate from Pokhara Airport. Book early morning flights for the clearest views and the smoothest air. The flights take you close to Annapurna, Dhaulagiri, and Machhapuchhre — views that few trekkers ever see.
-
-If you prefer to stay on the ground, the view from the paragliding landing area near Phewa Lake is excellent for watching pilots come in for landing, and the cafes there serve good coffee with mountain views.
-
-` +
-  `
-
+**Ultralight flights** from Pokhara Airport skim surprisingly close to Annapurna, Dhaulagiri, and Machhapuchhre. Book the first morning slot for the clearest air. Prefer ground level? The landing field cafes near Phewa pair good coffee with front-row landings.
 
 ## Where to Stay Beyond Lakeside
 
-Lakeside is convenient but can be noisy and touristy. Consider staying in one of these quieter areas:
+- **Hemja:** Village air, mountain views, direct trail access.
+- **Sardar / Bagar:** Residential calm, local restaurants, handy for early flights.
+- **Begnas Lake:** Homestays and small eco-resorts on still water.
+- **Village homestays:** Eat with the family, learn customs, and get the hikes tourists miss.
 
-- **Hemja**: Rural village atmosphere, mountain views, close to nature trails
-- **Sardar**: Residential area with local restaurants and shops
-- **Bagar**: Near the airport, quieter than Lakeside, good for early flights
-- **Begnas Lake**: Lakeside homestays and eco-resorts, peaceful and scenic
+![Sunrise over the Annapurnas](https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80 "Sarangkot sunrises face Machhapuchhre, Annapurna South, and Hiunchuli.")
 
-Homestays in the villages around Pokhara offer the most authentic experience. You will eat with the family, learn about local customs, and get recommendations for hiking trails that most tourists do not know about.
+## A Slow Three-Day Plan
 
-` +
-  `
+- **Day one:** Eastern Phewa by kayak, old bazaar lunch, Peace Pagoda forest trail at golden hour.
+- **Day two:** Sarangkot on foot for sunrise, Batulechour falls after breakfast, Begnas for sunset.
+- **Day three:** Gupteshwor Cave and Davis Falls early, Chipledhunga food crawl, paragliding or landing-field coffee.
 
-
-## Practical Tips for Exploring Pokhara
-
-**Best Time to Visit:** October to April offers the clearest mountain views. May and June are warm but hazy. July to September is monsoon season — the lakes are full and the hills are green, but mountain views are limited.
-
-**Getting Around:** Pokhara is compact and walkable. Taxis are inexpensive, and local buses connect the city to Begnas, Sarangkot, and other nearby areas. Bicycles and scooters can be rented in Lakeside.
-
-**Altitude:** Pokhara is at about 827 meters elevation — much lower than Kathmandu — so altitude sickness is not a concern. However, if you are heading to higher elevations for trekking, spend a day or two in Pokhara to acclimatize.
-
-**Money:** ATMs are plentiful in Lakeside but scarce in outlying villages. Carry cash for small purchases, homestays, and local restaurants.
-
-**Respect:** Pokhara is a religious city with many temples and shrines. Dress modestly when visiting religious sites, remove your shoes before entering temples, and ask before photographing people.
-
-Pokhara's true charm lies beyond the tourist trail. Take your time, explore the villages and lakes, and you will discover a side of the city that most visitors never see.`;
+> Pokhara's charm is patience. Take the longer trail, the second cup of tea, and the village invitation. That is where the city actually lives.`;

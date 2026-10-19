@@ -3,8 +3,11 @@
  *
  * Each entry is a complete article for the /blog/:slug detail page. The
  * listing page shows only the excerpt; the detail page renders the full body.
- * Sections are separated by blank lines so the detail page can split
- * on "\n\n" and render each block as its own paragraph.
+ *
+ * Body format is a lightweight markdown subset parsed by BlogDetailPage:
+ * `## ` / `### ` headings (h2 builds the "In this guide" TOC), `> ` tip
+ * callouts, `- ` / `1. ` lists, `**bold**`, and standalone image lines:
+ * `![alt text](image-url "Optional caption")`.
  *
  * Individual blog contents live in ./blogs/ to keep each file manageable.
  */
