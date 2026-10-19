@@ -20,6 +20,7 @@ import {
 import { uploadMedia } from '../services/api';
 import { compressImage, generatePreview } from '../utils/imageCompressor';
 import ImagePicker from '../components/ImagePicker';
+import BackButton from '../components/BackButton';
 
 export type NewPagePayload = {
   title: string;
@@ -304,274 +305,279 @@ export default function WriterPages() {
   ];
 
   return (
-    <PageShell
-      title="Pages"
-      description="Manage static frontend pages for your website."
-      action={
-        <div className="flex items-center gap-1.5">
-          <div className="flex rounded-full border border-gray-200 bg-white/80 p-0.5">
-            <button
-              type="button"
-              onClick={() => setViewMode('list')}
-              className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${viewMode === 'list' ? 'bg-darkBlue text-white' : 'text-gray-500 hover:text-darkBlue'}`}
+    <>
+      <div className="flex items-center gap-2 mb-4">
+        <BackButton to="/dashboard/content-manager" />
+      </div>
+      <PageShell
+        title="Pages"
+        description="Manage static frontend pages for your website."
+        action={
+          <div className="flex items-center gap-1.5">
+            <div className="flex rounded-full border border-gray-200 bg-white/80 p-0.5">
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${viewMode === 'list' ? 'bg-darkBlue text-white' : 'text-gray-500 hover:text-darkBlue'}`}
+              >
+                ☰ List
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('cards')}
+                className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${viewMode === 'cards' ? 'bg-darkBlue text-white' : 'text-gray-500 hover:text-darkBlue'}`}
+              >
+                ▦ Cards
+              </button>
+            </div>
+            <Button
+              variant="primary"
+              onClick={() => {
+                resetForm();
+                setOpenCreate(true);
+              }}
+              disabled={actionLoading === -1}
             >
-              ☰ List
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('cards')}
-              className={`rounded-full px-2.5 py-1 text-xs font-semibold transition ${viewMode === 'cards' ? 'bg-darkBlue text-white' : 'text-gray-500 hover:text-darkBlue'}`}
-            >
-              ▦ Cards
-            </button>
+              Add Page
+            </Button>
           </div>
-          <Button
-            variant="primary"
-            onClick={() => {
-              resetForm();
-              setOpenCreate(true);
-            }}
-            disabled={actionLoading === -1}
-          >
-            Add Page
-          </Button>
-        </div>
-      }
-    >
-      {loading ? (
-        <Loading label="Loading pages…" />
-      ) : viewMode === 'list' ? (
-        <Table
-          columns={columns}
-          rows={pages}
-          emptyMessage="No pages found. Add a page to get started."
-        />
-      ) : pages.length === 0 ? (
-        <div className="text-sm text-gray-500 py-10 text-center">
-          No pages found. Add a page to get started.
-        </div>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {pages.map((p) => (
-            <div
-              key={p.id}
-              className="gn-card rounded-2xl border border-gray-200/70 overflow-hidden flex flex-col"
-            >
-              {p.featuredImage ? (
-                <img src={p.featuredImage} alt="" className="h-28 w-full object-cover" />
-              ) : (
-                <div className="h-28 w-full bg-gradient-to-br from-darkBlue to-[#3a5a78] grid place-items-center text-3xl">
-                  {PageIcon({ slug: p.slug })}
+        }
+      >
+        {loading ? (
+          <Loading label="Loading pages…" />
+        ) : viewMode === 'list' ? (
+          <Table
+            columns={columns}
+            rows={pages}
+            emptyMessage="No pages found. Add a page to get started."
+          />
+        ) : pages.length === 0 ? (
+          <div className="text-sm text-gray-500 py-10 text-center">
+            No pages found. Add a page to get started.
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {pages.map((p) => (
+              <div
+                key={p.id}
+                className="gn-card rounded-2xl border border-gray-200/70 overflow-hidden flex flex-col"
+              >
+                {p.featuredImage ? (
+                  <img src={p.featuredImage} alt="" className="h-28 w-full object-cover" />
+                ) : (
+                  <div className="h-28 w-full bg-gradient-to-br from-darkBlue to-[#3a5a78] grid place-items-center text-3xl">
+                    {PageIcon({ slug: p.slug })}
+                  </div>
+                )}
+                <div className="p-3.5 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{PageIcon({ slug: p.slug })}</span>
+                    <h3 className="font-bold text-darkBlue truncate flex-1">{p.title}</h3>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">/{p.slug}</div>
+                  <div className="mt-2">
+                    <Badge variant={statusVariant(p.status)} size="sm">
+                      {p.status || 'draft'}
+                    </Badge>
+                  </div>
                 </div>
-              )}
-              <div className="p-3.5 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{PageIcon({ slug: p.slug })}</span>
-                  <h3 className="font-bold text-darkBlue truncate flex-1">{p.title}</h3>
-                </div>
-                <div className="text-xs text-gray-500 mt-1">/{p.slug}</div>
-                <div className="mt-2">
-                  <Badge variant={statusVariant(p.status)} size="sm">
-                    {p.status || 'draft'}
-                  </Badge>
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5 border-t border-gray-200/70 pt-2 pb-1.5 px-3.5">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setLiveEdit(p)}
-                  disabled={actionLoading === p.id}
-                >
-                  Edit
-                </Button>
-                {(p.status || 'draft') !== 'published' && (
+                <div className="flex items-center gap-1.5 border-t border-gray-200/70 pt-2 pb-1.5 px-3.5">
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handlePublish(p.id)}
+                    onClick={() => setLiveEdit(p)}
                     disabled={actionLoading === p.id}
                   >
-                    Publish
+                    Edit
                   </Button>
-                )}
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => handleDelete(p.id)}
-                  disabled={actionLoading === p.id}
-                >
-                  {actionLoading === p.id ? 'Removing…' : 'Remove'}
-                </Button>
+                  {(p.status || 'draft') !== 'published' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handlePublish(p.id)}
+                      disabled={actionLoading === p.id}
+                    >
+                      Publish
+                    </Button>
+                  )}
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleDelete(p.id)}
+                    disabled={actionLoading === p.id}
+                  >
+                    {actionLoading === p.id ? 'Removing…' : 'Remove'}
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <Modal open={openCreate} title="Add Page" onClose={() => setOpenCreate(false)}>
-        <div className="space-y-4">
-          <Field
-            label="Page Title"
-            placeholder="Enter page title"
-            value={form.title}
-            onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-              setForm({ ...form, title: e.target.value })
-            }
-          />
-          <Field
-            label="Slug"
-            placeholder="page-slug"
-            value={form.slug}
-            onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-              setForm({ ...form, slug: e.target.value })
-            }
-          />
-          <div>
-            <p className="text-sm font-medium text-gray-700 mb-1.5">Featured Image</p>
-            <ImagePicker
-              buttonText="Upload featured image"
-              previewUrl={featuredImagePreview}
-              onSelect={async (file) => {
-                setFeaturedImageFile(file);
-                const preview = await generatePreview(file);
-                setFeaturedImagePreview(preview);
-              }}
-              onClear={() => {
-                setFeaturedImageFile(null);
-                setFeaturedImagePreview('');
-              }}
-            />
+            ))}
           </div>
-          <Button
-            variant="primary"
-            className="w-full"
-            onClick={handleCreate}
-            disabled={!form.title.trim() || actionLoading === -1 || uploadingImage}
-          >
-            {actionLoading === -1 ? 'Adding…' : 'Add Page'}
-          </Button>
-        </div>
-      </Modal>
+        )}
 
-      <Modal open={openEdit !== null} title="Edit Page" onClose={() => setOpenEdit(null)}>
-        <div className="space-y-4">
-          <Field
-            label="Page Title"
-            placeholder="Enter page title"
-            value={form.title}
-            onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-              setForm({ ...form, title: e.target.value })
-            }
-          />
-          <Field
-            label="Slug"
-            placeholder="page-slug"
-            value={form.slug}
-            onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-              setForm({ ...form, slug: e.target.value })
-            }
-          />
-          <div>
-            <p className="text-sm font-medium text-gray-700 mb-1.5">Featured Image</p>
-            <ImagePicker
-              buttonText="Change featured image"
-              previewUrl={featuredImagePreview}
-              onSelect={async (file) => {
-                setFeaturedImageFile(file);
-                const preview = await generatePreview(file);
-                setFeaturedImagePreview(preview);
-              }}
-              onClear={() => {
-                setFeaturedImageFile(null);
-                setFeaturedImagePreview('');
-              }}
-            />
-          </div>
-          <Button
-            variant="primary"
-            className="w-full"
-            onClick={handleEdit}
-            disabled={!form.title.trim() || actionLoading === openEdit?.id || uploadingImage}
-          >
-            Save Changes
-          </Button>
-        </div>
-      </Modal>
-
-      {liveEdit && (
-        <LivePageEditor
-          slug={liveEdit.slug}
-          title={liveEdit.title}
-          path={
-            liveEdit.path ||
-            FRONTEND_PAGES.find((page) => page.slug === liveEdit.slug)?.path ||
-            `/${liveEdit.slug}`
-          }
-          initialSections={(() => {
-            // Prefer the real content of the public page so the live editor opens
-            // filled in; only build a generic skeleton for unknown slugs.
-            const preloaded = getFrontendContent(liveEdit.slug);
-            if (preloaded.length) return preloaded;
-            return [
-              {
-                id: 'page-hero',
-                label: 'Header Section',
-                type: 'hero',
-                content: {
-                  heading: liveEdit.title,
-                  subtitle: 'Manage your dynamic page content',
-                  buttonText: 'Get Started',
-                  tagline: liveEdit.slug,
-                },
-                style: {
-                  backgroundColor: '#213448',
-                  textColor: '#ffffff',
-                  accentColor: '#F4B400',
-                  alignment: 'left',
-                  headingSize: '2.5rem',
-                  padding: '3rem',
-                },
-              },
-              {
-                id: 'page-body',
-                label: 'Page Body',
-                type: 'text',
-                content: {
-                  heading: '',
-                  body: liveEdit.content || 'Edit your page content here.',
-                },
-                style: {
-                  backgroundColor: '#ffffff',
-                  textColor: '#213448',
-                  alignment: 'left',
-                  padding: '2.5rem',
-                },
-              },
-            ];
-          })()}
-          onSaved={async (sections) => {
-            const hero = sections.find((s) => s.type === 'hero');
-            const body = sections.find((s) => s.type === 'text');
-            if (hero?.content?.heading || body?.content?.body) {
-              try {
-                await updateContentPage(liveEdit.id, {
-                  title: hero?.content?.heading || liveEdit.title,
-                  // Only overwrite the page body when the page actually has a
-                  // body section, so sections without one keep their stored copy.
-                  ...(body?.content?.body ? { content: body.content.body } : {}),
-                });
-              } catch {
-                // sections already persisted
+        <Modal open={openCreate} title="Add Page" onClose={() => setOpenCreate(false)}>
+          <div className="space-y-4">
+            <Field
+              label="Page Title"
+              placeholder="Enter page title"
+              value={form.title}
+              onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+                setForm({ ...form, title: e.target.value })
               }
+            />
+            <Field
+              label="Slug"
+              placeholder="page-slug"
+              value={form.slug}
+              onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+                setForm({ ...form, slug: e.target.value })
+              }
+            />
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-1.5">Featured Image</p>
+              <ImagePicker
+                buttonText="Upload featured image"
+                previewUrl={featuredImagePreview}
+                onSelect={async (file) => {
+                  setFeaturedImageFile(file);
+                  const preview = await generatePreview(file);
+                  setFeaturedImagePreview(preview);
+                }}
+                onClear={() => {
+                  setFeaturedImageFile(null);
+                  setFeaturedImagePreview('');
+                }}
+              />
+            </div>
+            <Button
+              variant="primary"
+              className="w-full"
+              onClick={handleCreate}
+              disabled={!form.title.trim() || actionLoading === -1 || uploadingImage}
+            >
+              {actionLoading === -1 ? 'Adding…' : 'Add Page'}
+            </Button>
+          </div>
+        </Modal>
+
+        <Modal open={openEdit !== null} title="Edit Page" onClose={() => setOpenEdit(null)}>
+          <div className="space-y-4">
+            <Field
+              label="Page Title"
+              placeholder="Enter page title"
+              value={form.title}
+              onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+                setForm({ ...form, title: e.target.value })
+              }
+            />
+            <Field
+              label="Slug"
+              placeholder="page-slug"
+              value={form.slug}
+              onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+                setForm({ ...form, slug: e.target.value })
+              }
+            />
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-1.5">Featured Image</p>
+              <ImagePicker
+                buttonText="Change featured image"
+                previewUrl={featuredImagePreview}
+                onSelect={async (file) => {
+                  setFeaturedImageFile(file);
+                  const preview = await generatePreview(file);
+                  setFeaturedImagePreview(preview);
+                }}
+                onClear={() => {
+                  setFeaturedImageFile(null);
+                  setFeaturedImagePreview('');
+                }}
+              />
+            </div>
+            <Button
+              variant="primary"
+              className="w-full"
+              onClick={handleEdit}
+              disabled={!form.title.trim() || actionLoading === openEdit?.id || uploadingImage}
+            >
+              Save Changes
+            </Button>
+          </div>
+        </Modal>
+
+        {liveEdit && (
+          <LivePageEditor
+            slug={liveEdit.slug}
+            title={liveEdit.title}
+            path={
+              liveEdit.path ||
+              FRONTEND_PAGES.find((page) => page.slug === liveEdit.slug)?.path ||
+              `/${liveEdit.slug}`
             }
-          }}
-          onClose={() => {
-            setLiveEdit(null);
-            fetchPages();
-          }}
-        />
-      )}
-    </PageShell>
+            initialSections={(() => {
+              // Prefer the real content of the public page so the live editor opens
+              // filled in; only build a generic skeleton for unknown slugs.
+              const preloaded = getFrontendContent(liveEdit.slug);
+              if (preloaded.length) return preloaded;
+              return [
+                {
+                  id: 'page-hero',
+                  label: 'Header Section',
+                  type: 'hero',
+                  content: {
+                    heading: liveEdit.title,
+                    subtitle: 'Manage your dynamic page content',
+                    buttonText: 'Get Started',
+                    tagline: liveEdit.slug,
+                  },
+                  style: {
+                    backgroundColor: '#213448',
+                    textColor: '#ffffff',
+                    accentColor: '#F4B400',
+                    alignment: 'left',
+                    headingSize: '2.5rem',
+                    padding: '3rem',
+                  },
+                },
+                {
+                  id: 'page-body',
+                  label: 'Page Body',
+                  type: 'text',
+                  content: {
+                    heading: '',
+                    body: liveEdit.content || 'Edit your page content here.',
+                  },
+                  style: {
+                    backgroundColor: '#ffffff',
+                    textColor: '#213448',
+                    alignment: 'left',
+                    padding: '2.5rem',
+                  },
+                },
+              ];
+            })()}
+            onSaved={async (sections) => {
+              const hero = sections.find((s) => s.type === 'hero');
+              const body = sections.find((s) => s.type === 'text');
+              if (hero?.content?.heading || body?.content?.body) {
+                try {
+                  await updateContentPage(liveEdit.id, {
+                    title: hero?.content?.heading || liveEdit.title,
+                    // Only overwrite the page body when the page actually has a
+                    // body section, so sections without one keep their stored copy.
+                    ...(body?.content?.body ? { content: body.content.body } : {}),
+                  });
+                } catch {
+                  // sections already persisted
+                }
+              }
+            }}
+            onClose={() => {
+              setLiveEdit(null);
+              fetchPages();
+            }}
+          />
+        )}
+      </PageShell>
+    </>
   );
 }

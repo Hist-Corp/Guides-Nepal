@@ -9,6 +9,7 @@ import Modal from '../components/Modal';
 import Field from '../components/Field';
 import { statusVariant } from '../utils/statusVariant';
 import LivePageEditor from './LivePageEditor';
+import BackButton from '../components/BackButton';
 import {
   getContentGuides,
   createContentGuide,
@@ -154,174 +155,179 @@ export default function WriterGuidesContent() {
   ];
 
   return (
-    <PageShell
-      title="Guides Content"
-      description="Manage experience descriptions, itineraries and FAQs for guide profiles."
-      action={
-        <Button
-          variant="primary"
-          onClick={() => {
-            resetForm();
-            setOpenCreate(true);
-          }}
-          disabled={actionLoading === -1}
-        >
-          Add content
-        </Button>
-      }
-    >
-      {loading ? (
-        <Loading label="Loading guides content…" />
-      ) : (
-        <Table
-          columns={columns}
-          rows={contents}
-          emptyMessage="No guides content found. Add your first content entry."
-        />
-      )}
-
-      <Modal open={openCreate} title="Add Content" onClose={() => setOpenCreate(false)}>
-        <div className="space-y-4">
-          <Field
-            label="Title"
-            placeholder="Enter title"
-            value={form.title}
-            onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-              setForm({ ...form, title: e.target.value })
-            }
-          />
-          <Field
-            as="select"
-            label="Type"
-            value={form.type}
-            onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-              setForm({ ...form, type: e.target.value })
-            }
-          >
-            <option value="description">Description</option>
-            <option value="itinerary">Itinerary</option>
-            <option value="faq">FAQ</option>
-          </Field>
+    <>
+      <div className="flex items-center gap-2 mb-4">
+        <BackButton to="/dashboard/content-manager" />
+      </div>
+      <PageShell
+        title="Guides Content"
+        description="Manage experience descriptions, itineraries and FAQs for guide profiles."
+        action={
           <Button
             variant="primary"
-            className="w-full"
-            onClick={handleCreate}
-            disabled={!form.title.trim() || actionLoading === -1}
+            onClick={() => {
+              resetForm();
+              setOpenCreate(true);
+            }}
+            disabled={actionLoading === -1}
           >
-            {actionLoading === -1 ? 'Adding…' : 'Add Content'}
+            Add content
           </Button>
-        </div>
-      </Modal>
-
-      <Modal open={openEdit !== null} title="Edit Content" onClose={() => setOpenEdit(null)}>
-        <div className="space-y-4">
-          <Field
-            label="Title"
-            placeholder="Enter title"
-            value={form.title}
-            onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-              setForm({ ...form, title: e.target.value })
-            }
+        }
+      >
+        {loading ? (
+          <Loading label="Loading guides content…" />
+        ) : (
+          <Table
+            columns={columns}
+            rows={contents}
+            emptyMessage="No guides content found. Add your first content entry."
           />
-          <Field
-            as="select"
-            label="Type"
-            value={form.type}
-            onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-              setForm({ ...form, type: e.target.value })
-            }
-          >
-            <option value="description">Description</option>
-            <option value="itinerary">Itinerary</option>
-            <option value="faq">FAQ</option>
-          </Field>
-          <Button
-            variant="primary"
-            className="w-full"
-            onClick={handleEdit}
-            disabled={!form.title.trim() || actionLoading === openEdit?.id}
-          >
-            Save Changes
-          </Button>
-        </div>
-      </Modal>
+        )}
 
-      {liveEdit && (
-        <LivePageEditor
-          slug={`guides-${liveEdit.id}`}
-          title={liveEdit.title}
-          path="/explore"
-          initialSections={[
-            {
-              id: 'gc-hero',
-              label: 'Content Header',
-              type: 'hero',
-              content: {
-                heading: liveEdit.title,
-                subtitle: `Type: ${liveEdit.type} - Status: ${liveEdit.status || 'draft'}`,
-                buttonText: '',
-                tagline: liveEdit.type,
-              },
-              style: {
-                backgroundColor: '#213448',
-                textColor: '#ffffff',
-                accentColor: '#F4B400',
-                alignment: 'left',
-                headingSize: '2.2rem',
-                padding: '3rem',
-              },
-            },
-            {
-              id: 'gc-body',
-              label: 'Content Body',
-              type: 'text',
-              content: {
-                heading: '',
-                body:
-                  liveEdit.body ||
-                  'Write the content here. Click this section in the preview to edit the text.',
-              },
-              style: {
-                backgroundColor: '#ffffff',
-                textColor: '#213448',
-                alignment: 'left',
-                padding: '2.5rem',
-              },
-            },
-            {
-              id: 'gc-highlights',
-              label: 'Highlights',
-              type: 'values',
-              content: {
-                heading: 'Highlights',
-                items: liveEdit.highlights || ['Highlight one', 'Highlight two'],
-              },
-              style: {
-                backgroundColor: '#f8f8f8',
-                textColor: '#213448',
-                alignment: 'center',
-              },
-            },
-          ]}
-          onSaved={async (sections) => {
-            const hero = sections.find((s) => s.id === 'gc-hero');
-            const body = sections.find((s) => s.id === 'gc-body');
-            const highlights = sections.find((s) => s.id === 'gc-highlights');
-            if (hero?.content?.heading || body?.content?.body) {
-              try {
-                await updateContentGuide(liveEdit.id, {
-                  title: hero?.content?.heading || liveEdit.title,
-                  body: body?.content?.body,
-                  highlights: highlights?.content?.items,
-                });
-              } catch {
-                // sections already persisted
+        <Modal open={openCreate} title="Add Content" onClose={() => setOpenCreate(false)}>
+          <div className="space-y-4">
+            <Field
+              label="Title"
+              placeholder="Enter title"
+              value={form.title}
+              onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+                setForm({ ...form, title: e.target.value })
               }
-            }
-          }}
-          onClose={fetchContent}
-        />
-      )}
-    </PageShell>
+            />
+            <Field
+              as="select"
+              label="Type"
+              value={form.type}
+              onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+                setForm({ ...form, type: e.target.value })
+              }
+            >
+              <option value="description">Description</option>
+              <option value="itinerary">Itinerary</option>
+              <option value="faq">FAQ</option>
+            </Field>
+            <Button
+              variant="primary"
+              className="w-full"
+              onClick={handleCreate}
+              disabled={!form.title.trim() || actionLoading === -1}
+            >
+              {actionLoading === -1 ? 'Adding…' : 'Add Content'}
+            </Button>
+          </div>
+        </Modal>
+
+        <Modal open={openEdit !== null} title="Edit Content" onClose={() => setOpenEdit(null)}>
+          <div className="space-y-4">
+            <Field
+              label="Title"
+              placeholder="Enter title"
+              value={form.title}
+              onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+                setForm({ ...form, title: e.target.value })
+              }
+            />
+            <Field
+              as="select"
+              label="Type"
+              value={form.type}
+              onChange={(e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+                setForm({ ...form, type: e.target.value })
+              }
+            >
+              <option value="description">Description</option>
+              <option value="itinerary">Itinerary</option>
+              <option value="faq">FAQ</option>
+            </Field>
+            <Button
+              variant="primary"
+              className="w-full"
+              onClick={handleEdit}
+              disabled={!form.title.trim() || actionLoading === openEdit?.id}
+            >
+              Save Changes
+            </Button>
+          </div>
+        </Modal>
+
+        {liveEdit && (
+          <LivePageEditor
+            slug={`guides-${liveEdit.id}`}
+            title={liveEdit.title}
+            path="/explore"
+            initialSections={[
+              {
+                id: 'gc-hero',
+                label: 'Content Header',
+                type: 'hero',
+                content: {
+                  heading: liveEdit.title,
+                  subtitle: `Type: ${liveEdit.type} - Status: ${liveEdit.status || 'draft'}`,
+                  buttonText: '',
+                  tagline: liveEdit.type,
+                },
+                style: {
+                  backgroundColor: '#213448',
+                  textColor: '#ffffff',
+                  accentColor: '#F4B400',
+                  alignment: 'left',
+                  headingSize: '2.2rem',
+                  padding: '3rem',
+                },
+              },
+              {
+                id: 'gc-body',
+                label: 'Content Body',
+                type: 'text',
+                content: {
+                  heading: '',
+                  body:
+                    liveEdit.body ||
+                    'Write the content here. Click this section in the preview to edit the text.',
+                },
+                style: {
+                  backgroundColor: '#ffffff',
+                  textColor: '#213448',
+                  alignment: 'left',
+                  padding: '2.5rem',
+                },
+              },
+              {
+                id: 'gc-highlights',
+                label: 'Highlights',
+                type: 'values',
+                content: {
+                  heading: 'Highlights',
+                  items: liveEdit.highlights || ['Highlight one', 'Highlight two'],
+                },
+                style: {
+                  backgroundColor: '#f8f8f8',
+                  textColor: '#213448',
+                  alignment: 'center',
+                },
+              },
+            ]}
+            onSaved={async (sections) => {
+              const hero = sections.find((s) => s.id === 'gc-hero');
+              const body = sections.find((s) => s.id === 'gc-body');
+              const highlights = sections.find((s) => s.id === 'gc-highlights');
+              if (hero?.content?.heading || body?.content?.body) {
+                try {
+                  await updateContentGuide(liveEdit.id, {
+                    title: hero?.content?.heading || liveEdit.title,
+                    body: body?.content?.body,
+                    highlights: highlights?.content?.items,
+                  });
+                } catch {
+                  // sections already persisted
+                }
+              }
+            }}
+            onClose={fetchContent}
+          />
+        )}
+      </PageShell>
+    </>
   );
 }
