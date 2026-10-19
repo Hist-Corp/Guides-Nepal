@@ -6,9 +6,9 @@ import { Clock, User, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getCmsBlogPosts } from '../services/cms';
-import { useImagePlacement } from '../hooks/useCms';
 
-const staticBlogPosts = [
+// eslint-disable-next-line react-refresh/only-export-components
+export const staticBlogPosts = [
   {
     id: 1,
     slug: 'hidden-gems-kathmandu',
@@ -87,9 +87,8 @@ const staticBlogPosts = [
 ];
 
 const BlogPage: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [cmsPosts, setCmsPosts] = useState<any[]>([]);
-  // Dashboard-placed blog post images (slots blog-post-1 .. blog-post-6)
-  const placedImages = Array.from({ length: 6 }, (_, i) => useImagePlacement(`blog-post-${i + 1}`));
 
   useEffect(() => {
     getCmsBlogPosts().then(setCmsPosts);
@@ -117,7 +116,7 @@ const BlogPage: React.FC = () => {
         status: cms.status || p.status,
       };
     })
-    .filter((p): p is typeof staticBlogPosts[number] => p !== null)
+    .filter((p): p is (typeof staticBlogPosts)[number] => p !== null)
     .concat(
       cmsPosts
         .filter(
@@ -157,14 +156,14 @@ const BlogPage: React.FC = () => {
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {blogPosts.map((post, index) => (
+              {blogPosts.map((post) => (
                 <article
                   key={post.id}
                   className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow group"
                 >
                   <div className="h-48 overflow-hidden">
                     <img
-                      src={placedImages[index] || post.image}
+                      src={post.image}
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
@@ -187,9 +186,12 @@ const BlogPage: React.FC = () => {
                         {new Date(post.date).toLocaleDateString()}
                       </span>
                     </div>
-                    <button className="mt-4 text-primary font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
+                    <Link
+                      to={`/blog/${post.slug}`}
+                      className="mt-4 text-primary font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all"
+                    >
                       Read More <ArrowRight className="w-4 h-4" />
-                    </button>
+                    </Link>
                   </div>
                 </article>
               ))}
