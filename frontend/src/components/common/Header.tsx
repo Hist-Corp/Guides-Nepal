@@ -164,7 +164,7 @@ export const Header: React.FC = () => {
     <header
       className={`sticky top-0 z-50 w-full border-b border-transparent transition-all duration-300 ${
         isVisible ? 'translate-y-0' : '-translate-y-full'
-      } ${showSolidBackground ? 'bg-white shadow-md' : 'bg-peach'}`}
+      } ${showSolidBackground ? 'bg-white' : 'bg-peach'}`}
     >
       <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-2">
         {/* Logo */}
