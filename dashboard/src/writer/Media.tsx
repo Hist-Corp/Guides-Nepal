@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import PageShell from '../components/PageShell';
+import BackButton from '../components/BackButton';
 import Button from '../components/Button';
 import Loading from '../components/Loading';
 import Modal from '../components/Modal';
@@ -147,245 +148,252 @@ export default function WriterMedia() {
     media.find((m) => m.id === item.id)?.placements || [];
 
   return (
-    <PageShell
-      title="Media Library"
-      description="Upload and manage images used across your content. Replace an image in place, or place it anywhere on the website."
-      action={
-        <div className="flex gap-2">
-          <label className="cursor-pointer">
-            <input type="file" accept="image/*" className="hidden" onChange={handleUpload} />
-            <span
-              className={`inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium transition ${
-                uploading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-primary text-white hover:opacity-90'
-              }`}
+    <>
+      <div className="flex items-center gap-2 mb-4">
+        <BackButton to="/dashboard/content-manager" />
+      </div>
+      <PageShell
+        title="Media Library"
+        description="Upload and manage images used across your content. Replace an image in place, or place it anywhere on the website."
+        action={
+          <div className="flex gap-2">
+            <label className="cursor-pointer">
+              <input type="file" accept="image/*" className="hidden" onChange={handleUpload} />
+              <span
+                className={`inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium transition ${
+                  uploading
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-primary text-white hover:opacity-90'
+                }`}
+              >
+                {uploading ? 'Uploading…' : 'Upload from device'}
+              </span>
+            </label>
+            <button
+              type="button"
+              className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium border border-gray-300 hover:bg-gray-50 transition"
+              onClick={() => setOpenUrlUpload(true)}
             >
-              {uploading ? 'Uploading…' : 'Upload from device'}
-            </span>
-          </label>
-          <button
-            type="button"
-            className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium border border-gray-300 hover:bg-gray-50 transition"
-            onClick={() => setOpenUrlUpload(true)}
-          >
-            Add from URL
-          </button>
-        </div>
-      }
-    >
-      {/* Hidden input used by the per-item Replace action */}
-      <input
-        type="file"
-        accept="image/*"
-        className="hidden"
-        id="replace-input"
-        onChange={handleReplace}
-      />
+              Add from URL
+            </button>
+          </div>
+        }
+      >
+        {/* Hidden input used by the per-item Replace action */}
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          id="replace-input"
+          onChange={handleReplace}
+        />
 
-      {loading ? (
-        <Loading label="Loading media…" />
-      ) : media.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
-          <p>No media found.</p>
-          <p className="mt-1 text-sm">Upload your first media file to get started.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {media.map((item) => {
-            const placedKeys = itemPlacementKeys(item);
-            return (
-              <div key={item.id} className="group relative">
-                <div
-                  className={`aspect-square flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden cursor-zoom-in ${
-                    item.type.startsWith('image/') ? 'p-0' : 'p-3'
-                  }`}
-                  onClick={() => {
-                    setOpenPreview(item);
-                    setPreviewSrc(item.url);
-                  }}
-                >
-                  {item.type.startsWith('image/') ? (
-                    <img
-                      src={item.url}
-                      alt={item.original_name || item.filename}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-3xl">📎</span>
-                  )}
-                </div>
-                {placedKeys.length > 0 && (
-                  <span className="absolute top-1 left-1 z-10 rounded bg-emerald-600 text-white text-[10px] px-1.5 py-0.5">
-                    Placed ×{placedKeys.length}
-                  </span>
-                )}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-1 flex-wrap p-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white"
-                    onClick={() => setOpenPreview(item)}
-                  >
-                    Preview
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white"
-                    onClick={() => setReplaceTarget(item)}
-                  >
-                    Replace
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-white"
-                    onClick={() => setPlaceTarget(item)}
-                  >
-                    Place
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={async () => {
-                      if (!confirm('Delete this media item?')) return;
-                      await deleteMedia(item.id);
-                      loadMedia();
-                      loadPlacements();
+        {loading ? (
+          <Loading label="Loading media…" />
+        ) : media.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <p>No media found.</p>
+            <p className="mt-1 text-sm">Upload your first media file to get started.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {media.map((item) => {
+              const placedKeys = itemPlacementKeys(item);
+              return (
+                <div key={item.id} className="group relative">
+                  <div
+                    className={`aspect-square flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden cursor-zoom-in ${
+                      item.type.startsWith('image/') ? 'p-0' : 'p-3'
+                    }`}
+                    onClick={() => {
+                      setOpenPreview(item);
+                      setPreviewSrc(item.url);
                     }}
                   >
-                    Remove
-                  </Button>
+                    {item.type.startsWith('image/') ? (
+                      <img
+                        src={item.url}
+                        alt={item.original_name || item.filename}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-3xl">📎</span>
+                    )}
+                  </div>
+                  {placedKeys.length > 0 && (
+                    <span className="absolute top-1 left-1 z-10 rounded bg-emerald-600 text-white text-[10px] px-1.5 py-0.5">
+                      Placed ×{placedKeys.length}
+                    </span>
+                  )}
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-1 flex-wrap p-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white"
+                      onClick={() => setOpenPreview(item)}
+                    >
+                      Preview
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white"
+                      onClick={() => setReplaceTarget(item)}
+                    >
+                      Replace
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white"
+                      onClick={() => setPlaceTarget(item)}
+                    >
+                      Place
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={async () => {
+                        if (!confirm('Delete this media item?')) return;
+                        await deleteMedia(item.id);
+                        loadMedia();
+                        loadPlacements();
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500 truncate">
+                    {item.original_name || item.filename}
+                  </p>
                 </div>
-                <p className="mt-1 text-xs text-gray-500 truncate">
-                  {item.original_name || item.filename}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
 
-      <Modal
-        open={openPreview !== null}
-        title={openPreview?.original_name || openPreview?.filename || 'Preview'}
-        onClose={() => {
-          setOpenPreview(null);
-          setPreviewSrc('');
-        }}
-      >
-        <div className="flex justify-center">
-          {previewSrc && openPreview?.type.startsWith('image/') ? (
-            <img
-              src={previewSrc}
-              alt={openPreview?.original_name || openPreview?.filename}
-              className="max-w-full max-h-96 rounded"
-            />
-          ) : previewSrc ? (
-            <iframe
-              src={previewSrc}
-              title={openPreview?.filename}
-              className="w-full h-96 rounded"
-            />
-          ) : null}
-        </div>
-      </Modal>
-
-      {/* Replace modal */}
-      <Modal
-        open={replaceTarget !== null}
-        title={`Replace "${replaceTarget?.original_name || replaceTarget?.filename}"`}
-        onClose={() => setReplaceTarget(null)}
-      >
-        <p className="text-sm text-gray-600 mb-4">
-          Choose a new image file — it will replace this library item in place. Every spot on the
-          website currently using it will show the new image automatically.
-        </p>
-        <label
-          htmlFor="replace-input"
-          className={`inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium cursor-pointer ${
-            replacing ? 'bg-gray-400 pointer-events-none' : 'bg-primary text-white hover:opacity-90'
-          }`}
+        <Modal
+          open={openPreview !== null}
+          title={openPreview?.original_name || openPreview?.filename || 'Preview'}
+          onClose={() => {
+            setOpenPreview(null);
+            setPreviewSrc('');
+          }}
         >
-          {replacing ? 'Replacing…' : 'Choose new image'}
-        </label>
-      </Modal>
+          <div className="flex justify-center">
+            {previewSrc && openPreview?.type.startsWith('image/') ? (
+              <img
+                src={previewSrc}
+                alt={openPreview?.original_name || openPreview?.filename}
+                className="max-w-full max-h-96 rounded"
+              />
+            ) : previewSrc ? (
+              <iframe
+                src={previewSrc}
+                title={openPreview?.filename}
+                className="w-full h-96 rounded"
+              />
+            ) : null}
+          </div>
+        </Modal>
 
-      {/* Placement modal */}
-      <Modal
-        open={placeTarget !== null}
-        title={`Place "${placeTarget?.original_name || placeTarget?.filename}"`}
-        onClose={() => setPlaceTarget(null)}
-      >
-        <p className="text-sm text-gray-600 mb-3">
-          Pick where this image should appear on the website. Click a slot to place it; click
-          "Clear" to remove an existing placement.
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto">
-          {slots.map((slot) => {
-            const isCurrent = (placeTarget?.placements || []).includes(slot.key);
-            return (
-              <div
-                key={slot.key}
-                className="flex items-center justify-between gap-2 border rounded-lg px-3 py-2"
-              >
-                <span className="text-sm truncate">{slot.label}</span>
-                <div className="flex gap-1 flex-shrink-0">
-                  <Button
-                    size="sm"
-                    variant={isCurrent ? 'ghost' : 'primary'}
-                    disabled={isCurrent}
-                    onClick={() => handlePlace(slot.key)}
-                  >
-                    {isCurrent ? 'Placed' : 'Place here'}
-                  </Button>
-                  {isCurrent && (
+        {/* Replace modal */}
+        <Modal
+          open={replaceTarget !== null}
+          title={`Replace "${replaceTarget?.original_name || replaceTarget?.filename}"`}
+          onClose={() => setReplaceTarget(null)}
+        >
+          <p className="text-sm text-gray-600 mb-4">
+            Choose a new image file — it will replace this library item in place. Every spot on the
+            website currently using it will show the new image automatically.
+          </p>
+          <label
+            htmlFor="replace-input"
+            className={`inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium cursor-pointer ${
+              replacing
+                ? 'bg-gray-400 pointer-events-none'
+                : 'bg-primary text-white hover:opacity-90'
+            }`}
+          >
+            {replacing ? 'Replacing…' : 'Choose new image'}
+          </label>
+        </Modal>
+
+        {/* Placement modal */}
+        <Modal
+          open={placeTarget !== null}
+          title={`Place "${placeTarget?.original_name || placeTarget?.filename}"`}
+          onClose={() => setPlaceTarget(null)}
+        >
+          <p className="text-sm text-gray-600 mb-3">
+            Pick where this image should appear on the website. Click a slot to place it; click
+            "Clear" to remove an existing placement.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto">
+            {slots.map((slot) => {
+              const isCurrent = (placeTarget?.placements || []).includes(slot.key);
+              return (
+                <div
+                  key={slot.key}
+                  className="flex items-center justify-between gap-2 border rounded-lg px-3 py-2"
+                >
+                  <span className="text-sm truncate">{slot.label}</span>
+                  <div className="flex gap-1 flex-shrink-0">
                     <Button
                       size="sm"
-                      variant="danger"
-                      onClick={() => handleClearPlacement(slot.key)}
+                      variant={isCurrent ? 'ghost' : 'primary'}
+                      disabled={isCurrent}
+                      onClick={() => handlePlace(slot.key)}
                     >
-                      Clear
+                      {isCurrent ? 'Placed' : 'Place here'}
                     </Button>
-                  )}
+                    {isCurrent && (
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        onClick={() => handleClearPlacement(slot.key)}
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      </Modal>
+              );
+            })}
+          </div>
+        </Modal>
 
-      {/* URL upload modal */}
-      <Modal
-        open={openUrlUpload}
-        title="Add image from URL"
-        onClose={() => {
-          setOpenUrlUpload(false);
-          setUrlInput('');
-        }}
-      >
-        <p className="text-sm text-gray-600 mb-3">
-          Paste a direct link to an image (e.g. from Unsplash, your website, etc.). The image will
-          be fetched, compressed, and added to your media library.
-        </p>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="https://example.com/image.jpg"
-            className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-            value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleUrlUpload();
-            }}
-            disabled={urlUploading}
-          />
-          <Button disabled={urlUploading || !urlInput.trim()} onClick={handleUrlUpload}>
-            {urlUploading ? 'Adding…' : 'Add image'}
-          </Button>
-        </div>
-      </Modal>
-    </PageShell>
+        {/* URL upload modal */}
+        <Modal
+          open={openUrlUpload}
+          title="Add image from URL"
+          onClose={() => {
+            setOpenUrlUpload(false);
+            setUrlInput('');
+          }}
+        >
+          <p className="text-sm text-gray-600 mb-3">
+            Paste a direct link to an image (e.g. from Unsplash, your website, etc.). The image will
+            be fetched, compressed, and added to your media library.
+          </p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="https://example.com/image.jpg"
+              className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleUrlUpload();
+              }}
+              disabled={urlUploading}
+            />
+            <Button disabled={urlUploading || !urlInput.trim()} onClick={handleUrlUpload}>
+              {urlUploading ? 'Adding…' : 'Add image'}
+            </Button>
+          </div>
+        </Modal>
+      </PageShell>
+    </>
   );
 }

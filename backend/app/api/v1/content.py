@@ -7,7 +7,6 @@ import json
 import os
 import re
 import io
-import hashlib
 from uuid import uuid4
 from typing import Optional
 
@@ -15,6 +14,7 @@ from typing import Optional
 # installed the upload still works — images are just stored as-is.
 try:
     from PIL import Image, ImageFile, ImageOps
+
     ImageFile.LOAD_TRUNCATED_IMAGES = True
     _HAS_PILLOW = True
 except ImportError:
@@ -27,49 +27,281 @@ CMS_MANAGER_OR_ADMIN = require_role("admin", "content-manager")
 
 DB: dict[str, list] = {
     "pages": [
-        {"id": 1, "title": "Home", "slug": "home", "status": "published", "path": "/", "description": "The landing page — hero, category grid, promo banner and footer are all editable blocks."},
-        {"id": 2, "title": "About", "slug": "about", "status": "published", "path": "/about", "description": "Brand story — hero, mission, values and team sections."},
-        {"id": 3, "title": "Contact", "slug": "contact", "status": "published", "path": "/contact", "description": "Contact page — hero and contact info band with email, phone and address."},
-        {"id": 4, "title": "Blog", "slug": "blog", "status": "published", "path": "/blog", "description": "Journal / Learn — article listing page, editable hero and intro copy."},
-        {"id": 5, "title": "FAQ", "slug": "faq", "status": "published", "path": "/faq", "description": "Frequently asked questions — hero and body copy editable."},
-        {"id": 6, "title": "Destinations", "slug": "destinations", "status": "published", "path": "/destinations", "description": "Destination overview — hero and intro copy for Nepal's cities."},
-        {"id": 7, "title": "How It Works", "slug": "how-it-works", "status": "published", "path": "/how-it-works", "description": "The booking process explained — hero and step-by-step copy."},
-        {"id": 8, "title": "Sustainability", "slug": "sustainability", "status": "published", "path": "/sustainability", "description": "Responsible travel commitments — hero and body copy."},
-        {"id": 9, "title": "Press", "slug": "press", "status": "published", "path": "/press", "description": "Press and media coverage — hero and body copy."},
-        {"id": 10, "title": "Jobs", "slug": "jobs", "status": "published", "path": "/jobs", "description": "Careers page — hero and body copy for open roles."},
-        {"id": 11, "title": "Gift Cards", "slug": "gift-cards", "status": "published", "path": "/gift-cards", "description": "Gift cards — hero and body copy."},
-        {"id": 12, "title": "Host Center", "slug": "host-center", "status": "published", "path": "/host-center", "description": "B2B onboarding for hosts — hero, benefits and signup band."},
-        {"id": 13, "title": "Hosting", "slug": "hosting", "status": "published", "path": "/hosting", "description": "Hosting with Guides Nepal — hero and body copy."},
-        {"id": 14, "title": "Community", "slug": "community", "status": "published", "path": "/community", "description": "Community page — hero and body copy."},
-        {"id": 15, "title": "Terms", "slug": "terms", "status": "published", "path": "/terms", "description": "Terms of service — hero and body copy."},
-        {"id": 16, "title": "Help", "slug": "help", "status": "published", "path": "/help", "description": "Help center — hero and body copy."},
+        {
+            "id": 1,
+            "title": "Home",
+            "slug": "home",
+            "status": "published",
+            "path": "/",
+            "description": "The landing page — hero, category grid, promo banner and footer are all editable blocks.",
+        },
+        {
+            "id": 2,
+            "title": "About",
+            "slug": "about",
+            "status": "published",
+            "path": "/about",
+            "description": "Brand story — hero, mission, values and team sections.",
+        },
+        {
+            "id": 3,
+            "title": "Contact",
+            "slug": "contact",
+            "status": "published",
+            "path": "/contact",
+            "description": "Contact page — hero and contact info band with email, phone and address.",
+        },
+        {
+            "id": 4,
+            "title": "Blog",
+            "slug": "blog",
+            "status": "published",
+            "path": "/blog",
+            "description": "Journal / Learn — article listing page, editable hero and intro copy.",
+        },
+        {
+            "id": 5,
+            "title": "FAQ",
+            "slug": "faq",
+            "status": "published",
+            "path": "/faq",
+            "description": "Frequently asked questions — hero and body copy editable.",
+        },
+        {
+            "id": 6,
+            "title": "Destinations",
+            "slug": "destinations",
+            "status": "published",
+            "path": "/destinations",
+            "description": "Destination overview — hero and intro copy for Nepal's cities.",
+        },
+        {
+            "id": 7,
+            "title": "How It Works",
+            "slug": "how-it-works",
+            "status": "published",
+            "path": "/how-it-works",
+            "description": "The booking process explained — hero and step-by-step copy.",
+        },
+        {
+            "id": 8,
+            "title": "Sustainability",
+            "slug": "sustainability",
+            "status": "published",
+            "path": "/sustainability",
+            "description": "Responsible travel commitments — hero and body copy.",
+        },
+        {
+            "id": 9,
+            "title": "Press",
+            "slug": "press",
+            "status": "published",
+            "path": "/press",
+            "description": "Press and media coverage — hero and body copy.",
+        },
+        {
+            "id": 10,
+            "title": "Jobs",
+            "slug": "jobs",
+            "status": "published",
+            "path": "/jobs",
+            "description": "Careers page — hero and body copy for open roles.",
+        },
+        {
+            "id": 11,
+            "title": "Gift Cards",
+            "slug": "gift-cards",
+            "status": "published",
+            "path": "/gift-cards",
+            "description": "Gift cards — hero and body copy.",
+        },
+        {
+            "id": 12,
+            "title": "Host Center",
+            "slug": "host-center",
+            "status": "published",
+            "path": "/host-center",
+            "description": "B2B onboarding for hosts — hero, benefits and signup band.",
+        },
+        {
+            "id": 13,
+            "title": "Hosting",
+            "slug": "hosting",
+            "status": "published",
+            "path": "/hosting",
+            "description": "Hosting with Guides Nepal — hero and body copy.",
+        },
+        {
+            "id": 14,
+            "title": "Community",
+            "slug": "community",
+            "status": "published",
+            "path": "/community",
+            "description": "Community page — hero and body copy.",
+        },
+        {
+            "id": 15,
+            "title": "Terms",
+            "slug": "terms",
+            "status": "published",
+            "path": "/terms",
+            "description": "Terms of service — hero and body copy.",
+        },
+        {
+            "id": 16,
+            "title": "Help",
+            "slug": "help",
+            "status": "published",
+            "path": "/help",
+            "description": "Help center — hero and body copy.",
+        },
     ],
     "blog": [
         # Canonical source of truth for the frontend BlogPage static posts
         # (matched by slug — ids must never be assumed to line up). Only
         # "published" posts are served to anonymous visitors; drafts stay
         # visible in the dashboard for writers/admins.
-        {"id": 1, "title": "10 Hidden Gems in Kathmandu You Must Visit", "slug": "hidden-gems-kathmandu", "author": "Ram Bahadur", "date": "2026-01-15", "status": "published", "category": "Travel Tips", "image": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80", "content": "Discover the secret spots that only locals know about. From hidden temples to underground cafes."},
-        {"id": 2, "title": "A Foodie's Guide to Newari Cuisine", "slug": "foodie-guide-newari-cuisine", "author": "Priya Sharma", "date": "2026-01-10", "status": "published", "category": "Food & Culture", "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80", "content": "Explore the rich flavors of traditional Newari dishes and where to find the best ones."},
-        {"id": 3, "title": "Pokhara: Beyond the Tourist Trail", "slug": "pokhara-beyond-tourist-trail", "author": "Sujal Thapa", "date": "2026-01-05", "status": "published", "category": "Adventure", "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80", "content": "Go beyond Phewa Lake and discover what makes Pokhara truly special."},
-        {"id": 4, "title": "Sustainable Travel in Nepal: A Complete Guide", "slug": "sustainable-travel-nepal-guide", "author": "Rohan KC", "date": "2025-12-28", "status": "published", "category": "Sustainability", "image": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=800&q=80", "content": "Learn how to travel responsibly and support local communities while exploring Nepal."},
-        {"id": 5, "title": "Bhaktapur: Walking Through Living History", "slug": "bhaktapur-walking-living-history", "author": "Apicha Maharjan", "date": "2025-12-20", "status": "published", "category": "Culture", "image": "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=800&q=80", "content": "Experience the medieval charm of Bhaktapur and its preserved Newari architecture."},
-        {"id": 6, "title": "How to Become a Local Guide in Nepal", "slug": "how-to-become-local-guide-nepal", "author": "Guides Nepal Team", "date": "2025-12-15", "status": "published", "category": "Community", "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=800&q=80", "content": "Interested in sharing your culture? Here's everything you need to know about becoming a guide."},
+        {
+            "id": 1,
+            "title": "10 Hidden Gems in Kathmandu You Must Visit",
+            "slug": "hidden-gems-kathmandu",
+            "author": "Ram Bahadur",
+            "date": "2026-01-15",
+            "status": "published",
+            "category": "Travel Tips",
+            "excerpt": "Secret courtyards, basement chiya shops, and quiet hilltop views only locals know.",
+            "image": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80",
+            "content": "Discover the secret spots that only locals know about. From hidden temples to underground cafes.",
+        },
+        {
+            "id": 2,
+            "title": "A Foodie's Guide to Newari Cuisine",
+            "slug": "foodie-guide-newari-cuisine",
+            "author": "Priya Sharma",
+            "date": "2026-01-10",
+            "status": "published",
+            "category": "Food & Culture",
+            "excerpt": "Yomari, bara, samay baji, and king curd — where to eat Newari food across the valley.",
+            "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80",
+            "content": "Explore the rich flavors of traditional Newari dishes and where to find the best ones.",
+        },
+        {
+            "id": 3,
+            "title": "Pokhara: Beyond the Tourist Trail",
+            "slug": "pokhara-beyond-tourist-trail",
+            "author": "Sujal Thapa",
+            "date": "2026-01-05",
+            "status": "published",
+            "category": "Adventure",
+            "excerpt": "Quiet shores, village waterfalls, crowd-free sunrises, and calmer lakes beyond Lakeside.",
+            "image": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80",
+            "content": "Go beyond Phewa Lake and discover what makes Pokhara truly special.",
+        },
+        {
+            "id": 4,
+            "title": "Sustainable Travel in Nepal: A Complete Guide",
+            "slug": "sustainable-travel-nepal-guide",
+            "author": "Rohan KC",
+            "date": "2025-12-28",
+            "status": "published",
+            "category": "Sustainability",
+            "excerpt": "Homestays, fair porter treatment, refill habits, and low-impact itineraries that help.",
+            "image": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=800&q=80",
+            "content": "Learn how to travel responsibly and support local communities while exploring Nepal.",
+        },
+        {
+            "id": 5,
+            "title": "Bhaktapur: Walking Through Living History",
+            "slug": "bhaktapur-walking-living-history",
+            "author": "Apicha Maharjan",
+            "date": "2025-12-20",
+            "status": "published",
+            "category": "Culture",
+            "excerpt": "Nyatapola, pottery wheels, and king curd on a living medieval walking route.",
+            "image": "https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=800&q=80",
+            "content": "Experience the medieval charm of Bhaktapur and its preserved Newari architecture.",
+        },
+        {
+            "id": 6,
+            "title": "How to Become a Local Guide in Nepal",
+            "slug": "how-to-become-local-guide-nepal",
+            "author": "Guides Nepal Team",
+            "date": "2025-12-15",
+            "status": "published",
+            "category": "Community",
+            "excerpt": "Training, licensing, earnings, and listing yourself — from first course to first clients.",
+            "image": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=800&q=80",
+            "content": "Interested in sharing your culture? Here's everything you need to know about becoming a guide.",
+        },
     ],
     "guides": [
-        {"id": 1, "title": "Kathmandu Heritage Walk", "type": "description", "status": "published", "body": "Walk through the ancient streets of Kathmandu Durbar Square with a local historian."},
-        {"id": 2, "title": "Pokhara Lakeside Tour", "type": "itinerary", "status": "published", "body": "Day 1: Lakeside stroll and sunset boat ride. Day 2: Sarangkot sunrise and hike."},
-        {"id": 3, "title": "Bhaktapur Pottery Workshop", "type": "faq", "status": "draft", "body": "What should I wear? Can kids join? How long does the workshop take?"},
+        {
+            "id": 1,
+            "title": "Kathmandu Heritage Walk",
+            "type": "description",
+            "status": "published",
+            "body": "Walk through the ancient streets of Kathmandu Durbar Square with a local historian.",
+        },
+        {
+            "id": 2,
+            "title": "Pokhara Lakeside Tour",
+            "type": "itinerary",
+            "status": "published",
+            "body": "Day 1: Lakeside stroll and sunset boat ride. Day 2: Sarangkot sunrise and hike.",
+        },
+        {
+            "id": 3,
+            "title": "Bhaktapur Pottery Workshop",
+            "type": "faq",
+            "status": "draft",
+            "body": "What should I wear? Can kids join? How long does the workshop take?",
+        },
     ],
     "media": [
-        {"id": 1, "name": "kathmandu-hero.jpg", "type": "image", "size": "2.4 MB", "uploaded": "2026-08-10"},
-        {"id": 2, "name": "pokhara-lake.jpg", "type": "image", "size": "1.8 MB", "uploaded": "2026-08-15"},
-        {"id": 3, "name": "guide-portrait.jpg", "type": "image", "size": "0.9 MB", "uploaded": "2026-08-22"},
+        {
+            "id": 1,
+            "name": "kathmandu-hero.jpg",
+            "type": "image",
+            "size": "2.4 MB",
+            "uploaded": "2026-08-10",
+        },
+        {
+            "id": 2,
+            "name": "pokhara-lake.jpg",
+            "type": "image",
+            "size": "1.8 MB",
+            "uploaded": "2026-08-15",
+        },
+        {
+            "id": 3,
+            "name": "guide-portrait.jpg",
+            "type": "image",
+            "size": "0.9 MB",
+            "uploaded": "2026-08-22",
+        },
     ],
     "seo": [
-        {"id": 1, "page": "Homepage", "title": "Guides Nepal - Go Local in Charming Cities", "description": "Find unforgettable experiences with locals across Nepal.", "keywords": "nepal, local guides, experiences"},
-        {"id": 2, "page": "About", "title": "About Us | Guides Nepal", "description": "Connecting travelers with authentic local experiences across Nepal.", "keywords": "about, guides nepal"},
-        {"id": 3, "page": "Contact", "title": "Contact Us | Guides Nepal", "description": "Get in touch with the Guides Nepal team.", "keywords": "contact, support"},
+        {
+            "id": 1,
+            "page": "Homepage",
+            "title": "Guides Nepal - Go Local in Charming Cities",
+            "description": "Find unforgettable experiences with locals across Nepal.",
+            "keywords": "nepal, local guides, experiences",
+        },
+        {
+            "id": 2,
+            "page": "About",
+            "title": "About Us | Guides Nepal",
+            "description": "Connecting travelers with authentic local experiences across Nepal.",
+            "keywords": "about, guides nepal",
+        },
+        {
+            "id": 3,
+            "page": "Contact",
+            "title": "Contact Us | Guides Nepal",
+            "description": "Get in touch with the Guides Nepal team.",
+            "keywords": "contact, support",
+        },
     ],
 }
 NEXT_ID = 1000
@@ -88,6 +320,7 @@ def _find(key: str, item_id: int):
 
 def _crud_routes(key: str, tag: str, auth_dep=None):
     if auth_dep:
+
         @router.get(f"/{key}")
         def list_items(current_user: User = Depends(auth_dep)):
             items = _clone(DB[key])
@@ -105,7 +338,9 @@ def _crud_routes(key: str, tag: str, auth_dep=None):
             return _clone(item)
 
         @router.patch(f"/{key}/{{item_id}}")
-        def update_item(item_id: int, payload: dict, current_user: User = Depends(auth_dep)):
+        def update_item(
+            item_id: int, payload: dict, current_user: User = Depends(auth_dep)
+        ):
             item = _find(key, item_id)
             item.update(payload)
             return _clone(item)
@@ -115,7 +350,9 @@ def _crud_routes(key: str, tag: str, auth_dep=None):
             item = _find(key, item_id)
             DB[key].remove(item)
             return {"status": "ok", "message": "Deleted"}
+
     else:
+
         @router.get(f"/{key}")
         def list_items():
             items = _clone(DB[key])
@@ -149,7 +386,9 @@ def _crud_routes(key: str, tag: str, auth_dep=None):
 
 # Uploaded media lives in backend/uploads/media with a JSON registry so the
 # dashboard can manage (upload / replace / delete) images directly.
-MEDIA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../uploads/media"))
+MEDIA_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "../../../uploads/media")
+)
 os.makedirs(MEDIA_DIR, exist_ok=True)
 MEDIA_REGISTRY_PATH = os.path.join(MEDIA_DIR, "registry.json")
 
@@ -270,13 +509,17 @@ def list_media(request: Request, current_user: User = Depends(CMS_MANAGER_OR_ADM
     reg = _load_registry()
     items = []
     for it in reg["items"]:
-        items.append({
-            **it,
-            "url": _media_url(request, it["filename"]),
-            "placements": sorted(
-                k for k, v in reg["placements"].items() if v.get("media_id") == it["id"]
-            ),
-        })
+        items.append(
+            {
+                **it,
+                "url": _media_url(request, it["filename"]),
+                "placements": sorted(
+                    k
+                    for k, v in reg["placements"].items()
+                    if v.get("media_id") == it["id"]
+                ),
+            }
+        )
     return items
 
 
@@ -355,7 +598,10 @@ async def upload_media_from_url(
     # Download the image (with timeout and size limit)
     try:
         import urllib.request
-        req = urllib.request.Request(url, headers={"User-Agent": "GuidesNepal-MediaBot/1.0"})
+
+        req = urllib.request.Request(
+            url, headers={"User-Agent": "GuidesNepal-MediaBot/1.0"}
+        )
         with urllib.request.urlopen(req, timeout=15) as resp:
             content_type = resp.headers.get("Content-Type", "")
             content = resp.read()
@@ -403,7 +649,9 @@ async def upload_media_from_url(
 
 
 @router.patch("/media/{item_id}")
-def update_media(item_id: int, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)):
+def update_media(
+    item_id: int, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)
+):
     reg = _load_registry()
     for it in reg["items"]:
         if it["id"] == item_id:
@@ -446,7 +694,9 @@ def get_placements(request: Request):
 
 
 @router.put("/placements/{key}")
-def set_placement(key: str, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)):
+def set_placement(
+    key: str, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)
+):
     if key not in _PLACEMENT_KEYS:
         raise HTTPException(status_code=404, detail="Unknown placement slot")
     media_id = payload.get("media_id")
@@ -479,28 +729,39 @@ def clear_placement(key: str, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)
 #   the dashboard table shows exactly what the writer created.
 # - Writes (POST/PATCH/DELETE): admin / content-manager only.
 
+
 @router.get("/blog")
 def list_blog(current_user: Optional[User] = Depends(get_optional_user)) -> list:
     """Public read of published blog posts; staff see drafts too."""
     items = _clone(DB["blog"])
-    if current_user is not None and has_access(current_user.role, "admin", "content-manager"):
+    if current_user is not None and has_access(
+        current_user.role, "admin", "content-manager"
+    ):
         return items
-    return [it for it in items if (it.get("status") or "published").lower() == "published"]
+    return [
+        it for it in items if (it.get("status") or "published").lower() == "published"
+    ]
 
 
 @router.get("/blog/{item_id}")
-def get_blog_post(item_id: int, current_user: Optional[User] = Depends(get_optional_user)) -> dict:
+def get_blog_post(
+    item_id: int, current_user: Optional[User] = Depends(get_optional_user)
+) -> dict:
     """Public read of a single published post; staff may read drafts too."""
     item = _clone(_find("blog", item_id))
     if (item.get("status") or "published").lower() == "published":
         return item
-    if current_user is not None and has_access(current_user.role, "admin", "content-manager"):
+    if current_user is not None and has_access(
+        current_user.role, "admin", "content-manager"
+    ):
         return item
     raise HTTPException(status_code=404, detail="blog not found")
 
 
 @router.post("/blog")
-def create_blog_post(payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)) -> dict:
+def create_blog_post(
+    payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)
+) -> dict:
     """Create a blog post (dashboard writers/admins only)."""
     global NEXT_ID
     item = {**payload, "id": NEXT_ID}
@@ -509,13 +770,16 @@ def create_blog_post(payload: dict, current_user: User = Depends(CMS_MANAGER_OR_
         item["status"] = "draft"
     if not item.get("date"):
         from datetime import date as _date
+
         item["date"] = _date.today().isoformat()
     DB["blog"].append(item)
     return _clone(item)
 
 
 @router.patch("/blog/{item_id}")
-def update_blog_post(item_id: int, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)) -> dict:
+def update_blog_post(
+    item_id: int, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)
+) -> dict:
     """Update a blog post (dashboard writers/admins only)."""
     item = _find("blog", item_id)
     item.update(payload)
@@ -523,7 +787,9 @@ def update_blog_post(item_id: int, payload: dict, current_user: User = Depends(C
 
 
 @router.delete("/blog/{item_id}")
-def delete_blog_post(item_id: int, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)) -> dict:
+def delete_blog_post(
+    item_id: int, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)
+) -> dict:
     """Delete a blog post (dashboard writers/admins only)."""
     item = _find("blog", item_id)
     DB["blog"].remove(item)
@@ -552,55 +818,236 @@ NEXT_SECTION_ID = 100
 
 DEFAULT_SECTIONS = {
     "home": [
-        {"id": "home-hero", "title": "Hero Section", "type": "hero",
-         "content": {"heading": "Enchanting experiences,\nwith incredible locals", "subtitle": "Book unique and memorable travel\nexperiences guided by locals", "buttonText": "Search", "primaryText": "Guides Nepal", "tagline": "Guides Nepal"},
-         "style": {"backgroundColor": "#F9E6D6", "textColor": "#547792", "accentColor": "#F4B400", "alignment": "left", "headingSize": "4rem", "padding": "4rem"}},
-        {"id": "home-featured", "title": "Featured Experiences", "type": "featured",
-         "content": {"heading": "Trek / Hiking", "subtitle": "Find unforgettable experiences with locals", "buttonText": "View all"},
-         "style": {"backgroundColor": "#ffffff", "textColor": "#213448", "alignment": "left"}},
-        {"id": "home-promo", "title": "Promo Banner", "type": "promo",
-         "content": {"heading": "We have released our 2024\nImpact Report!", "subtitle": "Discover the true power of your travel with our 2024 Impact Report. See how responsible tourism supports local communities, preserves culture, and protects the planet.", "buttonText": "Read our report"},
-         "style": {"backgroundColor": "#FDF8F5", "textColor": "#213448", "accentColor": "#F4B400", "alignment": "left", "headingSize": "2.5rem", "padding": "4rem"}},
-        {"id": "home-categories", "title": "Categories Grid", "type": "categories",
-         "content": {"heading": "Most Popular. Most Delicious.", "subtitle": "Real-Good Travel."},
-         "style": {"backgroundColor": "#ffffff", "textColor": "#213448", "alignment": "center"}},
-        {"id": "home-find-experience", "title": "Find Your Perfect Experience", "type": "categories",
-         "content": {"heading": "Find your perfect experience", "subtitle": "Discover experiences based on your interest"},
-         "style": {"backgroundColor": "#ffffff", "textColor": "#213448", "alignment": "center"}},
-        {"id": "home-testimonials", "title": "Testimonials", "type": "testimonials",
-         "content": {"heading": "Travelers love our locals", "subtitle": "Real reviews from real travelers in Nepal"},
-         "style": {"backgroundColor": "#E0F2FE", "textColor": "#213448", "alignment": "center"}},
-        {"id": "home-values", "title": "Why Us", "type": "values",
-         "content": {"heading": "Why is Guides Nepal the best place to book a tour?", "subtitle": "Real People. Real Stories. Really Good Travel."},
-         "style": {"backgroundColor": "#ffffff", "textColor": "#213448", "alignment": "center"}},
-        {"id": "home-regions", "title": "Discovering Regions through Local Eyes", "type": "featured",
-         "content": {"heading": "Discovering Regions through Local Eyes", "subtitle": "Every corner of Nepal has a story \u2014 meet the locals who tell it best.", "buttonText": "Explore"},
-         "style": {"backgroundColor": "#213448", "textColor": "#ffffff", "accentColor": "#F4B400", "alignment": "center"}},
-        {"id": "home-plan-book", "title": "Plan and Book on the Go", "type": "promo",
-         "content": {"heading": "Plan and book on the go", "subtitle": "Your whole trip, one pocket-sized local \u2014 book, chat and travel from your phone.", "buttonText": "Book in a few taps", "tagline": "MOBILE"},
-         "style": {"backgroundColor": "#E0F2FE", "textColor": "#213448", "accentColor": "#F4B400", "alignment": "left"}},
-        {"id": "home-footer", "title": "Footer", "type": "footer",
-         "content": {"heading": "Guides Nepal", "tagline": "Real People. Real Stories. Really Good Travel.", "supportEmail": "support@guides-nepal.com", "copyright": "guides-nepal. All rights reserved."},
-         "style": {"backgroundColor": "#213448", "textColor": "#ffffff"}},
+        {
+            "id": "home-hero",
+            "title": "Hero Section",
+            "type": "hero",
+            "content": {
+                "heading": "Enchanting experiences,\nwith incredible locals",
+                "subtitle": "Book unique and memorable travel\nexperiences guided by locals",
+                "buttonText": "Search",
+                "primaryText": "Guides Nepal",
+                "tagline": "Guides Nepal",
+            },
+            "style": {
+                "backgroundColor": "#F9E6D6",
+                "textColor": "#547792",
+                "accentColor": "#F4B400",
+                "alignment": "left",
+                "headingSize": "4rem",
+                "padding": "4rem",
+            },
+        },
+        {
+            "id": "home-featured",
+            "title": "Featured Experiences",
+            "type": "featured",
+            "content": {
+                "heading": "Trek / Hiking",
+                "subtitle": "Find unforgettable experiences with locals",
+                "buttonText": "View all",
+            },
+            "style": {
+                "backgroundColor": "#ffffff",
+                "textColor": "#213448",
+                "alignment": "left",
+            },
+        },
+        {
+            "id": "home-promo",
+            "title": "Promo Banner",
+            "type": "promo",
+            "content": {
+                "heading": "We have released our 2024\nImpact Report!",
+                "subtitle": "Discover the true power of your travel with our 2024 Impact Report. See how responsible tourism supports local communities, preserves culture, and protects the planet.",
+                "buttonText": "Read our report",
+            },
+            "style": {
+                "backgroundColor": "#FDF8F5",
+                "textColor": "#213448",
+                "accentColor": "#F4B400",
+                "alignment": "left",
+                "headingSize": "2.5rem",
+                "padding": "4rem",
+            },
+        },
+        {
+            "id": "home-categories",
+            "title": "Categories Grid",
+            "type": "categories",
+            "content": {
+                "heading": "Most Popular. Most Delicious.",
+                "subtitle": "Real-Good Travel.",
+            },
+            "style": {
+                "backgroundColor": "#ffffff",
+                "textColor": "#213448",
+                "alignment": "center",
+            },
+        },
+        {
+            "id": "home-find-experience",
+            "title": "Find Your Perfect Experience",
+            "type": "categories",
+            "content": {
+                "heading": "Find your perfect experience",
+                "subtitle": "Discover experiences based on your interest",
+            },
+            "style": {
+                "backgroundColor": "#ffffff",
+                "textColor": "#213448",
+                "alignment": "center",
+            },
+        },
+        {
+            "id": "home-testimonials",
+            "title": "Testimonials",
+            "type": "testimonials",
+            "content": {
+                "heading": "Travelers love our locals",
+                "subtitle": "Real reviews from real travelers in Nepal",
+            },
+            "style": {
+                "backgroundColor": "#E0F2FE",
+                "textColor": "#213448",
+                "alignment": "center",
+            },
+        },
+        {
+            "id": "home-values",
+            "title": "Why Us",
+            "type": "values",
+            "content": {
+                "heading": "Why is Guides Nepal the best place to book a tour?",
+                "subtitle": "Real People. Real Stories. Really Good Travel.",
+            },
+            "style": {
+                "backgroundColor": "#ffffff",
+                "textColor": "#213448",
+                "alignment": "center",
+            },
+        },
+        {
+            "id": "home-regions",
+            "title": "Discovering Regions through Local Eyes",
+            "type": "featured",
+            "content": {
+                "heading": "Discovering Regions through Local Eyes",
+                "subtitle": "Every corner of Nepal has a story \u2014 meet the locals who tell it best.",
+                "buttonText": "Explore",
+            },
+            "style": {
+                "backgroundColor": "#213448",
+                "textColor": "#ffffff",
+                "accentColor": "#F4B400",
+                "alignment": "center",
+            },
+        },
+        {
+            "id": "home-plan-book",
+            "title": "Plan and Book on the Go",
+            "type": "promo",
+            "content": {
+                "heading": "Plan and book on the go",
+                "subtitle": "Your whole trip, one pocket-sized local \u2014 book, chat and travel from your phone.",
+                "buttonText": "Book in a few taps",
+                "tagline": "MOBILE",
+            },
+            "style": {
+                "backgroundColor": "#E0F2FE",
+                "textColor": "#213448",
+                "accentColor": "#F4B400",
+                "alignment": "left",
+            },
+        },
+        {
+            "id": "home-footer",
+            "title": "Footer",
+            "type": "footer",
+            "content": {
+                "heading": "Guides Nepal",
+                "tagline": "Real People. Real Stories. Really Good Travel.",
+                "supportEmail": "support@guides-nepal.com",
+                "copyright": "guides-nepal. All rights reserved.",
+            },
+            "style": {"backgroundColor": "#213448", "textColor": "#ffffff"},
+        },
     ],
     "about": [
-        {"id": "about-hero", "title": "About Hero", "type": "hero",
-         "content": {"heading": "About Guides Nepal", "subtitle": "Connecting travelers with authentic local experiences across Nepal's most beautiful destinations.", "buttonText": "Contact Us"},
-         "style": {"backgroundColor": "#213448", "textColor": "#ffffff", "alignment": "center", "headingSize": "3rem"}},
-        {"id": "about-mission", "title": "Our Mission", "type": "text",
-         "content": {"heading": "Our Mission", "body": "We believe that the best travel experiences come from connecting with locals who share their passion, knowledge, and culture. Our platform makes it easy to find authentic guided experiences across Nepal."},
-         "style": {"backgroundColor": "#ffffff", "textColor": "#213448", "alignment": "center"}},
-        {"id": "about-values", "title": "Our Values", "type": "values",
-         "content": {"heading": "Our Values", "subtitle": "Authenticity, community and real responsibility."},
-         "style": {"backgroundColor": "#E0F2FE", "textColor": "#213448", "alignment": "center"}},
+        {
+            "id": "about-hero",
+            "title": "About Hero",
+            "type": "hero",
+            "content": {
+                "heading": "About Guides Nepal",
+                "subtitle": "Connecting travelers with authentic local experiences across Nepal's most beautiful destinations.",
+                "buttonText": "Contact Us",
+            },
+            "style": {
+                "backgroundColor": "#213448",
+                "textColor": "#ffffff",
+                "alignment": "center",
+                "headingSize": "3rem",
+            },
+        },
+        {
+            "id": "about-mission",
+            "title": "Our Mission",
+            "type": "text",
+            "content": {
+                "heading": "Our Mission",
+                "body": "We believe that the best travel experiences come from connecting with locals who share their passion, knowledge, and culture. Our platform makes it easy to find authentic guided experiences across Nepal.",
+            },
+            "style": {
+                "backgroundColor": "#ffffff",
+                "textColor": "#213448",
+                "alignment": "center",
+            },
+        },
+        {
+            "id": "about-values",
+            "title": "Our Values",
+            "type": "values",
+            "content": {
+                "heading": "Our Values",
+                "subtitle": "Authenticity, community and real responsibility.",
+            },
+            "style": {
+                "backgroundColor": "#E0F2FE",
+                "textColor": "#213448",
+                "alignment": "center",
+            },
+        },
     ],
     "contact": [
-        {"id": "contact-hero", "title": "Contact Hero", "type": "hero",
-         "content": {"heading": "Contact Us", "subtitle": "Have a question or need help? We're here for you."},
-         "style": {"backgroundColor": "#213448", "textColor": "#ffffff", "alignment": "center", "headingSize": "3rem"}},
-        {"id": "contact-info", "title": "Contact Info", "type": "contact",
-         "content": {"heading": "Get in Touch", "body": "Reach out by email at support@guides-nepal.com or send us a message using the form.", "email": "support@guides-nepal.com", "phone": "+977-1-1234567", "address": "Thamel, Kathmandu, Nepal"},
-         "style": {"backgroundColor": "#ffffff", "textColor": "#213448"}},
+        {
+            "id": "contact-hero",
+            "title": "Contact Hero",
+            "type": "hero",
+            "content": {
+                "heading": "Contact Us",
+                "subtitle": "Have a question or need help? We're here for you.",
+            },
+            "style": {
+                "backgroundColor": "#213448",
+                "textColor": "#ffffff",
+                "alignment": "center",
+                "headingSize": "3rem",
+            },
+        },
+        {
+            "id": "contact-info",
+            "title": "Contact Info",
+            "type": "contact",
+            "content": {
+                "heading": "Get in Touch",
+                "body": "Reach out by email at support@guides-nepal.com or send us a message using the form.",
+                "email": "support@guides-nepal.com",
+                "phone": "+977-1-1234567",
+                "address": "Thamel, Kathmandu, Nepal",
+            },
+            "style": {"backgroundColor": "#ffffff", "textColor": "#213448"},
+        },
     ],
 }
 
@@ -608,23 +1055,58 @@ DEFAULT_SECTIONS = {
 # does not have an explicit template above, so each page in the Pages
 # list is editable in the live editor and stays synced with the real page.
 _FRONTEND_PAGE_TITLES = {
-    "blog": "Blog", "faq": "FAQ", "destinations": "Destinations",
-    "how-it-works": "How It Works", "sustainability": "Sustainability",
-    "press": "Press", "jobs": "Jobs", "gift-cards": "Gift Cards",
-    "host-center": "Host Center", "hosting": "Hosting",
-    "community": "Community", "terms": "Terms", "help": "Help",
+    "blog": "Blog",
+    "faq": "FAQ",
+    "destinations": "Destinations",
+    "how-it-works": "How It Works",
+    "sustainability": "Sustainability",
+    "press": "Press",
+    "jobs": "Jobs",
+    "gift-cards": "Gift Cards",
+    "host-center": "Host Center",
+    "hosting": "Hosting",
+    "community": "Community",
+    "terms": "Terms",
+    "help": "Help",
 }
 
 
 def _default_template(slug: str) -> list:
     label = _FRONTEND_PAGE_TITLES.get(slug, slug.replace("-", " ").title())
     return [
-        {"id": f"{slug}-hero", "title": f"{label} Hero", "type": "hero",
-         "content": {"heading": label, "subtitle": f"{label} page on Guides Nepal.", "buttonText": ""},
-         "style": {"backgroundColor": "#213448", "textColor": "#ffffff", "accentColor": "#F4B400", "alignment": "center", "headingSize": "3rem", "padding": "4rem"}},
-        {"id": f"{slug}-body", "title": f"{label} Body", "type": "text",
-         "content": {"heading": "", "body": f"Content for the {label} page. Click this section in the live preview to edit it."},
-         "style": {"backgroundColor": "#ffffff", "textColor": "#213448", "alignment": "left", "padding": "2.5rem"}},
+        {
+            "id": f"{slug}-hero",
+            "title": f"{label} Hero",
+            "type": "hero",
+            "content": {
+                "heading": label,
+                "subtitle": f"{label} page on Guides Nepal.",
+                "buttonText": "",
+            },
+            "style": {
+                "backgroundColor": "#213448",
+                "textColor": "#ffffff",
+                "accentColor": "#F4B400",
+                "alignment": "center",
+                "headingSize": "3rem",
+                "padding": "4rem",
+            },
+        },
+        {
+            "id": f"{slug}-body",
+            "title": f"{label} Body",
+            "type": "text",
+            "content": {
+                "heading": "",
+                "body": f"Content for the {label} page. Click this section in the live preview to edit it.",
+            },
+            "style": {
+                "backgroundColor": "#ffffff",
+                "textColor": "#213448",
+                "alignment": "left",
+                "padding": "2.5rem",
+            },
+        },
     ]
 
 
@@ -666,30 +1148,43 @@ def get_page_sections(
 
 
 @router.post("/pages/{slug}/sections")
-def create_page_section(slug: str, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)) -> dict:
+def create_page_section(
+    slug: str, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)
+) -> dict:
     section = _upsert_section(slug, payload)
     return {"status": "ok", "section": section}
 
 
 @router.put("/pages/{slug}/sections/{section_id}")
-def update_page_section(slug: str, section_id: str, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)) -> dict:
+def update_page_section(
+    slug: str,
+    section_id: str,
+    payload: dict,
+    current_user: User = Depends(CMS_MANAGER_OR_ADMIN),
+) -> dict:
     saved = _upsert_section(slug, {**payload, "id": section_id})
     return {"status": "ok", "section": saved}
 
 
 @router.put("/pages/{slug}/sections")
-def update_all_sections(slug: str, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)) -> dict:
+def update_all_sections(
+    slug: str, payload: dict, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)
+) -> dict:
     sections = payload.get("sections", [])
     SECTION_OVERRIDES[slug] = _clone(sections)
     return {"status": "ok", "count": len(sections)}
 
 
 @router.delete("/pages/{slug}/sections/{section_id}")
-def delete_page_section(slug: str, section_id: str, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)) -> dict:
+def delete_page_section(
+    slug: str, section_id: str, current_user: User = Depends(CMS_MANAGER_OR_ADMIN)
+) -> dict:
     if slug not in SECTION_OVERRIDES:
         SECTION_OVERRIDES[slug] = _clone(DEFAULT_SECTIONS.get(slug, []))
     before = len(SECTION_OVERRIDES[slug])
-    SECTION_OVERRIDES[slug] = [s for s in SECTION_OVERRIDES[slug] if s.get("id") != section_id]
+    SECTION_OVERRIDES[slug] = [
+        s for s in SECTION_OVERRIDES[slug] if s.get("id") != section_id
+    ]
     if len(SECTION_OVERRIDES[slug]) == before:
         raise HTTPException(status_code=404, detail="Section not found")
     return {"status": "ok", "message": "Section deleted"}

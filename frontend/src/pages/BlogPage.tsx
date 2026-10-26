@@ -106,13 +106,16 @@ const BlogPage: React.FC = () => {
       return {
         ...p,
         title: cms.title || p.title,
-        excerpt: cms.content
-          ? cms.content.slice(0, 140) + (cms.content.length > 140 ? '…' : '')
-          : p.excerpt,
+        excerpt:
+          cms.excerpt ||
+          (cms.content
+            ? cms.content.replace(/[#>*![\]()]/g, '').slice(0, 140) +
+              (cms.content.length > 140 ? '…' : '')
+            : p.excerpt),
         author: cms.author || p.author,
         date: cms.date || p.date,
         category: cms.category || p.category,
-        image: cms.image || p.image,
+        image: cms.image || cms.featuredImage || p.image,
         status: cms.status || p.status,
       };
     })
@@ -128,11 +131,12 @@ const BlogPage: React.FC = () => {
           id: c.id,
           slug: c.slug,
           title: c.title,
-          excerpt: (c.content || '').slice(0, 140),
+          excerpt: c.excerpt || (c.content || '').replace(/[#>*![\]()]/g, '').slice(0, 140),
           author: c.author || 'Guides Nepal Team',
           date: c.date || '',
           image:
             c.image ||
+            c.featuredImage ||
             'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=800&q=80',
           category: c.category || 'Community',
           status: c.status || 'published',

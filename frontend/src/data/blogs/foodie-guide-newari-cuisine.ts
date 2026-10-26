@@ -1,145 +1,90 @@
-export const foodieGuideNewariCuisine =
-  `
+export const foodieGuideNewariCuisine = `## Why Newari Food Deserves Its Own Trip
 
-## Introduction
+The Newar people are the valley's Indigenous inhabitants, and their cuisine blends Himalayan, Tibetan, and South Asian influences into something found nowhere else in Nepal. Unlike everyday dal-bhat, Newari food is richer, spicier, and built for festivals: harvests, weddings, Indra Jatra, Bhoto Jatra, and the winter feasts that fill courtyard houses.
 
-Newari cuisine is one of Nepal's most celebrated culinary traditions, and the Kathmandu Valley is its heartland. From the iconic yomari and bara to the elaborate Newari feast known as bhoye, every dish tells a story of centuries-old culture and festivals. In this foodie's guide, we explore the rich flavors of traditional Newari dishes — where to find them, what to order, and the stories behind each bite. We also highlight the best Newari restaurants in Kathmandu, Patan, and Bhaktapur so you can eat your way through the valley. Come hungry.
+Use this guide to eat in logical order: the icons first, then the feast platter, then drinks, then where to find each dish across Kathmandu, Patan, and Bhaktapur.
 
-` +
-  `
+![Newari feast spread](https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80 "A Newari spread: bara, chatamari, pickles, and curdanchor the table.")
 
+## At a Glance
 
-## The Origins of Newari Cuisine
+- **Spice:** Assume medium-hot. Say **"less spicy"** if you are sensitive; kitchens happily adjust.
+- **When kitchens close:** Many traditional spots shut **2:00 to 4:00 PM** and reopen for dinner around 6:00 PM.
+- **Payment:** Small eateries are cash-first. Carry small rupee notes.
+- **Diet notes:** Vegetarian options are everywhere. Vegan is harder because ghee and yoghurt appear often.
 
-The Newar people are the indigenous inhabitants of the Kathmandu Valley, and their cuisine reflects a unique blend of Indian, Tibetan, and Himalayan influences. Unlike the dal-bhat-tarkari staple found across Nepal, Newari food is distinct — richer, spicier, and more varied. Historically, Newari cuisine developed around the valley's agricultural abundance: rice from the fertile fields, vegetables from kitchen gardens, buffalo and goat from local herds, and an incredible array of spices traded along the ancient routes that passed through Kathmandu.
-
-Newari food is deeply tied to festivals and rituals. Every major celebration — from Indra Jatra to Bhoto Jatra, from weddings to death ceremonies — has its own associated dishes. The cuisine is also seasonal: winter brings hearty meat dishes and warming spices, while summer features lighter preparations with fresh vegetables and cooling yogurt-based sides.
-
-` +
-  `
-
-
-## Must-Try Newari Dishes
+## Start With These Icons
 
 ### Yomari
 
-Yomari is perhaps the most iconic Newari sweet. These steamed dumplings are made from rice flour dough filled with chaku (molasses) and sesame seeds, then shaped into a pointed, fish-like form. Yomari is traditionally eaten during Yomari Punhi, a festival celebrating the rice harvest in late autumn. The outer covering is soft and slightly chewy, while the filling is warm, sweet, and aromatic.
-
-You can find yomari at traditional Newari restaurants year-round, but the best versions are homemade during the Yomari Punhi festival (usually November or December). Look for them at local sweet shops in Patan and Bhaktapur, where families still prepare them using recipes passed down through generations.
+Steamed rice-flour dumplings shaped like pointed fish, filled with **chaku** (molasses) and sesame. They headline **Yomari Punhi**, the late-autumn harvest festival, but good sweet shops in Patan and Bhaktapur sell them year-round. The shell should be soft and faintly chewy; the filling warm and aromatic.
 
 ### Bara
 
-Bara are savory lentil pancakes made from ground black lentils, spices, and sometimes minced meat or egg. They are fried until golden and crispy on the outside, soft on the inside. Bara is a staple of Newari breakfasts and is also served as a snack or appetizer at feasts.
-
-The best bara are served hot off the griddle with a side of achaar (spicy pickle) and sliced raw onion. In Kathmandu's old market areas, you will find bara vendors who have been making them the same way for decades. Expect to pay between 40 and 100 rupees for a plate of two or three bara.
-
-
-` +
-  `
-
+Savoury black-lentil pancakes, fried crisp outside and soft inside, sometimes topped with egg or minced buffalo. Eat them hot with **achaar** and raw onion. Old-city vendors charge roughly **NPR 40 to 100** for two or three.
 
 ### Chatamari
 
-Often called "Newari pizza," chatamari is a thin rice crepe topped with minced meat, egg, onions, tomatoes, and spices. Unlike Italian pizza, chatamari is not baked — it is cooked on a flat griddle until the rice base is set and the toppings are just done. The result is a light, slightly crispy crepe with savory, flavorful toppings.
-
-Chatamari is typically served as a snack or light meal. Vegetarian versions are available with just egg and vegetables, while meat lovers can choose buffalo or chicken toppings. It is best eaten fresh off the griddle, folded and eaten with your hands.
+The so-called **Newari pizza**: a thin rice crepe set on a griddle with egg, minced meat, onion, and tomato. Fold it, eat with your hands, and order it fresh rather than reheated.
 
 ### Kwati
 
-Kwati is a mixed sprouted bean soup traditionally eaten during Janai Purnima (the sacred thread festival in August). Nine different types of beans are sprouted, then cooked with spices into a thick, nutritious soup. Kwati is believed to have medicinal properties and is considered especially good for health during the monsoon season.
+A sprouted nine-bean soup eaten during **Janai Purnima** in August but nourishing any cold evening. Nine beans are sprouted, slow-cooked with warming spices, and believed to restore strength after the monsoon.
 
-The beans used in kwati include black gram, green gram, chickpea, field bean, soybean, garden pea, cowpea, rice bean, and black bean. Each bean contributes a different texture and flavor, creating a complex, hearty soup that is served with rice.
+### Samay Baji: The Feast on One Plate
 
-### Samay Baji
+If you eat one Newari meal, make it **samay baji**: beaten rice, bara, boiled egg, smoked buffalo, black soybeans, pickles, and greens. It is the ritual platter of festivals and the fastest education in Newari flavour. Share one platter between two light eaters and order extras of whatever disappears first.
 
-Samay baji is a traditional Newari platter served during festivals and special occasions. It typically includes beaten rice (chiura), roasted soybeans, black lentils, boiled egg, spicy potato pickle, ginger, garlic, and sometimes pieces of buffalo meat. The platter is served on a leaf plate and eaten with the hands.
+![Beaten rice and pickles](https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=1200&q=80 "Samay baji centres on beaten rice with smoked meat, beans, egg, and pickles.")
 
-Samay baji represents the Newari philosophy of balance — carbohydrates from the beaten rice, protein from the lentils and egg, vitamins from the pickles, and digestive aids from the ginger and garlic. It is often accompanied by aila (traditional Newari liquor) or thon (rice beer).
+### Juju Dhau: Bhaktapur's King Curd
 
-### Aila
+Bhaktapur's thick sweet yoghurt sets in clay pots and eats with a spoon like custard. Buy it in the evening after sightseeing, sit on a square-side stool, and eat it cool. Returned pots are often reused, so the tradition stays low-waste.
 
-Aila is a traditional Newari distilled liquor made from rice, millet, or barley. It is clear, potent, and has a distinctive flavor that varies depending on the ingredients and the maker. Aila is traditionally served during festivals, weddings, and religious ceremonies, often poured from a special brass vessel called an antrapala.
+> Trivia: juju dhau translates as **king curd**. Bhaktapur families still guard starter cultures passed down for generations.
 
-Drinking aila is a social ritual in Newari culture. It is typically sipped from small clay cups, and the first sip is often offered to the gods before anyone drinks. If you are invited to share aila with a Newari family, accept graciously — it is a sign of trust and friendship.
+## What to Drink
 
-### Thon
+- **Aila:** Potent home-distilled spirit served at celebrations. Sip, do not shoot.
+- **Thon:** Cloudy rice beer, mild and slightly sweet, often served in clay bowls.
+- **Chiya:** Spiced milk tea that resets the palate between fried snacks.
+- **Lassi and fresh juices:** Safe, packaging-light alternatives to imported soft drinks.
 
-Thon is Newari rice beer, a mildly alcoholic, slightly sour beverage made from fermented rice. It is lighter than aila and is often served during the day, especially during festivals and feasts. Thon is served in a traditional clay cup called aSalina and is considered refreshing and nourishing.
+## Newari Table Manners
 
-You can find thon at traditional Newari restaurants and during local festivals. It is an acquired taste for some visitors, but many come to appreciate its unique, slightly effervescent character.
+- **Eat with your right hand.** The left is considered unclean. Cutlery is available on request, but try the traditional way once.
+- **Leaf plates (tapari)** add aroma and are biodegradable.
+- **Leave a little food** rather than cleaning the plate; it signals satisfaction.
+- **First bite goes to gods or elders** at festival meals. Take small first portions and accept seconds graciously.
 
+## Where to Eat, Neighbourhood by Neighbourhood
 
+### Kathmandu Old City
 
-` +
-  `
-
-
-## Where to Eat Newari Food in Kathmandu
-
-### Kathmandu
-
-In central Kathmandu, head to the old market areas around Asan, Indra Chowk, and New Road. Look for restaurants with wooden carved windows and brass bells — these are often family-run Newari establishments. Some recommended areas:
-
-- **Asan Tole**: Small eateries serving bara, chatamari, and yomari
-- **Indra Chowk**: Traditional sweet shops and snack stalls
-- **New Road**: Mid-range Newari restaurants with English menus
+- **Asan Tole:** Bara, chatamari, and yomari from family stalls around the square.
+- **Indra Chowk:** Sweet shops and festival snack vendors.
+- **New Road:** Mid-range Newari restaurants with English menus for first-timers.
 
 ### Patan (Lalitpur)
 
-Patan has some of the best-preserved Newari architecture in the valley, and its food scene reflects this heritage. The area around Patan Durbar Square has several excellent Newari restaurants, many housed in restored traditional buildings with courtyards and rooftop seating.
+Patan pairs the valley's best-preserved streets with courtyard restaurants and rooftop seats. Focus on the lanes around **Mangal Bazaar** and Patan Durbar Square for samay baji, kwati, and yomari. Restored Newari houses often hide the calmest dining rooms.
 
-Look for places serving samay baji, kwati, and yomari. The narrow alleys around Mangal Bazaar also have small eateries that locals frequent.
+![Patan's carved streets](https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1200&q=80 "Patan's lanes pair carved architecture with courtyard restaurants.")
 
 ### Bhaktapur
 
-Bhaktapur is famous for its Newari cuisine, especially juju dhau (king curd), a thick, sweet yogurt that is a specialty of the city. The potter's square area has several cafes serving Newari snacks, and the main square has restaurants offering full Newari meals.
+Come for temples, stay for curd. **Potter's Square** cafes serve snacks with courtyard seating, the main squares handle full Newari sets, and clay-pot **juju dhau** stalls cluster where the evening crowds gather.
 
-Do not leave Bhaktapur without trying juju dhau — it is served in small clay pots and has a distinctive rich, creamy texture. It is best enjoyed in the evening after a day of exploring the city's temples and squares.
+## A Perfect Newari Food Day
 
-` +
-  `
+- **Breakfast:** Bara with egg, milk chiya, seasonal fruit.
+- **Mid-morning:** Yomari or chatamari from a street vendor.
+- **Lunch:** Samay baji platter with aila or thon.
+- **Afternoon:** Juju dhau in Bhaktapur, eaten cool from the clay pot.
+- **Dinner:** Newari thali: rice, lentils, seasonal vegetables, meat curry, achar.
 
+> Hygiene tip: choose stalls with high turnover and food cooked fresh and served hot. Skip raw salads and unpeeled fruit from street carts.
 
-## Newari Food Etiquette
+## Final Bite
 
-Newari meals are traditionally eaten with the right hand — the left hand is considered unclean. If you are not comfortable eating with your hands, most restaurants will provide cutlery on request, but trying the traditional way is part of the experience.
-
-Meals are often served on leaf plates (tapari) made from sal leaves, which are biodegradable and add a subtle aroma to the food. When finishing a meal, it is polite to leave a small amount of food on your plate rather than cleaning it completely — this signals that you are satisfied.
-
-During festivals, food is often shared from communal plates. Take small portions at first, and accept seconds graciously if offered. It is also customary to offer the first bite of any dish to the gods or elders before eating.
-
-` +
-  `
-
-
-## A Sample Newari Food Day
-
-**Breakfast:** Bara with egg, a cup of chiya (milk tea), and seasonal fruit
-
-**Mid-morning snack:** Yomari or chatamari from a street vendor
-
-**Lunch:** Samay baji platter with aila or thon
-
-**Afternoon snack:** Juju dhau from a clay pot shop in Bhaktapur
-
-**Dinner:** Newari thali set — rice, lentils, seasonal vegetables, meat curry, and achar
-
-**Evening drink:** Aila shared with friends or hosts
-
-` +
-  `
-
-
-## Practical Tips for Newari Food Exploration
-
-**Spice Levels:** Newari food can be spicy. If you are sensitive to heat, ask for "mild" or "less spicy" when ordering. Most restaurants can accommodate this.
-
-**Hygiene:** Street food in Kathmandu is generally safe, but stick to vendors with high turnover — food that is cooked fresh and served hot. Avoid raw salads and unpeeled fruits from street stalls.
-
-**Timing:** Many traditional Newari restaurants close between 2:00 and 4:00 PM and reopen for dinner around 6:00 PM. Plan your meals accordingly.
-
-**Cash:** Most small Newari eateries do not accept credit cards. Carry Nepali rupees in small denominations.
-
-**Dietary Restrictions:** Vegetarian options are widely available, but vegan options can be limited as many dishes contain ghee (clarified butter) or yogurt. Buddhist Newari households often have extensive vegetarian traditions.
-
-Newari cuisine is more than just food — it is a window into the culture, history, and daily life of the Kathmandu Valley's original inhabitants. Every dish has a story, and every meal is an invitation to connect with centuries of tradition.`;
+Newari cuisine is edible heritage. Every bara and bowl of kwati carries harvest calendars, festival stories, and family technique. Eat slowly, ask what you are tasting, and you will leave understanding the valley far better than any museum could teach.`;

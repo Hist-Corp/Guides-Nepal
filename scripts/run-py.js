@@ -31,7 +31,17 @@ if (process.env.GUIDES_NEPAL_PYTHON) {
 
 function tryCandidate(cmd) {
   const flag = cmd === 'py' ? ['-3', '--version'] : ['--version'];
-  const r = spawnSync(cmd, flag, { stdio: 'pipe', shell: process.platform === 'win32' });
+  // With shell:true on Windows, Node concatenates cmd + args into one command
+  // line WITHOUT quoting. A venv path containing spaces (this repo lives under
+  // "Guides Nepal") is then split at the first space by cmd.exe — the probe
+  // fails with "'…\Guides' is not recognized" and the candidate looks broken.
+  // Quote such paths before spawning; the returned value stays unquoted for
+  // the final shell:false spawn below, which handles spaces natively.
+  const target =
+    process.platform === 'win32' && /\s/.test(cmd) && !/^".*"$/.test(cmd)
+      ? `"${cmd}"`
+      : cmd;
+  const r = spawnSync(target, flag, { stdio: 'pipe', shell: process.platform === 'win32' });
   return r.status === 0 ? cmd : null;
 }
 

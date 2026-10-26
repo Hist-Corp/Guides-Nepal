@@ -87,6 +87,7 @@ export default function LivePageEditor({
   slug,
   title,
   path = '/',
+  backLabel = 'pages',
   initialSections,
   onSaved,
   onClose,
@@ -94,6 +95,7 @@ export default function LivePageEditor({
   slug: string;
   title: string;
   path?: string;
+  backLabel?: string;
   initialSections?: Section[];
   onSaved?: (sections: Section[]) => Promise<void>;
   onClose: () => void;
@@ -355,7 +357,7 @@ export default function LivePageEditor({
           <button
             onClick={onClose}
             className="group flex items-center gap-2 pl-1.5 pr-2 sm:pr-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 bg-surface border border-slate-300 dark:border-slate-600 shadow-sm hover:shadow-md hover:border-slate-400 active:scale-[0.98] transition-all duration-200"
-            title="Back to pages"
+            title={`Back to ${backLabel}`}
           >
             <span className="w-7 h-7 rounded-lg bg-slate-500/10 dark:bg-slate-400/15 flex items-center justify-center group-hover:bg-slate-600 dark:group-hover:bg-slate-400 transition-colors duration-200">
               <svg
@@ -368,7 +370,7 @@ export default function LivePageEditor({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
             </span>
-            Back<span className="hidden sm:inline"> to pages</span>
+            Back<span className="hidden sm:inline"> to {backLabel}</span>
           </button>
           <div className="w-px h-8 bg-line hidden sm:block" />
           <div className="flex items-center gap-2.5 min-w-0">
@@ -662,12 +664,14 @@ function TextField({
   onChange,
   multiline,
   placeholder,
+  type,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   multiline?: boolean;
   placeholder?: string;
+  type?: string;
 }) {
   return (
     <div>
@@ -682,6 +686,7 @@ function TextField({
         />
       ) : (
         <input
+          type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
@@ -751,15 +756,21 @@ function SelectField({
 }
 
 // ─── Content Field Renderer ───
+type ContentFieldDef = {
+  key: string;
+  label: string;
+  multiline?: boolean;
+  image?: boolean;
+  inputType?: string;
+  select?: string[];
+};
+
 function renderContentFields(
   selected: Section,
   updateContent: (key: string, value: any) => void,
   onPickImage: (sectionId: string, imageKey: string) => void
 ) {
-  const fields: Record<
-    string,
-    { key: string; label: string; multiline?: boolean; image?: boolean }[]
-  > = {
+  const fields: Record<string, ContentFieldDef[]> = {
     hero: [
       { key: 'image', label: 'Background Image', image: true },
       { key: 'heading', label: 'Heading', multiline: true },
@@ -800,9 +811,15 @@ function renderContentFields(
       { key: 'supportEmail', label: 'Support Email' },
       { key: 'copyright', label: 'Copyright' },
     ],
+    meta: [
+      { key: 'author', label: 'Author' },
+      { key: 'date', label: 'Publish date', inputType: 'date' },
+      { key: 'category', label: 'Category' },
+      { key: 'status', label: 'Status', select: ['draft', 'published'] },
+    ],
   };
 
-  const fieldList = fields[selected.type] || [
+  const fieldList: ContentFieldDef[] = fields[selected.type] || [
     { key: 'heading', label: 'Heading', multiline: true },
     { key: 'subtitle', label: 'Subtitle', multiline: true },
     { key: 'buttonText', label: 'Button Text' },
@@ -816,6 +833,14 @@ function renderContentFields(
         value={selected.content[f.key] || ''}
         onPick={() => onPickImage(selected.id, f.key)}
       />
+    ) : f.select ? (
+      <SelectField
+        key={f.key}
+        label={f.label}
+        value={selected.content[f.key] || ''}
+        options={f.select}
+        onChange={(v) => updateContent(f.key, v)}
+      />
     ) : (
       <TextField
         key={f.key}
@@ -823,6 +848,7 @@ function renderContentFields(
         value={selected.content[f.key] || ''}
         onChange={(v) => updateContent(f.key, v)}
         multiline={f.multiline}
+        type={f.inputType}
       />
     )
   );

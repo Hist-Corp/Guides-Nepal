@@ -19,6 +19,9 @@ import { useAuthStore } from '../store/authStore';
 import { useProfileStore } from '../store/profileStore';
 import guidesApi from '../services/guidesApi';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { getApiUrl } from '../config/api';
+import { ReviewCard } from '../components/common/ReviewCard';
+import { ReviewForm } from '../components/common/ReviewForm';
 import { BookingCalendar } from '../components/common/BookingCalendar';
 import { GuestPicker } from '../components/common/GuestPicker';
 import { MobileBookingSheet, SheetGuide } from '../components/common/MobileBookingSheet';
@@ -58,6 +61,14 @@ interface Experience {
   grade?: string;
   maxAltitude?: string;
   region?: string;
+}
+
+interface Review {
+  id: number;
+  user_name: string | null;
+  rating: number;
+  comment: string | null;
+  created_at: string;
 }
 
 // Extended mock data for experiences
@@ -267,7 +278,8 @@ const experiencesData: Record<string, Experience> = {
         'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=80&h=80&q=80',
       rating: 5.0,
       reviews: 98,
-      about: "Bhaktapur is not just a city, it's a lifestyle. I want to show you the traditions that have been kept alive for centuries.",
+      about:
+        "Bhaktapur is not just a city, it's a lifestyle. I want to show you the traditions that have been kept alive for centuries.",
     },
   },
   // Night tours
@@ -329,7 +341,7 @@ const experiencesData: Record<string, Experience> = {
       rating: 4.9,
       reviews: 98,
       about:
-        "Bhaktapur at night is peaceful and magical. I love sharing the stories of our temples and squares when the day crowds have gone.",
+        'Bhaktapur at night is peaceful and magical. I love sharing the stories of our temples and squares when the day crowds have gone.',
     },
   },
   'phewa-lake-sunset-night-boating': {
@@ -657,8 +669,43 @@ const ExperiencePage: React.FC = () => {
     };
   }, [experienceId, staticExperience]);
 
+  const { isAuthenticated, accessToken } = useAuthStore();
+
+  // Load reviews for this experience and check whether the traveller is
+  // eligible to leave one (completed booking + not yet reviewed).
+  // Load reviews for this experience and check whether the current traveller
+  // is eligible to leave one (completed booking + not yet reviewed).
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const [reviewsRes, canRes] = await Promise.all([
+          fetch(getApiUrl(`/reviews/?experience_id=${experience.id}`)),
+          isAuthenticated
+            ? fetch(getApiUrl(`/reviews/can-review?experience_id=${experience.id}`), {
+                headers: { Authorization: `Bearer ${accessToken}` },
+              })
+            : null,
+        ]);
+        if (cancelled) return;
+        const reviewsData = await reviewsRes.json();
+        setReviews(Array.isArray(reviewsData) ? reviewsData : []);
+        if (canRes) {
+          const canData = await canRes.json();
+          setCanReview(canData.can_review ?? false);
+        }
+      } catch (error) {
+        console.error('Failed to load reviews:', error);
+        setReviews([]);
+      }
+    };
+    if (experience) load();
+    return () => {
+      cancelled = true;
+    };
+  }, [experience, isAuthenticated, accessToken]);
+
   const { addBooking } = useBookingStore();
-  const { isAuthenticated } = useAuthStore();
   const [isBooked, setIsBooked] = useState(false);
   const { profile, addBookmark, removeBookmark } = useProfileStore();
 
@@ -680,6 +727,11 @@ const ExperiencePage: React.FC = () => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [sheetError, setSheetError] = useState<string | null>(null);
   const [sheetConfirmed, setSheetConfirmed] = useState(false);
+
+  // Reviews state
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [canReview, setCanReview] = useState<boolean | null>(null);
+  const [reviewFormOpen, setReviewFormOpen] = useState(false);
 
   // The sheet offers guide selection; this page only has the host.
   const hostGuide: SheetGuide | null = experience
@@ -722,6 +774,36 @@ const ExperiencePage: React.FC = () => {
       return;
     }
 
+    // Pre-check guide availability before opening the Confirm Booking popup.
+    // Only block when the guide is already booked/reserved on the chosen date.
+    const apiDate = (() => {
+      const m = selectedDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+      const m2 = selectedDate.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if (m2) return `${m2[3]}-${m2[2]}-${m2[1]}`;
+      return null;
+    })();
+    if (apiDate) {
+      try {
+        const res = await fetch(
+          getApiUrl(`/bookings/availability?date=${apiDate}`),
+          { headers: { Authorization: `Bearer ${accessToken}` } },
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (!data.available) {
+            setBookingError(
+              `The guide is already ${data.status} on this date. Please choose another date.`,
+            );
+            return;
+          }
+        }
+      } catch {
+        // If the availability check cannot be reached, fall through so the
+        // booking attempt below surfaces its own error.
+      }
+    }
+
     if (experience) {
       setBookingError(null);
       setConfirmPopup(true);
@@ -749,6 +831,35 @@ const ExperiencePage: React.FC = () => {
       setSheetError('Please log in to book this experience');
       return;
     }
+
+    // Pre-check guide availability before confirming on mobile too.
+    const apiDate = (() => {
+      const m = selectedDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+      const m2 = selectedDate.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if (m2) return `${m2[3]}-${m2[2]}-${m2[1]}`;
+      return null;
+    })();
+    if (apiDate) {
+      try {
+        const res = await fetch(
+          getApiUrl(`/bookings/availability?date=${apiDate}`),
+          { headers: { Authorization: `Bearer ${accessToken}` } },
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (!data.available) {
+            setSheetError(
+              `The guide is already ${data.status} on this date. Please choose another date.`,
+            );
+            return;
+          }
+        }
+      } catch {
+        /* fall through and let persistBooking surface its own error */
+      }
+    }
+
     setSheetError(null);
     setBookingError(null);
     if (await persistBooking()) setSheetConfirmed(true);
@@ -861,7 +972,10 @@ const ExperiencePage: React.FC = () => {
           <div className="container mx-auto px-4 pt-4">
             <div className="grid grid-cols-4 gap-2">
               {experience.images.slice(0, 4).map((image, index) => (
-                <div key={index} className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 cursor-pointer hover:opacity-90 transition-opacity">
+                <div
+                  key={index}
+                  className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-100 cursor-pointer hover:opacity-90 transition-opacity"
+                >
                   <img
                     src={image}
                     alt={`${experience.title} photo ${index + 1}`}
@@ -892,7 +1006,9 @@ const ExperiencePage: React.FC = () => {
                   {experience.title}
                 </h1>
                 {experience.tagline && (
-                  <p className="text-lg text-slate-600 mb-4 leading-relaxed">{experience.tagline}</p>
+                  <p className="text-lg text-slate-600 mb-4 leading-relaxed">
+                    {experience.tagline}
+                  </p>
                 )}
                 <div className="flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-1 font-bold">
@@ -1052,6 +1168,51 @@ const ExperiencePage: React.FC = () => {
                   </div>
                 </div>
               </div>
+              {/* Reviews Section */}
+              <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-slate-900">Traveller Reviews</h2>
+                  {canReview && (
+                    <Button variant="outline" size="sm" onClick={() => setReviewFormOpen(true)}>
+                      Write a review
+                    </Button>
+                  )}
+                </div>
+                {reviews.length > 0 ? (
+                  <div className="space-y-3">
+                    {reviews.map((review) => (
+                      <ReviewCard key={review.id} review={review} />
+                    ))}
+                  </div>
+                ) : canReview ? (
+                  <p className="text-slate-500 text-sm">
+                    No reviews yet. Be the first to share your experience!
+                  </p>
+                ) : (
+                  <p className="text-slate-500 text-sm">
+                    Reviews appear once you have taken the experience.
+                  </p>
+                )}
+              </div>
+              {reviewFormOpen && canReview && (
+                <ReviewForm
+                  experienceId={experience.id}
+                  onReviewSaved={(saved) => {
+                    setReviews((prev) => [
+                      {
+                        id: -Date.now(),
+                        user_name: 'You',
+                        rating: saved.rating,
+                        comment: saved.comment,
+                        created_at: new Date().toISOString(),
+                      },
+                      ...prev,
+                    ]);
+                    setCanReview(false);
+                    setReviewFormOpen(false);
+                  }}
+                />
+              )}
             </div>
 
             {/* Right Sidebar (Booking Card) */}
@@ -1252,7 +1413,10 @@ const ExperiencePage: React.FC = () => {
           >
             ×
           </button>
-          <div className="relative max-w-5xl max-h-[85vh] flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="relative max-w-5xl max-h-[85vh] flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
             <img
               src={lightboxImages[lightboxIndex]}
               alt={experience.title}
@@ -1268,7 +1432,9 @@ const ExperiencePage: React.FC = () => {
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setLightboxIndex((i) => (i - 1 + lightboxImages.length) % lightboxImages.length);
+                    setLightboxIndex(
+                      (i) => (i - 1 + lightboxImages.length) % lightboxImages.length
+                    );
                   }}
                   className="pointer-events-auto z-20 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full"
                 >
@@ -1299,7 +1465,7 @@ const ExperiencePage: React.FC = () => {
           aria-label="Confirm booking"
         >
           <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="flex items-center justify-between mb-4"
             onClick={() => setConfirmPopup(false)}
           />
           <div
