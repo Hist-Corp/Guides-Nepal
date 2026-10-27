@@ -5,13 +5,46 @@ import './SupportWidget.css';
 
 type WidgetState = 'closed' | 'open' | 'sent';
 
+type SupportWidgetProps = {
+  /** When `true` the panel is shown; when `false` the FAB is shown (controlled
+      by the parent). When `undefined` the widget owns its own open/closed state. */
+  open?: boolean;
+  /** Callback invoked when the widget should open while it is controlled (e.g. tapping the FAB). */
+  onOpen?: () => void;
+  /** Callback invoked when the widget should close while it is controlled. */
+  onClose?: () => void;
+};
+
 /**
  * Floating customer-support widget. Visitors/travellers can raise a
  * support ticket stating their problem; the ticket lands in the
  * dashboard's Support > Tickets panel for the support team to resolve.
  */
-export default function SupportWidget() {
+export default function SupportWidget({
+  open: controlledOpen,
+  onOpen: controlledOnOpen,
+  onClose: controlledOnClose,
+}: SupportWidgetProps = {}) {
   const [state, setState] = useState<WidgetState>('closed');
+
+  // Controlled open state. When an external `open` is provided, the widget
+  // mirrors it. This is used to open/close the panel from the header's
+  // hamburger menu on mobile, where the floating FAB is hidden. Otherwise the
+  // widget owns its own open/closed state.
+  useEffect(() => {
+    if (controlledOpen !== undefined) {
+      setState(controlledOpen ? 'open' : 'closed');
+    }
+  }, [controlledOpen]);
+
+  // Close handler: always sync internal state, and forward a callback when the
+  // widget is driven by an external source (e.g. the hamburger menu on mobile).
+  const closeWidget = () => {
+    if (controlledOnClose) {
+      controlledOnClose();
+    }
+    setState('closed');
+  };
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -19,10 +52,10 @@ export default function SupportWidget() {
   // Close on Escape / outside click.
   useEffect(() => {
     if (state !== 'open') return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setState('closed');
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && closeWidget();
     const onClick = (e: MouseEvent) => {
       if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
-        setState('closed');
+        closeWidget();
       }
     };
     document.addEventListener('keydown', onKey);
@@ -82,7 +115,7 @@ export default function SupportWidget() {
               type="button"
               className="support-close"
               aria-label="Close support panel"
-              onClick={() => setState('closed')}
+              onClick={closeWidget}
             >
               ×
             </button>
@@ -138,7 +171,7 @@ export default function SupportWidget() {
           </div>
           <h3>Ticket submitted!</h3>
           <p>Our support team will get back to you by email shortly.</p>
-          <button type="button" className="support-submit" onClick={() => setState('closed')}>
+          <button type="button" className="support-submit" onClick={closeWidget}>
             Done
           </button>
         </div>
@@ -150,7 +183,13 @@ export default function SupportWidget() {
           className="support-fab"
           aria-label="Open customer support"
           title="Customer support"
-          onClick={() => setState('open')}
+          onClick={() => {
+            if (controlledOnOpen) {
+              controlledOnOpen();
+            } else {
+              setState('open');
+            }
+          }}
         >
           {/* Headset support icon */}
           <svg

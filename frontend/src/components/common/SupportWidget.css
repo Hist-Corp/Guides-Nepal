@@ -173,3 +173,17 @@
   font-size: 0.85rem;
   color: #4b5563;
 }
+.support-sent p {
+  margin: 0 0 14px;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+@media (max-width: 768px) {
+  /* Mobile phone (and tablet, which also uses the hamburger menu):
+     hide the floating FAB on ALL pages. The support panel is opened from the
+     hamburger menu instead. Desktop keeps the floating FAB unchanged. */
+  .support-widget .support-fab {
+    display: none;
+  }
+}
