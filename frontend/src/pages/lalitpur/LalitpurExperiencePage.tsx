@@ -29,6 +29,13 @@ import { isPredefinedTrip } from '../../utils/experienceBooking';
 import { BookmarkButton } from '../../components/common/BookmarkButton';
 import { experienceDetailPath } from '../../utils/canonicalExperience';
 
+const SAFE_IMAGE_URL_PATTERN = /^(?:https?:\/\/[A-Za-z0-9._~:/?#@!$&'()*+,;=%-]+|\/[A-Za-z0-9._~:/?#@!$&'()*+,;=%-]*)$/;
+const safeImageUrl = (url?: string): string => {
+  if (typeof url !== 'string') return '';
+  if (!SAFE_IMAGE_URL_PATTERN.test(url)) return '';
+  return encodeURI(decodeURI(url));
+};
+
 const ReadMoreText = ({
   text,
   limit = 150,
@@ -500,11 +507,13 @@ const LalitpurExperiencePage: React.FC = () => {
                         {selectedGuide && (
                           <div className="p-3 bg-white rounded-xl border border-gray-200 flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <img
-                                src={selectedGuide.image}
-                                alt={selectedGuide.name}
-                                className="w-10 h-10 rounded-full object-cover"
-                              />
+                              {SAFE_IMAGE_URL_PATTERN.test(selectedGuide.image || '') ? (
+                                <img
+                                  src={safeImageUrl(selectedGuide.image)}
+                                  alt={selectedGuide.name}
+                                  className="w-10 h-10 rounded-full object-cover"
+                                />
+                              ) : null}
                               <div>
                                 <p className="text-[10px] font-bold text-gray-500 uppercase">
                                   Selected Guide
@@ -690,11 +699,13 @@ const LalitpurExperiencePage: React.FC = () => {
                     <div className="mb-6">
                       {!isChangingGuide ? (
                         <div className="bg-white p-4 rounded-lg border border-primary/20 shadow-sm flex items-center gap-4">
-                          <img
-                            src={selectedGuide.image}
-                            alt={selectedGuide.name}
-                            className="w-12 h-12 rounded-full object-cover"
-                          />
+                          {SAFE_IMAGE_URL_PATTERN.test(selectedGuide.image || '') ? (
+                            <img
+                              src={safeImageUrl(selectedGuide.image)}
+                              alt={selectedGuide.name}
+                              className="w-12 h-12 rounded-full object-cover"
+                            />
+                          ) : null}
                           <div>
                             <span className="text-xs font-bold text-primary uppercase tracking-wider">
                               Your Guide
@@ -837,11 +848,18 @@ const LalitpurExperiencePage: React.FC = () => {
               <div className="relative hidden lg:block">
                 <div className="relative z-10 text-center">
                   <div className="w-64 h-64 mx-auto rounded-full p-2 border-4 border-secondary relative bg-white shadow-xl transition-all duration-500">
-                    <img
-                      src={selectedGuide ? selectedGuide.image : data.host.image}
-                      alt={selectedGuide ? selectedGuide.name : data.host.name}
-                      className="w-full h-full rounded-full object-cover grayscale"
-                    />
+                    {(() => {
+                      const rawImg = selectedGuide ? selectedGuide.image : data.host.image;
+                      if (!SAFE_IMAGE_URL_PATTERN.test(rawImg || '')) return null;
+                      const safeImg = safeImageUrl(rawImg);
+                      return (
+                        <img
+                          src={safeImg}
+                          alt={selectedGuide ? selectedGuide.name : data.host.name}
+                          className="w-full h-full rounded-full object-cover grayscale"
+                        />
+                      );
+                    })()}
                     {/* Decorative elements */}
                     <div className="absolute -top-4 -right-4 w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg animate-bounce">
                       100%
@@ -948,11 +966,13 @@ const LalitpurExperiencePage: React.FC = () => {
 
             <div className="p-8">
               <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
-                <img
-                  src={viewingGuide.image}
-                  alt={viewingGuide.name}
-                  className="w-32 h-32 rounded-full object-cover border-4 border-gray-50 shadow-lg"
-                />
+                {SAFE_IMAGE_URL_PATTERN.test(viewingGuide.image || '') ? (
+                  <img
+                    src={safeImageUrl(viewingGuide.image)}
+                    alt={viewingGuide.name}
+                    className="w-32 h-32 rounded-full object-cover border-4 border-gray-50 shadow-lg"
+                  />
+                ) : null}
                 <div className="space-y-4">
                   <div>
                     <h2 className="text-3xl font-bold text-gray-900 mb-1">

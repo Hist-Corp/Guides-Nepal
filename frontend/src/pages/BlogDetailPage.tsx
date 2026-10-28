@@ -187,6 +187,14 @@ const BlogDetailPage: React.FC = () => {
       });
   }, [slug]);
 
+  const sanitizeImageUrl = (src: string | undefined): string => {
+    const FALLBACK = '/placeholder.png';
+    if (!src || typeof src !== 'string') return FALLBACK;
+    if (/^https?:\/\/[\w.-]+(:\d+)?(\/[\w./%?=&#:+-]*)?$/.test(src)) return src;
+    if (/^\/[\w./%?=&#:+-]*$/.test(src)) return src;
+    return FALLBACK;
+  };
+  const safeImage = sanitizeImageUrl(post?.image);
   const blocks = useMemo(() => parseContent(post?.content || ''), [post?.content]);
   const toc = useMemo(
     () => blocks.filter((b) => b.kind === 'h2') as { kind: 'h2'; text: string; id: string }[],
@@ -294,7 +302,7 @@ const BlogDetailPage: React.FC = () => {
               <article className="lg:w-2/3">
                 <figure className="rounded-2xl overflow-hidden mb-8 shadow-sm border border-slate-100">
                   <img
-                    src={post.image}
+                    src={safeImage}
                     alt={post.title}
                     className="w-full h-72 md:h-96 object-cover"
                     loading="eager"
@@ -311,7 +319,7 @@ const BlogDetailPage: React.FC = () => {
                     <ol className="space-y-1.5 text-sm">
                       {toc.map((h) => (
                         <li key={h.id}>
-                          <a href={`#${h.id}`} className="text-slate-600 hover:text-primary">
+                          <a href={`#${encodeURIComponent(h.id)}`} className="text-slate-600 hover:text-primary">
                             → {h.text}
                           </a>
                         </li>
@@ -360,7 +368,7 @@ const BlogDetailPage: React.FC = () => {
                           className="my-8 rounded-2xl overflow-hidden border border-slate-200 bg-white"
                         >
                           <img
-                            src={block.src}
+                            src={sanitizeImageUrl(block.src)}
                             alt={block.alt}
                             className="w-full h-64 md:h-80 object-cover"
                             loading="lazy"
@@ -404,7 +412,7 @@ const BlogDetailPage: React.FC = () => {
                       <Link key={p.slug} to={`/blog/${p.slug}`} className="block mb-4 group">
                         <div className="flex gap-3">
                           <img
-                            src={p.image}
+                            src={sanitizeImageUrl(p.image)}
                             alt={p.title}
                             className="w-20 h-16 rounded-lg object-cover shrink-0"
                             loading="lazy"

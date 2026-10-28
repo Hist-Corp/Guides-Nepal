@@ -131,6 +131,18 @@ const ReadMoreText = ({
   );
 };
 
+const sanitizeImageUrl = (url: string | undefined | null): string => {
+  if (!url) return '';
+  const trimmed = String(url).trim();
+  if (/^\s*javascript:/i.test(trimmed) || /^\s*data:(?!image\/)/i.test(trimmed) || /^\s*vbscript:/i.test(trimmed)) {
+    return '';
+  }
+  if (/^(https?:\/\/|\/|\.\/|\.\.\/|data:image\/)/i.test(trimmed)) {
+    return trimmed;
+  }
+  return '';
+};
+
 const PokharaExperiencePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -552,7 +564,7 @@ const PokharaExperiencePage: React.FC = () => {
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-full p-1 border-2 border-secondary">
                       <img
-                        src={data.host.image}
+                        src={sanitizeImageUrl(data.host.image)}
                         alt={data.host.name}
                         className="w-full h-full rounded-full object-cover"
                       />
@@ -737,7 +749,7 @@ const PokharaExperiencePage: React.FC = () => {
                             <div className="p-3 flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <img
-                                  src={selectedGuide.image}
+                                  src={sanitizeImageUrl(selectedGuide.image)}
                                   alt={selectedGuide.name}
                                   className="w-10 h-10 rounded-full object-cover"
                                 />
@@ -1022,7 +1034,7 @@ const PokharaExperiencePage: React.FC = () => {
                       {!isChangingGuide ? (
                         <div className="bg-white p-4 rounded-lg border border-primary/20 shadow-sm flex items-center gap-4">
                           <img
-                            src={selectedGuide.image}
+                            src={sanitizeImageUrl(selectedGuide.image)}
                             alt={selectedGuide.name}
                             className="w-12 h-12 rounded-full object-cover"
                           />
@@ -1169,7 +1181,7 @@ const PokharaExperiencePage: React.FC = () => {
                 <div className="relative z-10 text-center">
                   <div className="w-64 h-64 mx-auto rounded-full p-2 border-4 border-secondary relative bg-white shadow-xl transition-all duration-500">
                     <img
-                      src={selectedGuide ? selectedGuide.image : data.host.image}
+                      src={sanitizeImageUrl(selectedGuide ? selectedGuide.image : data.host.image)}
                       alt={selectedGuide ? selectedGuide.name : data.host.name}
                       className="w-full h-full rounded-full object-cover grayscale"
                     />
@@ -1495,7 +1507,16 @@ const PokharaExperiencePage: React.FC = () => {
             <div className="p-8">
               <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
                 <img
-                  src={viewingGuide.image}
+                  src={(() => {
+                    try {
+                      const parsed = new URL(viewingGuide.image, window.location.origin);
+                      return parsed.protocol === 'http:' || parsed.protocol === 'https:'
+                        ? parsed.toString()
+                        : '';
+                    } catch {
+                      return '';
+                    }
+                  })()}
                   alt={viewingGuide.name}
                   className="w-32 h-32 rounded-full object-cover border-4 border-gray-50 shadow-lg"
                 />

@@ -1,6 +1,8 @@
 """
 Pytest configuration and fixtures for backend tests.
 """
+import os
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -54,7 +56,7 @@ def sample_user_data():
     """Sample user data for testing."""
     return {
         "email": "test@example.com",
-        "password": "TestPassword123!",
+        "password": os.environ.get("TEST_USER_PASSWORD", ""),
         "first_name": "Test",
         "last_name": "User",
     }

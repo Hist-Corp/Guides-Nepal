@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Eye, EyeOff, Facebook } from 'lucide-react';
+import { X, Eye, EyeOff, Globe, Share2 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { getApiUrl } from '../../config/api';
 
@@ -84,11 +84,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
     if (dev) {
       setRememberMe(true);
       const emailStub =
-        provider === 'google'
-          ? 'google.user@example.com'
-          : provider === 'facebook'
-            ? 'facebook.user@example.com'
-            : 'apple.user@example.com';
+        import.meta.env[`VITE_DEV_FAKE_${provider.toUpperCase()}_EMAIL`] ||
+        `${provider}.${Date.now()}@example.invalid`;
       login({
         firstName: 'Social',
         lastName: 'User',
@@ -249,7 +246,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               onClick={() => handleSocial('facebook')}
               className="flex-1 bg-[#1877F2] text-white h-11 rounded-full flex items-center justify-center hover:bg-[#166fe5] transition-colors"
             >
-              <Facebook className="w-5 h-5 fill-current" />
+              <Share2 className="w-5 h-5 fill-current" />
             </button>
 
             <button

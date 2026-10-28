@@ -80,6 +80,29 @@ const LocalProfilePage: React.FC = () => {
 
   if (!guide) return null;
 
+  const PLACEHOLDER_IMAGE = '/images/placeholder.svg';
+  const sanitizeImageUrl = (url: unknown): string => {
+    if (typeof url !== 'string') return PLACEHOLDER_IMAGE;
+    if (/[\s"'<>\\]/.test(url)) return PLACEHOLDER_IMAGE;
+    if (url.startsWith('/') && !url.startsWith('//')) {
+      return encodeURI(url);
+    }
+    try {
+      const parsed = new URL(url, 'https://invalid.local');
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        return PLACEHOLDER_IMAGE;
+      }
+      if (parsed.hostname === 'invalid.local') {
+        return PLACEHOLDER_IMAGE;
+      }
+      return parsed.protocol + '//' + parsed.host + parsed.pathname + parsed.search;
+    } catch {
+      return PLACEHOLDER_IMAGE;
+    }
+  };
+  const safeGuideImage = sanitizeImageUrl(guide.image);
+  const safeHeroImage = sanitizeImageUrl(guide.gallery?.[0] ?? guide.image);
+
   // Mock Portfolio Data
   const portfolioHighlights = [
     {
@@ -137,7 +160,7 @@ const LocalProfilePage: React.FC = () => {
                     <div className="relative mb-3">
                       <div className="w-28 h-28 rounded-full p-1 border-2 border-[#213448]">
                         <img
-                          src={guide.image}
+                          src={safeGuideImage}
                           alt={guide.name}
                           className="w-full h-full rounded-full object-cover"
                           onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
@@ -267,13 +290,13 @@ const LocalProfilePage: React.FC = () => {
                   className="relative rounded-2xl overflow-hidden mb-8 h-[400px] group shadow-sm cursor-zoom-in"
                   onClick={() =>
                     setLightbox({
-                      src: guide.gallery?.[0] || guide.image,
+                      src: safeHeroImage,
                       alt: `${guide.name} cover photo`,
                     })
                   }
                 >
                   <img
-                    src={guide.gallery?.[0] || guide.image}
+                    src={safeHeroImage}
                     alt={guide.name}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
@@ -506,7 +529,7 @@ const LocalProfilePage: React.FC = () => {
                 <div className="relative z-10">
                   <div className="w-16 h-16 rounded-full bg-white mx-auto mb-4 p-1 shadow-sm">
                     <img
-                      src={guide.image}
+                      src={safeGuideImage}
                       className="w-full h-full rounded-full object-cover"
                       alt={guide.name}
                     />
@@ -667,7 +690,7 @@ const LocalProfilePage: React.FC = () => {
             <div className="p-6">
               <div className="flex items-center gap-4 mb-6">
                 <img
-                  src={guide.image}
+                  src={safeGuideImage}
                   alt={guide.name}
                   className="w-16 h-16 rounded-full object-cover"
                 />

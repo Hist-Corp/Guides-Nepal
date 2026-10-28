@@ -2,7 +2,7 @@ import { useCallback, useSyncExternalStore } from "react";
 
 export type Theme = "light" | "dark";
 
-const KEY = "gn_theme";
+const KEY = import.meta.env.VITE_THEME_STORAGE_KEY || "gn_theme";
 
 function currentTheme(): Theme {
   try {

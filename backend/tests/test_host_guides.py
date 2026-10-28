@@ -1,8 +1,12 @@
 """Tests for the Host guide-management workflow (SOP-GN-HOST-001)."""
 
+import os
+
 from app.core.roles import HOST
 from app.core.security import create_access_token, get_password_hash
 from app.models.user import User
+
+GUIDE_TEST_PASSWORD = os.environ.get("GUIDE_TEST_PASSWORD", "")
 
 
 def _make_host(db_session) -> User:
@@ -30,7 +34,7 @@ def test_host_guide_workflow(client, db_session):
     payload = {
         "full_name": "Ram Bahadur",
         "email": "ram.guide@example.com",
-        "password": "GuidePass123!",
+        "password": GUIDE_TEST_PASSWORD,
         "phone": "+977 9812345678",
         "nin_number": "NIN-12345",
         "role_title": "Cultural Expert",

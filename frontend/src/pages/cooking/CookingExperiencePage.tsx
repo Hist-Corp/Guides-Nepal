@@ -521,7 +521,17 @@ const handleBookNow = async (): Promise<boolean> => {
                             </div>
                           )}
                           <img
-                            src={guide.image}
+                            src={(() => {
+                              try {
+                                const parsed = new URL(guide.image, window.location.origin);
+                                if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                                  return parsed.href;
+                                }
+                              } catch {
+                                /* invalid URL */
+                              }
+                              return '';
+                            })()}
                             alt={guide.name}
                             className="w-20 h-20 rounded-full object-cover mb-3 ring-2 ring-white shadow-sm"
                           />
@@ -559,7 +569,17 @@ const handleBookNow = async (): Promise<boolean> => {
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-full p-1 border-2 border-secondary">
                       <img
-                        src={data.host.image}
+                        src={(() => {
+                          try {
+                            const parsed = new URL(data.host.image, window.location.origin);
+                            if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                              return parsed.href;
+                            }
+                          } catch {
+                            /* invalid URL */
+                          }
+                          return '';
+                        })()}
                         alt={data.host.name}
                         className="w-full h-full rounded-full object-cover"
                       />
@@ -710,7 +730,17 @@ const handleBookNow = async (): Promise<boolean> => {
                           <div className="p-3 bg-white rounded-xl border border-gray-200 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <img
-                                src={selectedGuide.image}
+                                src={(() => {
+                                  try {
+                                    const parsed = new URL(selectedGuide.image, window.location.origin);
+                                    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                                      return parsed.href;
+                                    }
+                                  } catch {
+                                    /* invalid URL */
+                                  }
+                                  return '';
+                                })()}
                                 alt={selectedGuide.name}
                                 className="w-10 h-10 rounded-full object-cover"
                               />
@@ -863,7 +893,17 @@ const handleBookNow = async (): Promise<boolean> => {
                         >
                           <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 relative">
                             <img
-                              src={item.heroImage}
+                              src={(() => {
+                                try {
+                                  const parsed = new URL(item.heroImage, window.location.origin);
+                                  if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                                    return parsed.href;
+                                  }
+                                } catch {
+                                  /* invalid URL */
+                                }
+                                return '';
+                              })()}
                               alt={item.title}
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
@@ -908,7 +948,17 @@ const handleBookNow = async (): Promise<boolean> => {
                       {!isChangingGuide ? (
                         <div className="bg-white p-4 rounded-lg border border-orange-600/20 shadow-sm flex items-center gap-4">
                           <img
-                            src={selectedGuide.image}
+                            src={(() => {
+                              try {
+                                const parsed = new URL(selectedGuide.image, window.location.origin);
+                                if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                                  return parsed.href;
+                                }
+                              } catch {
+                                /* invalid URL */
+                              }
+                              return '';
+                            })()}
                             alt={selectedGuide.name}
                             className="w-12 h-12 rounded-full object-cover"
                           />
@@ -957,7 +1007,17 @@ const handleBookNow = async (): Promise<boolean> => {
                                 `}
                               >
                                 <img
-                                  src={guide.image}
+                                  src={(() => {
+                                    try {
+                                      const parsed = new URL(guide.image, window.location.origin);
+                                      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                                        return parsed.href;
+                                      }
+                                    } catch {
+                                      /* invalid URL */
+                                    }
+                                    return '';
+                                  })()}
                                   alt={guide.name}
                                   className="w-8 h-8 rounded-full object-cover"
                                 />
@@ -1055,7 +1115,18 @@ const handleBookNow = async (): Promise<boolean> => {
                 <div className="relative z-10 text-center">
                   <div className="w-64 h-64 mx-auto rounded-full p-2 border-4 border-orange-600 relative bg-white shadow-xl transition-all duration-500">
                     <img
-                      src={selectedGuide ? selectedGuide.image : data.host.image}
+                      src={(() => {
+                        const rawImg = selectedGuide ? selectedGuide.image : data.host.image;
+                        try {
+                          const parsed = new URL(rawImg, window.location.origin);
+                          if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                            return parsed.href;
+                          }
+                        } catch {
+                          /* invalid URL */
+                        }
+                        return '';
+                      })()}
                       alt={selectedGuide ? selectedGuide.name : data.host.name}
                       className="w-full h-full rounded-full object-cover grayscale"
                     />
@@ -1161,7 +1232,17 @@ const handleBookNow = async (): Promise<boolean> => {
             <div className="p-8">
               <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
                 <img
-                  src={viewingGuide.image}
+                  src={(() => {
+                    try {
+                      const parsed = new URL(viewingGuide.image, window.location.origin);
+                      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                        return parsed.href;
+                      }
+                    } catch {
+                      /* invalid URL */
+                    }
+                    return '';
+                  })()}
                   alt={viewingGuide.name}
                   className="w-32 h-32 rounded-full object-cover border-4 border-gray-50 shadow-lg"
                 />

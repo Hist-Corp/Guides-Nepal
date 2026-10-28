@@ -523,11 +523,12 @@ const BhaktapurExperiencePage: React.FC = () => {
                         {selectedGuide && (
                           <div className="p-3 bg-white rounded-xl border border-gray-200 flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <img
-                                src={selectedGuide.image}
-                                alt={selectedGuide.name}
-                                className="w-10 h-10 rounded-full object-cover"
-                              />
+                              <div
+                                aria-label={selectedGuide.name}
+                                className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-bold text-sm"
+                              >
+                                {(selectedGuide.name || '?').charAt(0)}
+                              </div>
                               <div>
                                 <p className="text-[10px] font-bold text-gray-500 uppercase">
                                   Selected Guide
@@ -718,11 +719,12 @@ const BhaktapurExperiencePage: React.FC = () => {
                     <div className="mb-6">
                       {!isChangingGuide ? (
                         <div className="bg-white p-4 rounded-lg border border-primary/20 shadow-sm flex items-center gap-4">
-                          <img
-                            src={selectedGuide.image}
-                            alt={selectedGuide.name}
-                            className="w-12 h-12 rounded-full object-cover"
-                          />
+                          <div
+                            aria-label={selectedGuide.name}
+                            className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-bold"
+                          >
+                            {(selectedGuide.name || '?').charAt(0)}
+                          </div>
                           <div>
                             <span className="text-xs font-bold text-primary uppercase tracking-wider">
                               Your Guide
@@ -866,7 +868,7 @@ const BhaktapurExperiencePage: React.FC = () => {
                 <div className="relative z-10 text-center">
                   <div className="w-64 h-64 mx-auto rounded-full p-2 border-4 border-secondary relative bg-white shadow-xl transition-all duration-500">
                     <img
-                      src={selectedGuide ? selectedGuide.image : data.host.image}
+                      src={data.host.image}
                       alt={selectedGuide ? selectedGuide.name : data.host.name}
                       className="w-full h-full rounded-full object-cover grayscale"
                     />
@@ -977,7 +979,7 @@ const BhaktapurExperiencePage: React.FC = () => {
             <div className="p-8">
               <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
                 <img
-                  src={viewingGuide.image}
+                  src={(() => { try { const u = new URL(viewingGuide.image, window.location.origin); return (u.protocol === 'http:' || u.protocol === 'https:') ? u.href : ''; } catch { return ''; } })()}
                   alt={viewingGuide.name}
                   className="w-32 h-32 rounded-full object-cover border-4 border-gray-50 shadow-lg"
                 />

@@ -312,7 +312,7 @@ export const SearchPage: React.FC = () => {
                     >
                       <div className="h-48 overflow-hidden relative">
                         <img
-                          src={exp.heroImage}
+                          src={typeof exp.heroImage === 'string' && /^(https?:\/\/|\/)/i.test(exp.heroImage) ? encodeURI(exp.heroImage) : ''}
                           alt={exp.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -352,11 +352,12 @@ export const SearchPage: React.FC = () => {
                         </div>
                         {exp.host && (
                           <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2">
-                            <img
-                              src={exp.host.image}
-                              alt={exp.host.name}
-                              className="w-6 h-6 rounded-full object-cover"
-                            />
+                            <div
+                              aria-label={exp.host.name}
+                              className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-xs text-slate-600"
+                            >
+                              {(exp.host.name || '?').charAt(0)}
+                            </div>
                             <span className="text-xs text-slate-500">{exp.host.name}</span>
                           </div>
                         )}

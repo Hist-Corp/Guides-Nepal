@@ -13,7 +13,9 @@ from app.core.security import create_access_token, get_password_hash
 from app.models.host_application import HostApplication
 from app.models.user import User
 
-STRONG_PASSWORD = "HostPass123!"
+import os
+
+STRONG_PASSWORD = os.environ.get("TEST_HOST_PASSWORD", "HostPass123!")
 APPLICATION_CREATE = "/api/v1/operations/host-applications"
 REVIEW = "/api/v1/operations/host-applications/{application_id}"
 ME_APPLICATION = "/api/v1/operations/host/me/application"

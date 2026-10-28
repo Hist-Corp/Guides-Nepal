@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { Globe, Share2 } from 'lucide-react';
 import { useCmsSection } from '../../hooks/useCms';
 
 export const Footer: React.FC = () => {
@@ -75,10 +75,10 @@ export const Footer: React.FC = () => {
              <span className="text-xs text-slate-500">© {new Date().getFullYear()} {cmsFooter?.content?.copyright || "guides-nepal. All rights reserved."}</span>
           </div>
           <div className="flex gap-4">
-            <a href="#" className="text-slate-400 hover:text-primary transition-colors"><Facebook className="w-5 h-5" /></a>
-            <a href="#" className="text-slate-400 hover:text-primary transition-colors"><Twitter className="w-5 h-5" /></a>
-            <a href="#" className="text-slate-400 hover:text-primary transition-colors"><Instagram className="w-5 h-5" /></a>
-            <a href="#" className="text-slate-400 hover:text-primary transition-colors"><Linkedin className="w-5 h-5" /></a>
+            <a href="#" className="text-slate-400 hover:text-primary transition-colors"><Share2 className="w-5 h-5" /></a>
+            <a href="#" className="text-slate-400 hover:text-primary transition-colors"><Share2 className="w-5 h-5" /></a>
+            <a href="#" className="text-slate-400 hover:text-primary transition-colors"><Share2 className="w-5 h-5" /></a>
+            <a href="#" className="text-slate-400 hover:text-primary transition-colors"><Share2 className="w-5 h-5" /></a>
           </div>
         </div>
       </div>

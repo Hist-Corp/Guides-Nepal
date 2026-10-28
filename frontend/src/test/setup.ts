@@ -1,4 +1,5 @@
-import '@testing-library/jest-dom';
+/// <reference types="@testing-library/jest-dom/vitest" />
+import '@testing-library/jest-dom/vitest';
 import { vi, beforeAll, afterAll } from 'vitest';
 
 // Node 25 can expose a global `localStorage` without a backing file (setItem is

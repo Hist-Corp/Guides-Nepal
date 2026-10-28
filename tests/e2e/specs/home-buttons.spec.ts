@@ -82,8 +82,8 @@ test.describe('Frontend — Home page buttons and links', () => {
           state: {
             isAuthenticated: true,
             user: { firstName: 'Test', lastName: 'User', email: 'test@example.com' },
-            accessToken: 'e2e-token',
-            refreshToken: 'e2e-refresh-token',
+            accessToken: process.env.E2E_ACCESS_TOKEN,
+            refreshToken: process.env.E2E_REFRESH_TOKEN,
             rememberMe: false,
           },
           version: 0,

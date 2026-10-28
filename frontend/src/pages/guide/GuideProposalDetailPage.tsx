@@ -106,13 +106,16 @@ const GuideProposalDetailPage: React.FC = () => {
                 <div>
                   <h2 className="font-bold text-gray-900">Attached documents</h2>
                   <ul className="mt-1 list-inside list-disc text-sm text-gray-700">
-                    {proposal.documents.map((d, i) => (
-                      <li key={`${d.url}-${i}`}>
-                        <a href={d.url} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                    {proposal.documents.map((d, i) => {
+                      const safeUrl = /^(https?:|\/)/i.test(d.url) ? d.url : '#';
+                      return (
+                      <li key={`${safeUrl}-${i}`}>
+                        <a href={safeUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline">
                           {d.name}
                         </a>
                       </li>
-                    ))}
+                      );
+                    })}
                   </ul>
                 </div>
               )}

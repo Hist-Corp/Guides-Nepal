@@ -1,5 +1,7 @@
 """Dev seed: create admin, content-manager and host users. Idempotent."""
 
+import os
+
 from app.core.database import SessionLocal
 from app.core.roles import ADMIN, CONTENT_MANAGER, HOST
 from app.core.security import get_password_hash
@@ -11,14 +13,14 @@ USERS = [
         "firstName": "System",
         "lastName": "Admin",
         "role": ADMIN,
-        "password": "Admin@12345",
+        "password": os.environ["SEED_ADMIN_PASSWORD"],
     },
     {
         "email": "content@guides-nepal.com",
         "firstName": "Content",
         "lastName": "Manager",
         "role": CONTENT_MANAGER,
-        "password": "Content@2024",
+        "password": os.environ["SEED_CONTENT_PASSWORD"],
     },
     {
         "email": "host@guides-nepal.com",
@@ -26,7 +28,7 @@ USERS = [
         "lastName": "Host",
         "role": HOST,
         "region": "Kathmandu Valley",
-        "password": "Host@2024",
+        "password": os.environ["SEED_HOST_PASSWORD"],
     },
 ]
 

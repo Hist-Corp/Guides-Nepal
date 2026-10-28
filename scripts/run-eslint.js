@@ -28,11 +28,21 @@ const { spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const workspace = process.argv[2];
+const workspaceInput = process.argv[2];
 const eslintArgs = process.argv.slice(3);
 
-if (!workspace) {
+if (!workspaceInput) {
   console.error('Usage: node scripts/run-eslint.js <workspace> <eslint-args...>');
+  process.exit(1);
+}
+
+let workspace;
+if (workspaceInput === 'frontend') {
+  workspace = 'frontend';
+} else if (workspaceInput === 'dashboard') {
+  workspace = 'dashboard';
+} else {
+  console.error(`Unknown workspace. Allowed: frontend, dashboard`);
   process.exit(1);
 }
 
