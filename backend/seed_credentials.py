@@ -17,13 +17,15 @@ from app.models.user import User
 # These rows are created here rather than through POST /auth/register on purpose:
 # `guide` (and every staff role) is outside SELF_REGISTERABLE_ROLES, so the
 # public registration endpoint refuses to mint it.
+import os
+
 CREDENTIALS = {
-    "admin@guides-nepal.com":        {"password": "Admin@12345",      "role": ADMIN},
-    "content@guides-nepal.com":      {"password": "Content@2024",     "role": CONTENT_MANAGER},
-    "regional@guides-nepal.com":     {"password": "Regional@2024",    "role": REGIONAL_HEAD},
-    "support@guides-nepal.com":      {"password": "Support@2024",     "role": CUSTOMER_SUPPORT},
-    "host@guides-nepal.com":         {"password": "Host@2024",        "role": HOST},
-    "guide@guides-nepal.com":        {"password": "Guide@2024",       "role": GUIDE},
+    "admin@guides-nepal.com":        {"password": os.environ.get("ADMIN_PASSWORD"),            "role": ADMIN},
+    "content@guides-nepal.com":      {"password": os.environ.get("CONTENT_MANAGER_PASSWORD"),  "role": CONTENT_MANAGER},
+    "regional@guides-nepal.com":     {"password": os.environ.get("REGIONAL_HEAD_PASSWORD"),    "role": REGIONAL_HEAD},
+    "support@guides-nepal.com":      {"password": os.environ.get("CUSTOMER_SUPPORT_PASSWORD"), "role": CUSTOMER_SUPPORT},
+    "host@guides-nepal.com":         {"password": os.environ.get("HOST_PASSWORD"),             "role": HOST},
+    "guide@guides-nepal.com":        {"password": os.environ.get("GUIDE_PASSWORD"),            "role": GUIDE},
 }
 
 db = SessionLocal()

@@ -102,16 +102,17 @@ def get_password_hash(password: str) -> str:
     return hashed.decode("utf-8")
 
 
-def get_user_id_from_token(token: str) -> Optional[int]:
-    """Extract and verify user ID from JWT token"""
+def get_user_id_from_token(token: str, expected_type: str = "access") -> Optional[int]:
+    """Extract and verify user ID from JWT token.
+
+    ``expected_type`` lets callers validate either access or refresh tokens.
+    """
     try:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
 
-        # Verify token type is access token
         token_type = payload.get("type")
-        expected_type = "access"  # nosec B105 - token-type literal, not a password
         if token_type != expected_type:
             logger.warning(f"Invalid token type: {token_type}")
             return None

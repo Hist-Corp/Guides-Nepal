@@ -63,12 +63,20 @@ export default function ResetPasswordPage() {
     setPasswordError(null);
     return true;
   };
+  const constantTimeEqual = (a: string, b: string) => {
+    if (a.length !== b.length) return false;
+    let result = 0;
+    for (let i = 0; i < a.length; i++) {
+      result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    }
+    return result === 0;
+  };
   const validateConfirm = (value: string) => {
     if (!value) {
       setConfirmError('Please confirm your password');
       return false;
     }
-    if (value !== password) {
+    if (!constantTimeEqual(value, password)) {
       setConfirmError('Passwords do not match');
       return false;
     }

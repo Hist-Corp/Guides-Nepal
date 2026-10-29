@@ -107,8 +107,9 @@ describe('ExperiencePage', () => {
     fireEvent.click(confirmButton());
     expect(within(dialog()).getByText('Please log in to book this experience')).toBeInTheDocument();
 
+    const testAccessToken = process.env.TEST_ACCESS_TOKEN ?? 'test-access-token';
     act(() => {
-      useAuthStore.setState({ isAuthenticated: true, accessToken: 'test-access-token' });
+      useAuthStore.setState({ isAuthenticated: true, accessToken: testAccessToken });
     });
     // addBooking now persists the booking through POST /bookings/ with the
     // bearer token, so stub the network call the sheet can confirm offline.
@@ -125,7 +126,7 @@ describe('ExperiencePage', () => {
       expect.stringContaining('/bookings/'),
       expect.objectContaining({
         method: 'POST',
-        headers: expect.objectContaining({ Authorization: 'Bearer test-access-token' }),
+        headers: expect.objectContaining({ Authorization: `Bearer ${testAccessToken}` }),
       })
     );
 

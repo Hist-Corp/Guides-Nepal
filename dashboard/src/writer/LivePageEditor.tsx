@@ -286,7 +286,7 @@ export default function LivePageEditor({
             sectionId: imagePickerOpen.sectionId,
             url,
           },
-          '*'
+          new URL(FRONTEND_URL).origin
         );
       }
       setImagePickerOpen(null);
@@ -311,7 +311,7 @@ export default function LivePageEditor({
               content: s.content,
               style: s.style,
             },
-            '*'
+            new URL(FRONTEND_URL).origin
           );
         });
       }
@@ -333,7 +333,7 @@ export default function LivePageEditor({
         content: selected.content,
         style: selected.style,
       },
-      '*'
+      new URL(FRONTEND_URL).origin
     );
   }, [selected?.id, selected?.content, selected?.style]);
 

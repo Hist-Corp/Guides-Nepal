@@ -66,11 +66,11 @@ async def upload_photo(
     uploads_dir = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "../../../uploads")
     )
-    user_dir = os.path.join(uploads_dir, str(user_id))
+    user_dir = os.path.join(uploads_dir, os.path.basename(str(int(user_id))))
     os.makedirs(user_dir, exist_ok=True)
     filename = file.filename or "photo.jpg"
     safe_name = "".join(c for c in filename if c.isalnum() or c in ("-", "_", "."))
-    path = os.path.join(user_dir, safe_name)
+    path = os.path.join(user_dir, os.path.basename(safe_name))
     with open(path, "wb") as f:
         f.write(await file.read())
     url = f"/uploads/{user_id}/{safe_name}"

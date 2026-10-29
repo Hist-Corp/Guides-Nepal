@@ -7,6 +7,9 @@ import react from '@vitejs/plugin-react';
 const backendTarget = process.env.VITE_BACKEND_URL ?? 'http://localhost:8000';
 
 export default defineConfig({
+  resolve: {
+    dedupe: ['react', 'react-dom'],
+  },
   plugins: [react()],
   build: {
     chunkSizeWarningLimit: 3000,

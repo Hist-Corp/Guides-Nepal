@@ -19,6 +19,10 @@ Base.metadata.create_all(bind=engine)
 BASE = "/api/v1/auth"
 client = TestClient(app)
 
+TEST_PASSWORD = os.environ.get("TEST_USER_PASSWORD")
+if not TEST_PASSWORD:
+    raise RuntimeError("TEST_USER_PASSWORD environment variable must be set to run this verification script")
+
 results: list[tuple[str, bool]] = []
 
 
@@ -45,7 +49,7 @@ r = client.post(
     f"{BASE}/register",
     json={
         "email": "test1@example.com",
-        "password": "Strong@123",
+        "password": TEST_PASSWORD,
         "firstName": "Test",
         "lastName": "User",
         "phone": "9800000000",
@@ -67,7 +71,7 @@ r = client.post(
     f"{BASE}/register",
     json={
         "email": "test1@example.com",
-        "password": "Strong@123",
+        "password": TEST_PASSWORD,
         "firstName": "Test",
         "lastName": "User",
         "phone": "9800000000",
@@ -93,7 +97,7 @@ r = client.post(
     f"{BASE}/login",
     json={
         "email": "test1@example.com",
-        "password": "Strong@123",
+        "password": TEST_PASSWORD,
     },
 )
 check(
@@ -106,17 +110,20 @@ r = client.post(
     f"{BASE}/login",
     json={
         "email": "test1@example.com",
-        "password": "WrongPass@1",
+        "password": _WRONG_PASSWORD,
     },
 )
 check("Signed-up user with wrong password is rejected (401)", r.status_code == 401)
+
+_WRONG_PASSWORD = os.environ.get("TEST_WRONG_PASSWORD", os.urandom(16).hex() + "A@1")
+_DUMMY_PASSWORD = os.environ.get("TEST_DUMMY_PASSWORD", os.urandom(16).hex() + "A@1")
 
 # 6) Login with an account that was NEVER signed up -> rejected
 r = client.post(
     f"{BASE}/login",
     json={
         "email": "nobody@example.com",
-        "password": "Whatever@1",
+        "password": _DUMMY_PASSWORD,
     },
 )
 check("Never-signed-up user cannot log in (401)", r.status_code == 401)
@@ -126,7 +133,7 @@ r = client.post(
     f"{BASE}/login",
     json={
         "email": "not-an-email",
-        "password": "Whatever@1",
+        "password": _DUMMY_PASSWORD,
     },
 )
 check("Malformed email login is rejected (422)", r.status_code == 422)
@@ -136,7 +143,7 @@ login = client.post(
     f"{BASE}/login",
     json={
         "email": "test1@example.com",
-        "password": "Strong@123",
+        "password": TEST_PASSWORD,
     },
 ).json()
 token = login["access_token"]

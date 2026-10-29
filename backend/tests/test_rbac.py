@@ -18,7 +18,10 @@ GUIDE_ME = "/api/v1/guide/me"
 REGISTER = "/api/v1/auth/register"
 ADMIN_PATCH_USER = "/api/v1/admin/users/{user_id}"
 
-STRONG_PASSWORD = "Guide@2024"
+import os
+import secrets
+
+STRONG_PASSWORD = os.environ.get("TEST_STRONG_PASSWORD") or secrets.token_urlsafe(16) + "Aa1@"
 
 
 def _make_user(db_session, email: str, role: str, is_active: bool = True) -> User:

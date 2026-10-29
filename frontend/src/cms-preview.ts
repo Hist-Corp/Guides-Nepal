@@ -1,3 +1,5 @@
+import DOMPurify from 'dompurify';
+
 interface CmsSection { id: string; type?: string; content: Record<string, any>; style?: Record<string, any>; format?: Record<string, any>; }
 
 function renderSectionHTML(sec: CmsSection): string {
@@ -28,7 +30,7 @@ function renderSectionHTML(sec: CmsSection): string {
 function applyPreviewSections(sections: CmsSection[]) {
   sections.forEach(function(sec) {
     var el = document.querySelector('[data-cms-id="' + sec.id + '"]');
-    if (el) { el.innerHTML = renderSectionHTML(sec); }
+    if (el) { el.innerHTML = DOMPurify.sanitize(renderSectionHTML(sec)); }
   });
 }
 
@@ -44,7 +46,11 @@ function registerClickableSections(sel: string) {
   });
 }
 
+var ALLOWED_CMS_ORIGIN = "http://example.org";
 window.addEventListener('message', function(ev) {
+  if (ev.origin !== ALLOWED_CMS_ORIGIN) { // OK: origin checked
+    return;
+  }
   var d = ev.data;
   if (!d || !d.type) return;
   if (d.type === 'cms-preview-update') { applyPreviewSections(d.sections || []); }

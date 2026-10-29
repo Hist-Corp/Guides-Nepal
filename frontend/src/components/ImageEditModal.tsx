@@ -14,6 +14,21 @@ export function ImageEditModal({ open, onClose, onSave, currentSrc }: ImageEditM
 
   if (!open) return null;
 
+  const getSafeImageUrl = (u: string): string => {
+    if (!u) return '';
+    if (u.startsWith('data:image/')) return encodeURI(u);
+    try {
+      const parsed = new URL(u, window.location.origin);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+        return encodeURI(parsed.href);
+      }
+    } catch {
+      return '';
+    }
+    return '';
+  };
+  const safeUrl = getSafeImageUrl(url);
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -70,9 +85,9 @@ export function ImageEditModal({ open, onClose, onSave, currentSrc }: ImageEditM
               placeholder="https://example.com/image.jpg"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 outline-none"
             />
-            {url && (
+            {safeUrl && (
               <div className="rounded-lg overflow-hidden border border-gray-200">
-                <img src={url} alt="Preview" className="w-full h-40 object-cover" />
+                <img src={safeUrl} alt="Preview" className="w-full h-40 object-cover" />
               </div>
             )}
           </div>
@@ -87,9 +102,9 @@ export function ImageEditModal({ open, onClose, onSave, currentSrc }: ImageEditM
               <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
             </label>
             {uploading && <p className="text-sm text-blue-500">Uploading...</p>}
-            {url && !uploading && (
+            {safeUrl && !uploading && (
               <div className="rounded-lg overflow-hidden border border-gray-200">
-                <img src={url} alt="Preview" className="w-full h-40 object-cover" />
+                <img src={safeUrl} alt="Preview" className="w-full h-40 object-cover" />
               </div>
             )}
           </div>

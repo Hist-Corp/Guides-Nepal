@@ -11,6 +11,8 @@ from app.models.user import User
 from app.models.host_application import HostApplication
 from app.models.support_ticket import SupportTicket
 
+import os
+
 USERS = [
     {
         "email": "regional@guides-nepal.com",
@@ -18,14 +20,14 @@ USERS = [
         "lastName": "Head",
         "role": REGIONAL_HEAD,
         "region": "Kathmandu Valley",
-        "password": "Regional@2024",
+        "password": os.environ["SEED_REGIONAL_PASSWORD"],
     },
     {
         "email": "support@guides-nepal.com",
         "firstName": "Customer",
         "lastName": "Support",
         "role": CUSTOMER_SUPPORT,
-        "password": "Support@2024",
+        "password": os.environ["SEED_SUPPORT_PASSWORD"],
     },
 ]
 

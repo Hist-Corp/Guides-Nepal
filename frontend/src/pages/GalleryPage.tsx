@@ -34,6 +34,17 @@ const GalleryPage: React.FC = () => {
 
   if (!guide || !guide.gallery) return null;
 
+  const sanitizeImageUrl = (u: string): string => {
+    try {
+      const parsed = new URL(u, window.location.origin);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return '';
+      return encodeURI(parsed.href);
+    } catch {
+      return '';
+    }
+  };
+  const safeGuideImage = sanitizeImageUrl(guide.image);
+
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white">
       <Header />
@@ -59,11 +70,11 @@ const GalleryPage: React.FC = () => {
             <div
               className="break-inside-avoid rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative cursor-zoom-in"
               onClick={() =>
-                setLightbox({ src: guide.image, alt: `${guide.name} profile photo` })
+                setLightbox({ src: safeGuideImage, alt: `${guide.name} profile photo` })
               }
             >
               <img 
-                src={guide.image} 
+                src={safeGuideImage}
                 alt={`${guide.name} Profile`}
                 className="w-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
@@ -71,20 +82,23 @@ const GalleryPage: React.FC = () => {
             </div>
 
             {/* Gallery Images */}
-            {guide.gallery.map((img, index) => (
+            {guide.gallery.map((img, index) => {
+              const safeImg = sanitizeImageUrl(img);
+              return (
               <div 
                 key={index} 
-                onClick={() => setLightbox({ src: img, alt: `${guide.name} gallery photo ${index + 1}` })}
+                onClick={() => setLightbox({ src: safeImg, alt: `${guide.name} gallery photo ${index + 1}` })}
                 className="break-inside-avoid rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative cursor-zoom-in"
               >
                 <img 
-                  src={img} 
+                  src={safeImg}
                   alt={`Gallery ${index + 1}`}
                   className="w-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none" />
               </div>
-            ))}
+              );
+            })}
 
             {/* Additional photos from the verified Nepal image pool (masonry effect) */}
             {extraGallery.map((photo, i) => (

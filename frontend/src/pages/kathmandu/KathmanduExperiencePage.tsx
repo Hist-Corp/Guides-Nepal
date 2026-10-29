@@ -27,6 +27,18 @@ import { isPredefinedTrip } from '../../utils/experienceBooking';
 import { BookmarkButton } from '../../components/common/BookmarkButton';
 import { experienceDetailPath } from '../../utils/canonicalExperience';
 
+const sanitizeImageUrl = (url: string): string => {
+  try {
+    const parsed = new URL(url, window.location.origin);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return encodeURI(parsed.toString());
+    }
+  } catch {
+    return '';
+  }
+  return '';
+};
+
 const ReadMoreText = ({
   text,
   limit = 150,
@@ -86,7 +98,7 @@ const KathmanduExperiencePage: React.FC = () => {
   const [sheetConfirmed, setSheetConfirmed] = useState(false);
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
-  const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
+  const [confirmPopup, setConfirmPopup] = useState(false);
 
   // Active bookings decide which guides are still available to show/select
   const bookings = useBookingStore((s) => s.bookings);
@@ -151,7 +163,18 @@ const KathmanduExperiencePage: React.FC = () => {
     }
 
     if (!data) return false;
-    // Persist the booking so the reserved guide is hidden from "Who you'll meet"
+    // Show the confirmation popup — the actual booking is persisted in
+    // confirmBooking so the guide isn't reserved until the traveler confirms.
+    setConfirmPopup(true);
+    const cardElement = document.getElementById('booking-card-desktop');
+    if (cardElement) {
+      cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return true;
+  };
+
+  const confirmBooking = async () => {
+    if (!data) return;
     const success = await addBooking({
       id: Math.random().toString(36).substr(2, 9),
       experienceId: data.id,
@@ -165,18 +188,9 @@ const KathmanduExperiencePage: React.FC = () => {
       guideId: selectedGuide?.id,
       guideName: selectedGuide?.name,
     });
-
-    // Only set confirmation state if booking succeeded
     if (success) {
-      setIsBookingConfirmed(true);
-
-      // Optional: Scroll to top of card to ensure confirmation is visible if on mobile/small screen
-      const cardElement = document.getElementById('booking-card-desktop');
-      if (cardElement) {
-        cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      setConfirmPopup(false);
     }
-    return success;
   };
 
   const handleSheetConfirm = async () => {
@@ -474,7 +488,7 @@ const KathmanduExperiencePage: React.FC = () => {
                 >
                   <div className="absolute top-0 left-0 w-full h-1 bg-primary rounded-t-2xl"></div>
 
-                  {!isBookingConfirmed ? (
+                  {!confirmPopup ? (
                     <>
                       <div className="flex items-center space-x-1 mb-2">
                         {[...Array(5)].map((_, i) => (
@@ -523,7 +537,7 @@ const KathmanduExperiencePage: React.FC = () => {
                           <div className="p-3 bg-white rounded-xl border border-gray-200 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <img
-                                src={selectedGuide.image}
+                                src={sanitizeImageUrl(selectedGuide.image)}
                                 alt={selectedGuide.name}
                                 className="w-10 h-10 rounded-full object-cover"
                               />
@@ -647,7 +661,7 @@ const KathmanduExperiencePage: React.FC = () => {
                       </div>
 
                       <button
-                        onClick={() => setIsBookingConfirmed(false)}
+                        onClick={() => setConfirmPopup(false)}
                         className="text-primary hover:underline text-sm font-bold"
                       >
                         Make another booking
@@ -718,7 +732,7 @@ const KathmanduExperiencePage: React.FC = () => {
                       {!isChangingGuide ? (
                         <div className="bg-white p-4 rounded-lg border border-primary/20 shadow-sm flex items-center gap-4">
                           <img
-                            src={selectedGuide.image}
+                            src={sanitizeImageUrl(selectedGuide.image)}
                             alt={selectedGuide.name}
                             className="w-12 h-12 rounded-full object-cover"
                           />
@@ -865,7 +879,7 @@ const KathmanduExperiencePage: React.FC = () => {
                 <div className="relative z-10 text-center">
                   <div className="w-64 h-64 mx-auto rounded-full p-2 border-4 border-secondary relative bg-white shadow-xl transition-all duration-500">
                     <img
-                      src={selectedGuide ? selectedGuide.image : data.host.image}
+                      src={sanitizeImageUrl(selectedGuide ? selectedGuide.image : data.host.image)}
                       alt={selectedGuide ? selectedGuide.name : data.host.name}
                       className="w-full h-full rounded-full object-cover grayscale"
                     />
@@ -976,7 +990,7 @@ const KathmanduExperiencePage: React.FC = () => {
             <div className="p-8">
               <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
                 <img
-                  src={viewingGuide.image}
+                  src={/^https?:\/\//i.test(viewingGuide.image) ? encodeURI(viewingGuide.image) : ''}
                   alt={viewingGuide.name}
                   className="w-32 h-32 rounded-full object-cover border-4 border-gray-50 shadow-lg"
                 />
@@ -1059,6 +1073,88 @@ const KathmanduExperiencePage: React.FC = () => {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Booking confirmation popup */}
+      {confirmPopup && data && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Confirm booking"
+        >
+          <div
+            className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">Confirm booking</h2>
+              <button
+                type="button"
+                onClick={() => setConfirmPopup(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src={data.heroImage}
+                alt={data.title}
+                className="w-16 h-16 rounded-xl object-cover"
+                onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+              />
+              <div>
+                <h3 className="font-bold text-gray-900">{data.title}</h3>
+                <p className="text-sm text-gray-500">{data.city ?? 'Kathmandu'}</p>
+              </div>
+            </div>
+            <div className="space-y-3 text-sm text-gray-700 mb-6">
+              <div className="flex justify-between border-b pb-2">
+                <span>Date</span>
+                <span className="font-medium">{checkIn}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span>Guests</span>
+                <span className="font-medium">{guestCount}</span>
+              </div>
+              {selectedGuide && (
+                <div className="flex justify-between border-b pb-2">
+                  <span>Guide</span>
+                  <span className="font-medium">{selectedGuide.name}</span>
+                </div>
+              )}
+              <div className="flex justify-between border-b pb-2">
+                <span>Price per person</span>
+                <span className="font-medium">
+                  <Price amount={data.price ?? 45} />
+                </span>
+              </div>
+              <div className="flex justify-between border-b pb-2 font-bold text-primary">
+                <span>Total</span>
+                <span className="font-bold">
+                  <Price amount={total} />
+                </span>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setConfirmPopup(false)}
+                className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-bold hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmBooking}
+                className="flex-1 py-3 rounded-xl bg-primary hover:bg-primary-hover text-white font-bold transition-colors"
+              >
+                Confirm Booking
+              </button>
             </div>
           </div>
         </div>

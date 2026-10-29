@@ -12,29 +12,28 @@ codebase canonical role is ``traveler`` (American English, see
 ``app/core/roles.py`` -> ``TRAVELER = "traveler"``). This script seeds the
 canonical ``traveler`` role, which is what the API / frontend expect.
 """
+import os
+
 from app.core.database import Base, engine, SessionLocal
 from app.core.roles import GUIDE, TRAVELER
 from app.core.security import get_password_hash, validate_password_strength, verify_password
 from app import models  # noqa: F401  (register all models so create_all sees them)
 from app.models.user import User
 
-# Test credentials — development only, never use in production.
-# Passwords intentionally meet the policy in backend/.env
-# (min 8 chars + uppercase + number + special char).
 USERS = [
     {
         "email": "traveler@guides-nepal.com",
         "firstName": "Test",
         "lastName": "Traveler",
         "role": TRAVELER,
-        "password": "Traveler@2024",
+        "password": os.environ["SEED_TRAVELER_PASSWORD"],
     },
     {
         "email": "guide@guides-nepal.com",
         "firstName": "Test",
         "lastName": "Guide",
         "role": GUIDE,
-        "password": "Guide@2024",
+        "password": os.environ["SEED_GUIDE_PASSWORD"],
     },
 ]
 

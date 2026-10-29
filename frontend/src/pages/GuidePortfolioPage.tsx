@@ -27,6 +27,11 @@ const GuidePortfolioPage: React.FC = () => {
 
   if (!guide) return null;
 
+  const isSafeImageUrl = (url: string) => typeof url === 'string' && /^(https?:\/\/|\/)/i.test(url);
+  const safeGuideImage = isSafeImageUrl(guide.image) ? encodeURI(guide.image) : '';
+  const heroImageRaw = guide.gallery?.[0] || guide.image;
+  const safeHeroImage = isSafeImageUrl(heroImageRaw) ? encodeURI(heroImageRaw) : '';
+
   // Mock Portfolio Data
   const portfolioHighlights = [
     {
@@ -92,13 +97,13 @@ const GuidePortfolioPage: React.FC = () => {
                 className="relative rounded-2xl overflow-hidden mb-8 h-[400px] group cursor-zoom-in"
                 onClick={() =>
                   setLightbox({
-                    src: guide.gallery?.[0] || guide.image,
+                    src: safeHeroImage,
                     alt: `${guide.name} cover photo`,
                   })
                 }
               >
                 <img 
-                  src={guide.gallery?.[0] || guide.image} 
+                  src={safeHeroImage}
                   alt={guide.name} 
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
@@ -109,7 +114,7 @@ const GuidePortfolioPage: React.FC = () => {
 
               {/* Guide Stats/Bio Block */}
               <div className="mb-12 pb-8 border-b border-gray-100 flex flex-col md:flex-row gap-6 items-start">
-                 <img src={guide.image} alt={guide.name} className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg" />
+                 <img src={safeGuideImage} alt={guide.name} className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg" />
                  <div>
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">My Professional Journey</h2>
                     <p className="text-gray-600 leading-relaxed">
@@ -206,7 +211,14 @@ const GuidePortfolioPage: React.FC = () => {
                 <div>
                    <h3 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wide">My Colleagues</h3>
                    <div className="space-y-4">
-                      {allGuides.filter(g => g.id !== guide.id).slice(0, 3).map((colleague) => (
+                      {allGuides.filter(g => g.id !== guide.id).slice(0, 3).map((colleague) => {
+                         const colleagueInitials = String(colleague.name || '?')
+                            .split(' ')
+                            .map(n => n.charAt(0).toUpperCase())
+                            .join('')
+                            .replace(/[^A-Z]/g, '')
+                            .slice(0, 2);
+                         return (
                          <div 
                            key={colleague.id} 
                            className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer group"
@@ -215,13 +227,16 @@ const GuidePortfolioPage: React.FC = () => {
                               window.scrollTo({ top: 0, behavior: 'instant' });
                            }}
                          >
-                            <img src={colleague.image} alt={colleague.name} className="w-12 h-12 rounded-full object-cover" />
+                            <div className="w-12 h-12 rounded-full object-cover bg-gray-200 flex items-center justify-center text-gray-700 font-bold text-sm">
+                               {colleagueInitials}
+                            </div>
                             <div>
                                <h4 className="font-bold text-gray-900 group-hover:text-[#213448] transition-colors">{colleague.name}</h4>
                                <p className="text-xs text-gray-500">{colleague.role}</p>
                             </div>
                          </div>
-                      ))}
+                         );
+                      })}
                    </div>
                 </div>
 

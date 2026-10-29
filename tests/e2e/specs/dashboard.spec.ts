@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Dashboard — Auth + Nav buttons', () => {
-  const adminUser = { email: 'admin@guides-nepal.com', password: 'Admin@12345' };
+  const adminUser = { email: 'admin@guides-nepal.com', password: process.env.ADMIN_PASSWORD };
 
   test('login page has all expected buttons', async ({ page }) => {
     await page.goto('/dashboard/login');

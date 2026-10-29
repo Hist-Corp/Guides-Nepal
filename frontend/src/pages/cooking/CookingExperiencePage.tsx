@@ -247,7 +247,7 @@ const CookingExperiencePage: React.FC = () => {
   const [sheetConfirmed, setSheetConfirmed] = useState(false);
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
-  const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
+  const [confirmPopup, setConfirmPopup] = useState(false);
 
   // Active bookings decide which guides are still available to show/select
   const bookings = useBookingStore((s) => s.bookings);
@@ -305,7 +305,18 @@ const handleBookNow = async (): Promise<boolean> => {
     }
 
     if (!data) return false;
-    // Persist the booking so the reserved chef is hidden from "Who you'll meet"
+    // Show the confirmation popup — the actual booking is persisted in
+    // confirmBooking so the chef isn't reserved until the traveler confirms.
+    setConfirmPopup(true);
+    const cardElement = document.getElementById('booking-card-desktop');
+    if (cardElement) {
+      cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return true;
+  };
+
+  const confirmBooking = async () => {
+    if (!data) return;
     const success = await addBooking({
       id: Math.random().toString(36).substr(2, 9),
       experienceId: data.id,
@@ -319,18 +330,9 @@ const handleBookNow = async (): Promise<boolean> => {
       guideId: selectedGuide?.id,
       guideName: selectedGuide?.name,
     });
-
-    // Only set confirmation state if booking succeeded
     if (success) {
-      setIsBookingConfirmed(true);
-
-      // Scroll to top of card to ensure confirmation is visible
-      const cardElement = document.getElementById('booking-card-desktop');
-      if (cardElement) {
-        cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      setConfirmPopup(false);
     }
-    return success;
   };
 
   const handleSheetConfirm = async () => {
@@ -521,7 +523,17 @@ const handleBookNow = async (): Promise<boolean> => {
                             </div>
                           )}
                           <img
-                            src={guide.image}
+                            src={(() => {
+                              try {
+                                const parsed = new URL(guide.image, window.location.origin);
+                                if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                                  return parsed.href;
+                                }
+                              } catch {
+                                /* invalid URL */
+                              }
+                              return '';
+                            })()}
                             alt={guide.name}
                             className="w-20 h-20 rounded-full object-cover mb-3 ring-2 ring-white shadow-sm"
                           />
@@ -559,7 +571,17 @@ const handleBookNow = async (): Promise<boolean> => {
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 rounded-full p-1 border-2 border-secondary">
                       <img
-                        src={data.host.image}
+                        src={(() => {
+                          try {
+                            const parsed = new URL(data.host.image, window.location.origin);
+                            if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                              return parsed.href;
+                            }
+                          } catch {
+                            /* invalid URL */
+                          }
+                          return '';
+                        })()}
                         alt={data.host.name}
                         className="w-full h-full rounded-full object-cover"
                       />
@@ -664,7 +686,7 @@ const handleBookNow = async (): Promise<boolean> => {
                 >
                   <div className="absolute top-0 left-0 w-full h-1 bg-orange-600 rounded-t-2xl"></div>
 
-                  {!isBookingConfirmed ? (
+                  {!confirmPopup ? (
                     <>
                       <div className="flex items-center space-x-1 mb-2">
                         {[...Array(5)].map((_, i) => (
@@ -710,7 +732,17 @@ const handleBookNow = async (): Promise<boolean> => {
                           <div className="p-3 bg-white rounded-xl border border-gray-200 flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <img
-                                src={selectedGuide.image}
+                                src={(() => {
+                                  try {
+                                    const parsed = new URL(selectedGuide.image, window.location.origin);
+                                    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                                      return parsed.href;
+                                    }
+                                  } catch {
+                                    /* invalid URL */
+                                  }
+                                  return '';
+                                })()}
                                 alt={selectedGuide.name}
                                 className="w-10 h-10 rounded-full object-cover"
                               />
@@ -833,7 +865,7 @@ const handleBookNow = async (): Promise<boolean> => {
                       </div>
 
                       <button
-                        onClick={() => setIsBookingConfirmed(false)}
+                        onClick={() => setConfirmPopup(false)}
                         className="text-orange-600 hover:underline text-sm font-bold"
                       >
                         Make another booking
@@ -863,7 +895,17 @@ const handleBookNow = async (): Promise<boolean> => {
                         >
                           <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 relative">
                             <img
-                              src={item.heroImage}
+                              src={(() => {
+                                try {
+                                  const parsed = new URL(item.heroImage, window.location.origin);
+                                  if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                                    return parsed.href;
+                                  }
+                                } catch {
+                                  /* invalid URL */
+                                }
+                                return '';
+                              })()}
                               alt={item.title}
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
@@ -908,7 +950,17 @@ const handleBookNow = async (): Promise<boolean> => {
                       {!isChangingGuide ? (
                         <div className="bg-white p-4 rounded-lg border border-orange-600/20 shadow-sm flex items-center gap-4">
                           <img
-                            src={selectedGuide.image}
+                            src={(() => {
+                              try {
+                                const parsed = new URL(selectedGuide.image, window.location.origin);
+                                if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                                  return parsed.href;
+                                }
+                              } catch {
+                                /* invalid URL */
+                              }
+                              return '';
+                            })()}
                             alt={selectedGuide.name}
                             className="w-12 h-12 rounded-full object-cover"
                           />
@@ -957,7 +1009,17 @@ const handleBookNow = async (): Promise<boolean> => {
                                 `}
                               >
                                 <img
-                                  src={guide.image}
+                                  src={(() => {
+                                    try {
+                                      const parsed = new URL(guide.image, window.location.origin);
+                                      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                                        return parsed.href;
+                                      }
+                                    } catch {
+                                      /* invalid URL */
+                                    }
+                                    return '';
+                                  })()}
                                   alt={guide.name}
                                   className="w-8 h-8 rounded-full object-cover"
                                 />
@@ -1055,7 +1117,18 @@ const handleBookNow = async (): Promise<boolean> => {
                 <div className="relative z-10 text-center">
                   <div className="w-64 h-64 mx-auto rounded-full p-2 border-4 border-orange-600 relative bg-white shadow-xl transition-all duration-500">
                     <img
-                      src={selectedGuide ? selectedGuide.image : data.host.image}
+                      src={(() => {
+                        const rawImg = selectedGuide ? selectedGuide.image : data.host.image;
+                        try {
+                          const parsed = new URL(rawImg, window.location.origin);
+                          if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                            return parsed.href;
+                          }
+                        } catch {
+                          /* invalid URL */
+                        }
+                        return '';
+                      })()}
                       alt={selectedGuide ? selectedGuide.name : data.host.name}
                       className="w-full h-full rounded-full object-cover grayscale"
                     />
@@ -1161,7 +1234,17 @@ const handleBookNow = async (): Promise<boolean> => {
             <div className="p-8">
               <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
                 <img
-                  src={viewingGuide.image}
+                  src={(() => {
+                    try {
+                      const parsed = new URL(viewingGuide.image, window.location.origin);
+                      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                        return parsed.href;
+                      }
+                    } catch {
+                      /* invalid URL */
+                    }
+                    return '';
+                  })()}
                   alt={viewingGuide.name}
                   className="w-32 h-32 rounded-full object-cover border-4 border-gray-50 shadow-lg"
                 />
@@ -1244,6 +1327,86 @@ const handleBookNow = async (): Promise<boolean> => {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Booking confirmation popup */}
+      {confirmPopup && data && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Confirm booking"
+        >
+          <div
+            className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">Confirm booking</h2>
+              <button
+                type="button"
+                onClick={() => setConfirmPopup(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src={data.heroImage}
+                alt={data.title}
+                className="w-16 h-16 rounded-xl object-cover"
+                onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+              />
+              <div>
+                <h3 className="font-bold text-gray-900">{data.title}</h3>
+                <p className="text-sm text-gray-500">Cooking Class</p>
+              </div>
+            </div>
+            <div className="space-y-3 text-sm text-gray-700 mb-6">
+              <div className="flex justify-between border-b pb-2">
+                <span>Date</span>
+                <span className="font-medium">{checkIn}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span>Time</span>
+                <span className="font-medium">{bookingTime}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span>Guests</span>
+                <span className="font-medium">{guestCount}</span>
+              </div>
+              {selectedGuide && (
+                <div className="flex justify-between border-b pb-2">
+                  <span>Chef</span>
+                  <span className="font-medium">{selectedGuide.name}</span>
+                </div>
+              )}
+              <div className="flex justify-between border-b pb-2 font-bold text-primary">
+                <span>Total</span>
+                <span className="font-bold">
+                  <Price amount={total} />
+                </span>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setConfirmPopup(false)}
+                className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-bold hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmBooking}
+                className="flex-1 py-3 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold transition-colors"
+              >
+                Confirm Booking
+              </button>
             </div>
           </div>
         </div>

@@ -7,8 +7,7 @@ import {
   Calendar,
   Tag,
   Sparkles,
-  Facebook,
-  Instagram,
+  Share2,
   CheckCircle2,
   Globe,
   Shield,
@@ -166,8 +165,8 @@ const BecomeHostPage: React.FC = () => {
               <p className="text-gray-600 max-w-3xl mx-auto text-lg flex items-center justify-center gap-4">
                 At Guides Nepal, we're a diverse community of locals sharing authentic experiences.
                 <span className="flex gap-2 text-gray-400">
-                  <Facebook className="w-5 h-5 hover:text-brand-yellow cursor-pointer" />
-                  <Instagram className="w-5 h-5 hover:text-brand-yellow cursor-pointer" />
+                  <Share2 className="w-5 h-5 hover:text-brand-yellow cursor-pointer" />
+                  <Share2 className="w-5 h-5 hover:text-brand-yellow cursor-pointer" />
                 </span>
               </p>
             </div>
@@ -330,14 +329,16 @@ const BecomeHostPage: React.FC = () => {
                   desc: 'A transparent rating system.',
                 },
                 {
-                  icon: <Facebook />,
+                  icon: <Globe />,
                   title: 'Expert guidance',
                   desc: 'Get tips and best practices from our team.',
                 },
               ].map((item, i) => (
                 <div key={i} className="flex flex-col items-start p-4">
                   <div className="w-12 h-12 bg-brand-yellow/10 rounded-xl flex items-center justify-center text-brand-yellow mb-4">
-                    {React.cloneElement(item.icon as React.ReactElement, { className: 'w-6 h-6' })}
+                    {React.cloneElement(item.icon as React.ReactElement<{ className?: string }>, {
+                      className: 'w-6 h-6',
+                    })}
                   </div>
                   <h3 className="font-bold text-lg text-gray-900 mb-2">{item.title}</h3>
                   <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>

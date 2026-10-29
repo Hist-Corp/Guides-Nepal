@@ -8,6 +8,9 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 // Local dev keeps working with zero config (defaults to localhost:8000).
 const backendTarget = process.env.VITE_BACKEND_URL ?? 'http://localhost:8000';
 export default defineConfig({
+  resolve: {
+    dedupe: ['react', 'react-dom'],
+  },
   build: {
     sourcemap: 'hidden',
     chunkSizeWarningLimit: 3000,

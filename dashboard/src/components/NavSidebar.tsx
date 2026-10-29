@@ -1,3 +1,4 @@
+import React from "react";
 import { NavLink } from "react-router-dom"
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "../hooks/useTheme"
@@ -12,7 +13,7 @@ type NavItem = { to: string; label: string; icon: IconName }
 type NavGroup = { heading: string; items: NavItem[] }
 
 function Icon({ name, className = "h-4 w-4" }: { name: IconName; className?: string }) {
-  const paths: Record<IconName, JSX.Element> = {
+  const paths: Record<IconName, React.ReactElement> = {
     grid: (
       <>
         <rect x="3" y="3" width="7" height="7" rx="1.5" />
@@ -253,7 +254,7 @@ export default function NavSidebar() {
                 <NavLink
                   key={item.to}
                   to={item.to}
-                  className={({ isActive }) =>
+                  className={({ isActive }: { isActive: boolean }) =>
                     `flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-all ${
                       isActive
                         ? "bg-brand-500/15 text-brand-300 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.25)]"

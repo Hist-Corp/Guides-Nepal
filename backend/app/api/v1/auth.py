@@ -1,30 +1,33 @@
+import logging
+import urllib.parse
+
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from sqlalchemy.orm import Session
-from typing import Optional
+
+from app.core.config import Settings, settings
 from app.core.database import get_db
-from app.schemas.auth import (
-    PrivilegedUserCreate,
-    UserCreate,
-    UserLogin,
-    Token,
-    ForgotPasswordRequest,
-    SyncPasswordRequest,
-    ChangePasswordRequest,
-)
-from app.services.auth_service import AuthService
-from app.core.config import settings, Settings
 from app.core.dependencies import get_current_user
 from app.core.roles import ADMIN, normalize_role
+from app.core.security import get_user_id_from_token
 from app.models.user import User
-import httpx
-import urllib.parse
-import logging
+from app.schemas.auth import (
+    ChangePasswordRequest,
+    ForgotPasswordRequest,
+    PrivilegedUserCreate,
+    SyncPasswordRequest,
+    Token,
+    TokenRefreshRequest,
+    UserCreate,
+    UserLogin,
+)
+from app.services.auth_service import AuthService
 
 logger = logging.getLogger(__name__)
 
 
-def user_role_for(db: Session, email: str) -> Optional[str]:
+def user_role_for(db: Session, email: str) -> str | None:
     """Return the stored role for an email, or None if no such user.
 
     Used by the login error path to distinguish "host awaiting approval"
@@ -173,6 +176,34 @@ def login(login_data: UserLogin, db: Session = Depends(get_db)) -> dict:
     # flow (which uses Supabase's resetPasswordForEmail) can find them.
     # This handles users who registered before Supabase sync was added.
     auth_service.ensure_supabase_user(str(user.email), login_data.password)
+    return auth_service.create_tokens(user)
+
+
+@router.post("/refresh", response_model=Token)
+def refresh_access_token(
+    payload: TokenRefreshRequest, db: Session = Depends(get_db)
+) -> dict:
+    """Rotate an expired access token using a valid refresh token.
+
+    Returns a fresh access/refresh token pair so the frontend can retry
+    authenticated requests (e.g. creating a booking) without forcing the
+    user to log in again.
+    """
+    user_id = get_user_id_from_token(payload.refresh_token, expected_type="refresh")
+    if user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    auth_service = AuthService(db)
+    user = db.get(User, user_id)
+    if user is None or not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found or inactive",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     return auth_service.create_tokens(user)
 
 

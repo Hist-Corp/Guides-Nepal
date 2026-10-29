@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Eye, EyeOff, Facebook, User, Map, ArrowRight } from 'lucide-react';
+import { X, Eye, EyeOff, User, Map, ArrowRight, Share2 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useNavigate } from 'react-router-dom';
 
@@ -269,7 +269,7 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
 
                 {/* Facebook */}
                 <button className="flex-1 bg-[#1877F2] text-white h-11 rounded-full flex items-center justify-center hover:bg-[#166fe5] transition-colors">
-                  <Facebook className="w-5 h-5 fill-current" />
+                  <Share2 className="w-5 h-5 fill-current" />
                 </button>
 
                 {/* Google */}

@@ -1,4 +1,4 @@
-﻿import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGoBack } from '../../utils/backNavigation';
 import { Header } from '../../components/common/Header';
@@ -189,6 +189,17 @@ const AccountSettingsPage: React.FC = () => {
     navigate('/');
   };
 
+  const isSafeImageUrl = (url: string): boolean => {
+    if (!url) return false;
+    const trimmed = url.trim();
+    const lower = trimmed.toLowerCase();
+    if (lower.startsWith('http://') || lower.startsWith('https://')) return true;
+    if (trimmed.startsWith('/')) return true;
+    if (lower.startsWith('data:image/')) return true;
+    return false;
+  };
+  const safeAvatarUrl = isSafeImageUrl(avatarUrl) ? avatarUrl : '';
+
   const inputClass =
     'w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-yellow';
   const labelClass = 'block text-xs font-bold text-gray-600 uppercase mb-1';
@@ -235,8 +246,8 @@ const AccountSettingsPage: React.FC = () => {
             {/* Avatar row */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-3 mb-6">
               <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden border border-gray-300 flex items-center justify-center shrink-0">
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                {safeAvatarUrl ? (
+                  <img src={safeAvatarUrl} alt="avatar" className="w-full h-full object-cover" />
                 ) : user?.firstName ? (
                   <span className="font-bold text-xl text-gray-700">{user.firstName[0]}</span>
                 ) : (

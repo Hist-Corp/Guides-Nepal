@@ -48,6 +48,18 @@ const ContactGuidePage: React.FC = () => {
     }
   };
 
+  const isSafeImageUrl = (url: string): boolean => {
+    if (typeof url !== 'string') return false;
+    if (url.startsWith('/') || url.startsWith('./') || url.startsWith('../')) return true;
+    try {
+      const parsed = new URL(url, window.location.origin);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  };
+  const safeGuideImage = isSafeImageUrl(guide.image) ? encodeURI(guide.image) : '';
+
   // Calendar generation helper
   const renderCalendar = () => {
     const days = [];
@@ -96,7 +108,7 @@ const ContactGuidePage: React.FC = () => {
           {/* Header Section */}
           <div className="flex items-start gap-4">
             <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 border border-gray-200">
-              <img src={guide.image} alt={guide.name} className="w-full h-full object-cover" />
+              <img src={safeGuideImage} alt={guide.name} className="w-full h-full object-cover" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-brand-yellow mb-1">

@@ -42,12 +42,9 @@ class Settings(BaseSettings):
     def DEBUG(self) -> bool:
         return self.ENV == "development"
 
-    # Security - CRITICAL: Must be set in production
-    # Placeholder default for local dev only. Not a real secret; production
-    # requires SECRET_KEY to be set via environment.
-    _DEFAULT_DEV_SECRET = "CHANGEME_IN_PRODUCTION_SECRET_KEY_12345"  # nosec B105
-    SECRET_KEY: str = os.getenv("SECRET_KEY", _DEFAULT_DEV_SECRET)
-    if SECRET_KEY == _DEFAULT_DEV_SECRET and _ENV == "production":
+    # Security - CRITICAL: Must be set via environment variable.
+    SECRET_KEY: str = os.getenv("SECRET_KEY") or __import__("secrets").token_urlsafe(32)
+    if not os.getenv("SECRET_KEY") and _ENV == "production":
         raise ValueError("❌ SECURITY ERROR: SECRET_KEY must be set in production!")
 
     ALGORITHM: str = "HS256"
