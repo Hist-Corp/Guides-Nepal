@@ -247,7 +247,7 @@ const CookingExperiencePage: React.FC = () => {
   const [sheetConfirmed, setSheetConfirmed] = useState(false);
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
-  const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
+  const [confirmPopup, setConfirmPopup] = useState(false);
 
   // Active bookings decide which guides are still available to show/select
   const bookings = useBookingStore((s) => s.bookings);
@@ -305,7 +305,18 @@ const handleBookNow = async (): Promise<boolean> => {
     }
 
     if (!data) return false;
-    // Persist the booking so the reserved chef is hidden from "Who you'll meet"
+    // Show the confirmation popup — the actual booking is persisted in
+    // confirmBooking so the chef isn't reserved until the traveler confirms.
+    setConfirmPopup(true);
+    const cardElement = document.getElementById('booking-card-desktop');
+    if (cardElement) {
+      cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return true;
+  };
+
+  const confirmBooking = async () => {
+    if (!data) return;
     const success = await addBooking({
       id: Math.random().toString(36).substr(2, 9),
       experienceId: data.id,
@@ -319,18 +330,9 @@ const handleBookNow = async (): Promise<boolean> => {
       guideId: selectedGuide?.id,
       guideName: selectedGuide?.name,
     });
-
-    // Only set confirmation state if booking succeeded
     if (success) {
-      setIsBookingConfirmed(true);
-
-      // Scroll to top of card to ensure confirmation is visible
-      const cardElement = document.getElementById('booking-card-desktop');
-      if (cardElement) {
-        cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      setConfirmPopup(false);
     }
-    return success;
   };
 
   const handleSheetConfirm = async () => {
@@ -684,7 +686,7 @@ const handleBookNow = async (): Promise<boolean> => {
                 >
                   <div className="absolute top-0 left-0 w-full h-1 bg-orange-600 rounded-t-2xl"></div>
 
-                  {!isBookingConfirmed ? (
+                  {!confirmPopup ? (
                     <>
                       <div className="flex items-center space-x-1 mb-2">
                         {[...Array(5)].map((_, i) => (
@@ -863,7 +865,7 @@ const handleBookNow = async (): Promise<boolean> => {
                       </div>
 
                       <button
-                        onClick={() => setIsBookingConfirmed(false)}
+                        onClick={() => setConfirmPopup(false)}
                         className="text-orange-600 hover:underline text-sm font-bold"
                       >
                         Make another booking
@@ -1325,6 +1327,86 @@ const handleBookNow = async (): Promise<boolean> => {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Booking confirmation popup */}
+      {confirmPopup && data && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Confirm booking"
+        >
+          <div
+            className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">Confirm booking</h2>
+              <button
+                type="button"
+                onClick={() => setConfirmPopup(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src={data.heroImage}
+                alt={data.title}
+                className="w-16 h-16 rounded-xl object-cover"
+                onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+              />
+              <div>
+                <h3 className="font-bold text-gray-900">{data.title}</h3>
+                <p className="text-sm text-gray-500">Cooking Class</p>
+              </div>
+            </div>
+            <div className="space-y-3 text-sm text-gray-700 mb-6">
+              <div className="flex justify-between border-b pb-2">
+                <span>Date</span>
+                <span className="font-medium">{checkIn}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span>Time</span>
+                <span className="font-medium">{bookingTime}</span>
+              </div>
+              <div className="flex justify-between border-b pb-2">
+                <span>Guests</span>
+                <span className="font-medium">{guestCount}</span>
+              </div>
+              {selectedGuide && (
+                <div className="flex justify-between border-b pb-2">
+                  <span>Chef</span>
+                  <span className="font-medium">{selectedGuide.name}</span>
+                </div>
+              )}
+              <div className="flex justify-between border-b pb-2 font-bold text-primary">
+                <span>Total</span>
+                <span className="font-bold">
+                  <Price amount={total} />
+                </span>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setConfirmPopup(false)}
+                className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-bold hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmBooking}
+                className="flex-1 py-3 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold transition-colors"
+              >
+                Confirm Booking
+              </button>
             </div>
           </div>
         </div>

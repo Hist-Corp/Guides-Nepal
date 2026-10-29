@@ -76,6 +76,10 @@ class Token(BaseModel):
     user: UserResponse
 
 
+class TokenRefreshRequest(BaseModel):
+    refresh_token: str
+
+
 class ForgotPasswordRequest(BaseModel):
     """Request body for the forgot-password endpoint.
 

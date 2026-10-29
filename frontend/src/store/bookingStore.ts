@@ -33,28 +33,42 @@ export const useBookingStore = create<BookingStore>()(
     (set) => ({
       bookings: [],
       addBooking: async (booking) => {
-        const { accessToken } = useAuthStore.getState();
+        const { accessToken, refreshTokens } = useAuthStore.getState();
         if (!accessToken) return false;
+
+        const attempt = async (token: string) => {
+          const response = await fetch(getApiUrl('/bookings/'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              experience_id: Number(booking.experienceId) || 0,
+              experience_title: booking.experienceTitle,
+              city: booking.city,
+              date: booking.date,
+              guests: booking.guests,
+              price: booking.price,
+              image: booking.image,
+            }),
+          });
+          if (response.status === 401) {
+            // Access token likely expired (30-minute expiry). Rotate it using
+            // the refresh token and retry the booking once before giving up.
+            const refreshed = await refreshTokens();
+            if (refreshed) {
+              const nextToken = useAuthStore.getState().accessToken;
+              if (nextToken) return attempt(nextToken);
+            }
+          }
+          return response;
+        };
 
         // Keep the traveler view responsive, then persist the same booking so
         // the assigned guide can see it from their own account.
         try {
-          const response = await fetch(getApiUrl('/bookings/'), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            experience_id: Number(booking.experienceId) || 0,
-            experience_title: booking.experienceTitle,
-            city: booking.city,
-            date: booking.date,
-            guests: booking.guests,
-            price: booking.price,
-            image: booking.image,
-          }),
-          });
+          const response = await attempt(accessToken);
           if (!response.ok) {
             const error = await response.json().catch(() => ({}));
             alert(error.detail || 'This guide is unavailable. Please choose another guide or another date.');
