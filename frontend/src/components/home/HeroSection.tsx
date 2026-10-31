@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, MapPin, ChevronRight } from 'lucide-react';
 import { useUIStore } from '../../store/uiStore';
 import { Link } from 'react-router-dom';
@@ -18,8 +18,19 @@ const destinations = [
 export const HeroSection: React.FC = () => {
   const [destination, setDestination] = useState('');
   const [currentDestIndex, setCurrentDestIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
   const { openSearch, setSearchQuery } = useUIStore();
   const cmsHero = useCmsSection('home', 'home-hero');
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setIsVisible(true);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +49,8 @@ export const HeroSection: React.FC = () => {
     <section
       data-cms-id="home-hero"
       data-cms-label="Hero"
-      className="bg-peach pt-10 md:pt-14 pb-16 md:pb-24 relative overflow-hidden"
+      className={`bg-peach pt-10 md:pt-14 pb-16 md:pb-24 relative overflow-hidden transition-all duration-700 $`
+        + `'{' + (isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8') + ''}`}
       style={cmsBackground(cmsHero?.style, '#DCE5ED')}
     >
       <div className="container mx-auto px-4">

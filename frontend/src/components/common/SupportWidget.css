@@ -187,3 +187,12 @@
     display: none;
   }
 }
+
+/* Scroll tracking - show widget when scrolling up from footer dark blue line */
+.support-widget.visible .support-fab {
+  display: flex;
+}
+
+.support-widget.visible .support-panel {
+  display: block;
+}

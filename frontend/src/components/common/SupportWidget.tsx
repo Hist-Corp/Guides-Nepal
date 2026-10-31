@@ -26,6 +26,9 @@ export default function SupportWidget({
   onClose: controlledOnClose,
 }: SupportWidgetProps = {}) {
   const [state, setState] = useState<WidgetState>('closed');
+  const [isVisible, setIsVisible] = useState(true);
+  const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('down');
+  const lastScrollYRef = useRef(0);
 
   // Controlled open state. When an external `open` is provided, the widget
   // mirrors it. This is used to open/close the panel from the header's
@@ -36,6 +39,32 @@ export default function SupportWidget({
       setState(controlledOpen ? 'open' : 'closed');
     }
   }, [controlledOpen]);
+
+  // Track scroll position and direction to show/hide the widget
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const direction = currentScrollY > lastScrollYRef.current ? 'down' : 'up';
+      setScrollDirection(direction);
+      lastScrollYRef.current = currentScrollY;
+      // Hide widget when scrolling down past 300px, show when scrolling up
+      if (direction === 'down' && currentScrollY > 300) {
+        setIsVisible(false);
+      } else if (direction === 'up') {
+        setIsVisible(true);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Add the isVisible class to the widget for CSS visibility control
+  useEffect(() => {
+    const widget = document.querySelector('.support-widget') as HTMLElement;
+    if (widget) {
+      widget.classList.toggle('visible', isVisible);
+    }
+  }, [isVisible]);
 
   // Close handler: always sync internal state, and forward a callback when the
   // widget is driven by an external source (e.g. the hamburger menu on mobile).

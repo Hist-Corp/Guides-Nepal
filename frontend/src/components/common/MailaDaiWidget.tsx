@@ -63,7 +63,33 @@ export default function MailaDaiWidget() {
     if (isBookingSheetOpen) setState('closed');
   }, [isBookingSheetOpen]);
 
-  // Resize handling
+  const [isVisible, setIsVisible] = useState(true);
+  const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('down');
+  const lastScrollYRef = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const direction = currentScrollY > lastScrollYRef.current ? 'down' : 'up';
+      setScrollDirection(direction);
+      lastScrollYRef.current = currentScrollY;
+      if (direction === 'down' && currentScrollY > 300) {
+        setIsVisible(false);
+      } else if (direction === 'up') {
+        setIsVisible(true);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Add the isVisible class for CSS visibility control
+  useEffect(() => {
+    const widget = document.querySelector('.maildai-widget') as HTMLElement;
+    if (widget) {
+      widget.classList.toggle('visible', isVisible);
+    }
+  }, [isVisible]);
   const handleResizeStart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();

@@ -338,3 +338,11 @@
   scrollbar-width: thin;
   scrollbar-color: #ffba0a transparent;
 }
+/* Scroll tracking - show widget when scrolling up from footer dark blue line */
+.maildai-widget.visible .maildai-fab {
+  display: flex;
+}
+
+.maildai-widget.visible .maildai-panel {
+  display: flex;
+}
