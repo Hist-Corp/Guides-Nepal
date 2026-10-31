@@ -29,6 +29,7 @@ export default function SupportWidget({
   const [isVisible, setIsVisible] = useState(true);
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('down');
   const lastScrollYRef = useRef(0);
+  const footerTopRef = useRef(0);
 
   // Controlled open state. When an external `open` is provided, the widget
   // mirrors it. This is used to open/close the panel from the header's
@@ -40,21 +41,25 @@ export default function SupportWidget({
     }
   }, [controlledOpen]);
 
-  // Track scroll position and direction to show/hide the widget
+  // Track scroll position to show/hide widget based on hero middle and footer
   useEffect(() => {
+    const heroEl = document.querySelector('[data-cms-id="home-hero"]') as HTMLElement;
+    const footerEl = document.querySelector('[data-cms-id="home-footer"]') as HTMLElement;
+    const heroTop = heroEl ? heroEl.offsetTop : 0;
+    const heroHeight = heroEl ? heroEl.offsetHeight : window.innerHeight;
+    const heroMiddle = heroTop + heroHeight * 0.5;
+    if (footerEl) {
+      footerTopRef.current = footerEl.offsetTop;
+    }
+
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      const direction = currentScrollY > lastScrollYRef.current ? 'down' : 'up';
-      setScrollDirection(direction);
-      lastScrollYRef.current = currentScrollY;
-      // Hide widget when scrolling down past 300px, show when scrolling up
-      if (direction === 'down' && currentScrollY > 300) {
-        setIsVisible(false);
-      } else if (direction === 'up') {
-        setIsVisible(true);
-      }
+      const showWidget = currentScrollY > heroMiddle && currentScrollY < footerTopRef.current;
+      setIsVisible(showWidget);
     };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 

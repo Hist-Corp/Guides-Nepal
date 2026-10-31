@@ -63,23 +63,29 @@ export default function MailaDaiWidget() {
     if (isBookingSheetOpen) setState('closed');
   }, [isBookingSheetOpen]);
 
-  const [isVisible, setIsVisible] = useState(true);
-  const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('down');
+  const [isVisible, setIsVisible] = useState(false); // Hidden initially on hero
   const lastScrollYRef = useRef(0);
+  const footerTopRef = useRef(0);
 
+  // Track scroll position to show/hide widget based on hero middle and footer
   useEffect(() => {
+    const heroEl = document.querySelector('[data-cms-id="home-hero"]') as HTMLElement;
+    const footerEl = document.querySelector('[data-cms-id="home-footer"]') as HTMLElement;
+    const heroTop = heroEl ? heroEl.offsetTop : 0;
+    const heroHeight = heroEl ? heroEl.offsetHeight : window.innerHeight;
+    const heroMiddle = heroTop + heroHeight * 0.5;
+    if (footerEl) {
+      footerTopRef.current = footerEl.offsetTop;
+    }
+
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      const direction = currentScrollY > lastScrollYRef.current ? 'down' : 'up';
-      setScrollDirection(direction);
-      lastScrollYRef.current = currentScrollY;
-      if (direction === 'down' && currentScrollY > 300) {
-        setIsVisible(false);
-      } else if (direction === 'up') {
-        setIsVisible(true);
-      }
+      const showWidget = currentScrollY > heroMiddle && currentScrollY < footerTopRef.current;
+      setIsVisible(showWidget);
     };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
