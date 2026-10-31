@@ -1,6 +1,7 @@
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.models.booking import Booking, BookingStatus
+from app.models.host_guide import HostGuide
 from app.models.user import User
 from app.core.roles import GUIDE
 from fastapi import HTTPException
@@ -25,6 +26,34 @@ class BookingService:
             raise HTTPException(status_code=503, detail="The booking guide is unavailable")
         return guide
 
+    def _resolve_guide_user_id(self, catalog_guide_id: int | None) -> int | None:
+        """Map a catalog guide id (frontend ``guideId``) to a backend user id.
+
+        The frontend sends the catalog profile id from the ``guides`` table, not
+        the ``users`` id.  ``host_guides`` links them, so resolve through that
+        table and verify the linked account is an active guide.
+        """
+        if catalog_guide_id is None:
+            return None
+        link = (
+            self.db.query(HostGuide)
+            .filter(HostGuide.guide_id == catalog_guide_id, HostGuide.status == "active")
+            .first()
+        )
+        if link and link.guide_user_id:
+            guide = self.db.query(User).filter(User.id == link.guide_user_id, User.role == GUIDE, User.is_active.is_(True)).first()
+            if guide:
+                return guide.id
+        # Fallback: direct user id lookup (legacy / direct account id).
+        guide = (
+            self.db.query(User)
+            .filter(User.id == catalog_guide_id, User.role == GUIDE, User.is_active.is_(True))
+            .first()
+        )
+        if guide:
+            return guide.id
+        return None
+
     def availability_for_date(self, date: str) -> dict:
         guide = self.get_booking_guide()
         active = (
@@ -42,10 +71,13 @@ class BookingService:
         return {"available": False, "status": status}
 
     def create_booking(self, user_id: int, booking_in: BookingCreate) -> Booking:
-        # The current catalog has one bookable guide account. Do not infer a
-        # recipient from display-only guide profiles until those profiles have
-        # their own authenticated accounts.
-        guide = self.get_booking_guide()
+        # Honor the guide/host the traveler selected when it maps to an active
+        # guide account; otherwise fall back to the default bookable guide.
+        guide_id = self._resolve_guide_user_id(booking_in.guide_id)
+        if guide_id is None:
+            guide = self.get_booking_guide()
+        else:
+            guide = self.db.query(User).filter(User.id == guide_id).first()
         availability = self.availability_for_date(booking_in.date.date().isoformat())
         if not availability["available"]:
             raise HTTPException(
@@ -55,7 +87,7 @@ class BookingService:
         db_booking = Booking(
             user_id=user_id,
             guide_user_id=guide.id,
-            **booking_in.model_dump(),
+            **booking_in.model_dump(exclude={"guide_id"}),
         )
         self.db.add(db_booking)
         self.db.commit()
