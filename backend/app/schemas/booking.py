@@ -21,6 +21,9 @@ class BookingBase(BaseModel):
     guests: int
     price: float
     image: Optional[str] = None
+    # Backend user id of the guide/host the traveler selected. When omitted the
+    # booking falls back to the default bookable guide account.
+    guide_id: Optional[int] = None
 
 
 class BookingCreate(BookingBase):
@@ -34,6 +37,7 @@ class BookingUpdate(BaseModel):
 class BookingResponse(BookingBase):
     id: int
     user_id: int
+    guide_user_id: Optional[int] = None
     status: BookingStatus
     created_at: datetime
 

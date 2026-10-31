@@ -23,6 +23,7 @@ import { useUIStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
 import { useProfileStore } from '../../store/profileStore';
 import { useCart } from '../../contexts/CartContext';
+import { useBookingStore } from '../../store/bookingStore';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { CurrencyPickerModal } from './CurrencyPickerModal';
 import { getAllSuggestions } from '../../utils/searchIndex';
@@ -323,6 +324,7 @@ export const Header: React.FC = () => {
                     <button
                       onClick={() => {
                         logout();
+                        useBookingStore.setState({ bookings: [] });
                         navigate('/');
                         setIsProfileDropdownOpen(false);
                       }}
@@ -518,11 +520,12 @@ export const Header: React.FC = () => {
                             Profile
                           </Link>
                           <button
-                            onClick={() => {
-                              logout();
-                              setIsMenuOpen(false);
-                              navigate('/');
-                            }}
+                          onClick={() => {
+                            logout();
+                            useBookingStore.setState({ bookings: [] });
+                            setIsMenuOpen(false);
+                            navigate('/');
+                          }}
                             className="w-full text-left block px-4 py-2 text-red-600 font-bold hover:bg-red-50 rounded-lg transition-colors mx-2"
                           >
                             Log out

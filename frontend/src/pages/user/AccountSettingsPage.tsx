@@ -4,6 +4,7 @@ import { useGoBack } from '../../utils/backNavigation';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
+import { useBookingStore } from '../../store/bookingStore';
 import {
   User as UserIcon,
   Mail,
@@ -186,6 +187,7 @@ const AccountSettingsPage: React.FC = () => {
 
   const handleLogout = () => {
     logout();
+    useBookingStore.setState({ bookings: [] });
     navigate('/');
   };
 

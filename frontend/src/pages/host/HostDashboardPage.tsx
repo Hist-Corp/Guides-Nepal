@@ -13,6 +13,7 @@ import {
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
+import { useBookingStore } from '../../store/bookingStore';
 
 /**
  * Host Frontend home after a unified login.
@@ -107,7 +108,10 @@ const HostDashboardPage: React.FC = () => {
                   <ExternalLink className="w-4 h-4" /> Open Dashboard
                 </a>
                 <button
-                  onClick={logout}
+                  onClick={() => {
+                    logout();
+                    useBookingStore.setState({ bookings: [] });
+                  }}
                   className="inline-flex items-center gap-2 rounded-full bg-white/15 px-5 py-2.5 text-sm font-bold text-white hover:bg-white/25 transition-colors"
                 >
                   <LogOut className="w-4 h-4" /> Log out

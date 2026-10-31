@@ -51,6 +51,9 @@ export const useBookingStore = create<BookingStore>()(
               guests: booking.guests,
               price: booking.price,
               image: booking.image,
+              ...(booking.guideId !== undefined && booking.guideId !== null
+                ? { guide_id: Number(booking.guideId) }
+                : {}),
             }),
           });
           if (response.status === 401) {

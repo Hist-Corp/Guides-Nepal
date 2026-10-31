@@ -111,13 +111,27 @@ safe to re-run.
 
 ### Traveller & Guide Test Credentials (public frontend)
 
+Twelve frontend test accounts are seeded (4 travellers + 8 guides) so every
+catalog guide profile is connected to a backend guide account. Test the booking
+flow end-to-end between any traveller and any guide:
+
 > **Spelling note:** "Traveller" (British English) maps to the codebase role
 > `traveler` (American English, see `backend/app/core/roles.py`).
 
 | Role | Email (username) | Password | Where to sign in |
 |------|------------------|----------|------------------|
 | Traveller (`traveler`) | `traveler@guides-nepal.com` | `Traveler@2024` | Public frontend login (`http://localhost:5175`, Login modal → Traveller tab) or `POST /api/v1/auth/login` |
+| Traveller (`traveler`) | `traveler2@guides-nepal.com` | `Traveler2@2024` | Public frontend login (`http://localhost:5175`, Login modal → Traveller tab) or `POST /api/v1/auth/login` |
+| Traveller (`traveler`) | `traveler3@guides-nepal.com` | `Traveler3@2024` | Public frontend login (`http://localhost:5175`, Login modal → Traveller tab) or `POST /api/v1/auth/login` |
+| Traveller (`traveler`) | `traveler4@guides-nepal.com` | `Traveler4@2024` | Public frontend login (`http://localhost:5175`, Login modal → Traveller tab) or `POST /api/v1/auth/login` |
 | Guide (`guide`) | `guide@guides-nepal.com` | `Guide@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `guide2@guides-nepal.com` | `Guide2@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `guide3@guides-nepal.com` | `Guide3@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `guide4@guides-nepal.com` | `Guide4@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `guide5@guides-nepal.com` | `Guide5@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `guide6@guides-nepal.com` | `Guide6@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `guide7@guides-nepal.com` | `Guide7@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `guide8@guides-nepal.com` | `Guide8@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
 
 **Create / reset them:**
 
@@ -125,6 +139,8 @@ safe to re-run.
 cd backend
 python seed_traveler_guide.py
 ```
+
+Override any password via environment variables, e.g. `SEED_GUIDE2_PASSWORD=New@2024 python seed_traveler_guide.py`.
 
 **How to use them:**
 
@@ -142,6 +158,55 @@ python seed_traveler_guide.py
 4. Neither account can sign in to the staff dashboard (`http://localhost:5176`) —
    they have no console and are refused at sign-in by design; admins can still
    see them under **Administration**.
+
+### Guide accounts connected to experiences (adventures / hikes / treks)
+
+To connect the backend `guide` user accounts to real catalog guides and
+experience listings (so a booking assigned to a guide shows the right host and
+the guide can manage their own tours), run the guide catalog seed:
+
+```bash
+cd backend
+python seed_guides_catalog.py
+```
+
+This is idempotent (safe to re-run) and creates/updates:
+
+- **Guide catalog profiles** in the `guides` table — food tours, culture walks,
+  art & lifestyle, adventure, high-altitude treks, mountain hikes, Everest
+  region treks, and Newari cooking experiences across Kathmandu, Pokhara,
+  Lukla and Bhaktapur.
+- **Host-guide links** (`host_guides`) tying each `guide@` user account to its
+  catalog profile.
+- **Guide onboarding profiles** (`guide_profiles`, onboarding completed).
+- **Guide-owned experience listings** (`guide_listings`) — e.g. Kathmandu
+  Street Food Walk, Annapurna Sunrise Trek, Mardi Himal Short Trek, Everest
+  Base Camp Expedition, Bhaktapur Newari Cooking.
+- **Experience-guide links** (`host_experience_guides`) assigning each listing
+  to its catalog guide.
+
+The default mapping is:
+
+| Guide account | Catalog profile | Catalog id | User id | Sample listings |
+|---------------|-----------------|------------|---------|-----------------|
+| `guide@guides-nepal.com` | Apicha — Foodie & Local Expert | 1 | 6 | Kathmandu Street Food Walk |
+| `guide2@guides-nepal.com` | Lhakpa — High-Altitude Trek Guide | 5 | 10 | Annapurna Sunrise Trek |
+| `guide3@guides-nepal.com` | Dawa — Mountain Hike Specialist | 6 | 11 | Mardi Himal Short Trek |
+| `guide4@guides-nepal.com` | Sujal — History & Culture Buff | 2 | 13 | Patan Heritage Walk |
+| `guide5@guides-nepal.com` | Priya — Art & Lifestyle Host | 3 | 14 | Kathmandu Art Gallery Tour |
+| `guide6@guides-nepal.com` | Rohan — Adventure Enthusiast | 4 | 15 | Kathmandu Adventure Day Hike |
+| `guide7@guides-nepal.com` | Mingma — Everest Region Trek Lead | 7 | 16 | Everest Base Camp Expedition |
+| `guide8@guides-nepal.com` | Sarita — Cultural Experience Host | 8 | 17 | Bhaktapur Newari Cooking |
+
+After seeding, sign in as a guide at `http://localhost:5175` (Login modal → Guide
+tab) and visit `/guide/dashboard` to see stats and `/guide/bookings` to manage
+booking requests assigned to that guide.
+
+**Catalog guide id → backend user id:** the frontend sends the catalog profile
+id from the `guides` table as `guide_id` in the booking request. The backend
+resolves it through `host_guides` (catalog `guide_id` → `guide_user_id`), so a
+traveler who picks "Priya" (catalog id 3) gets their booking assigned to
+`guide_user_id=14` (`guide5@guides-nepal.com`), not to user id 3.
 
 ### Guide Dashboard & Onboarding (public frontend)
 
@@ -177,6 +242,37 @@ list and stats re-poll every 30 seconds so new bookings show up live.
 | `PATCH /api/v1/guide/listings/{id}/capacity` | Set `max_guests` or apply `booked_delta` |
 | `GET/POST /api/v1/guide/status`, `DELETE /api/v1/guide/status/{id}` | Manage real-time updates |
 | `PATCH /api/v1/guide/bookings/{id}` | Accept / reject / complete own bookings |
+
+#### Booking assignment and access control
+
+When a traveler confirms a booking, the request is assigned to the guide they selected
+in the "Who you'll meet" picker and stored on `bookings.guide_user_id`. Access is
+scoped so a booking is visible **only** to the traveler who made it and the guide it
+is assigned to:
+
+| Actor | Endpoint | Filter | Sees Traveller1→Guide1 booking? |
+|-------|----------|--------|---------------------------------|
+| Traveller1 (owner) | `GET /api/v1/bookings/` | `user_id == Traveller1.id` | ✅ Yes |
+| Guide1 (assigned) | `GET /api/v1/guide/bookings` | `guide_user_id == Guide1.id` | ✅ Yes |
+| Guide2 (other guide) | `GET /api/v1/guide/bookings` | `guide_user_id == Guide2.id` | ❌ No |
+| Traveller2 (other traveler) | `GET /api/v1/bookings/` | `user_id == Traveller2.id` | ❌ No |
+
+- **Traveler endpoints** (`GET/POST /api/v1/bookings/`, `POST /{id}/cancel`, `POST /{id}/archive`) require the `traveler` role and are filtered by `user_id` — a traveler sees only their own bookings and can only cancel/archive their own.
+- **Guide endpoints** (`GET /api/v1/guide/bookings`, `PATCH /api/v1/guide/bookings/{id}`) require the `guide` role and are filtered by `guide_user_id` — a guide sees only bookings assigned to them and can only accept/reject/complete their own.
+- **Admin** has full oversight via `GET /api/v1/admin/bookings` (all bookings).
+
+#### Shopping cart isolation
+
+The shopping cart mirrors bookings from the client-side booking store. To prevent a
+guide from seeing another guide's bookings (or a traveler's bookings from a previous
+session) in their cart:
+
+- The cart only mirrors bookings when a **traveler** is logged in. Guides manage
+  their bookings on `/guide/bookings`, not in the cart.
+- Logging out clears the client-side booking store, so bookings from one session
+  never leak into the next user's cart on the same browser.
+
+If the selected guide has no backend account, the booking falls back to the default bookable guide account (`guide@guides-nepal.com`).
 
 #### Step-by-step: how a guide lists an experience (with capacity)
 
