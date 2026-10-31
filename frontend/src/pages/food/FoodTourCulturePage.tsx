@@ -357,7 +357,7 @@ const FoodTourCulturePage: React.FC = () => {
           <h1 className="text-3xl font-bold mb-4">Culture not found</h1>
           <button
             onClick={() => navigate('/food-tours')}
-            className="px-6 py-3 bg-brand-yellow hover:bg-[#E5A800] text-slate-900 font-bold rounded-full transition-all"
+            className="px-6 py-3 bg-brand-yellow hover:bg-[#ffba0a] text-slate-900 font-bold rounded-full transition-all"
           >
             Back to Food Tours
           </button>
@@ -430,7 +430,7 @@ const FoodTourCulturePage: React.FC = () => {
                 onClick={() =>
                   document.getElementById('experiences')?.scrollIntoView({ behavior: 'smooth' })
                 }
-                className="px-8 py-3.5 bg-brand-yellow hover:bg-[#E5A800] text-slate-900 font-bold rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                className="px-8 py-3.5 bg-brand-yellow hover:bg-[#ffba0a] text-slate-900 font-bold rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
                 Explore experiences
               </button>

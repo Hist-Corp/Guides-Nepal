@@ -48,13 +48,13 @@ export const CookingExperiencesPage: React.FC = () => {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
-                      <Star className="w-3.5 h-3.5 fill-[#F4B400] text-[#F4B400]" />
+                      <Star className="w-3.5 h-3.5 fill-[#ffba0a] text-[#ffba0a]" />
                       {exp.rating}{' '}
                       <span className="font-normal text-gray-500">({exp.reviews})</span>
                     </div>
                   </div>
                   <div className="p-5 flex flex-col flex-grow">
-                    <p className="text-xs font-bold uppercase tracking-wider text-[#F4B400] mb-1">
+                    <p className="text-xs font-bold uppercase tracking-wider text-[#ffba0a] mb-1">
                       {exp.host.type}
                     </p>
                     <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-primary transition-colors">

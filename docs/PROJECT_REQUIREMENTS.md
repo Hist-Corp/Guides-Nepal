@@ -47,7 +47,7 @@ graph TD
 ## 4. User Interface Design
 
 ### 4.1 Design Style
-- **Primary Colors**: Deep orange (#FF6B35) for CTAs, warm grays for text, white backgrounds
+- **Primary Colors**: Deep orange (#ffba0a) for CTAs, warm grays for text, white backgrounds
 - **Button Style**: Rounded corners with subtle shadows, orange primary buttons, white secondary buttons
 - **Typography**: Clean sans-serif fonts, 16px base size, clear hierarchy with size variations
 - **Layout Style**: Card-based design with generous whitespace, top navigation bar, responsive grid systems

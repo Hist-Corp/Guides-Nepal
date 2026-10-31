@@ -34,7 +34,7 @@ export const KathmanduPage: React.FC = () => {
       <Header />
       
       {/* Hero Section */}
-      <div className="relative pt-4 pb-16 overflow-hidden bg-[#FFF0E6]">
+      <div data-page-hero="true" className="relative pt-4 pb-16 overflow-hidden bg-[#FFF0E6]">
         <div className="container mx-auto px-4 relative z-10">
           <button 
             onClick={goBack} 
@@ -65,7 +65,7 @@ export const KathmanduPage: React.FC = () => {
               <div className="flex flex-wrap gap-4 pt-2">
                 <button 
                   onClick={() => document.getElementById('locals-section')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="px-8 py-3.5 bg-brand-yellow hover:bg-[#E5A800] text-slate-900 font-bold rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                  className="px-8 py-3.5 bg-brand-yellow hover:bg-[#ffba0a] text-slate-900 font-bold rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                 >
                   Find your local
                 </button>

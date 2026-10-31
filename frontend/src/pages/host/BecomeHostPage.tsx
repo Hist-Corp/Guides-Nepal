@@ -365,7 +365,7 @@ const BecomeHostPage: React.FC = () => {
               It only takes a minute to apply
             </h2>
             <Button
-              className="bg-brand-yellow hover:bg-[#E5A800] text-[#213448] px-12 py-5 rounded-full text-xl font-bold border-none shadow-2xl hover:scale-105 transition-transform"
+              className="bg-brand-yellow hover:bg-[#ffba0a] text-[#213448] px-12 py-5 rounded-full text-xl font-bold border-none shadow-2xl hover:scale-105 transition-transform"
               onClick={() => navigate('/host-application')}
             >
               Apply now

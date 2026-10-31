@@ -197,7 +197,7 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
                 src="/images/logo.png"
                 alt="Guides Nepal logo"
                 className=" object-contain shrink-0"
-                style={{ maxWidth: '180px', maxHeight: '80px' }}
+                style={{ maxWidth: '200px', maxHeight: '50px' }}
               />
             </div>
           </div>
@@ -412,7 +412,7 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
                 <button
                   type="submit"
                   disabled={loading || !acceptedTerms}
-                  className="w-full bg-brand-yellow hover:bg-[#E5A800] text-[#213448] font-bold py-3 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0 disabled:shadow-none disabled:cursor-not-allowed"
+                  className="w-full bg-brand-yellow hover:bg-[#ffba0a] text-[#213448] font-bold py-3 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0 disabled:shadow-none disabled:cursor-not-allowed"
                 >
                   {loading ? 'Signing up…' : 'Sign up'}
                 </button>

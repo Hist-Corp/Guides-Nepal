@@ -15,7 +15,7 @@ function renderSectionHTML(sec: CmsSection): string {
   if (fmt.fontFamily) s.push('font-family:' + fmt.fontFamily);
   if (fmt.fontSize) s.push('font-size:' + fmt.fontSize);
   if (fmt.color) s.push('color:' + fmt.color);
-  const ss = s.join(';'), a = st.accentColor || '#F4B400';
+  const ss = s.join(';'), a = st.accentColor || '#ffba0a';
   const wrap = (v: string, style: string, tag = 'div') => v ? '<' + tag + ' style="' + style + '">' + v + '</' + tag + '>' : '';
   switch (sec.type) {
     case 'hero': return '<div style="' + ss + '">' + wrap(c.tagline, 'opacity:0.7;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em','span') + wrap(c.heading, 'font-size:2.5rem;font-weight:800;margin:0.5rem 0;line-height:1.1','h1') + wrap(c.subtitle, 'font-size:1rem;opacity:0.85;max-width:32rem','p') + (c.buttonText ? '<button style="margin-top:1rem;padding:0.75rem 1.5rem;border-radius:9999px;border:none;background:' + a + ';color:#333;font-weight:700;cursor:pointer">' + c.buttonText + '</button>' : '') + '</div>';

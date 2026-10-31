@@ -113,7 +113,7 @@ const GuideListingsPage: React.FC = () => {
                     value={capEdits[l.id] ?? ''} onChange={(e) => setCapEdits((c) => ({ ...c, [l.id]: e.target.value }))}
                     className="w-48 rounded-xl border border-gray-300 p-2 text-sm"
                   />
-                  <button onClick={() => saveCapacity(l.id)} className="rounded-full bg-brand-yellow px-4 py-2 text-xs font-bold text-[#213448] hover:bg-[#E5A800]">Save capacity</button>
+                  <button onClick={() => saveCapacity(l.id)} className="rounded-full bg-brand-yellow px-4 py-2 text-xs font-bold text-[#213448] hover:bg-[#ffba0a]">Save capacity</button>
                 </div>
               </article>
             ))}

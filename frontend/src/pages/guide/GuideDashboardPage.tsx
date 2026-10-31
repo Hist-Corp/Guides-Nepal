@@ -181,7 +181,7 @@ const GuideDashboardPage: React.FC = () => {
                     {UPDATE_TYPES.map((t) => (<option key={t} value={t}>{t}</option>))}
                   </select>
                   <textarea value={statusText} onChange={(e) => setStatusText(e.target.value)} placeholder="e.g. 4 spots left for Oct 20!" className="min-h-24 w-full rounded-xl border border-gray-300 p-3 text-sm" />
-                  <button type="submit" disabled={posting || !statusText.trim()} className="w-full rounded-full bg-brand-yellow py-3 text-sm font-bold text-[#213448] hover:bg-[#E5A800] disabled:opacity-60">
+                  <button type="submit" disabled={posting || !statusText.trim()} className="w-full rounded-full bg-brand-yellow py-3 text-sm font-bold text-[#213448] hover:bg-[#ffba0a] disabled:opacity-60">
                     {posting ? 'Posting...' : 'Post update'}
                   </button>
                 </form>

@@ -26,7 +26,7 @@ const HostingPage: React.FC = () => {
             <p className="text-xl text-white/80 max-w-2xl mx-auto mb-8">
               Share your knowledge, culture, and passion with travelers from around the world.
             </p>
-            <Link to="/become-host" className="inline-block bg-brand-yellow text-slate-900 px-8 py-3 rounded-lg font-bold hover:bg-[#E5A800] transition-colors">
+            <Link to="/become-host" className="inline-block bg-brand-yellow text-slate-900 px-8 py-3 rounded-lg font-bold hover:bg-[#ffba0a] transition-colors">
               Become a Host
             </Link>
           </div>

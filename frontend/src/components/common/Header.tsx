@@ -108,6 +108,8 @@ export const Header: React.FC = () => {
       const topBlock = (() => {
         const homeHero = document.querySelector<HTMLElement>('[data-cms-id="home-hero"]');
         if (homeHero) return homeHero;
+        const pageHero = document.querySelector<HTMLElement>('[data-page-hero="true"]');
+        if (pageHero) return pageHero;
         const headerEl = document.querySelector('header');
         let el: Element | null | undefined = headerEl?.nextElementSibling ?? null;
         if (el && (el.tagName === 'MAIN' || el.tagName === 'FOOTER')) {
@@ -184,14 +186,14 @@ export const Header: React.FC = () => {
           {/* Logo */}
           <Link
             to="/"
-            className="flex items-center gap-2 shrink-0"
+            className="flex items-center gap-2 shrink-0 -ml-2"
             aria-label="Guides Nepal - Home"
           >
             <img
               src="/images/logo.png"
               alt="Guides Nepal logo"
-              className=" object-contain shrink-0"
-              style={{ maxWidth: '180px' }}
+              className="object-contain shrink-0"
+              style={{ maxWidth: '200px', maxHeight: '50px' }}
             />
           </Link>
 
@@ -400,7 +402,7 @@ export const Header: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setIsSignupOpen(true)}
-                  className="shrink-0 bg-brand-yellow hover:bg-[#E5A800] text-[#213448] text-sm font-bold px-3.5 py-2 rounded-full transition-colors shadow-sm"
+                  className="shrink-0 bg-brand-yellow hover:bg-[#ffba0a] text-[#213448] text-sm font-bold px-3.5 py-2 rounded-full transition-colors shadow-sm"
                 >
                   Sign up
                 </button>
@@ -649,7 +651,7 @@ export const Header: React.FC = () => {
                     />
                     <button
                       onClick={handleSearch}
-                      className="absolute right-2 top-2 bottom-2 w-10 h-10 bg-brand-yellow hover:bg-[#E5A800] rounded-full flex items-center justify-center text-[#213448] transition-transform hover:scale-105 active:scale-95 shadow-sm"
+                      className="absolute right-2 top-2 bottom-2 w-10 h-10 bg-brand-yellow hover:bg-[#ffba0a] rounded-full flex items-center justify-center text-[#213448] transition-transform hover:scale-105 active:scale-95 shadow-sm"
                     >
                       <Search className="w-5 h-5" />
                     </button>

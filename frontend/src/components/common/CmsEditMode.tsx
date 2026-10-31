@@ -165,10 +165,10 @@ const CmsEditMode: React.FC = () => {
       [data-cms-id]:not([data-cms-kind])::after {
         content: attr(data-cms-label);
         position: absolute; top: 8px; left: 8px; z-index: 60;
-        background: #F4B400; color: #213448; font-size: 11px; font-weight: 700;
+        background: #ffba0a; color: #213448; font-size: 11px; font-weight: 700;
         padding: 2px 8px; border-radius: 999px; pointer-events: none;
       }
-      [data-cms-id]:not([data-cms-kind]):hover { outline: 2px dashed #F4B400; outline-offset: -2px; }
+      [data-cms-id]:not([data-cms-kind]):hover { outline: 2px dashed #ffba0a; outline-offset: -2px; }
       [data-cms-kind] { transition: outline-color 0.15s; }
       [data-cms-kind]:hover {
         outline: 2px dashed #213448; outline-offset: 2px; border-radius: 2px;
@@ -181,7 +181,7 @@ const CmsEditMode: React.FC = () => {
       [data-cms-kind]:hover::before {
         content: attr(data-cms-kind);
         position: absolute; top: -10px; left: 0; z-index: 61;
-        background: #213448; color: #F4B400; font-size: 9px; font-weight: 700;
+        background: #213448; color: #ffba0a; font-size: 9px; font-weight: 700;
         padding: 1px 6px; border-radius: 4px; pointer-events: none;
         text-transform: uppercase; letter-spacing: 0.03em;
       }

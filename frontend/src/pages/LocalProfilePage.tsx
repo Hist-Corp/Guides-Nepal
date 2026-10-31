@@ -182,7 +182,7 @@ const LocalProfilePage: React.FC = () => {
                     </p>
 
                     <div className="flex items-center gap-1 mb-4">
-                      <div className="flex text-[#FFD700]">
+                      <div className="flex text-[#ffba0a]">
                         {[...Array(5)].map((_, i) => (
                           <Star key={i} className="w-3.5 h-3.5 fill-current" />
                         ))}
@@ -499,7 +499,7 @@ const LocalProfilePage: React.FC = () => {
 
                           <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-50">
                             <div className="flex items-center gap-1">
-                              <Star className="w-4 h-4 fill-[#FFD700] text-[#FFD700]" />
+                              <Star className="w-4 h-4 fill-[#ffba0a] text-[#ffba0a]" />
                               <span className="font-bold text-gray-900">4.9</span>
                               <span className="text-gray-400 text-sm">(120)</span>
                             </div>
@@ -590,7 +590,7 @@ const LocalProfilePage: React.FC = () => {
                           <span className="font-bold text-gray-900">{review.name}</span>
                           <span className="text-gray-400 text-sm">• {review.date}</span>
                         </div>
-                        <div className="flex text-[#FFD700] mb-3">
+                        <div className="flex text-[#ffba0a] mb-3">
                           {[...Array(review.rating)].map((_, r) => (
                             <Star key={r} className="w-3 h-3 fill-current" />
                           ))}
@@ -728,8 +728,8 @@ const LocalProfilePage: React.FC = () => {
                         <Star
                           className={`w-8 h-8 transition-colors ${
                             star <= selectedRating
-                              ? 'text-[#FFD700] fill-[#FFD700]'
-                              : 'text-gray-300 hover:text-[#FFD700] hover:fill-[#FFD700]'
+                              ? 'text-[#ffba0a] fill-[#ffba0a]'
+                              : 'text-gray-300 hover:text-[#ffba0a] hover:fill-[#ffba0a]'
                           }`}
                         />
                       </button>

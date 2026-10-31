@@ -95,7 +95,7 @@ export const CategoryGrid: React.FC = () => {
                   <Button
                     variant="primary"
                     size="sm"
-                    className="bg-brand-yellow text-slate-900 hover:bg-[#E5A800] border-none font-bold"
+                    className="bg-brand-yellow text-slate-900 hover:bg-[#ffba0a] border-none font-bold"
                   >
                     Explore
                   </Button>

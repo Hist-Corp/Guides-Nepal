@@ -368,7 +368,7 @@ const BecomeGuidePage: React.FC = () => {
               <Button 
                 type="submit"
                 disabled={submitting}
-                className="w-full bg-brand-yellow hover:bg-[#E5A800] text-[#213448] font-bold py-4 rounded-xl text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:hover:translate-y-0"
+                className="w-full bg-brand-yellow hover:bg-[#ffba0a] text-[#213448] font-bold py-4 rounded-xl text-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 disabled:opacity-50 disabled:hover:translate-y-0"
               >
                 {submitting ? 'Submitting…' : 'Submit Application'}
               </Button>

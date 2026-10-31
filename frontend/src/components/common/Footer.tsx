@@ -71,7 +71,12 @@ export const Footer: React.FC = () => {
 
         <div className="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
-             <span className="text-primary font-bold text-lg">guides-nepal</span>
+             <img
+               src="/images/footerguidesnepal.png"
+               alt="Guides Nepal footer logo"
+               className="object-contain shrink-0"
+               style={{ maxWidth: '160px', maxHeight: '28px' }}
+             />
              <span className="text-xs text-slate-500">© {new Date().getFullYear()} {cmsFooter?.content?.copyright || "guides-nepal. All rights reserved."}</span>
           </div>
           <div className="flex gap-4">

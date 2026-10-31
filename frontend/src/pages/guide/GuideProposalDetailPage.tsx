@@ -185,7 +185,7 @@ const GuideProposalDetailPage: React.FC = () => {
               {proposal.status === 'published' && proposal.listing_id && (
                 <Link
                   to={`/guide/listings/${proposal.listing_id}/edit`}
-                  className="rounded-full bg-brand-yellow px-5 py-2.5 text-sm font-bold text-[#213448] hover:bg-[#E5A800]"
+                  className="rounded-full bg-brand-yellow px-5 py-2.5 text-sm font-bold text-[#213448] hover:bg-[#ffba0a]"
                 >
                   Manage live listing
                 </Link>

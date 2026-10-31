@@ -16,7 +16,7 @@ export type FrontendSection = {
 };
 
 // ─── Brand palette (must match tailwind.config.js exactly) ───
-const CREAM = '#F9E6D6'; // tailwind `peach` / hero background
+const CREAM = '#DCE5ED'; // tailwind `peach` / hero background
 const BACKGROUND_CREAM = '#FDF8F5'; // tailwind `background.cream`
 const PRIMARY = '#213448';
 const SECONDARY = '#547792';

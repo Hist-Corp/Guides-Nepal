@@ -102,7 +102,7 @@ const HostDashboardPage: React.FC = () => {
                   href="http://localhost:5176/dashboard"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-brand-yellow px-5 py-2.5 text-sm font-bold text-[#213448] hover:bg-[#E5A800] transition-colors"
+                  className="inline-flex items-center gap-2 rounded-full bg-brand-yellow px-5 py-2.5 text-sm font-bold text-[#213448] hover:bg-[#ffba0a] transition-colors"
                 >
                   <ExternalLink className="w-4 h-4" /> Open Dashboard
                 </a>

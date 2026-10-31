@@ -474,7 +474,7 @@ const handleBookNow = async (): Promise<boolean> => {
                 onClick={() =>
                   document.getElementById('guides-section')?.scrollIntoView({ behavior: 'smooth' })
                 }
-                className="px-8 py-3.5 bg-brand-yellow hover:bg-[#E5A800] text-slate-900 font-bold rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                className="px-8 py-3.5 bg-brand-yellow hover:bg-[#ffba0a] text-slate-900 font-bold rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
                 Meet Your Chef
               </button>
@@ -602,8 +602,8 @@ const handleBookNow = async (): Promise<boolean> => {
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">What is this experience?</h2>
                 <p className="mb-6 leading-relaxed">{data.description}</p>
 
-                <div className="my-8 p-6 bg-orange-50 rounded-xl border border-orange-200">
-                  <h3 className="text-orange-800 font-bold mb-2 uppercase text-sm tracking-wide">
+                <div className="my-8 p-6 bg-[#ffba0a] rounded-xl border border-[#ffba0a]">
+                  <h3 className="text-[#ffba0a] font-bold mb-2 uppercase text-sm tracking-wide">
                     Cooking Class Structure
                   </h3>
                   <div className="flex flex-col md:flex-row gap-4 justify-between items-center text-center">
@@ -614,7 +614,7 @@ const handleBookNow = async (): Promise<boolean> => {
                           <span className="text-xs text-gray-500">{step.label}</span>
                         </div>
                         {index < data.tourStructure.steps.length - 1 && (
-                          <ArrowRight className="text-orange-600 hidden md:block" />
+                          <ArrowRight className="text-[#ffba0a] hidden md:block" />
                         )}
                       </React.Fragment>
                     ))}
@@ -626,7 +626,7 @@ const handleBookNow = async (): Promise<boolean> => {
                 <ul className="space-y-3 mb-8">
                   {data.exploration.points.map((item, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <div className="w-2 h-2 rounded-full bg-orange-600 mt-2.5 flex-shrink-0"></div>
+                      <div className="w-2 h-2 rounded-full bg-[#ffba0a] mt-2.5 flex-shrink-0"></div>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -672,7 +672,7 @@ const handleBookNow = async (): Promise<boolean> => {
                         setSheetConfirmed(false);
                         setIsSheetOpen(true);
                       }}
-                      className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg uppercase tracking-wide"
+                      className="bg-[#ffba0a] hover:bg-[#ffba0a] text-white font-bold py-3 px-6 rounded-lg uppercase tracking-wide"
                     >
                       Book Now
                     </button>
@@ -684,7 +684,7 @@ const handleBookNow = async (): Promise<boolean> => {
                   id="booking-card-desktop"
                   className="hidden lg:block bg-white rounded-2xl shadow-xl border border-gray-100 p-6 overflow-visible relative"
                 >
-                  <div className="absolute top-0 left-0 w-full h-1 bg-orange-600 rounded-t-2xl"></div>
+                  <div className="absolute top-0 left-0 w-full h-1 bg-[#ffba0a] rounded-t-2xl"></div>
 
                   {!confirmPopup ? (
                     <>
@@ -701,7 +701,7 @@ const handleBookNow = async (): Promise<boolean> => {
                       </div>
 
                       <div className="flex items-baseline space-x-2 mb-6">
-                        <span className="text-3xl font-bold text-orange-600">
+                        <span className="text-3xl font-bold text-[#ffba0a]">
                           <Price amount={data.price || 65} />
                         </span>
                         <span className="text-gray-500">/ person</span>
@@ -774,7 +774,7 @@ const handleBookNow = async (): Promise<boolean> => {
                       <div className="space-y-3 mb-6">
                         <button
                           onClick={handleBookNow}
-                          className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-orange-600/20 hover:shadow-orange-600/40 active:scale-[0.98]"
+                          className="w-full bg-[#ffba0a] hover:bg-[#ffba0a] text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-[#ffba0a]/20 hover:shadow-[#ffba0a]/40 active:scale-[0.98]"
                         >
                           Book Now
                         </button>
@@ -866,7 +866,7 @@ const handleBookNow = async (): Promise<boolean> => {
 
                       <button
                         onClick={() => setConfirmPopup(false)}
-                        className="text-orange-600 hover:underline text-sm font-bold"
+                        className="text-[#ffba0a] hover:underline text-sm font-bold"
                       >
                         Make another booking
                       </button>
@@ -909,17 +909,17 @@ const handleBookNow = async (): Promise<boolean> => {
                               alt={item.title}
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
-                            <div className="absolute inset-0 bg-orange-600/20 mix-blend-multiply"></div>
+                            <div className="absolute inset-0 bg-[#ffba0a]/20 mix-blend-multiply"></div>
                           </div>
                           <div className="flex flex-col justify-between py-1">
-                            <h4 className="font-bold text-sm text-gray-900 leading-snug group-hover:text-orange-600 transition-colors line-clamp-2">
+                            <h4 className="font-bold text-sm text-gray-900 leading-snug group-hover:text-[#ffba0a] transition-colors line-clamp-2">
                               {item.title}
                             </h4>
                             <div className="flex items-center gap-1 text-xs text-gray-500">
                               <Clock className="w-3 h-3" />
                               <span>{item.duration}</span>
                             </div>
-                            <span className="text-[10px] font-bold text-orange-600 tracking-wider uppercase">
+                            <span className="text-[10px] font-bold text-[#ffba0a] tracking-wider uppercase">
                               READ MORE
                             </span>
                           </div>
@@ -933,7 +933,7 @@ const handleBookNow = async (): Promise<boolean> => {
         </div>
 
         {/* Lead Capture / Contact Section */}
-        <div id="booking" className="bg-orange-50 py-16">
+        <div id="booking" className="bg-[#ffba0a] py-16">
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               {/* Form */}
@@ -948,7 +948,7 @@ const handleBookNow = async (): Promise<boolean> => {
                   {selectedGuide && (
                     <div className="mb-6">
                       {!isChangingGuide ? (
-                        <div className="bg-white p-4 rounded-lg border border-orange-600/20 shadow-sm flex items-center gap-4">
+                        <div className="bg-white p-4 rounded-lg border border-[#ffba0a]/20 shadow-sm flex items-center gap-4">
                           <img
                             src={(() => {
                               try {
@@ -965,7 +965,7 @@ const handleBookNow = async (): Promise<boolean> => {
                             className="w-12 h-12 rounded-full object-cover"
                           />
                           <div>
-                            <span className="text-xs font-bold text-orange-600 uppercase tracking-wider">
+                            <span className="text-xs font-bold text-[#ffba0a] uppercase tracking-wider">
                               Your Chef
                             </span>
                             <h3 className="font-bold text-gray-900">{selectedGuide.name}</h3>
@@ -1003,7 +1003,7 @@ const handleBookNow = async (): Promise<boolean> => {
                                   flex items-center gap-3 p-2 rounded-lg border text-left transition-all
                                   ${
                                     selectedGuide.id === guide.id
-                                      ? 'border-orange-600 bg-orange-50 ring-1 ring-orange-600'
+                                      ? 'border-[#ffba0a] bg-[#ffba0a] ring-1 ring-[#ffba0a]'
                                       : 'border-gray-100 hover:border-gray-300 hover:bg-gray-50'
                                   }
                                 `}
@@ -1033,7 +1033,7 @@ const handleBookNow = async (): Promise<boolean> => {
                                   </div>
                                 </div>
                                 {selectedGuide.id === guide.id && (
-                                  <Check className="w-3 h-3 text-orange-600 ml-auto" />
+                                  <Check className="w-3 h-3 text-[#ffba0a] ml-auto" />
                                 )}
                               </button>
                             ))}
@@ -1048,7 +1048,7 @@ const handleBookNow = async (): Promise<boolean> => {
                       <label className="text-xs font-bold text-gray-500 uppercase">Name</label>
                       <input
                         type="text"
-                        className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent outline-none transition-all"
+                        className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#ffba0a] focus:border-transparent outline-none transition-all"
                         placeholder="Your name"
                       />
                     </div>
@@ -1058,7 +1058,7 @@ const handleBookNow = async (): Promise<boolean> => {
                       </label>
                       <input
                         type="text"
-                        className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent outline-none transition-all"
+                        className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#ffba0a] focus:border-transparent outline-none transition-all"
                         placeholder="+1 234 567 890"
                       />
                     </div>
@@ -1069,7 +1069,7 @@ const handleBookNow = async (): Promise<boolean> => {
                       <label className="text-xs font-bold text-gray-500 uppercase">Email</label>
                       <input
                         type="email"
-                        className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent outline-none transition-all"
+                        className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#ffba0a] focus:border-transparent outline-none transition-all"
                         placeholder="you@example.com"
                       />
                     </div>
@@ -1077,7 +1077,7 @@ const handleBookNow = async (): Promise<boolean> => {
                       <label className="text-xs font-bold text-gray-500 uppercase">Date</label>
                       <input
                         type="date"
-                        className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent outline-none transition-all"
+                        className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#ffba0a] focus:border-transparent outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -1087,7 +1087,7 @@ const handleBookNow = async (): Promise<boolean> => {
                       Special Requests
                     </label>
                     <textarea
-                      className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent outline-none transition-all h-32 resize-none"
+                      className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#ffba0a] focus:border-transparent outline-none transition-all h-32 resize-none"
                       placeholder="Any dietary restrictions or preferences?"
                     ></textarea>
                   </div>
@@ -1096,7 +1096,7 @@ const handleBookNow = async (): Promise<boolean> => {
                     <input
                       type="checkbox"
                       id="consent"
-                      className="rounded text-orange-600 focus:ring-orange-600"
+                      className="rounded text-[#ffba0a] focus:ring-[#ffba0a]"
                     />
                     <label htmlFor="consent" className="text-xs text-gray-500">
                       I agree to the terms and conditions and cancellation policy.
@@ -1105,7 +1105,7 @@ const handleBookNow = async (): Promise<boolean> => {
 
                   <button
                     type="button"
-                    className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-8 rounded-full uppercase tracking-wider transition-all shadow-lg shadow-orange-600/30 flex items-center gap-2"
+                    className="bg-[#ffba0a] hover:bg-[#ffba0a] text-white font-bold py-3 px-8 rounded-full uppercase tracking-wider transition-all shadow-lg shadow-[#ffba0a]/30 flex items-center gap-2"
                   >
                     Send Request
                   </button>
@@ -1115,7 +1115,7 @@ const handleBookNow = async (): Promise<boolean> => {
               {/* Right Illustration/Profile */}
               <div className="relative hidden lg:block">
                 <div className="relative z-10 text-center">
-                  <div className="w-64 h-64 mx-auto rounded-full p-2 border-4 border-orange-600 relative bg-white shadow-xl transition-all duration-500">
+                  <div className="w-64 h-64 mx-auto rounded-full p-2 border-4 border-[#ffba0a] relative bg-white shadow-xl transition-all duration-500">
                     <img
                       src={(() => {
                         const rawImg = selectedGuide ? selectedGuide.image : data.host.image;
@@ -1133,11 +1133,11 @@ const handleBookNow = async (): Promise<boolean> => {
                       className="w-full h-full rounded-full object-cover grayscale"
                     />
                     {/* Decorative elements */}
-                    <div className="absolute -top-4 -right-4 w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg animate-bounce">
+                    <div className="absolute -top-4 -right-4 w-12 h-12 bg-[#ffba0a] rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg animate-bounce">
                       100%
                     </div>
                     <div className="absolute top-1/2 -left-12 bg-white p-3 rounded-xl shadow-lg flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-orange-600"></div>
+                      <div className="w-2 h-2 rounded-full bg-[#ffba0a]"></div>
                       <span className="text-xs font-bold">Verified Chef</span>
                     </div>
                   </div>
@@ -1146,14 +1146,14 @@ const handleBookNow = async (): Promise<boolean> => {
                     <h3 className="font-bold text-xl text-gray-900">
                       {selectedGuide ? selectedGuide.name : data.host.name}
                     </h3>
-                    <p className="text-orange-600 font-medium">
+                    <p className="text-[#ffba0a] font-medium">
                       {selectedGuide ? selectedGuide.role : data.host.type}
                     </p>
                   </div>
                 </div>
 
                 {/* Background decorative blob */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-tr from-orange-600/20 to-yellow-500/20 rounded-full blur-3xl -z-0"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-tr from-[#ffba0a]/20 to-yellow-500/20 rounded-full blur-3xl -z-0"></div>
               </div>
             </div>
           </div>
@@ -1173,7 +1173,7 @@ const handleBookNow = async (): Promise<boolean> => {
           serviceFee={serviceFee}
           rating={data.rating || 0}
           reviews={data.reviews || 124}
-          accentClass="bg-orange-600 hover:bg-orange-700"
+          accentClass="bg-[#ffba0a] hover:bg-[#ffba0a]"
           checkIn={checkIn}
           checkOut={checkOut}
           onDateChange={(ci, co) => {
@@ -1290,9 +1290,9 @@ const handleBookNow = async (): Promise<boolean> => {
                       {viewingGuide.languages.map((lang: string, i: number) => (
                         <div
                           key={i}
-                          className="flex items-center gap-2 px-4 py-2 bg-orange-100 rounded-lg text-orange-800 font-bold text-sm tracking-wide"
+                          className="flex items-center gap-2 px-4 py-2 bg-[#ffba0a] rounded-lg text-[#ffba0a] font-bold text-sm tracking-wide"
                         >
-                          <Globe className="w-4 h-4 text-orange-600" />
+                          <Globe className="w-4 h-4 text-[#ffba0a]" />
                           {lang}
                         </div>
                       ))}
@@ -1309,7 +1309,7 @@ const handleBookNow = async (): Promise<boolean> => {
                       const formElement = document.querySelector('form');
                       if (formElement) formElement.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg shadow-orange-600/20"
+                    className="w-full bg-[#ffba0a] hover:bg-[#ffba0a] text-white font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg shadow-[#ffba0a]/20"
                   >
                     <Check className="w-5 h-5" />
                     Choose {viewingGuide.name} as my chef
@@ -1403,7 +1403,7 @@ const handleBookNow = async (): Promise<boolean> => {
               <button
                 type="button"
                 onClick={confirmBooking}
-                className="flex-1 py-3 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold transition-colors"
+                className="flex-1 py-3 rounded-xl bg-[#ffba0a] hover:bg-[#ffba0a] text-white font-bold transition-colors"
               >
                 Confirm Booking
               </button>

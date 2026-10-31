@@ -156,7 +156,7 @@ export default function ResetPasswordPage() {
               </p>
               <button
                 onClick={() => navigate('/')}
-                className="w-full bg-brand-yellow hover:bg-[#E5A800] text-[#213448] font-bold py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                className="w-full bg-brand-yellow hover:bg-[#ffba0a] text-[#213448] font-bold py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
                 Back to home
               </button>
@@ -175,7 +175,7 @@ export default function ResetPasswordPage() {
               </p>
               <Link
                 to="/"
-                className="block w-full bg-brand-yellow hover:bg-[#E5A800] text-[#213448] font-bold py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                className="block w-full bg-brand-yellow hover:bg-[#ffba0a] text-[#213448] font-bold py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
                 Back to home
               </Link>
@@ -240,7 +240,7 @@ export default function ResetPasswordPage() {
               )}
               <button
                 type="submit"
-                className="w-full bg-brand-yellow hover:bg-[#E5A800] text-[#213448] font-bold py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-60 flex items-center justify-center gap-2"
+                className="w-full bg-brand-yellow hover:bg-[#ffba0a] text-[#213448] font-bold py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-60 flex items-center justify-center gap-2"
                 disabled={status === 'submitting'}
               >
                 {status === 'submitting' ? (

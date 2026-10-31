@@ -32,7 +32,7 @@ export const PromoBanner: React.FC = () => {
                 accentText(cmsPromo.content.heading, ['2024'])
               ) : (
                 <>
-                  We have released our <span className="text-brand-yellow">2024</span>
+                  We have released our <span className="text-[#213448]">2024</span>
                   <br />
                   Impact Report!
                 </>

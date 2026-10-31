@@ -105,7 +105,7 @@ const JobsPage: React.FC = () => {
             <p className="text-slate-600 max-w-xl mx-auto mb-6">
               We're always looking for talented people. Send us your resume and we'll keep you in mind for future opportunities.
             </p>
-            <button className="bg-brand-yellow text-slate-900 px-8 py-3 rounded-lg font-bold hover:bg-[#E5A800] transition-colors">
+            <button className="bg-brand-yellow text-slate-900 px-8 py-3 rounded-lg font-bold hover:bg-[#ffba0a] transition-colors">
               Send Resume
             </button>
           </div>

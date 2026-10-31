@@ -121,8 +121,8 @@ export default {
         },
         'off-black': '#1A1A1A', // Off Black
         'off-white': '#F5F5F5', // Off White
-        'brand-yellow': '#F4B400', // Brand Gold/Yellow
-        peach: '#F9E6D6', // Hero Background
+        'brand-yellow': '#ffba0a', // Brand Gold/Yellow
+        peach: '#DCE5ED', // Hero Background
         background: {
           cream: '#FDF8F5', // Warm cream restored
           white: '#ffffff',

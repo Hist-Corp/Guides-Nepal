@@ -830,9 +830,9 @@ DEFAULT_SECTIONS = {
                 "tagline": "Guides Nepal",
             },
             "style": {
-                "backgroundColor": "#F9E6D6",
+                "backgroundColor": "#DCE5ED",
                 "textColor": "#547792",
-                "accentColor": "#F4B400",
+                "accentColor": "#ffba0a",
                 "alignment": "left",
                 "headingSize": "4rem",
                 "padding": "4rem",
@@ -865,7 +865,7 @@ DEFAULT_SECTIONS = {
             "style": {
                 "backgroundColor": "#FDF8F5",
                 "textColor": "#213448",
-                "accentColor": "#F4B400",
+                "accentColor": "#ffba0a",
                 "alignment": "left",
                 "headingSize": "2.5rem",
                 "padding": "4rem",
@@ -939,7 +939,7 @@ DEFAULT_SECTIONS = {
             "style": {
                 "backgroundColor": "#213448",
                 "textColor": "#ffffff",
-                "accentColor": "#F4B400",
+                "accentColor": "#ffba0a",
                 "alignment": "center",
             },
         },
@@ -956,7 +956,7 @@ DEFAULT_SECTIONS = {
             "style": {
                 "backgroundColor": "#E0F2FE",
                 "textColor": "#213448",
-                "accentColor": "#F4B400",
+                "accentColor": "#ffba0a",
                 "alignment": "left",
             },
         },
@@ -1086,7 +1086,7 @@ def _default_template(slug: str) -> list:
             "style": {
                 "backgroundColor": "#213448",
                 "textColor": "#ffffff",
-                "accentColor": "#F4B400",
+                "accentColor": "#ffba0a",
                 "alignment": "center",
                 "headingSize": "3rem",
                 "padding": "4rem",

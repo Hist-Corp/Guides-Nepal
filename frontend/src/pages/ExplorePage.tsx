@@ -185,7 +185,7 @@ const ExplorePage: React.FC = () => {
                 <div className="p-4 sm:p-5 flex flex-col flex-1">
                   <h3 className="font-bold text-base sm:text-lg mb-2 text-primary">{item.title}</h3>
                   <p className="text-slate-600 text-sm mb-4 line-clamp-2">{item.description}</p>
-                  <span className="mt-auto inline-flex w-fit items-center gap-1.5 bg-brand-yellow group-hover:bg-[#E5A800] text-primary text-xs font-bold py-2 px-4 rounded-full transition-colors pointer-events-none">
+                  <span className="mt-auto inline-flex w-fit items-center gap-1.5 bg-brand-yellow group-hover:bg-[#ffba0a] text-primary text-xs font-bold py-2 px-4 rounded-full transition-colors pointer-events-none">
                     Explore
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </span>
@@ -281,7 +281,7 @@ const ExplorePage: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent"></div>
                 <div className="absolute bottom-0 left-0 right-0 p-4 text-center">
                   <h3 className="text-white font-bold text-xl mb-3">{cat.name}</h3>
-                  <span className="inline-block bg-brand-yellow text-primary text-xs font-bold px-4 py-2 rounded-full transition-colors group-hover:bg-[#E5A800]">
+                  <span className="inline-block bg-brand-yellow text-primary text-xs font-bold px-4 py-2 rounded-full transition-colors group-hover:bg-[#ffba0a]">
                     Explore
                   </span>
                 </div>
@@ -339,7 +339,7 @@ const ExplorePage: React.FC = () => {
           </div>
           <div className="text-center">
             <Link to="/search">
-              <Button className="bg-brand-yellow hover:bg-[#E5A800] text-primary font-bold px-8 py-3 rounded-full border-none shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
+              <Button className="bg-brand-yellow hover:bg-[#ffba0a] text-primary font-bold px-8 py-3 rounded-full border-none shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
                 View more experiences
               </Button>
             </Link>
@@ -381,7 +381,7 @@ const ExplorePage: React.FC = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-4">
                       <Button
                         size="sm"
-                        className="bg-brand-yellow hover:bg-[#E5A800] text-primary border-none text-xs font-bold"
+                        className="bg-brand-yellow hover:bg-[#ffba0a] text-primary border-none text-xs font-bold"
                       >
                         View Profile
                       </Button>
@@ -450,7 +450,7 @@ const ExplorePage: React.FC = () => {
                 Skip the tourist traps and explore the city with people who know it best.
               </p>
               <Link to="/search">
-                <Button className="bg-brand-yellow hover:bg-[#E5A800] text-primary font-bold px-8 py-3 rounded-full border-none text-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
+                <Button className="bg-brand-yellow hover:bg-[#ffba0a] text-primary font-bold px-8 py-3 rounded-full border-none text-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
                   Find a Local
                 </Button>
               </Link>

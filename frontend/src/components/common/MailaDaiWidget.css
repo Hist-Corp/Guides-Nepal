@@ -31,7 +31,7 @@
   height: 56px;
   border-radius: 50%;
   border: none;
-  background: #F4B400; /* Brand yellow */
+  background: #ffba0a; /* Brand yellow */
   color: #213448;
   display: flex;
   align-items: center;
@@ -42,7 +42,7 @@
 }
 
 .maildai-fab:hover {
-  background: #E5A800;
+  background: #ffba0a;
   transform: scale(1.06);
 }
 
@@ -70,7 +70,7 @@
 }
 
 .maildai-panel-header {
-  background: #F4B400; /* Brand yellow */
+  background: #ffba0a; /* Brand yellow */
   color: #213448;
   padding: 12px 14px;
   display: flex;
@@ -274,7 +274,7 @@
 }
 
 .maildai-input:focus {
-  border-color: #F4B400;
+  border-color: #ffba0a;
   box-shadow: 0 0 0 3px rgba(244, 180, 0, 0.2);
 }
 
@@ -288,7 +288,7 @@
   height: 40px;
   border-radius: 50%;
   border: none;
-  background: #F4B400;
+  background: #ffba0a;
   color: #213448;
   display: flex;
   align-items: center;
@@ -299,7 +299,7 @@
 }
 
 .maildai-send:hover:not(:disabled) {
-  background: #E5A800;
+  background: #ffba0a;
   transform: scale(1.05);
 }
 
@@ -328,13 +328,13 @@
   background: transparent;
 }
 .maildai-messages::-webkit-scrollbar-thumb {
-  background: #F4B400;
+  background: #ffba0a;
   border-radius: 3px;
 }
 .maildai-messages::-webkit-scrollbar-thumb:hover {
-  background: #E5A800;
+  background: #ffba0a;
 }
 .maildai-messages {
   scrollbar-width: thin;
-  scrollbar-color: #F4B400 transparent;
+  scrollbar-color: #ffba0a transparent;
 }

@@ -62,7 +62,7 @@ export const FeaturedExperiences: React.FC = () => {
                     <h3 className="font-bold text-lg mb-1">{exp.title}</h3>
                     <p className="text-slate-600 text-sm mb-4 line-clamp-2 min-h-[40px]">{exp.description}</p>
                     <div className="flex items-center justify-center mt-auto w-full">
-                      <Button size="sm" className="w-full bg-brand-yellow hover:bg-[#E5A800] text-slate-900 rounded-md py-2 h-auto text-sm font-bold uppercase tracking-wide pointer-events-none">Explore</Button>
+                      <Button size="sm" className="w-full bg-brand-yellow hover:bg-[#ffba0a] text-slate-900 rounded-md py-2 h-auto text-sm font-bold uppercase tracking-wide pointer-events-none">Explore</Button>
                     </div>
                   </div>
                 </Card>

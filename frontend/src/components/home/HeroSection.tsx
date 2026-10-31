@@ -39,7 +39,7 @@ export const HeroSection: React.FC = () => {
       data-cms-id="home-hero"
       data-cms-label="Hero"
       className="bg-peach pt-10 md:pt-14 pb-16 md:pb-24 relative overflow-hidden"
-      style={cmsBackground(cmsHero?.style, '#F9E6D6')}
+      style={cmsBackground(cmsHero?.style, '#DCE5ED')}
     >
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
@@ -53,7 +53,7 @@ export const HeroSection: React.FC = () => {
                       {accentText(
                         cmsHero.content.heading,
                         ['incredible locals'],
-                        'text-[#F4B400] drop-shadow-sm'
+                        'text-[#ffba0a] drop-shadow-sm'
                       )}
                     </span>
                   ) : (
@@ -61,7 +61,7 @@ export const HeroSection: React.FC = () => {
                       <span className="text-[#547792]">Enchanting experiences,</span>
                       <br />
                       <span className="text-[#547792]">with </span>
-                      <span className="text-[#F4B400] drop-shadow-sm">incredible locals</span>
+                      <span className="text-[#ffba0a] drop-shadow-sm">incredible locals</span>
                     </>
                   )}
                 </h1>
@@ -95,7 +95,7 @@ export const HeroSection: React.FC = () => {
                   <div className="absolute right-2 top-2 bottom-2">
                     <button
                       type="submit"
-                      className="h-full bg-[#F4B400] hover:bg-[#E5A800] text-[#333333] font-bold rounded-full px-8 flex items-center gap-2 transition-transform hover:scale-105 active:scale-95"
+                      className="h-full bg-[#ffba0a] hover:bg-[#ffba0a] text-[#333333] font-bold rounded-full px-8 flex items-center gap-2 transition-transform hover:scale-105 active:scale-95"
                     >
                       <Search className="w-5 h-5 stroke-[2.5]" />
                       <span>Search</span>
@@ -114,7 +114,7 @@ export const HeroSection: React.FC = () => {
                   </span>
                   <Link
                     to="/maila-dai"
-                    className="bg-[#F4B400]/20 hover:bg-[#F4B400]/30 text-[#333333] text-sm font-bold pl-4 pr-1 py-1 rounded-full flex items-center gap-2 transition-colors shadow-sm border border-[#F4B400]/50"
+                    className="bg-[#ffba0a]/20 hover:bg-[#ffba0a]/30 text-[#333333] text-sm font-bold pl-4 pr-1 py-1 rounded-full flex items-center gap-2 transition-colors shadow-sm border border-[#ffba0a]/50"
                   >
                     Ask Maila Dai!
                     <SafeImage
@@ -151,7 +151,7 @@ export const HeroSection: React.FC = () => {
                   <span className="text-sm font-bold text-[#333333] w-20 text-left">
                     {currentCity.name}
                   </span>
-                  <div className="w-6 h-6 rounded-full bg-[#F4B400] flex items-center justify-center group-hover:bg-[#E5A800] transition-colors">
+                  <div className="w-6 h-6 rounded-full bg-[#ffba0a] flex items-center justify-center group-hover:bg-[#ffba0a] transition-colors">
                     <ChevronRight className="w-4 h-4 text-white group-hover:text-white transition-colors" />
                   </div>
                 </button>
@@ -246,7 +246,7 @@ export const HeroSection: React.FC = () => {
                   <span className="text-sm font-bold text-[#333333] w-20 text-left">
                     {currentCity.name}
                   </span>
-                  <div className="w-6 h-6 rounded-full bg-[#F4B400] flex items-center justify-center group-hover:bg-[#E5A800] transition-colors">
+                  <div className="w-6 h-6 rounded-full bg-[#ffba0a] flex items-center justify-center group-hover:bg-[#ffba0a] transition-colors">
                     <ChevronRight className="w-4 h-4 text-white group-hover:text-white transition-colors" />
                   </div>
                 </button>

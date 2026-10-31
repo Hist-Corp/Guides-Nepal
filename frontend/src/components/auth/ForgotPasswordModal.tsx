@@ -155,7 +155,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               </p>
               <button
                 onClick={handleSwitchToLogin}
-                className="w-full bg-brand-yellow hover:bg-[#E5A800] text-[#213448] font-bold py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                className="w-full bg-brand-yellow hover:bg-[#ffba0a] text-[#213448] font-bold py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
                 Back to log in
               </button>
@@ -194,7 +194,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
 
                 <button
                   type="submit"
-                  className="w-full bg-brand-yellow hover:bg-[#E5A800] text-[#213448] font-bold py-3 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-lg flex items-center justify-center gap-2"
+                  className="w-full bg-brand-yellow hover:bg-[#ffba0a] text-[#213448] font-bold py-3 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-lg flex items-center justify-center gap-2"
                   disabled={status === 'loading'}
                 >
                   {status === 'loading' ? (
