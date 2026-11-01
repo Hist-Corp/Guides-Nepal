@@ -14,6 +14,7 @@ import {
   Star,
   MapPin as MapPinIcon,
   Sparkles,
+  LayoutDashboard,
 } from 'lucide-react';
 import { LoginModal } from '../auth/LoginModal';
 import { SignupModal } from '../auth/SignupModal';
@@ -257,6 +258,14 @@ export const Header: React.FC = () => {
                     Dashboard
                   </Link>
                 )}
+                {user?.role === 'host' && (
+                  <Link
+                    to="/host/dashboard"
+                    className="text-sm font-bold text-gray-800 hover:text-primary transition-colors flex items-center gap-2"
+                  >
+                    <LayoutDashboard className="w-4 h-4" /> Dashboard
+                  </Link>
+                )}
                 <Link
                   to="/favorites"
                   className="text-gray-800 hover:text-primary transition-colors"
@@ -291,14 +300,53 @@ export const Header: React.FC = () => {
                       </p>
                       <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                     </div>
-                    <Link
-                      to="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
-                      onClick={() => setIsProfileDropdownOpen(false)}
-                    >
-                      Profile
-                    </Link>
-                    {user?.role === 'guide' && (
+                          <Link
+                            to="/profile"
+                            className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            Profile
+                          </Link>
+                          {user?.role === 'host' && (
+                            <>
+                              <Link
+                                to="/host/dashboard"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2 flex items-center gap-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                <LayoutDashboard className="w-4 h-4" /> Host dashboard
+                              </Link>
+                              <Link
+                                to="/host/experiences"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                My experiences
+                              </Link>
+                              <Link
+                                to="/host/bookings"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                Bookings
+                              </Link>
+                              <Link
+                                to="/host/earnings"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                Earnings
+                              </Link>
+                              <Link
+                                to="/host/settings"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                Settings
+                              </Link>
+                            </>
+                          )}
+                          {user?.role === 'guide' && (
                       <>
                         <Link
                           to="/guide/dashboard"
@@ -320,6 +368,45 @@ export const Header: React.FC = () => {
                           onClick={() => setIsProfileDropdownOpen(false)}
                         >
                           Onboarding
+                        </Link>
+                      </>
+                    )}
+                    {user?.role === 'host' && (
+                      <>
+                        <Link
+                          to="/host/dashboard"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center gap-2"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          <LayoutDashboard className="w-4 h-4" /> Host dashboard
+                        </Link>
+                        <Link
+                          to="/host/experiences"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          My experiences
+                        </Link>
+                        <Link
+                          to="/host/bookings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          Bookings
+                        </Link>
+                        <Link
+                          to="/host/earnings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          Earnings
+                        </Link>
+                        <Link
+                          to="/host/settings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          Settings
                         </Link>
                       </>
                     )}
@@ -521,6 +608,45 @@ export const Header: React.FC = () => {
                           >
                             Profile
                           </Link>
+                          {user?.role === 'host' && (
+                            <>
+                              <Link
+                                to="/host/dashboard"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2 flex items-center gap-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                <LayoutDashboard className="w-4 h-4" /> Host dashboard
+                              </Link>
+                              <Link
+                                to="/host/experiences"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                My experiences
+                              </Link>
+                              <Link
+                                to="/host/bookings"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                Bookings
+                              </Link>
+                              <Link
+                                to="/host/earnings"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                Earnings
+                              </Link>
+                              <Link
+                                to="/host/settings"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                Settings
+                              </Link>
+                            </>
+                          )}
                           <button
                           onClick={() => {
                             logout();
