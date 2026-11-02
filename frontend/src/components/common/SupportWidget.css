@@ -1,8 +1,11 @@
+@media (max-width: 1023px) {
+  .support-widget { display: none !important; }
+}
 .support-widget {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 1000;
+  z-index: 40;
   font-family: inherit;
 }
 
@@ -183,16 +186,19 @@
   /* Mobile phone (and tablet, which also uses the hamburger menu):
      hide the floating FAB on ALL pages. The support panel is opened from the
      hamburger menu instead. Desktop keeps the floating FAB unchanged. */
+  .support-widget {
+    display: none !important;
+  }
   .support-widget .support-fab {
-    display: none;
+    display: none !important;
   }
 }
 
 /* Scroll tracking - show widget when scrolling up from footer dark blue line */
 .support-widget.visible .support-fab {
-  display: flex;
+  display: flex !important;
 }
 
 .support-widget.visible .support-panel {
-  display: block;
+  display: block !important;
 }

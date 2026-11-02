@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { ChevronDown } from "lucide-react"
 import {
   decideChangeRequest,
   decideProposal,
@@ -56,7 +57,7 @@ function ReviewCard({
       setOpen(false)
       setNotes("")
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Action failed")
+      (() => { const _d = e?.response?.data?.detail; const _m = typeof _d === 'string' ? _d : (Array.isArray(_d) ? _d.map((x: any) => (typeof x === 'string' ? x : x?.msg || JSON.stringify(x))).join(' ') : (_d && typeof _d === 'object' ? (_d.msg || JSON.stringify(_d)) : null)); setError(_m || "Action failed"); })()
     } finally {
       setBusy(false)
     }
@@ -217,11 +218,12 @@ export default function ExperienceReviewPanel({ scope }: { scope: "both" | "prop
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="text-xl font-semibold text-darkBlue">Experience Reviews</div>
-        <select
-          className="rounded-lg border px-3 py-2 text-sm"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        >
+        <div className="relative">
+          <select
+            className="appearance-none rounded-lg border border-line bg-surface px-4 py-2 pr-9 text-sm font-medium text-main shadow-sm transition-colors hover:border-brand-300 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 cursor-pointer"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          >
           <option value="submitted">Submitted</option>
           <option value="approved">Approved</option>
           <option value="changes_requested">Changes requested</option>
@@ -230,6 +232,8 @@ export default function ExperienceReviewPanel({ scope }: { scope: "both" | "prop
           <option value="applied">Applied</option>
           <option value="all">All</option>
         </select>
+          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-soft" />
+        </div>
       </div>
       {msg && (
         <div className="rounded-lg bg-green-50 border border-green-200 text-green-700 px-3 py-2 text-sm">

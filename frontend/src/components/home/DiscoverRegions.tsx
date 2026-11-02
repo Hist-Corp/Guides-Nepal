@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, ArrowRight } from 'lucide-react';
+import { MapPin, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SafeImage } from '../common/SafeImage';
 import { NEPAL_IMAGES } from '../../data/images';
 import { useCmsSection } from '../../hooks/useCms';
@@ -56,27 +56,22 @@ export const DiscoverRegions: React.FC = () => {
     'Every corner of Nepal has a story — meet the locals who tell it best.';
 
   const sectionRef = React.useRef<HTMLElement>(null);
-  const [inView, setInView] = React.useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [canScrollNext, setCanScrollNext] = useState(true);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
 
-  React.useEffect(() => {
-    const node = sectionRef.current;
-    if (!node) return;
-    if (typeof IntersectionObserver === 'undefined') {
-      setInView(true);
-      return;
+  const scrollToIndex = (index: number) => {
+    if (scrollContainerRef.current) {
+      const card = scrollContainerRef.current.firstElementChild as HTMLElement;
+      const cardWidth = card ? card.offsetWidth + 16 : scrollContainerRef.current.clientWidth; // 16 = gap-4
+      scrollContainerRef.current.scrollTo({
+        left: index * cardWidth,
+        behavior: 'smooth',
+      });
     }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setInView(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.12 }
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
+  };
+
 
   return (
     <section
@@ -103,43 +98,76 @@ export const DiscoverRegions: React.FC = () => {
           <p className="text-white/75 max-w-xl mx-auto">{subtitle}</p>
         </div>
 
-        {/* Region tiles — withlocals style */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {regions.map((region, index) => (
-            <div
-              key={region.city}
-              className={'h-full ' + (inView ? 'animate-fade-in-up' : 'opacity-0')}
-              style={{ animationDelay: index * 110 + 'ms' }}
-            >
-              <Link
-                to={region.path}
-                className="group block h-full"
-                aria-label={'Discover ' + region.city + ' with a local'}
-              >
-                <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-[0_1px_1px_0_rgba(0,0,0,0.05),0_2px_2px_0_rgba(0,0,0,0.05),0_4px_4px_0_rgba(0,0,0,0.05)] transition-all duration-300 ease-out group-hover:-translate-y-2 group-hover:shadow-[0_10px_30px_rgba(33,52,72,0.2)]">
-                  <SafeImage
-                    src={region.image}
-                    alt={region.city}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#213448]/90 via-[#213448]/25 to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 p-4 text-center">
-                    <span className="block font-serif italic text-2xl sm:text-[1.65rem] leading-tight text-white drop-shadow-md">
-                      {region.city}
-                    </span>
-                    <span className="mt-1.5 flex items-center justify-center gap-1 text-[11px] font-semibold text-white/85">
-                      <MapPin className="w-3 h-3 shrink-0" />
-                      {region.tagline}
-                    </span>
-                    <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white ring-1 ring-white/30 backdrop-blur-sm transition-all duration-300 group-hover:bg-brand-yellow group-hover:text-primary group-hover:ring-brand-yellow">
-                      Explore
-                      <ArrowRight className="w-3 h-3 transition-transform duration-300 group-hover:translate-x-0.5" />
-                    </span>
+        {/* Responsive scroll: 1/2/3/4 cards per view */}
+        <div className="relative px-12">
+          <button
+            onClick={() => { scrollToIndex(Math.max(0, activeIndex - 1)); setActiveIndex(Math.max(0, activeIndex - 1)); }}
+            disabled={!canScrollPrev}
+            className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center border border-slate-200 min-[1024px]:hidden transition-colors ${activeIndex === 0 ? 'text-slate-300 cursor-not-allowed opacity-50' : 'text-slate-700 hover:bg-slate-50'}`}
+            aria-label="Previous region"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <div
+            ref={scrollContainerRef}
+            onScroll={() => {
+              if (scrollContainerRef.current) {
+                const card = scrollContainerRef.current.firstElementChild as HTMLElement;
+                const cardWidth = card ? card.offsetWidth + 16 : scrollContainerRef.current.clientWidth;
+                const { scrollLeft, clientWidth, scrollWidth } = scrollContainerRef.current;
+                const index = Math.round(scrollLeft / cardWidth);
+                // Check if at the end (no more scrolling possible)
+                const atEnd = scrollLeft + clientWidth >= scrollWidth - 5;
+                setActiveIndex(atEnd ? regions.length - 1 : Math.min(Math.max(0, index), regions.length - 1));
+                setCanScrollNext(!atEnd);
+                setCanScrollPrev(scrollLeft > 5);
+              }
+            }}
+            className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {regions.map((region) => (
+              <div key={region.city} className="flex-shrink-0 w-full min-[500px]:w-[calc(50%-0.5rem)] min-[690px]:w-[calc(33.333%-0.667rem)] min-[920px]:w-[calc(25%-0.75rem)] min-[1024px]:w-[calc(20%-0.8rem)] snap-center">
+                <Link
+                  to={region.path}
+                  className="group block h-full"
+                  aria-label={'Discover ' + region.city + ' with a local'}
+                >
+                  <div className="relative aspect-[3/4] rounded-2xl shadow-[0_1px_1px_0_rgba(0,0,0,0.05),0_2px_2px_0_rgba(0,0,0,0.05),0_4px_4px_0_rgba(0,0,0,0.05)] transition-all duration-300 ease-out group-hover:-translate-y-2 group-hover:shadow-[0_10px_30px_rgba(33,52,72,0.2)]">
+                    <div className="absolute inset-0 rounded-2xl overflow-hidden">
+                      <SafeImage
+                        src={region.image}
+                        alt={region.city}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 rounded-2xl origin-bottom"
+                      />
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#213448]/90 via-[#213448]/25 to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 p-4 text-center">
+                      <span className="block font-serif italic text-2xl leading-tight text-white drop-shadow-md">
+                        {region.city}
+                      </span>
+                      <span className="mt-1.5 flex items-center justify-center gap-1 text-[11px] font-semibold text-white/85">
+                        <MapPin className="w-3 h-3 shrink-0" />
+                        {region.tagline}
+                      </span>
+                      <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-white ring-1 ring-white/30 backdrop-blur-sm transition-all duration-300 group-hover:bg-brand-yellow group-hover:text-primary group-hover:ring-brand-yellow">
+                        Explore
+                        <ArrowRight className="w-3 h-3 transition-transform duration-300 group-hover:translate-x-0.5" />
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            </div>
-          ))}
+                </Link>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={() => { scrollToIndex(Math.min(regions.length - 1, activeIndex + 1)); setActiveIndex(Math.min(regions.length - 1, activeIndex + 1)); }}
+            disabled={!canScrollNext}
+            className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center border border-slate-200 min-[1024px]:hidden transition-colors ${activeIndex >= regions.length - 1 ? 'text-slate-300 cursor-not-allowed opacity-50' : 'text-slate-700 hover:bg-slate-50'}`}
+            aria-label="Next region"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </div>
       </div>
     </section>

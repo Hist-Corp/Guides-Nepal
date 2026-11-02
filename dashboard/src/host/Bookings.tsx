@@ -23,7 +23,7 @@ export default function HostBookings() {
       await decideHostBooking(id, status)
       await load()
     } catch (e: any) {
-      setError(e?.response?.data?.detail || "Unable to update booking.")
+      (() => { const _d = e?.response?.data?.detail; const _m = typeof _d === 'string' ? _d : (Array.isArray(_d) ? _d.map((x: any) => (typeof x === 'string' ? x : x?.msg || JSON.stringify(x))).join(' ') : (_d && typeof _d === 'object' ? (_d.msg || JSON.stringify(_d)) : null)); setError(_m || "Unable to update booking."); })()
     } finally {
       setActionId(null)
     }

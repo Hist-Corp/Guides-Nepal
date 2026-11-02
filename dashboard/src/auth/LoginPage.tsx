@@ -193,7 +193,17 @@ export default function LoginPage() {
         setError('Cannot reach the server. Please check the backend is running and try again.');
       } else {
         const detail = err?.response?.data?.detail;
-        setError(detail || 'Login failed. Please check your credentials.');
+        // detail can be a string or an array of Pydantic validation errors
+        // (objects with {type, loc, msg, input}). Coerce to a readable string.
+        let message = 'Login failed. Please check your credentials.';
+        if (typeof detail === 'string') {
+          message = detail;
+        } else if (Array.isArray(detail)) {
+          message = detail.map((d: any) => (typeof d === 'string' ? d : d?.msg || JSON.stringify(d))).join(' ');
+        } else if (detail && typeof detail === 'object') {
+          message = detail.msg || JSON.stringify(detail);
+        }
+        setError(message);
       }
     } finally {
       setLoading(false);

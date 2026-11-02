@@ -62,7 +62,7 @@ Pokhara is among the world's great paragliding bowls. For a calmer experience, p
 - **Begnas Lake:** Homestays and small eco-resorts on still water.
 - **Village homestays:** Eat with the family, learn customs, and get the hikes tourists miss.
 
-![Sunrise over the Annapurnas](https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80 "Sarangkot sunrises face Machhapuchhre, Annapurna South, and Hiunchuli.")
+![Sunrise over the Annapurnas](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80"Sarangkot sunrises face Machhapuchhre, Annapurna South, and Hiunchuli.")
 
 ## A Slow Three-Day Plan
 

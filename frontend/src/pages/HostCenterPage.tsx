@@ -3,38 +3,44 @@ import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { PageBackButton } from '../components/common/PageBackButton';
 import { Link } from 'react-router-dom';
-import { BookOpen, DollarSign, Users, Star, Shield, Headphones } from 'lucide-react';
+import { Rocket, Wallet, Users, Award, ShieldCheck, Headset, ArrowRight } from 'lucide-react';
 
 const resources = [
   {
-    icon: BookOpen,
+    icon: Rocket,
     title: 'Getting Started Guide',
-    description: 'Learn how to create compelling experiences that travelers love.'
+    description: 'Learn how to create compelling experiences that travelers love.',
+    path: '/host-application'
   },
   {
-    icon: DollarSign,
+    icon: Wallet,
     title: 'Pricing & Payments',
-    description: 'Understand how pricing works and when you get paid.'
+    description: 'Understand how pricing works and when you get paid.',
+    path: '/host-center'
   },
   {
     icon: Users,
     title: 'Building Your Community',
-    description: 'Tips for growing your traveler community and getting reviews.'
+    description: 'Tips for growing your traveler community and getting reviews.',
+    path: '/host-center'
   },
   {
-    icon: Star,
+    icon: Award,
     title: 'Creating Great Experiences',
-    description: 'Best practices for memorable and highly-rated experiences.'
+    description: 'Best practices for memorable and highly-rated experiences.',
+    path: '/host-application'
   },
   {
-    icon: Shield,
+    icon: ShieldCheck,
     title: 'Safety & Insurance',
-    description: 'Information about our safety guidelines and coverage.'
+    description: 'Information about our safety guidelines and coverage.',
+    path: '/terms'
   },
   {
-    icon: Headphones,
+    icon: Headset,
     title: 'Support Center',
-    description: 'Get help from our team whenever you need it.'
+    description: 'Get help from our team whenever you need it.',
+    path: '/contact'
   }
 ];
 
@@ -53,17 +59,33 @@ const HostCenterPage: React.FC = () => {
           </div>
         </section>
 
-        <section className="py-16 bg-white">
+        <section className="py-20 bg-gradient-to-b from-white to-slate-50">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold text-slate-900 mb-8 text-center">Resources for Hosts</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary mb-3">Resources</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Resources for Hosts</h2>
+              <p className="mt-3 text-slate-500 max-w-xl mx-auto">Everything you need to grow your hosting business and deliver unforgettable experiences.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
               {resources.map((resource, index) => (
-                <div key={index} className="border border-slate-200 rounded-xl p-6 hover:border-primary hover:shadow-md transition-all">
-                  <resource.icon className="w-10 h-10 text-primary mb-4" />
-                  <h3 className="font-bold text-lg text-slate-900 mb-2">{resource.title}</h3>
-                  <p className="text-slate-600">{resource.description}</p>
-                  <button className="mt-4 text-primary font-bold text-sm hover:underline">Learn More</button>
-                </div>
+                <Link
+                  key={index}
+                  to={resource.path}
+                  className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-primary/30 block"
+                >
+                  <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-primary/5 transition-transform duration-500 group-hover:scale-150" />
+                  <div className="relative">
+                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary ring-1 ring-primary/10 transition-all duration-300 group-hover:from-primary group-hover:to-primary/80 group-hover:text-white group-hover:ring-primary/30 group-hover:shadow-md">
+                      <resource.icon className="h-6 w-6" />
+                    </div>
+                    <h3 className="mb-2 text-base sm:text-lg font-bold text-slate-900 transition-colors group-hover:text-primary">{resource.title}</h3>
+                    <p className="text-sm leading-relaxed text-slate-500">{resource.description}</p>
+                    <div className="mt-5 flex items-center gap-1.5 text-sm font-semibold text-primary opacity-0 transition-all duration-300 group-hover:opacity-100">
+                      Learn more
+                      <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    </div>
+                  </div>
+                </Link>
               ))}
             </div>
           </div>

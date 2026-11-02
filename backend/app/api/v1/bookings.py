@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from app.core.database import get_db
 from app.schemas.booking import BookingCreate, BookingResponse
 from app.services.booking_service import BookingService
@@ -18,11 +18,24 @@ TRAVELER_ONLY = require_role(TRAVELER)
 @router.get("/availability")
 def booking_availability(
     date: str = Query(pattern=r"^\d{4}-\d{2}-\d{2}$"),
+    guide_id: Optional[int] = Query(default=None),
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ) -> dict:
     """Availability of the currently bookable guide for a calendar date."""
-    return BookingService(db).availability_for_date(date)
+    return BookingService(db).availability_for_date(date, guide_id=guide_id)
+
+@router.get("/availability/month")
+def booking_availability_month(
+    year: int = Query(ge=2020, le=2100),
+    month: int = Query(ge=1, le=12),
+    guide_id: Optional[int] = Query(default=None),
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+) -> dict:
+    """Unavailable dates for the currently bookable guide in a given month."""
+    unavailable = BookingService(db).availability_for_month(year, month, guide_id=guide_id)
+    return {"unavailable": unavailable}
 
 
 @router.get("/", response_model=List[BookingResponse])

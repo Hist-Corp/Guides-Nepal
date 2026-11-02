@@ -63,39 +63,15 @@ export default function MailaDaiWidget() {
     if (isBookingSheetOpen) setState('closed');
   }, [isBookingSheetOpen]);
 
-  const [isVisible, setIsVisible] = useState(false); // Hidden initially on hero
-  const lastScrollYRef = useRef(0);
-  const footerTopRef = useRef(0);
+  const [isVisible, setIsVisible] = useState(true);
 
-  // Track scroll position to show/hide widget based on hero middle and footer
-  useEffect(() => {
-    const heroEl = document.querySelector('[data-cms-id="home-hero"]') as HTMLElement;
-    const footerEl = document.querySelector('[data-cms-id="home-footer"]') as HTMLElement;
-    const heroTop = heroEl ? heroEl.offsetTop : 0;
-    const heroHeight = heroEl ? heroEl.offsetHeight : window.innerHeight;
-    const heroMiddle = heroTop + heroHeight * 0.5;
-    if (footerEl) {
-      footerTopRef.current = footerEl.offsetTop;
-    }
-
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const showWidget = currentScrollY > heroMiddle && currentScrollY < footerTopRef.current;
-      setIsVisible(showWidget);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Add the isVisible class for CSS visibility control
+  // Always visible, like the customer support widget
   useEffect(() => {
     const widget = document.querySelector('.maildai-widget') as HTMLElement;
     if (widget) {
-      widget.classList.toggle('visible', isVisible);
+      widget.classList.add('visible');
     }
-  }, [isVisible]);
+  }, []);
   const handleResizeStart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();

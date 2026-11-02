@@ -14,7 +14,7 @@ export const bhaktapurRichData: RichExperienceData[] = [
     host: {
       name: 'Krishna',
       image:
-        'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=400&q=80',
+        'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80',
       type: 'Heritage Expert',
     },
     guides: [

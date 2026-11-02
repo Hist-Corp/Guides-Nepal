@@ -1,6 +1,6 @@
 /* AUTO-GENERATED from magicalnepal.com trip-page styles (see /tmp/gen_css.py).
 
-   Re-scoped under .mn-tt so only the ported Annapurna sections are affected. */
+   Re-scoped under .mn-tt so only the ported Everest sections are affected. */
 
 
 
@@ -377,29 +377,40 @@
 
 .mn-tt .tg-lb__media{display:flex;align-items:center;justify-content:center}
 
-.mn-tt .tg-lb__img{max-width:100%;max-height:88vh;object-fit:contain;border-radius:10px}
+.mn-tt .tg-lb__inner.is-review{background:#fff;border-radius:16px;overflow:hidden;max-width:min(1000px,100%);display:flex;flex-direction:column;margin-bottom:2rem}
+.mn-tt .tg-lb__inner.is-review .tg-lb__media{width:100%;background:#0b1622;overflow:hidden;position:relative;flex:0 0 auto}
+.mn-tt .tg-lb__inner.is-review .tg-lb__img{width:100%;height:auto;display:block;border-radius:0;object-fit:contain;max-height:70vh}
+.mn-tt .tg-lb__star-badge{position:absolute;top:1rem;left:1rem;z-index:3;background:rgba(255,255,255,.95);border-radius:999px;padding:.35rem .75rem;font-size:.85rem;font-weight:700;color:#0f172a;box-shadow:0 2px 8px rgba(0,0,0,.15);display:flex;align-items:center;gap:.25rem}
+.mn-tt .tg-lb__star-badge--active{color:#f5a623}
+.mn-tt .tg-lb__star-badge--inactive{color:#d1d5db}
+.mn-tt .tg-lb__star-badge svg{width:15px;height:15px;fill:none;stroke:#f5a623;stroke-width:2}
+.mn-tt .tg-lb__review{padding:.8rem 1rem;width:100%;max-width:100%;margin:0 auto;background:#fff;max-height:30vh;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
+.mn-tt .tg-lb__person{display:flex;align-items:center;gap:.75rem;margin-bottom:.35rem}
+.mn-tt .tg-lb__ava{width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.mn-tt .tg-lb__ava--ph{width:32px;height:32px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;flex-shrink:0}
+.mn-tt .tg-lb__ava--ph svg{width:16px;height:16px}
+.mn-tt .tg-lb__pmeta{flex:1;min-width:0}
+.mn-tt .tg-lb__name{margin:0;font-size:.92rem;font-weight:600;color:#0f172a;line-height:1.2}
+.mn-tt .tg-lb__name span{color:#64748b;font-weight:500;font-size:.66rem;text-transform:uppercase;letter-spacing:.05em}
+.mn-tt .tg-lb__booked{margin:.12rem 0 0;font-size:.76rem;color:#64748b}
+.mn-tt .tg-lb__booked span{color:#0f172a;font-weight:500}
+.mn-tt .tg-lb__stars{color:#f5a623;letter-spacing:2px;font-size:.92rem;font-weight:700;margin:.35rem 0 .35rem}
+.mn-tt .tg-lb__text{margin:0 0 .5rem;color:#334155;line-height:1.5;font-size:.85rem;white-space:pre-line;overflow-wrap:break-word;word-wrap:break-word}
+.mn-tt .tg-lb__guide{margin-top:.55rem;display:flex;align-items:center;gap:.5rem;font-size:.76rem;color:#64748b}
+.mn-tt .tg-lb__gava{width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.mn-tt .tg-lb__gtext{font-size:.76rem;color:#64748b}
+.mn-tt .tg-lb__gtext strong{color:#0f172a;font-weight:600}
 
-.mn-tt .tg-lb__video{width:min(960px,92vw);aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden}
 
-.mn-tt .tg-lb__video iframe{width:100%;height:100%}
 
-.mn-tt .tg-lb__inner.is-review{background:#fff;border-radius:16px;overflow:hidden;max-width:min(1000px,100%);flex-direction:column}
 
-.mn-tt .tg-lb__inner.is-review .tg-lb__media{background:#0b1622;max-height:56vh}
 
-.mn-tt .tg-lb__inner.is-review .tg-lb__img{border-radius:0;max-height:56vh}
 
-.mn-tt .tg-lb__review{padding:1.1rem 1.3rem 1.3rem;max-height:34vh;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
 
-.mn-tt .tg-lb__stars{color:#f5a623;letter-spacing:2px;font-size:1rem}
 
-.mn-tt .tg-lb__text{margin:.45rem 0 .7rem;color:#334155;line-height:1.55;font-size:.95rem;white-space:pre-line}
 
-.mn-tt .tg-lb__who{margin:0;color:#0f172a;font-size:.9rem}
 
-.mn-tt .tg-lb__who span{color:#94a3b8;text-transform:uppercase;font-size:.72rem;letter-spacing:.04em}
 
-@media (min-width: 820px){.mn-tt .tg-lb__inner.is-review{flex-direction:row;align-items:stretch}.mn-tt .tg-lb__inner.is-review .tg-lb__media{max-height:80vh;flex:1 1 60%;min-width:0}.mn-tt .tg-lb__inner.is-review .tg-lb__img{max-height:80vh;width:100%;height:100%;object-fit:cover}.mn-tt .tg-lb__review{flex:0 0 320px;align-self:stretch;display:flex;flex-direction:column;justify-content:center;max-height:80vh}.mn-tt .tg-lb__review:has(.tg-lb__more){justify-content:flex-start}}
 
 .mn-tt .tg-lb__x, .mn-tt .tg-lb__nav{position:absolute;border:0;cursor:pointer;color:#fff;z-index:2;background:rgba(255,255,255,.16);border-radius:999px;display:flex;align-items:center;justify-content:center;transition:background .2s ease}
 
@@ -429,7 +440,6 @@
 
 .mn-tt .tg-lb__meta{margin:.3rem 0 0;font-size:.8rem;color:#64748b}
 
-.mn-tt .tg-lb__guide{margin:.45rem 0 0;display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:#334155}
 
 .mn-tt .tg-lb__guideimg{width:28px;height:28px;border-radius:999px;object-fit:cover;flex:none}
 
@@ -461,11 +471,8 @@
 
 .mn-tt .tg-lb__booked span{color:#64748b}
 
-.mn-tt .tg-lb__guide{margin:.75rem 0 0;padding-top:.7rem;border-top:1px solid #eef2f6;display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:#334155}
 
-.mn-tt .tg-lb__stars{margin-top:.9rem}
 
-.mn-tt .tg-lb__text{margin:.5rem 0 0}
 
 .mn-tt .block-trip-gallery .tg-mwrap{position:relative}
 
@@ -553,7 +560,6 @@
 
 .mn-tt .tg-lb__mnav{display:none}
 
-@media (max-width: 819px){.mn-tt .tg-lb{padding:0;place-items:stretch}.mn-tt .tg-lb__inner{max-width:100%;max-height:none;width:100%}.mn-tt .tg-lb__inner.is-review{border-radius:0;height:100dvh;max-height:100dvh;display:block;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}.mn-tt .tg-lb__inner.is-review .tg-lb__media{max-height:none}.mn-tt .tg-lb__inner.is-review .tg-lb__img{width:100%;max-height:62dvh;object-fit:contain}.mn-tt .tg-lb__review{max-height:none;overflow:visible;padding-bottom:5.5rem}.mn-tt .tg-lb__x{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;background:rgba(15,23,42,.6);box-shadow:0 2px 10px rgba(0,0,0,.35);z-index:6}.mn-tt .tg-lb__nav{display:none}.mn-tt .tg-lb__mnav{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.55rem 1rem calc(env(safe-area-inset-bottom,0px) + .55rem);background:rgba(255,255,255,.97);border-top:1px solid #e5e7eb}.mn-tt .tg-lb__mnav button{border:0;cursor:pointer;background:#0f172a;color:#fff;font-weight:700;font-size:.9rem;border-radius:999px;padding:.55rem 1.2rem}.mn-tt .tg-lb__count{color:#64748b;font-size:.82rem;font-weight:600}}
 
 .mn-tt .transition-height{transition-property:height;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:150ms}
 
@@ -1294,7 +1300,7 @@
 
 @media (max-width: 639px){.mn-tt .slide-form{width:100%;min-width:0;max-width:100%;box-sizing:border-box;overflow-y:auto}}
 
-.mn-tt{--iti-hover-color:rgba(0,0,0,.05);--iti-border-color:#ccc;--iti-dialcode-color:#999;--iti-dropdown-bg:white;--iti-spacer-horizontal:8px;--iti-flag-height:12px;--iti-flag-width:16px;--iti-border-width:1px;--iti-arrow-height:4px;--iti-arrow-width:6px;--iti-triangle-border:calc(var(--iti-arrow-width) / 2);--iti-arrow-padding:6px;--iti-arrow-color:#555;--iti-path-flags-1x:url("https://www.magicalnepal.com/wp-content/plugins/wpforms/assets/pro/css/fields/img/flags.webp");--iti-path-flags-2x:url("https://www.magicalnepal.com/wp-content/plugins/wpforms/assets/pro/css/fields/img/flags@2x.webp");--iti-path-globe-1x:url("https://www.magicalnepal.com/wp-content/plugins/wpforms/assets/pro/css/fields/img/globe.webp");--iti-path-globe-2x:url("https://www.magicalnepal.com/wp-content/plugins/wpforms/assets/pro/css/fields/img/globe@2x.webp");--iti-flag-sprite-width:3904px;--iti-flag-sprite-height:12px;--iti-mobile-popup-margin:30px}
+.mn-tt{--iti-hover-color:rgba(0,0,0,.05);--iti-border-color:#ccc;--iti-dialcode-color:#999;--iti-dropdown-bg:white;--iti-spacer-horizontal:8px;--iti-flag-height:12px;--iti-flag-width:16px;--iti-border-width:1px;--iti-arrow-height:4px;--iti-arrow-width:6px;--iti-triangle-border:calc(var(--iti-arrow-width) / 2);--iti-arrow-padding:6px;--iti-arrow-color:#555;--iti-path-flags-1x:url("https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80");--iti-path-flags-2x:url("https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80");--iti-path-globe-1x:url("https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80");--iti-path-globe-2x:url("https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80");--iti-flag-sprite-width:3904px;--iti-flag-sprite-height:12px;--iti-mobile-popup-margin:30px}
 
 .mn-tt{--iti-mobile-popup-margin:30px}
 
@@ -2224,10 +2230,38 @@
 /* ---- runtime overrides (must win) ---- */
 .mn-tt{font-family:Inter,"SF Pro Display",-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
 html:has(.mn-tt){scroll-behavior:smooth}
-/* The tab bar's `top` is driven per-frame by ABCStickyNav (AnnapurnaReference.tsx),
+/* The tab bar's `top` is driven per-frame by ABCStickyNav (EverestReference.tsx),
    which glues it to the header's live bottom edge so the two never overlap while
    the header slides in/out — no CSS transition on `top`, since easing would make
    the bar lag the header and re-create the overlap. */
 .mn-tt [id]{scroll-margin-top:140px}
 .mn-tt .trip-mobile-cta{position:static !important;bottom:auto !important;left:auto !important;right:auto !important;box-shadow:none !important}
 .mn-tt .tg-lb__img{max-width:min(1100px,92vw);max-height:78vh;width:auto;height:auto;object-fit:contain;border-radius:8px}
+
+/* Mobile fixes for traveller photos gallery: prevent overflow, keep chips inside visible section */
+@media (max-width: 640px){
+  .mn-tt .block-trip-gallery [data-gwrap="photos"]{overflow:hidden;max-width:100%}
+  .mn-tt .block-trip-gallery [data-gwrap="photos"] .tg-ogrid{grid-template-columns:repeat(2,1fr)!important;gap:.6rem!important}
+  .mn-tt .block-trip-gallery [data-gwrap="photos"] .tg-ph{overflow:hidden!important;width:100%!important;max-width:100%!important}
+  .mn-tt .block-trip-gallery [data-gwrap="photos"] .tg-ph img{width:100%!important;height:100%!important;object-fit:cover!important}
+  .mn-tt .block-trip-gallery [data-gwrap="photos"] .tg-ph--review .tg-chip{left:.4rem!important;bottom:.4rem!important;max-width:calc(100% - .8rem)!important;font-size:.65rem!important;padding:.22rem .5rem .22rem .25rem!important}
+  .mn-tt .block-trip-gallery [data-gwrap="photos"] .tg-chip__name{font-size:.68rem!important}
+  .mn-tt .block-trip-gallery [data-gwrap="photos"] .tg-chip__meta{font-size:.58rem!important}
+  .mn-tt .block-trip-gallery [data-gwrap="photos"] .tg-allpill{font-size:.7rem!important;padding:.4rem .7rem!important}
+}
+
+/* Mobile lightbox: full-size image, review text fits within screen */
+@media (max-width: 640px){
+  .mn-tt .tg-lb{padding:.6rem}
+  .mn-tt .tg-lb__inner.is-review{max-width:100%!important;border-radius:12px}
+  .mn-tt .tg-lb__inner.is-review .tg-lb__img{max-height:55vh!important;object-fit:cover!important;width:100%!important;height:100%!important}
+  .mn-tt .tg-lb__review{padding:.6rem .7rem!important;font-size:.8rem!important}
+  .mn-tt .tg-lb__text{font-size:.78rem!important;line-height:1.4!important}
+  .mn-tt .tg-lb__name{font-size:.85rem!important}
+  .mn-tt .tg-lb__name span{font-size:.6rem!important}
+  .mn-tt .tg-lb__meta{font-size:.6rem!important;white-space:normal!important}
+  .mn-tt .tg-lb__star-badge{top:.5rem!important;left:.5rem!important;padding:.25rem .5rem!important;font-size:.7rem!important}
+  .mn-tt .tg-lb__star-badge svg{width:12px!important;height:12px!important}
+  .mn-tt .tg-lb__x{top:10px!important;right:10px!important;width:36px!important;height:36px!important;font-size:1.4rem!important}
+  .mn-tt .tg-lb__nav{width:36px!important;height:36px!important;font-size:1.4rem!important}
+}

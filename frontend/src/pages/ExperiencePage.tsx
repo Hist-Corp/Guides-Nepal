@@ -15,6 +15,7 @@ import {
   Bookmark,
 } from 'lucide-react';
 import { useBookingStore } from '../store/bookingStore';
+import { BookingLoginPrompt } from '../components/common/BookingLoginPrompt';
 import { useAuthStore } from '../store/authStore';
 import { useProfileStore } from '../store/profileStore';
 import guidesApi from '../services/guidesApi';
@@ -671,6 +672,13 @@ const ExperiencePage: React.FC = () => {
 
   const { isAuthenticated, accessToken } = useAuthStore();
 
+  useEffect(() => {
+    if (accessToken) {
+      const now = new Date();
+      fetchUnavailableDates(now.getFullYear(), now.getMonth() + 1);
+    }
+  }, [accessToken]);
+
   // Load reviews for this experience and check whether the traveller is
   // eligible to leave one (completed booking + not yet reviewed).
   // Load reviews for this experience and check whether the current traveller
@@ -720,6 +728,7 @@ const ExperiencePage: React.FC = () => {
   const [, setBookmarkSaved] = useState(false);
   // Booking confirmation popup shown just before confirming.
   const [confirmPopup, setConfirmPopup] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   // Mobile sticky footer: configure-booking sheet state (same flow as the
   // city experience pages - dates, guests, start time and host in a sheet).
@@ -727,6 +736,8 @@ const ExperiencePage: React.FC = () => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [sheetError, setSheetError] = useState<string | null>(null);
   const [sheetConfirmed, setSheetConfirmed] = useState(false);
+  const [disabledDates, setDisabledDates] = useState<string[]>([]);
+  const [bookingConfirmed, setBookingConfirmed] = useState(false);
 
   // Reviews state
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -759,13 +770,27 @@ const ExperiencePage: React.FC = () => {
       image: experience.images[0],
       status: 'upcoming',
     });
-    if (bookingSaved) setIsBooked(true);
+    if (bookingSaved) { setIsBooked(true); setBookingConfirmed(true); }
     return bookingSaved;
+  };
+
+  const fetchUnavailableDates = async (year: number, month: number) => {
+    if (!accessToken) return;
+    try {
+      const url = getApiUrl(`/bookings/availability/month?year=${year}&month=${month}`);
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+      if (res.ok) {
+        const data = await res.json();
+        setDisabledDates(Array.isArray(data.unavailable) ? data.unavailable : []);
+      }
+    } catch {
+      // Silently fail
+    }
   };
 
   const handleBooking = async () => {
     if (!isAuthenticated) {
-      alert('Please log in to book an experience');
+      setShowLoginPrompt(true);
       return;
     }
 
@@ -862,7 +887,7 @@ const ExperiencePage: React.FC = () => {
 
     setSheetError(null);
     setBookingError(null);
-    if (await persistBooking()) setSheetConfirmed(true);
+    if (await persistBooking()) setIsSheetOpen(false);
   };
 
   const closeSheet = () => {
@@ -1274,6 +1299,8 @@ const ExperiencePage: React.FC = () => {
                       idPrefix="exp"
                       single
                       ariaLabel="Choose experience date"
+                      disabledDates={disabledDates}
+                      onMonthChange={fetchUnavailableDates}
                     />
                   </div>
                   <GuestPicker
@@ -1535,6 +1562,33 @@ const ExperiencePage: React.FC = () => {
           </div>
         </div>
       )}
+      <BookingLoginPrompt
+        isOpen={showLoginPrompt}
+        onClose={() => setShowLoginPrompt(false)}
+      />
+
+      {bookingConfirmed && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+              <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">Booking Confirmed!</h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Your booking has been confirmed. You can view it in your bookings.
+            </p>
+            <button
+              onClick={() => setBookingConfirmed(false)}
+              className="mt-6 w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-primary/90 active:scale-[0.98]"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );

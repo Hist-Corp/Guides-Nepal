@@ -30,7 +30,7 @@ export default function Customers({
     setLoading(true);
     getAdminUsers("traveler")
       .then((data) => setRows(Array.isArray(data) ? data : []))
-      .catch((e) => setError(e?.response?.data?.detail || "Could not load customers"))
+      .catch((e) => (() => { const _d = e?.response?.data?.detail; const _m = typeof _d === 'string' ? _d : (Array.isArray(_d) ? _d.map((x: any) => (typeof x === 'string' ? x : x?.msg || JSON.stringify(x))).join(' ') : (_d && typeof _d === 'object' ? (_d.msg || JSON.stringify(_d)) : null)); setError(_m || "Could not load customers"); })())
       .finally(() => setLoading(false));
   }, []);
 

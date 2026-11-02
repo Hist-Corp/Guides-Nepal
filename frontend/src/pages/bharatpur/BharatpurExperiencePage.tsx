@@ -13,7 +13,9 @@ import { BookingCalendar } from '../../components/common/BookingCalendar';
 import { GuestPicker } from '../../components/common/GuestPicker';
 import { TimePicker } from '../../components/common/TimePicker';
 import { useBookingStore } from '../../store/bookingStore';
+import { BookingLoginPrompt } from '../../components/common/BookingLoginPrompt';
 import { useAuthStore } from '../../store/authStore';
+import { getApiUrl } from '../../config/api';
 import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
 import { getAvailableGuides } from '../../utils/guides';
 import { isPredefinedTrip } from '../../utils/experienceBooking';
@@ -88,11 +90,38 @@ const BharatpurExperiencePage: React.FC = () => {
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [confirmPopup, setConfirmPopup] = useState(false);
+  const [disabledDates, setDisabledDates] = useState<string[]>([]);
+  const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   // Active bookings decide which guides are still available to show/select
   const bookings = useBookingStore((s) => s.bookings);
   const addBooking = useBookingStore((s) => s.addBooking);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const accessToken = useAuthStore((s) => s.accessToken);
+
+  const fetchUnavailableDates = async (year: number, month: number) => {
+    if (!accessToken) return;
+    try {
+      const guideId = selectedGuide?.id;
+      const url = getApiUrl(`/bookings/availability/month?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`);
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+      if (res.ok) {
+        const data = await res.json();
+        setDisabledDates(Array.isArray(data.unavailable) ? data.unavailable : []);
+      }
+    } catch {
+      // Silently fail
+    }
+  };
+
+  useEffect(() => {
+    if (accessToken) {
+      const now = new Date();
+      fetchUnavailableDates(now.getFullYear(), now.getMonth() + 1);
+    }
+  }, [selectedGuide, accessToken]);
+
   const availableGuides = useMemo(
     () => (data ? getAvailableGuides(data.guides ?? [], bookings, data.id, data.city ?? '') : []),
     [data, bookings]
@@ -100,7 +129,7 @@ const BharatpurExperiencePage: React.FC = () => {
 
   const handleBookNow = async (): Promise<boolean> => {
     if (!isAuthenticated) {
-      alert('Please log in to book an experience');
+      setShowLoginPrompt(true);
       return false;
     }
     if (!checkIn) {
@@ -174,6 +203,7 @@ const BharatpurExperiencePage: React.FC = () => {
     });
     if (success) {
       setConfirmPopup(false);
+      setBookingConfirmed(true);
     }
   };
 
@@ -193,7 +223,7 @@ const BharatpurExperiencePage: React.FC = () => {
     setSheetError(null);
     const success = await handleBookNow();
     if (success) {
-      setSheetConfirmed(true);
+      setIsSheetOpen(false);
     }
   };
 
@@ -499,6 +529,8 @@ const BharatpurExperiencePage: React.FC = () => {
                           }}
                           idPrefix="card"
                           single={singleDateTrip}
+                          disabledDates={disabledDates}
+                          onMonthChange={fetchUnavailableDates}
                         />
 
                         <GuestPicker
@@ -1139,6 +1171,33 @@ const BharatpurExperiencePage: React.FC = () => {
                 Confirm Booking
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      <BookingLoginPrompt
+        isOpen={showLoginPrompt}
+        onClose={() => setShowLoginPrompt(false)}
+      />
+
+      {bookingConfirmed && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+              <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">Booking Confirmed!</h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Your booking has been confirmed. You can view it in your bookings.
+            </p>
+            <button
+              onClick={() => setBookingConfirmed(false)}
+              className="mt-6 w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-primary/90 active:scale-[0.98]"
+            >
+              OK
+            </button>
           </div>
         </div>
       )}

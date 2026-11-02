@@ -228,7 +228,7 @@ export const FoodToursPage: React.FC = () => {
                   </div>
                   <div className="aspect-[3/4] rounded-2xl overflow-hidden shadow-lg rounded-bl-[4rem]">
                     <img
-                      src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80"
+                      src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80"
                       alt="Newari feast tasting"
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                     />
@@ -287,30 +287,32 @@ export const FoodToursPage: React.FC = () => {
               heart of Nepal.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1 items-center">
             {loading ? (
               // Loading skeleton
-              Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="text-center animate-pulse">
-                  <div className="aspect-[4/5] rounded-2xl bg-gray-200 mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-2 w-3/4 mx-auto"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2 mx-auto"></div>
+              Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="flex flex-col items-center text-center animate-pulse">
+                  <div className="aspect-[3/4] rounded-sm bg-gray-200 mb-1.5"></div>
+                  <div className="h-2 bg-gray-200 rounded mb-0.5 w-2/3 mx-auto"></div>
+                  <div className="h-1.5 bg-gray-200 rounded w-1/3 mx-auto"></div>
                 </div>
               ))
             ) : guides.length > 0 ? (
-              guides.map((guide) => (
-                <Link key={guide.name} to={`/local/${guide.id}`} className="text-center group">
-                  <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-lg mb-4 group-hover:shadow-xl transition-shadow duration-300">
+              guides.slice(0, 6).map((guide) => (
+                <Link key={guide.name} to={`/local/${guide.id}`} className="flex flex-col items-center text-center group">
+                  <div className="aspect-[3/4] rounded-sm overflow-hidden shadow-sm mb-1.5 group-hover:shadow-md transition-shadow duration-300">
                     <img
                       src={guide.image}
                       alt={guide.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
-                  <h3 className="font-bold text-lg text-gray-900 group-hover:text-[#D2691E] transition-colors duration-300">
+                  <h3 className="font-semibold text-lg text-gray-900 transition-colors duration-300 leading-tight">
                     {guide.name}
                   </h3>
-                  <p className="text-sm text-gray-600">{guide.role}</p>
+                  <p className="text-sm font-medium text-gray-900 leading-tight">
+                    {guide.role}
+                  </p>
                 </Link>
               ))
             ) : (

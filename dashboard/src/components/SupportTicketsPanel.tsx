@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { ChevronDown } from "lucide-react"
 import { getSupportTickets, updateSupportTicket } from "../services/api"
 
 const STATUSES = ["open", "in_progress", "resolved", "closed"]
@@ -39,16 +40,19 @@ export default function SupportTicketsPanel() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="text-xl font-semibold text-darkBlue">Support Tickets</div>
-        <select
-          className="rounded-lg border px-3 py-2 text-sm"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        >
+        <div className="relative">
+          <select
+            className="appearance-none rounded-lg border border-line bg-surface px-4 py-2 pr-9 text-sm font-medium text-main shadow-sm transition-colors hover:border-brand-300 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 cursor-pointer"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          >
           <option value="">All statuses</option>
           {STATUSES.map((s) => (
             <option key={s} value={s}>{s.replace("_", " ")}</option>
           ))}
         </select>
+          <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-soft" />
+        </div>
       </div>
       {msg && (
         <div className="rounded-lg bg-green-50 border border-green-200 text-green-700 px-3 py-2 text-sm">
