@@ -103,6 +103,61 @@ export async function deleteHostExperience(id: number) {
   return res.data
 }
 
+export async function publishHostExperience(id: number) {
+  const res = await http.post(`/host/experiences/${id}/publish`)
+  return res.data
+}
+
+export async function unpublishHostExperience(id: number) {
+  const res = await http.post(`/host/experiences/${id}/unpublish`)
+  return res.data
+}
+
+export async function getHostEarnings() {
+  const res = await http.get("/host/earnings")
+  return res.data
+}
+
+export async function getHostPayouts() {
+  const res = await http.get("/host/payouts")
+  return res.data
+}
+
+export async function requestPayout(payload: { amount: number }) {
+  const res = await http.post("/host/payouts", payload)
+  return res.data
+}
+
+export async function getHostBookingDetail(id: number) {
+  const res = await http.get(`/host/bookings/${id}`)
+  return res.data
+}
+
+export async function messageGuest(bookingId: number, message: string) {
+  const res = await http.post(`/host/bookings/${bookingId}/message`, { message })
+  return res.data
+}
+
+export async function getNotificationSettings() {
+  const res = await http.get("/host/settings/notifications")
+  return res.data
+}
+
+export async function updateNotificationSettings(payload: any) {
+  const res = await http.patch("/host/settings/notifications", payload)
+  return res.data
+}
+
+export async function getPayoutSettings() {
+  const res = await http.get("/host/settings/payout")
+  return res.data
+}
+
+export async function updatePayoutSettings(payload: any) {
+  const res = await http.patch("/host/settings/payout", payload)
+  return res.data
+}
+
 export async function createBooking(payload: {
   experience_id: number
   date: string

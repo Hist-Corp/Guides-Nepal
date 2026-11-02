@@ -1,22 +1,24 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Navigate, Link } from 'react-router-dom';
-import { Calendar, MapPin, Users, CreditCard, Clock } from 'lucide-react';
+import { Navigate } from 'react-router-dom';
+import { Calendar, MapPin, Users, CreditCard, Clock, MessageSquare, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
-import hostApi from '../../services/hostApi';
-import type { HostBooking } from '../../services/hostApi';
+import hostApi, { type HostBooking } from '../../services/hostApi';
 
 type TabKey = 'all' | 'upcoming' | 'accepted' | 'rejected' | 'completed';
 
 const TABS: TabKey[] = ['all', 'upcoming', 'accepted', 'rejected', 'completed'];
 
 const HostBookingsPage: React.FC = () => {
-  const { isAuthenticated, user, accessToken, logout } = useAuthStore();
+  const { isAuthenticated, user, accessToken } = useAuthStore();
   const [bookings, setBookings] = useState<HostBooking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<TabKey>('all');
+  const [viewingBooking, setViewingBooking] = useState<HostBooking | null>(null);
+  const [bookingDetailLoading, setBookingDetailLoading] = useState(false);
+  const [messageText, setMessageText] = useState('');
 
   const load = useCallback(async () => {
     if (!accessToken) return;
@@ -52,6 +54,34 @@ const HostBookingsPage: React.FC = () => {
     }
   };
 
+  const viewDetail = async (booking: HostBooking) => {
+    setViewingBooking(booking);
+    if (!booking.timeline?.length) {
+      setBookingDetailLoading(true);
+      try {
+        const detail = await hostApi.getBookingDetail(accessToken!, booking.id);
+        setViewingBooking(detail);
+      } catch (e) {
+        console.error('Failed to load booking detail', e);
+      } finally {
+        setBookingDetailLoading(false);
+      }
+    }
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!messageText.trim() || !viewingBooking) return;
+    try {
+      await hostApi.messageGuest(accessToken!, viewingBooking.id, messageText);
+      const detail = await hostApi.getBookingDetail(accessToken!, viewingBooking.id);
+      setViewingBooking(detail);
+      setMessageText('');
+    } catch (e) {
+      alert('Failed to send message');
+    }
+  };
+
   const statusColor = (status: string): string => {
     switch (status) {
       case 'upcoming':
@@ -62,6 +92,10 @@ const HostBookingsPage: React.FC = () => {
         return 'bg-red-600/20 text-red-700';
       case 'completed':
         return 'bg-gray-600/20 text-gray-700';
+      case 'cancelled':
+        return 'bg-red-600/20 text-red-700';
+      case 'pending':
+        return 'bg-amber-100 text-amber-700';
       default:
         return 'bg-gray-100 text-gray-600';
     }
@@ -95,6 +129,9 @@ const HostBookingsPage: React.FC = () => {
     );
   };
 
+  const formatDate = (dateStr: string) => new Date(dateStr).toLocaleString();
+  const formatDateOnly = (dateStr: string) => new Date(dateStr).toLocaleDateString();
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Header />
@@ -125,11 +162,11 @@ const HostBookingsPage: React.FC = () => {
           </div>
           <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
             <p className="text-xs font-bold uppercase text-gray-500">Earnings</p>
-            <p className="text-2xl font-bold text-gray-900">{stats.revenue}</p>
+            <p className="text-2xl font-bold text-gray-900">${stats.revenue.toLocaleString()}</p>
           </div>
         </div>
 
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 flex-wrap">
           {TABS.map(renderTabButton)}
         </div>
 
@@ -165,7 +202,7 @@ const HostBookingsPage: React.FC = () => {
                         </div>
                         <div>
                           <h3 className="font-bold text-gray-900 text-sm">{b.experience_title}</h3>
-                          <p className="text-xs text-gray-500">{b.status}</p>
+                          <p className="text-xs text-gray-500">{b.experience_city}</p>
                         </div>
                       </div>
                     </td>
@@ -176,46 +213,54 @@ const HostBookingsPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-gray-900 text-sm font-medium">
-                      {new Date(b.date).toLocaleDateString()}
+                      {formatDateOnly(b.date)}
                     </td>
                     <td className="px-6 py-4 text-gray-600 text-sm">
                       <Users className="w-4 h-4 inline mr-1" /> {b.guests}
                     </td>
                     <td className="px-6 py-4 text-gray-900 text-sm font-medium">
-                      {b.total_price}
+                      ${b.total_price.toLocaleString()}
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ' + statusColor(b.status)}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${statusColor(b.status)}`}
                       >
                         {b.status.charAt(0).toUpperCase() + b.status.slice(1)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      {b.status === 'upcoming' && (
-                        <div className="flex gap-2 justify-end">
-                          <button
-                            onClick={() => decide(b.id, 'accepted')}
-                            className="px-3 py-1.5 rounded-full bg-green-600 text-xs font-bold text-white hover:bg-green-700"
-                          >
-                            Accept
-                          </button>
-                          <button
-                            onClick={() => decide(b.id, 'rejected')}
-                            className="px-3 py-1.5 rounded-full bg-red-600 text-xs font-bold text-white hover:bg-red-700"
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      )}
-                      {b.status === 'accepted' && (
+                      <div className="flex items-center gap-2 justify-end">
                         <button
-                          onClick={() => decide(b.id, 'completed')}
-                          className="px-3 py-1.5 rounded-full bg-gray-900 text-xs font-bold text-white hover:bg-black"
+                          onClick={() => viewDetail(b)}
+                          className="px-3 py-1.5 rounded-full border border-gray-200 bg-white text-xs font-bold text-gray-700 hover:bg-gray-50"
                         >
-                          Mark completed
+                          <MessageSquare className="w-3 h-3 mr-1" /> Details
                         </button>
-                      )}
+                        {b.status === 'pending' && (
+                          <>
+                            <button
+                              onClick={() => decide(b.id, 'accepted')}
+                              className="px-3 py-1.5 rounded-full bg-green-600 text-xs font-bold text-white hover:bg-green-700"
+                            >
+                              Accept
+                            </button>
+                            <button
+                              onClick={() => decide(b.id, 'rejected')}
+                              className="px-3 py-1.5 rounded-full bg-red-600 text-xs font-bold text-white hover:bg-red-700"
+                            >
+                              Reject
+                            </button>
+                          </>
+                        )}
+                        {b.status === 'accepted' && (
+                          <button
+                            onClick={() => decide(b.id, 'completed')}
+                            className="px-3 py-1.5 rounded-full bg-gray-900 text-xs font-bold text-white hover:bg-black"
+                          >
+                            Mark completed
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -225,8 +270,145 @@ const HostBookingsPage: React.FC = () => {
         )}
       </main>
       <Footer />
+
+      {viewingBooking && (
+        <BookingDetailModal
+          booking={viewingBooking}
+          onClose={() => setViewingBooking(null)}
+          onMessage={handleSendMessage}
+          loading={bookingDetailLoading}
+          messageText={messageText}
+          setMessageText={setMessageText}
+        />
+      )}
     </div>
   );
 };
+
+function BookingDetailModal({
+  booking,
+  onClose,
+  onMessage,
+  loading,
+  messageText,
+  setMessageText,
+}: {
+  booking: HostBooking;
+  onClose: () => void;
+  onMessage: (e: React.FormEvent) => void;
+  loading: boolean;
+  messageText: string;
+  setMessageText: (value: string) => void;
+}) {
+  const statusColor = (status: string): string => {
+    switch (status) {
+      case 'upcoming': return 'bg-brand-yellow/20 text-[#213448]';
+      case 'accepted': return 'bg-green-600/20 text-green-700';
+      case 'rejected': return 'bg-red-600/20 text-red-700';
+      case 'completed': return 'bg-gray-600/20 text-gray-700';
+      case 'cancelled': return 'bg-red-600/20 text-red-700';
+      case 'pending': return 'bg-amber-100 text-amber-700';
+      default: return 'bg-gray-100 text-gray-600';
+    }
+  };
+
+  const formatDate = (dateStr: string) => new Date(dateStr).toLocaleString();
+
+  const actorIcons: Record<string, string> = { guest: '👤', host: '🏠', system: '⚙️' };
+  const actorLabels: Record<string, string> = { guest: 'Guest', host: 'You', system: 'System' };
+  const typeColors: Record<string, string> = {
+    created: 'text-blue-600', accepted: 'text-green-600', rejected: 'text-red-600',
+    cancelled: 'text-red-600', completed: 'text-gray-600', message: 'text-purple-600', reminder: 'text-amber-600'
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-6 border border-gray-100 max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {loading && <div className="flex justify-center py-8"><p className="text-gray-500">Loading details…</p></div>}
+        {!loading && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">{booking.experience_title}</h2>
+                <p className="text-sm text-gray-500">{booking.experience_city}</p>
+              </div>
+              <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap ${statusColor(booking.status)}`}>
+                {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <DetailField label="Guest" value={booking.guest_name} />
+              <DetailField label="Email" value={booking.guest_email} />
+              <DetailField label="Phone" value={booking.guest_phone || '—'} />
+              <DetailField label="Booking date" value={formatDate(booking.date)} />
+              <DetailField label="Guests" value={String(booking.guests)} />
+              <DetailField label="Total price" value={`$${booking.total_price.toLocaleString()}`} />
+              <DetailField label="Booking ID" value={String(booking.id)} />
+              <DetailField label="Created" value={formatDate(booking.created_at)} />
+            </div>
+
+            {booking.notes && (
+              <div className="rounded-lg bg-gray-50 p-4">
+                <h3 className="font-semibold text-gray-900 mb-2">Guest notes</h3>
+                <p className="text-gray-600 whitespace-pre-wrap">{booking.notes}</p>
+              </div>
+            )}
+
+            <div className="border-t pt-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-gray-900">Timeline</h3>
+                <form onSubmit={onMessage} className="flex gap-2 w-full max-w-md">
+                  <input
+                    type="text"
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
+                    placeholder="Message guest…"
+                    className="flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
+                  />
+                  <button type="submit" className="px-3 py-2 rounded-xl bg-brand-yellow text-[#213448] font-bold hover:bg-[#ffba0a] text-sm">
+                    Send
+                  </button>
+                </form>
+              </div>
+              <div className="space-y-3">
+                {booking.timeline?.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">No timeline events yet.</p>
+                ) : (
+                  booking.timeline.map((event) => (
+                    <div key={event.id} className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm">
+                        {actorIcons[event.actor] || '⚙️'}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-gray-900">{actorLabels[event.actor] || event.actor}</span>
+                          <span className="text-xs text-gray-500">{new Date(event.created_at).toLocaleString()}</span>
+                        </div>
+                        <p className={`text-sm ${typeColors[event.event_type] || ''}`}>{event.description}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DetailField({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <span className="text-xs text-gray-400 block mb-1">{label}</span>
+      <span className="font-medium text-gray-900">{value}</span>
+    </div>
+  );
+}
 
 export default HostBookingsPage;

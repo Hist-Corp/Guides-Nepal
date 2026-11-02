@@ -1,10 +1,29 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
-import { Plus, Trash2, Edit3, Eye, CalendarDays, AlertCircle } from 'lucide-react';
+import { Plus, Trash2, Edit3, Eye, CalendarDays, AlertCircle, CheckCircle, XCircle, ExternalLink } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import hostApi, { type HostExperience, type HostExperienceCreate } from '../../services/hostApi';
+
+const cities = ['Kathmandu', 'Pokhara', 'Lalitpur', 'Bhaktapur', 'Bharatpur'];
+const categories = ['Heritage & Culture', 'Nature & Adventure', 'Food & Drink', 'Wellness', 'Arts & Crafts', 'Photography'];
+
+const getStatusBadge = (status: string) => {
+  const variants: Record<string, { bg: string; text: string }> = {
+    draft: { bg: 'bg-amber-100', text: 'text-amber-700' },
+    listed: { bg: 'bg-emerald-100', text: 'text-emerald-700' },
+    archived: { bg: 'bg-gray-100', text: 'text-gray-700' },
+  };
+  const v = variants[status] || variants.draft;
+  return (
+    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${v.bg} ${v.text}`}>
+      {status.charAt(0).toUpperCase() + status.slice(1)}
+    </span>
+  );
+};
+
+const StatusBadge = ({ status }: { status: string }) => getStatusBadge(status);
 
 const HostExperiencesPage: React.FC = () => {
   const { isAuthenticated, user, accessToken } = useAuthStore();
@@ -13,6 +32,7 @@ const HostExperiencesPage: React.FC = () => {
   const [error, setError] = useState('');
   const [openForm, setOpenForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [viewingExp, setViewingExp] = useState<HostExperience | null>(null);
   const [form, setForm] = useState<HostExperienceCreate>({
     title: '',
     city: '',
@@ -100,6 +120,32 @@ const HostExperiencesPage: React.FC = () => {
     setOpenForm(true);
   };
 
+  const handleView = (exp: HostExperience) => {
+    setViewingExp(exp);
+  };
+
+  const handlePublish = async (id: number) => {
+    if (!accessToken) return;
+    try {
+      await hostApi.publishExperience(accessToken, id);
+      await load();
+      setViewingExp(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Unable to publish experience.');
+    }
+  };
+
+  const handleUnpublish = async (id: number) => {
+    if (!accessToken) return;
+    try {
+      await hostApi.unpublishExperience(accessToken, id);
+      await load();
+      setViewingExp(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Unable to unpublish experience.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Header />
@@ -162,8 +208,9 @@ const HostExperiencesPage: React.FC = () => {
                     {exp.category}
                   </span>
                   <span className="absolute top-2 right-2 rounded-full bg-white px-2 py-1 text-xs font-bold text-gray-900">
-                    {exp.price}
+                    ${exp.price}
                   </span>
+                  <StatusBadge status={exp.status} />
                 </div>
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-2 mb-2">
@@ -178,7 +225,7 @@ const HostExperiencesPage: React.FC = () => {
                     <span>{exp.duration}</span>
                   </div>
                   <p className="text-sm text-gray-600 line-clamp-2 mb-4">{exp.description}</p>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Link
                       to={`/experience/${exp.id}`}
                       className="flex-1 text-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-gray-800 hover:bg-gray-50"
@@ -186,11 +233,32 @@ const HostExperiencesPage: React.FC = () => {
                       View
                     </Link>
                     <button
+                      onClick={() => handleView(exp)}
+                      className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-gray-800 hover:bg-gray-50"
+                    >
+                      <Eye className="w-4 h-4 mr-1" /> Details
+                    </button>
+                    <button
                       onClick={() => handleEdit(exp)}
                       className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-gray-800 hover:bg-gray-50"
                     >
                       <Edit3 className="w-4 h-4 mr-1" /> Edit
                     </button>
+                    {exp.status === 'listed' ? (
+                      <button
+                        onClick={() => handleUnpublish(exp.id)}
+                        className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-amber-600 hover:bg-amber-50"
+                      >
+                        <XCircle className="w-4 h-4 mr-1" /> Unpublish
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handlePublish(exp.id)}
+                        className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-emerald-600 hover:bg-emerald-50"
+                      >
+                        <CheckCircle className="w-4 h-4 mr-1" /> Publish
+                      </button>
+                    )}
                     <button
                       onClick={() => handleDelete(exp.id)}
                       disabled={deletingId === exp.id}
@@ -207,117 +275,241 @@ const HostExperiencesPage: React.FC = () => {
       </main>
       <Footer />
 
+      {viewingExp && (
+        <ExperienceDetailModal
+          experience={viewingExp}
+          onClose={() => setViewingExp(null)}
+          onEdit={() => { handleEdit(viewingExp!); setViewingExp(null) }}
+          onPublish={handlePublish}
+          onUnpublish={handleUnpublish}
+          onDelete={() => { handleDelete(viewingExp!.id); setViewingExp(null) }}
+        />
+      )}
+
       {openForm && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setOpenForm(false)}>
-          <div
-            className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 border border-gray-100"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-start justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900">
-                {editingId ? 'Edit Experience' : 'Add Experience'}
-              </h2>
-              <button onClick={() => setOpenForm(false)} className="text-gray-400 hover:text-gray-600">
-                <AlertCircle className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Title</label>
-                <input
-                  type="text"
-                  required
-                  value={form.title}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">City</label>
-                <input
-                  type="text"
-                  required
-                  value={form.city}
-                  onChange={(e) => setForm({ ...form, city: e.target.value })}
-                  className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Category</label>
-                <input
-                  type="text"
-                  required
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Description</label>
-                <textarea
-                  required
-                  minLength={30}
-                  rows={4}
-                  value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Price</label>
-                  <input
-                    type="number"
-                    required
-                    min="0"
-                    step="0.01"
-                    value={form.price}
-                    onChange={(e) => setForm({ ...form, price: Number(e.target.value) || 0 })}
-                    className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Duration</label>
-                  <input
-                    type="text"
-                    required
-                    value={form.duration}
-                    onChange={(e) => setForm({ ...form, duration: e.target.value })}
-                    className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Hero image URL</label>
-                <input
-                  type="text"
-                  value={form.hero_image}
-                  onChange={(e) => setForm({ ...form, hero_image: e.target.value })}
-                  className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
-                />
-              </div>
-              <div className="flex gap-3 justify-end pt-4">
-                <button
-                  type="button"
-                  onClick={() => setOpenForm(false)}
-                  className="flex-1 px-5 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-bold hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="flex-1 px-5 py-2.5 rounded-xl bg-brand-yellow text-[#213448] font-bold hover:bg-[#ffba0a] disabled:opacity-60"
-                >
-                  {saving ? 'Saving...' : editingId ? 'Update experience' : 'Create experience'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <ExperienceFormModal
+          form={form}
+          setForm={setForm}
+          editingId={editingId}
+          saving={saving}
+          onSubmit={handleSubmit}
+          onClose={() => { resetForm(); setOpenForm(false); }}
+        />
       )}
     </div>
   );
 };
+
+function ExperienceDetailModal({
+  experience,
+  onClose,
+  onEdit,
+  onPublish,
+  onUnpublish,
+  onDelete,
+}: {
+  experience: HostExperience;
+  onClose: () => void;
+  onEdit: () => void;
+  onPublish: (id: number) => void;
+  onUnpublish: (id: number) => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 border border-gray-100 max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-900">{experience.title}</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <AlertCircle className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            {experience.hero_image && (
+              <img src={experience.hero_image} alt={experience.title} className="h-48 w-full sm:w-72 rounded-2xl object-cover flex-shrink-0" />
+            )}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-sm text-gray-500">{experience.city} · {experience.category}</p>
+                </div>
+                <StatusBadge status={experience.status} />
+              </div>
+              <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                <div><span className="text-gray-400 block">Duration</span><span className="font-medium">{experience.duration}</span></div>
+                <div><span className="text-gray-400 block">Price</span><span className="font-medium text-[#213448]">${experience.price.toFixed(2)}</span></div>
+                <div><span className="text-gray-400 block">Bookings</span><span className="font-medium">{experience.bookings_count}</span></div>
+                <div><span className="text-gray-400 block">Rating</span><span className="font-medium">{experience.rating > 0 ? `★ ${experience.rating.toFixed(1)} (${experience.review_count})` : 'No ratings'}</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-2">Description</h3>
+            <p className="text-gray-600 whitespace-pre-wrap">{experience.description}</p>
+          </div>
+
+          <div className="flex flex-wrap gap-2 pt-4 border-t">
+            <button onClick={onEdit} className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-800 hover:bg-gray-50">
+              Edit experience
+            </button>
+            {experience.status === 'listed' ? (
+              <button onClick={() => onUnpublish(experience.id)} className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-bold text-amber-600 hover:bg-amber-50">
+                Unpublish
+              </button>
+            ) : (
+              <button onClick={() => onPublish(experience.id)} className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700">
+                Publish
+              </button>
+            )}
+            <button onClick={onDelete} className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-bold text-red-600 hover:bg-red-50">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ExperienceFormModal({
+  form,
+  setForm,
+  editingId,
+  saving,
+  onSubmit,
+  onClose,
+}: {
+  form: HostExperienceCreate;
+  setForm: React.Dispatch<React.SetStateAction<HostExperienceCreate>>;
+  editingId: number | null;
+  saving: boolean;
+  onSubmit: (e: React.FormEvent) => void;
+  onClose: () => void;
+}) {
+  const setField = (key: keyof HostExperienceCreate, value: string | number) => {
+    setForm((current) => ({ ...current, [key]: value }));
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 border border-gray-100 max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-900">
+            {editingId ? 'Edit Experience' : 'Add Experience'}
+          </h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <AlertCircle className="w-5 h-5" />
+          </button>
+        </div>
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Title *</label>
+            <input
+              type="text"
+              required
+              value={form.title}
+              onChange={(e) => setField('title', e.target.value)}
+              className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">City *</label>
+            <select
+              required
+              value={form.city}
+              onChange={(e) => setField('city', e.target.value)}
+              className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
+            >
+              <option value="">Select city</option>
+              {cities.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Category *</label>
+            <select
+              required
+              value={form.category}
+              onChange={(e) => setField('category', e.target.value)}
+              className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
+            >
+              <option value="">Select category</option>
+              {categories.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Description *</label>
+            <textarea
+              required
+              minLength={30}
+              rows={4}
+              value={form.description}
+              onChange={(e) => setField('description', e.target.value)}
+              className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Price per guest (USD) *</label>
+              <input
+                type="number"
+                required
+                min="0"
+                step="0.01"
+                value={form.price}
+                onChange={(e) => setField('price', Number(e.target.value) || 0)}
+                className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Duration *</label>
+              <input
+                type="text"
+                required
+                value={form.duration}
+                onChange={(e) => setField('duration', e.target.value)}
+                placeholder="e.g., 4h, 2h 30m"
+                className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Hero image URL (optional)</label>
+            <input
+              type="text"
+              value={form.hero_image}
+              onChange={(e) => setField('hero_image', e.target.value)}
+              placeholder="https://..."
+              className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
+            />
+          </div>
+          <div className="flex gap-3 justify-end pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-5 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-bold hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="flex-1 px-5 py-2.5 rounded-xl bg-brand-yellow text-[#213448] font-bold hover:bg-[#ffba0a] disabled:opacity-60"
+            >
+              {saving ? 'Saving...' : editingId ? 'Update experience' : 'Create experience'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
 
 export default HostExperiencesPage;

@@ -51,6 +51,7 @@ const HostExperiences = lazy(() => import('./host/Experiences'));
 const HostBookings = lazy(() => import('./host/Bookings'));
 const HostEarnings = lazy(() => import('./host/Earnings'));
 const HostPerformance = lazy(() => import('./host/Performance'));
+const HostSettings = lazy(() => import('./host/Settings'));
 
 export default function App() {
   return (
@@ -183,8 +184,7 @@ export default function App() {
             <Route path="tours" element={<HostTours />} />
             <Route path="experiences" element={<HostExperiences />} />
             <Route path="bookings" element={<HostBookings />} />
-            <Route
-              path="customers"
+            <Route path="customers"
               element={
                 <Customers
                   title="My Customers"
@@ -194,6 +194,7 @@ export default function App() {
             />
             <Route path="earnings" element={<HostEarnings />} />
             <Route path="performance" element={<HostPerformance />} />
+            <Route path="settings" element={<HostSettings />} />
           </Route>
           {/* Unknown dashboard URLs fall back to login. */}
           <Route path="*" element={<Navigate to="/dashboard/login" replace />} />

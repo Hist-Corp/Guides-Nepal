@@ -1,5 +1,5 @@
+from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Text
-from sqlalchemy.sql import func
 from app.core.database import Base
 
 
@@ -31,5 +31,5 @@ class HostApplication(Base):
     reviewed_by = Column(String, nullable=True)
     review_note = Column(String, nullable=True)
     reviewed_at = Column(DateTime(timezone=True), nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+    updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)

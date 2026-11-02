@@ -192,6 +192,12 @@ export default function NavSidebar() {
               { to: `${base}/customers`, label: "Customers", icon: "user" },
             ],
           },
+          {
+            heading: "Settings",
+            items: [
+              { to: `${base}/settings`, label: "Settings", icon: "settings" },
+            ],
+          },
         ]
       : role === "regional-head"
       ? [
