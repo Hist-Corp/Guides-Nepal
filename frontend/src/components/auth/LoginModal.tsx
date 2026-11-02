@@ -354,13 +354,27 @@ export const LoginModal: React.FC<LoginModalProps> = ({
           </form>
 
           <div className="text-center mt-6 text-sm text-gray-500">
-            No account?{' '}
-            <button
-              onClick={onSwitchToSignup}
-              className="text-[#213448] font-bold hover:text-brand-yellow hover:underline transition-colors"
-            >
-              Sign up
-            </button>
+            {userType === 'host' ? (
+              <>
+                No account?{' '}
+                <button
+                  onClick={() => navigate('/host-application')}
+                  className="text-[#213448] font-bold hover:text-brand-yellow hover:underline transition-colors"
+                >
+                  Become a Host
+                </button>
+              </>
+            ) : (
+              <>
+                No account?{' '}
+                <button
+                  onClick={onSwitchToSignup}
+                  className="text-[#213448] font-bold hover:text-brand-yellow hover:underline transition-colors"
+                >
+                  Sign up
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

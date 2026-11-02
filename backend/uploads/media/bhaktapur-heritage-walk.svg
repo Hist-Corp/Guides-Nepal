@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" rx="12" fill="url(#bg)"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fef3c7"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <path d="M100 210 L100 140 L120 140 L120 210 Z" fill="#d97706"/>
+  <path d="M140 130 L140 210 L160 210 L160 130 Z" fill="#d97706"/>
+  <path d="M180 150 L180 210 L200 210 L200 150 Z" fill="#d97706"/>
+  <path d="M220 140 L220 210 L240 210 L240 140 Z" fill="#d97706"/>
+  <path d="M260 160 L260 210 L280 210 L280 160 Z" fill="#d97706"/>
+  <circle cx="200" cy="120" r="25" fill="#fbbf24"/>
+  <path d="M185 120 L185 100 L215 100 L215 120 Z" fill="#fbbf24"/>
+  <circle cx="200" cy="95" r="10" fill="#fbbf24"/>
+  <text x="200" y="285" font-family="Arial" font-size="12" fill="#92400e" text-anchor="middle">Heritage Walk</text>
+</svg>

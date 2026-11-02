@@ -80,7 +80,7 @@ app.include_router(
 )
 
 # Static file mounting with restrictions
-uploads_dir = os.path.join(os.path.dirname(__file__), "uploads")
+uploads_dir = os.path.join(os.path.dirname(__file__), "..", "uploads")
 try:
     os.makedirs(uploads_dir, exist_ok=True)
     app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
