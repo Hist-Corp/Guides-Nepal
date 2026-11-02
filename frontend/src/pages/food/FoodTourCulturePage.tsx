@@ -124,7 +124,7 @@ const cultures: Record<string, CultureConfig> = {
       {
         title: 'Forest Greens Forage',
         image:
-          'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1740&q=80',
+          'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1740&q=80',
         description:
           "Journey into the Terai's verdant forests where Tharu women possess encyclopedic knowledge of over 200 edible wild plants, each with distinct flavors, medicinal properties, and seasonal availability. Discover delicate fiddlehead ferns that emerge with the spring rains, offering a grassy, asparagus-like flavor with subtle nutty undertones. Learn to identify wild amaranth leaves (latte saag) prized for their earthy, slightly peppery taste and exceptional nutritional value. Experience the preparation of bamboo shoots (tama) that require careful processing to remove bitterness while preserving their crisp texture and subtle sweetness. These foraging traditions represent centuries of ecological wisdom, where every plant has its story, season, and specific culinary application that connects the Tharu people to their forest home in profound ways.",
       },

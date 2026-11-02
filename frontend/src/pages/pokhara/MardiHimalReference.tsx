@@ -496,9 +496,10 @@ export const MardiHimalGallery: React.FC = () => {
                 onClick={(e) => e.stopPropagation()}
                 style={{ position: 'relative', zIndex: 1 }}
               >
-                <div className="tg-lb__media">
+                <div className="tg-lb__media" style={{ position: 'relative' }}>
                   {imgOk ? (
-                    <img
+                    <>
+                      <img
                       key={current.src}
                       className="tg-lb__img"
                       src={current.src}
@@ -509,8 +510,15 @@ export const MardiHimalGallery: React.FC = () => {
                       }
                       referrerPolicy="no-referrer"
                       onError={() => setImgOk(false)}
-                      style={{ maxWidth: 'min(1000px,88vw)', maxHeight: '78vh' }}
+                      style={{ maxWidth: '100%', height: 'auto' }}
                     />
+                      {review && (
+                        <div className="tg-lb__star-badge">
+                          <span className="tg-lb__star-badge--active">{'★'.repeat(Number(review.rating) || 5)}</span>
+                          <span className="tg-lb__star-badge--inactive">{'☆'.repeat(5 - (Number(review.rating) || 5))}</span>
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <div
                       style={{
@@ -703,8 +711,8 @@ export const MardiHimalMain: React.FC = () => {
     // the share-menu links (Facebook/X/Email, wired at runtime in ABCHeading)
     // are always kept.
     const KEPT_OUTBOUND = new Set([
-      'https://www.magicalnepal.com/travel-guide/kathmandu/go-kathmandu-pokhara/',
-      'https://www.magicalnepal.com/nepal/kathmandu/tour/kathmandu-day-tour/',
+      'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80',
       'https://nepaliport.immigration.gov.np/onlinevisa-mission/application',
       'https://ntb.gov.np/',
     ]);

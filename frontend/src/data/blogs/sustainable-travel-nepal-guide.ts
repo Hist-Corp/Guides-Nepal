@@ -47,7 +47,7 @@ Agencies registered with **TAAN** or the **Nepal Mountaineering Association (NMA
 - **Skip single-use toiletries** where possible; bring bar soap and shampoo in reusable cases.
 - **Stay on marked trails** to protect thin alpine soils and terraced fields.
 
-![Village homestay in the hills](https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80 "Community homestays in villages like Ghalegaun keep trip income with host families.")
+![Village homestay in the hills](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80"Community homestays in villages like Ghalegaun keep trip income with host families.")
 
 ## Respect Culture as Carefully as Nature
 

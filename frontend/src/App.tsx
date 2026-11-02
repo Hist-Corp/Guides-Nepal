@@ -48,6 +48,10 @@ import ExplorePage from './pages/ExplorePage';
 import BecomeHostPage from './pages/host/BecomeHostPage';
 import HostApplicationWizard from './pages/host/HostApplicationWizard';
 import HostDashboardPage from './pages/host/HostDashboardPage';
+import HostExperiencesPage from './pages/host/HostExperiencesPage';
+import HostBookingsPage from './pages/host/HostBookingsPage';
+import HostEarningsPage from './pages/host/HostEarningsPage';
+import HostSettingsPage from './pages/host/HostSettingsPage';
 import BecomeGuidePage from './pages/guide/BecomeGuidePage';
 import GuideOnboardingPage from './pages/guide/GuideOnboardingPage';
 import GuideDashboardPage from './pages/guide/GuideDashboardPage';
@@ -138,6 +142,10 @@ function App() {
             <Route path="/become-host" element={<BecomeHostPage />} />
             <Route path="/host-application" element={<HostApplicationWizard />} />
             <Route path="/host/dashboard" element={<HostDashboardPage />} />
+            <Route path="/host/experiences" element={<HostExperiencesPage />} />
+            <Route path="/host/bookings" element={<HostBookingsPage />} />
+            <Route path="/host/earnings" element={<HostEarningsPage />} />
+            <Route path="/host/settings" element={<HostSettingsPage />} />
             <Route path="/become-guide" element={<BecomeGuidePage />} />
             <Route path="/guide-application" element={<BecomeGuidePage />} />
             <Route path="/bookings" element={<BookingsPage />} />

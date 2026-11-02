@@ -55,7 +55,7 @@ export const outdoorActivities = [
     duration: '12 days',
     price: 899,
     image:
-      'https://images.unsplash.com/photo-1544735716-392fe2489ffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80',
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1740&q=80',
     locals: ['Tenzin', 'Lhakpa', 'Pema'],
     slug: 'everest-base-camp-trek',
   },

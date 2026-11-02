@@ -41,7 +41,7 @@ Most visitors meet Boudhanath at midday. For the contemplative side, head uphill
 
 Check the monastery calendar: short courses, pujas, and teachings run through the year. Dress modestly, keep voices low, and never point your feet at shrines.
 
-![Boudhanath stupa at dawn](https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=1200&q=80 "Boudhanath's great stupa is calmest at dawn before the kora crowds arrive.")
+![Boudhanath stupa at dawn](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80"Boudhanath's great stupa is calmest at dawn before the kora crowds arrive.")
 
 > Getting there: a 15-minute taxi from Boudhanath, or a steep but pleasant 40-minute uphill walk. Start early to catch the morning light.
 

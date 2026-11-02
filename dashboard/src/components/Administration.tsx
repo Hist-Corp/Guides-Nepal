@@ -44,7 +44,7 @@ export default function Administration({
     setLoading(true);
     getAdminUsers()
       .then((data) => setRows(Array.isArray(data) ? data : []))
-      .catch((e) => setError(e?.response?.data?.detail || "Could not load users"))
+      .catch((e) => (() => { const _d = e?.response?.data?.detail; const _m = typeof _d === 'string' ? _d : (Array.isArray(_d) ? _d.map((x: any) => (typeof x === 'string' ? x : x?.msg || JSON.stringify(x))).join(' ') : (_d && typeof _d === 'object' ? (_d.msg || JSON.stringify(_d)) : null)); setError(_m || "Could not load users"); })())
       .finally(() => setLoading(false));
   }, []);
 

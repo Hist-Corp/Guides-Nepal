@@ -54,12 +54,17 @@ class BookingService:
             return guide.id
         return None
 
-    def availability_for_date(self, date: str) -> dict:
-        guide = self.get_booking_guide()
+    def availability_for_date(self, date: str, guide_id: Optional[int] = None) -> dict:
+        if guide_id is not None:
+            guide_user_id = self._resolve_guide_user_id(guide_id)
+            if guide_user_id is None:
+                return {"available": True, "status": "free"}
+        else:
+            guide_user_id = self.get_booking_guide().id
         active = (
             self.db.query(Booking)
             .filter(
-                Booking.guide_user_id == guide.id,
+                Booking.guide_user_id == guide_user_id,
                 func.date(Booking.date) == date,
                 Booking.status.in_([BookingStatus.upcoming, BookingStatus.accepted]),
             )
@@ -69,6 +74,30 @@ class BookingService:
             return {"available": True, "status": "free"}
         status = "booked" if active.status == BookingStatus.accepted else "reserved"
         return {"available": False, "status": status}
+
+    def availability_for_month(self, year: int, month: int, guide_id: Optional[int] = None) -> list[str]:
+        """Return list of unavailable date strings (YYYY-MM-DD) for the given month."""
+        import calendar
+        if guide_id is not None:
+            guide_user_id = self._resolve_guide_user_id(guide_id)
+            if guide_user_id is None:
+                return []
+        else:
+            guide_user_id = self.get_booking_guide().id
+        _, days_in_month = calendar.monthrange(year, month)
+        start = f"{year:04d}-{month:02d}-01"
+        end = f"{year:04d}-{month:02d}-{days_in_month:02d}"
+        rows = (
+            self.db.query(Booking)
+            .filter(
+                Booking.guide_user_id == guide_user_id,
+                func.date(Booking.date) >= start,
+                func.date(Booking.date) <= end,
+                Booking.status.in_([BookingStatus.upcoming, BookingStatus.accepted]),
+            )
+            .all()
+        )
+        return [b.date.strftime("%Y-%m-%d") if hasattr(b.date, "strftime") else str(b.date)[:10] for b in rows]
 
     def create_booking(self, user_id: int, booking_in: BookingCreate) -> Booking:
         # Honor the guide/host the traveler selected when it maps to an active

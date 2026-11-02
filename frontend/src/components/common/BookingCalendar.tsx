@@ -12,10 +12,14 @@ interface BookingCalendarProps {
   minDate?: string;
   /** Latest selectable date (inclusive), yyyy-mm-dd */
   maxDate?: string;
+  /** Dates that should be disabled (yyyy-mm-dd), e.g. guide unavailable */
+  disabledDates?: string[];
   /** Accessible label announced for the trigger buttons */
   ariaLabel?: string;
   /** Compact trigger styling for narrow booking cards (smaller padding/text). */
   compact?: boolean;
+  /** Called when the visible month changes (year, month 1-12). */
+  onMonthChange?: (year: number, month: number) => void;
 }
 
 const toKey = (d: Date): string => {
@@ -134,8 +138,10 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
   single = false,
   minDate,
   maxDate,
+  disabledDates,
   ariaLabel,
   compact = false,
+  onMonthChange,
 }) => {
   const today = useMemo(() => {
     const t = new Date();
@@ -146,6 +152,12 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     const anchor = parseKey(checkIn) ?? today;
     return new Date(anchor.getFullYear(), anchor.getMonth(), 1);
   });
+
+  useEffect(() => {
+    if (onMonthChange) {
+      onMonthChange(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1);
+    }
+  }, [visibleMonth, onMonthChange]);
   const [isOpen, setIsOpen] = useState(false);
   const [hoverKey, setHoverKey] = useState<string | null>(null);
   /** Which field the next grid click fills; null = derive from the current range. */
@@ -170,6 +182,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
   const isDisabled = (key: string): boolean => {
     if (key < minKey) return true;
     if (maxDate && key > maxDate) return true;
+    if (disabledDates && disabledDates.includes(key)) return true;
     return false;
   };
 

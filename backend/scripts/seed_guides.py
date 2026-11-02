@@ -84,8 +84,43 @@ guides_data = [
             "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
         ],
     },
-]
 
+    {
+        "id": 5,
+        "name": "Mingma",
+        "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+        "role": "Everest Region Trek Lead",
+        "rating": 4.94,
+        "reviews": 156,
+        "bio": "High-altitude trekking specialist with 10+ years of experience leading expeditions in the Everest region.",
+        "languages": ["English", "Nepali", "Sherpa"],
+        "verified": True,
+        "livesIn": "Kathmandu",
+        "cities": ["Kathmandu", "Lalitpur"],
+        "gallery": [
+            "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+            "https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+            "https://images.unsplash.com/photo-1523275334575-1c0148a2533b?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&q=80",
+        ],
+    },
+    {
+        "id": 6,
+        "name": "Sarita",
+        "image": "https://images.unsplash.com/photo-1615109398623-88346a601842?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80",
+        "role": "Cultural Experience Host",
+        "rating": 4.88,
+        "reviews": 178,
+        "bio": "Passionate about Nepali heritage, festivals, and local traditions. Loves introducing travelers to authentic cultural experiences.",
+        "languages": ["English", "Nepali"],
+        "verified": True,
+        "livesIn": "Bhaktapur",
+        "cities": ["Bhaktapur", "Kathmandu"],
+        "gallery": [
+            "https://images.unsplash.com/photo-1615109398623-88346a601842?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+            "https://images.unsplash.com/photo-1615109398623-88346a601842?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&q=80",
+        ],
+    },
+]
 
 def seed_guides() -> None:
     """Seed the database with guides data"""

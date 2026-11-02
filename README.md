@@ -16,6 +16,34 @@ This repository contains a Vite + React frontend, an optional dashboard app, and
 
 ## Changelog
 
+### v1.3.1 (unreleased)
+
+**Auth — Host Login Fixed**
+
+- Host login (`POST /api/v1/auth/login` with `role=host`) now succeeds for
+  pre-seeded host accounts. `backend/seed_credentials.py` now seeds an
+  approved `HostApplication` for `host@guides-nepal.com` so the login gate
+  (which requires an approved application) passes.
+- `backend/app/services/auth_service.py: _host_approval_ok()` now ensures the
+  `host_applications` credential-lifecycle columns exist at login time via
+  runtime `ALTER TABLE`, fixing `no such column: host_applications.credential_token_hash`
+  on existing SQLite databases.
+
+**Host Frontend Pages**
+
+- New host pages on the public frontend (`http://localhost:5175`):
+  - `/host/experiences` — create, edit, delete experiences
+  - `/host/bookings` — accept/reject/complete traveler bookings
+  - `/host/earnings` — total, pending, and monthly earnings
+  - `/host/settings` — profile, region, password, 2FA
+- Routing added under `frontend/src/App.tsx`; API service at
+  `frontend/src/services/hostApi.ts`.
+
+**Host Login Credentials**
+- Email: `host@guides-nepal.com` · Password: `HostPass123!` (set via `HOST_PASSWORD` env var)
+
+After signing in as host, you land on `/host/dashboard`.
+
 ### v1.3.0 (2026-10-08)
 
 **Search & Discovery**
@@ -347,13 +375,14 @@ and host. `guide` and `traveler` accounts have no console and are refused at sig
 - `/content-manager/media` - Media library
 - `/content-manager/seo` - SEO settings
 
-#### Host (`host` role)
-- `/host` - Host overview
-- `/host/guides` - Manage guide profiles
-- `/host/tours` - Manage tours
-- `/host/bookings` - View bookings
-- `/host/earnings` - Earnings dashboard
-- `/host/performance` - Performance metrics
+#### Host (`host` role) — Host Frontend (`http://localhost:5175`)
+
+- `/host/dashboard` - Host home: quick links to experiences, bookings, earnings, settings
+- `/host/experiences` - Create, edit, and delete your experiences
+- `/host/bookings` - Review, accept, reject, and complete traveler bookings
+- `/host/earnings` - View total, pending, and monthly earnings
+- `/host/settings` - Update profile, region, password, and 2FA
+
 
 ### Role Assignment During Registration
 
@@ -369,7 +398,14 @@ request body is client-controlled. Elevated roles are granted by an admin via
 `PATCH /api/v1/admin/users/{id}` (which validates against `ADMIN_ASSIGNABLE_ROLES` and
 refuses to mass-assign `hashed_password`), or by `backend/seed_credentials.py`.
 
-After registration, hosts must be approved by an admin or regional head before they can access their full dashboard features.
+After registration, hosts must be approved by an admin or regional head before they can log in.
+Approval mints the `users` login row (`role=host`, `is_active=true`) and sets the linked
+`HostApplication` to `approved`. Until approved, `POST /api/v1/auth/login` returns `403`
+with "Your host account is not active yet..." — wrong password and not-yet-approved both
+return the same generic refusal so account state is never leaked.
+
+The pre-seeded host account (`host@guides-nepal.com`) is seeded with an approved
+`HostApplication` by `seed_credentials.py`, so it can log in immediately.
 
 ## Key features
 
@@ -786,5 +822,5 @@ This project is licensed under MIT. See the LICENSE file for details.
 
 ---
 
-**Last updated:** 2026-10-08  
-**Version:** 1.3.0
+**Last updated:** 2026-11-01  
+**Version:** 1.3.1

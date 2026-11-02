@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, Plus, Minus, ShoppingCart } from 'lucide-react';
 import { useCart } from '../../contexts/CartContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
@@ -13,6 +13,7 @@ interface CartProps {
 
 const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
   const { items, removeItem, updateQuantity, getTotalItems, getTotalPrice } = useCart();
+  const [showCheckoutPrompt, setShowCheckoutPrompt] = useState(false);
   const { formatPrice } = useCurrency();
   const cancelBooking = useBookingStore((state) => state.cancelBooking);
   const deleteBooking = useBookingStore((state) => state.deleteBooking);
@@ -33,14 +34,16 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
 
   const handleCheckout = () => {
     // Implement checkout logic here
-    alert('Checkout functionality will be implemented soon!');
+    setShowCheckoutPrompt(true);
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black bg-opacity-50 transition-opacity"
+        className="absolute inset-0 bg-black/20 transition-opacity"
         onClick={onClose}
       />
       
@@ -154,7 +157,36 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
           )}
         </div>
       </div>
-    </div>
+      </div>
+      )}
+    {showCheckoutPrompt && (
+      <div
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm p-4"
+        onClick={() => setShowCheckoutPrompt(false)}
+      >
+        <div
+          className="relative w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl animate-in fade-in zoom-in-95"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
+            <svg className="h-7 w-7 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 className="text-lg font-bold text-gray-900">Checkout functionality will be implemented soon!</h2>
+          <p className="mt-2 text-sm text-gray-600">
+            We're working on bringing you a seamless checkout experience. Stay tuned!
+          </p>
+          <button
+            onClick={() => setShowCheckoutPrompt(false)}
+            className="mt-6 w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-primary/90 active:scale-[0.98]"
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 

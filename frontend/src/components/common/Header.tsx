@@ -14,6 +14,8 @@ import {
   Star,
   MapPin as MapPinIcon,
   Sparkles,
+  LayoutDashboard,
+  MessageCircle,
 } from 'lucide-react';
 import { LoginModal } from '../auth/LoginModal';
 import { SignupModal } from '../auth/SignupModal';
@@ -32,6 +34,18 @@ export const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Listen for open-login-modal and open-signup-modal events from BookingLoginPrompt
+  useEffect(() => {
+    const openLogin = () => setIsLoginOpen(true);
+    const openSignup = () => setIsSignupOpen(true);
+    window.addEventListener('open-login-modal', openLogin);
+    window.addEventListener('open-signup-modal', openSignup);
+    return () => {
+      window.removeEventListener('open-login-modal', openLogin);
+      window.removeEventListener('open-signup-modal', openSignup);
+    };
+  }, []);
   const { isSearchOpen, openSearch, closeSearch, searchQuery, setSearchQuery, openCart } =
     useUIStore();
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -161,14 +175,15 @@ export const Header: React.FC = () => {
 
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileProfileDropdownRef = useRef<HTMLDivElement>(null);
 
   // Close profile dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        profileDropdownRef.current &&
-        !profileDropdownRef.current.contains(event.target as Node)
-      ) {
+      const target = event.target as Node;
+      const inDesktop = profileDropdownRef.current && profileDropdownRef.current.contains(target);
+      const inMobile = mobileProfileDropdownRef.current && mobileProfileDropdownRef.current.contains(target);
+      if (!inDesktop && !inMobile) {
         setIsProfileDropdownOpen(false);
       }
     };
@@ -231,7 +246,7 @@ export const Header: React.FC = () => {
           )}
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">
             {!isAuthenticated ? (
               <>
                 <button
@@ -257,6 +272,14 @@ export const Header: React.FC = () => {
                     Dashboard
                   </Link>
                 )}
+                {user?.role === 'host' && (
+                  <Link
+                    to="/host/dashboard"
+                    className="text-sm font-bold text-gray-800 hover:text-primary transition-colors flex items-center gap-2"
+                  >
+                    <LayoutDashboard className="w-4 h-4" /> Dashboard
+                  </Link>
+                )}
                 <Link
                   to="/favorites"
                   className="text-gray-800 hover:text-primary transition-colors"
@@ -267,7 +290,6 @@ export const Header: React.FC = () => {
                   ref={profileDropdownRef}
                   className="relative inline-block"
                   onMouseEnter={() => setIsProfileDropdownOpen(true)}
-                  onMouseLeave={() => setIsProfileDropdownOpen(false)}
                 >
                   <button
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
@@ -283,7 +305,7 @@ export const Header: React.FC = () => {
                   </button>
                   {/* Dropdown Menu */}
                   <div
-                    className={`absolute right-0 top-full pt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 transition-all duration-200 ${isProfileDropdownOpen ? 'visible opacity-100' : 'invisible opacity-0 pointer-events-none'} animate-in fade-in zoom-in-95`}
+                    className={`absolute right-0 top-full pt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 transition-all duration-200 z-50 ${isProfileDropdownOpen ? 'visible opacity-100 pointer-events-auto' : 'invisible opacity-0 pointer-events-none'} animate-in fade-in zoom-in-95`}
                   >
                     <div className="px-4 py-2 border-b border-gray-100 mb-2">
                       <p className="font-bold text-gray-900 truncate">
@@ -298,6 +320,45 @@ export const Header: React.FC = () => {
                     >
                       Profile
                     </Link>
+                    {user?.role === 'host' && (
+                      <>
+                        <Link
+                          to="/host/dashboard"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center gap-2"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          <LayoutDashboard className="w-4 h-4" /> Host dashboard
+                        </Link>
+                        <Link
+                          to="/host/experiences"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          My experiences
+                        </Link>
+                        <Link
+                          to="/host/bookings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          Bookings
+                        </Link>
+                        <Link
+                          to="/host/earnings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          Earnings
+                        </Link>
+                        <Link
+                          to="/host/settings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          Settings
+                        </Link>
+                      </>
+                    )}
                     {user?.role === 'guide' && (
                       <>
                         <Link
@@ -305,7 +366,7 @@ export const Header: React.FC = () => {
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
                           onClick={() => setIsProfileDropdownOpen(false)}
                         >
-                          Guide dashboard
+                          Dashboard
                         </Link>
                         <Link
                           to="/guide/listings"
@@ -322,6 +383,15 @@ export const Header: React.FC = () => {
                           Onboarding
                         </Link>
                       </>
+                    )}
+                    {(user?.role !== 'host' && user?.role !== 'guide') && (
+                      <Link
+                        to="/bookings"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        Travel lists
+                      </Link>
                     )}
                     <button
                       onClick={() => {
@@ -378,7 +448,7 @@ export const Header: React.FC = () => {
           </div>
 
           {/* Mobile Actions */}
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center gap-2 lg:hidden">
             {/* Mobile Search Icon (on home page: animates in after scrolling past hero) */}
             {!isHostApplicationPage && (
               <button
@@ -393,6 +463,94 @@ export const Header: React.FC = () => {
               >
                 <Search className="w-5 h-5 shrink-0" />
               </button>
+            )}
+            {isAuthenticated && (
+              <>
+                <Link
+                  to="/maila-dai"
+                  className="w-10 h-10 bg-white hover:bg-slate-50 text-gray-800 rounded-lg flex items-center justify-center transition-colors shadow-sm"
+                  title="Chat with Maila Dai"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                </Link>
+                <div className="relative" ref={mobileProfileDropdownRef}>
+                  <button
+                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                    className="w-10 h-10 bg-white hover:bg-slate-50 text-gray-800 rounded-lg flex items-center justify-center transition-colors shadow-sm"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-300">
+                      {user?.firstName ? (
+                        <span className="font-bold text-sm text-gray-700">{user.firstName[0]}</span>
+                      ) : (
+                        <User className="w-5 h-5 text-gray-500" />
+                      )}
+                    </div>
+                  </button>
+                {isProfileDropdownOpen && (
+                  <div className="absolute right-0 top-full pt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[100] animate-in fade-in zoom-in-95">
+                    <div className="px-4 py-2 border-b border-gray-100 mb-2">
+                      <p className="font-bold text-gray-900 truncate">
+                        {user?.firstName} {user?.lastName}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                    </div>
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                      onClick={() => setIsProfileDropdownOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    {user?.role === 'guide' ? (
+                      <Link
+                        to="/guide/dashboard"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        Dashboard
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/bookings"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        Travel lists
+                      </Link>
+                    )}
+                    {user?.role === 'guide' && (
+                      <>
+                        <Link
+                          to="/guide/listings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          My listings
+                        </Link>
+                        <Link
+                          to="/guide/onboarding"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          Onboarding
+                        </Link>
+                      </>
+                    )}
+                    <button
+                      onClick={() => {
+                        logout();
+                        useBookingStore.setState({ bookings: [] });
+                        navigate('/');
+                        setIsProfileDropdownOpen(false);
+                      }}
+                      className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-bold"
+                    >
+                      Log out
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
             )}
             {!isAuthenticated && (
               <>
@@ -521,6 +679,79 @@ export const Header: React.FC = () => {
                           >
                             Profile
                           </Link>
+                          {user?.role === 'host' && (
+                            <>
+                              <Link
+                                to="/host/dashboard"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2 flex items-center gap-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                <LayoutDashboard className="w-4 h-4" /> Host dashboard
+                              </Link>
+                              <Link
+                                to="/host/experiences"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                My experiences
+                              </Link>
+                              <Link
+                                to="/host/bookings"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                Bookings
+                              </Link>
+                              <Link
+                                to="/host/earnings"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                Earnings
+                              </Link>
+                              <Link
+                                to="/host/settings"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                Settings
+                              </Link>
+                            </>
+                          )}
+                          {user?.role === 'guide' && (
+                            <>
+                              <Link
+                                to="/guide/dashboard"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                Dashboard
+                              </Link>
+                              <Link
+                                to="/guide/listings"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                My listings
+                              </Link>
+                              <Link
+                                to="/guide/onboarding"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                Onboarding
+                              </Link>
+                            </>
+                          )}
+                          {(user?.role !== 'host' && user?.role !== 'guide') && (
+                            <Link
+                              to="/bookings"
+                              className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                              onClick={() => setIsMenuOpen(false)}
+                            >
+                              Travel lists
+                            </Link>
+                          )}
                           <button
                           onClick={() => {
                             logout();
