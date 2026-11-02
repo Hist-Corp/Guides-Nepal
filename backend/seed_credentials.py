@@ -1,4 +1,13 @@
 """Set known passwords for dev seed users that had undocumented passwords."""
+# All credentials for every dashboard role in the project.
+# Role hierarchy: admin > content-manager > regional-head > customer-support > host > guide
+#
+# These rows are created here rather than through POST /auth/register on purpose:
+# `guide` (and every staff role) is outside SELF_REGISTERABLE_ROLES, so the
+# public registration endpoint refuses to mint it.
+import os
+
+from app.core.database import SessionLocal
 from app.core.roles import (
     ADMIN,
     CONTENT_MANAGER,
@@ -7,17 +16,13 @@ from app.core.roles import (
     HOST,
     REGIONAL_HEAD,
 )
-from app.core.database import SessionLocal
-from app.core.security import get_password_hash, verify_password, validate_password_strength
+from app.core.security import (
+    get_password_hash,
+    validate_password_strength,
+    verify_password,
+)
+from app.models.host_application import HostApplication
 from app.models.user import User
-
-# All credentials for every dashboard role in the project.
-# Role hierarchy: admin > content-manager > regional-head > customer-support > host > guide
-#
-# These rows are created here rather than through POST /auth/register on purpose:
-# `guide` (and every staff role) is outside SELF_REGISTERABLE_ROLES, so the
-# public registration endpoint refuses to mint it.
-import os
 
 CREDENTIALS = {
     "admin@guides-nepal.com":        {"password": os.environ.get("ADMIN_PASSWORD"),            "role": ADMIN},
@@ -69,6 +74,22 @@ for email, info in CREDENTIALS.items():
         db.commit()
         ok = verify_password(password, db.query(User).filter(User.email == email).first().hashed_password)
         print(f"  [CREATED] {email:35s} | Role: {role:20s} | Password: {password:20s} | Verified: {ok}")
+
+    # Host login is gated on an approved HostApplication. Seed one so the
+    # directly-created host account can log in (mirrors staff approval).
+    if role == HOST:
+        app = (
+            db.query(HostApplication)
+            .filter(HostApplication.email == email.lower())
+            .order_by(HostApplication.id.desc())
+            .first()
+        )
+        if app is None:
+            db.add(HostApplication(email=email.lower(), status="approved"))
+            db.commit()
+        elif (app.status or "").lower() != "approved":
+            app.status = "approved"
+            db.commit()
 
 print("=" * 80)
 print(f"Total users: {db.query(User).count()}")

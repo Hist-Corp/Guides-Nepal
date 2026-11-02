@@ -1,19 +1,21 @@
-from typing import Optional, Dict, Any
-import secrets
 import logging
+import secrets
+from typing import Any
+
 import httpx
 from sqlalchemy.orm import Session
-from app.models.user import User
-from app.schemas.auth import UserCreate, UserResponse
-from app.core.security import (
-    get_password_hash,
-    verify_password,
-    create_access_token,
-    create_refresh_token,
-    validate_password_strength,
-)
+
 from app.core.config import settings
 from app.core.roles import TRAVELER, is_known_role, normalize_role
+from app.core.security import (
+    create_access_token,
+    create_refresh_token,
+    get_password_hash,
+    validate_password_strength,
+    verify_password,
+)
+from app.models.user import User
+from app.schemas.auth import UserCreate, UserResponse
 
 logger = logging.getLogger(__name__)
 
@@ -22,10 +24,10 @@ class AuthService:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_user_by_email(self, email: str) -> Optional[User]:
+    def get_user_by_email(self, email: str) -> User | None:
         return self.db.query(User).filter(User.email == email).first()
 
-    def check_supabase_user_exists(self, email: str) -> Dict[str, Any]:
+    def check_supabase_user_exists(self, email: str) -> dict[str, Any]:
         """
         Check whether a user exists in Supabase Auth.
 
@@ -35,7 +37,7 @@ class AuthService:
             - user_id: the Supabase user ID (or None)
             - email_confirmed: whether the email is confirmed (or None)
         """
-        result: Dict[str, Any] = {
+        result: dict[str, Any] = {
             "email": email,
             "exists": False,
             "user_id": None,
@@ -201,6 +203,13 @@ class AuthService:
         from app.models.host_application import HostApplication
 
         email_l = (email or "").strip().lower()
+        # Ensure the host_applications credential-lifecycle columns exist
+        # before querying (SQLite uses runtime ALTER TABLE instead of Alembic
+        # for these columns; the helper normally runs on operations routes,
+        # but login hits this path directly).
+        from app.api.v1.operations import _ensure_host_application_columns
+
+        _ensure_host_application_columns(self.db)
         app = (
             self.db.query(HostApplication)
             .filter(HostApplication.email == email_l)
@@ -209,7 +218,7 @@ class AuthService:
         )
         return bool(app and (app.status or "").lower() == "approved")
 
-    def authenticate_user(self, email: str, password: str) -> Optional[User]:
+    def authenticate_user(self, email: str, password: str) -> User | None:
         user = self.get_user_by_email(email)
         if not user:
             return None
@@ -239,15 +248,15 @@ class AuthService:
     def upsert_social_user(
         self,
         email: str,
-        first_name: Optional[str] = None,
-        last_name: Optional[str] = None,
+        first_name: str | None = None,
+        last_name: str | None = None,
     ) -> User:
         user = self.get_user_by_email(email)
         if user:
             if first_name and not user.firstName:
-                setattr(user, "firstName", first_name)
+                user.firstName = first_name
             if last_name and not user.lastName:
-                setattr(user, "lastName", last_name)
+                user.lastName = last_name
             self.db.commit()
             self.db.refresh(user)
             return user
@@ -277,7 +286,7 @@ class AuthService:
         if not is_valid:
             raise ValueError(error_message)
 
-        setattr(user, "hashed_password", get_password_hash(new_password))
+        user.hashed_password = get_password_hash(new_password)
         self.db.commit()
         self.db.refresh(user)
         return user
