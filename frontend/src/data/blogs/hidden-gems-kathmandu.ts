@@ -6,12 +6,12 @@ This guide shares ten local-favourite spots: hidden courtyard temples, basement 
 
 ![Courtyard temples in old Kathmandu](https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=1200&q=80 "Quiet temple courtyards hide just steps from busy bazaars like Indra Chowk.")
 
-## At a Glance
+## Fact Table
 
-- **Best season:** October to March for clear skies; December and January are cold at night so pack layers.
-- **Getting around:** Most central gems are walkable from Thamel or Durbar Marg. For Chobhar and Champadevi hire a taxi for half a day.
-- **Money:** Carry small Nepali rupee notes for tea, donations, and snacks. ATMs cluster in Thamel and Durbar Marg.
-- **Etiquette:** Cover shoulders and knees at temples, remove shoes before inner sanctums, circle stupas clockwise, and ask before photographing people.
+Best season|October to March for clear skies; December and January are cold at night so pack layers
+Getting around|Most central gems are walkable from Thamel or Durbar Marg. For Chobhar and Champadevi hire a taxi for half a day
+Money|Carry small Nepali rupee notes for tea, donations, and snacks. ATMs cluster in Thamel and Durbar Marg
+Etiquette|Cover shoulders and knees at temples, remove shoes before inner sanctums, circle stupas clockwise, and ask before photographing people
 
 > Local rule of thumb: if a lane looks too narrow to lead anywhere, it probably leads to the best courtyard in the neighbourhood.
 
@@ -19,13 +19,16 @@ This guide shares ten local-favourite spots: hidden courtyard temples, basement 
 
 Tucked behind the textile stalls of Indra Chowk, a narrow brick lane opens into tranquil courtyards most tourists walk past. Here stands **Akash Bhairav**, a three-tiered pagoda to the sky god, ringed by smaller shrines where locals light butter lamps at dawn. Carved woodwork shows scenes from the Mahabharata, and the silence inside sits in stark contrast to traffic twenty metres away.
 
-Go between **6:00 and 8:00 AM** for morning puja, marigold, and incense. There is no entry fee; a small donation is appreciated.
+**When to go:** Between **6:00 and 8:00 AM** for morning puja, marigold, and incense
+**Cost:** No entry fee; a small donation is appreciated
 
 ## 2. Asan Tole's Basement Chiya Shops
 
 Asan Tole is Kathmandu's oldest market square. Beneath the main level, down worn stone steps near the southern corner, basement chiya shops serve rickshaw drivers, shopkeepers, and elders over steaming glasses of spiced milk tea.
 
-There are no signboards. Follow the clatter of kettles and the smell of cardamom, ginger, and boiled milk. A glass of **masala chiya** is famously cheap, and you may get **sel roti**, the ring-shaped rice bread fried until crisp. Visit **4:00 to 6:00 PM**, bring small change, and expect conversation: many families have traded here for three generations.
+There are no signboards. Follow the clatter of kettles and the smell of cardamom, ginger, and boiled milk. A glass of **masala chiya** is famously cheap, and you may get **sel roti**, the ring-shaped rice bread fried until crisp. **When to go:** **4:00 to 6:00 PM**, bring small change
+**Cost:** A glass of masala chiya is famously cheap
+**Try:** **Sel roti**, the ring-shaped rice bread fried until crisp
 
 ![Spiced milk tea in Kathmandu](https://images.unsplash.com/photo-1571934811356-5cc061b6821f?auto=format&fit=crop&w=1200&q=80 "Basement chiya shops near Asan gather locals every afternoon for masala tea.")
 
@@ -33,13 +36,18 @@ There are no signboards. Follow the clatter of kettles and the smell of cardamom
 
 Before piped water, the valley ran on **dhara**: carved stone spouts feeding neighbourhood basins. Many have dried up, but a handful still flow. One of the best-preserved hides in the alleys behind Mangal Bazaar, a ten-minute walk from Patan Durbar Square, where a dragon-mouth spout fills a basin locals still use for vegetables and bottles.
 
-The water is cold and clear, but stick to bottled or filtered water for drinking. Morning is liveliest, when the neighbourhood comes to wash, chat, and fill jars.
+**When to go:** Morning is liveliest, when the neighbourhood comes to wash, chat, and fill jars
+**Note:** The water is cold and clear, but stick to bottled or filtered water for drinking
 
 ## 4. Kopan's Quiet Morning Sessions
 
 Most visitors meet Boudhanath at midday. For the contemplative side, head uphill to **Kopan Monastery**, founded in the 1970s and now one of the valley's best-known Tibetan Buddhist centres. Early meditation sessions and the terrace view over Boudhanath's white dome are worth the climb.
 
-Check the monastery calendar: short courses, pujas, and teachings run through the year. Dress modestly, keep voices low, and never point your feet at shrines.
+Check the monastery calendar: short courses, daily puja, and guest talks. No entry fee; donations welcome.
+
+![Kopan Monastery view](https://images.unsplash.com/photo-1541131989912-2b3c5a7f8a84?auto=format&fit=crop&w=1200&q=80 "Kopan Monastery terrace overlooks the Boudhanath stupa.")
+
+> Getting there: a 15-minute taxi from Boudhanath, or a steep but pleasant 40-minute uphill walk. Start early to catch the morning light.
 
 ![Boudhanath stupa at dawn](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80"Boudhanath's great stupa is calmest at dawn before the kora crowds arrive.")
 

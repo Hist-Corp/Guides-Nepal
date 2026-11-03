@@ -13,19 +13,28 @@ import {
   MapPin,
   Share2,
   CheckCircle2,
+  Quote,
+  FileText,
+  ChevronRight,
 } from 'lucide-react';
 import { getCmsBlogPosts, type CmsBlogPost } from '../services/cms';
 import { staticBlogPosts } from './BlogPage';
 import { blogFullContent } from '../data/blogContent';
 
 type BlogPost = (typeof staticBlogPosts)[number] & { content?: string };
+type FactRow = { label: string; value: string };
+type AuthorBio = { name: string; role: string; bio: string };
 type Block =
   | { kind: 'h2'; text: string; id: string }
   | { kind: 'h3'; text: string; id: string }
   | { kind: 'p'; text: string }
   | { kind: 'list'; items: string[] }
   | { kind: 'quote'; text: string }
-  | { kind: 'image'; alt: string; src: string; caption?: string };
+  | { kind: 'image'; alt: string; src: string; caption?: string }
+  | { kind: 'key-takeaways'; items: string[] }
+  | { kind: 'fact-table'; rows: FactRow[] }
+  | { kind: 'author-bio'; bios: AuthorBio[] }
+  | { kind: 'faq'; question: string; answer: string };
 
 function slugifyHeading(text: string): string {
   return text
@@ -55,6 +64,14 @@ function parseContent(raw: string): Block[] {
   const blocks: Block[] = [];
   let para: string[] = [];
   let list: string[] = [];
+  let tableRows: FactRow[] = [];
+  let inTable = false;
+  let keyTakeaways: string[] = [];
+  let inKeyTakeaways = false;
+  let authorBios: AuthorBio[] = [];
+  let currentBio: Partial<AuthorBio> | null = null;
+  let inAuthorBio = false;
+
   const flushP = () => {
     const t = para.join(' ').trim();
     if (t) blocks.push({ kind: 'p', text: t });
@@ -64,17 +81,53 @@ function parseContent(raw: string): Block[] {
     if (list.length) blocks.push({ kind: 'list', items: list });
     list = [];
   };
+  const flushTable = () => {
+    if (tableRows.length) {
+      blocks.push({ kind: 'fact-table', rows: tableRows });
+      tableRows = [];
+    }
+    inTable = false;
+  };
+  const flushKeyTakeaways = () => {
+    if (keyTakeaways.length) {
+      blocks.push({ kind: 'key-takeaways', items: keyTakeaways });
+      keyTakeaways = [];
+    }
+    inKeyTakeaways = false;
+  };
+  const flushAuthorBio = () => {
+    if (currentBio && (currentBio.name || currentBio.bio)) {
+      authorBios.push({
+        name: currentBio.name || '',
+        role: currentBio.role || '',
+        bio: currentBio.bio || '',
+      });
+    }
+    currentBio = null;
+    inAuthorBio = false;
+    if (authorBios.length) {
+      blocks.push({ kind: 'author-bio', bios: authorBios });
+      authorBios = [];
+    }
+  };
+
   for (const rl of lines) {
     const line = rl.trim();
     if (!line) {
       flushP();
       flushL();
+      flushTable();
+      flushKeyTakeaways();
+      flushAuthorBio();
       continue;
     }
     const m = line.match(/^!\[(.*?)\]\((\S+?)(?:\s+"(.*?)")?\)$/);
     if (m) {
       flushP();
       flushL();
+      flushTable();
+      flushKeyTakeaways();
+      flushAuthorBio();
       blocks.push({
         kind: 'image',
         alt: m[1] || 'Nepal travel photo',
@@ -83,24 +136,85 @@ function parseContent(raw: string): Block[] {
       });
       continue;
     }
-    if (line.startsWith('## ')) {
+    const headingMatch = line.match(/^##\s+(.+)$/);
+    if (headingMatch) {
+      const headingText = headingMatch[1].trim();
+      const lower = headingText.toLowerCase();
       flushP();
       flushL();
-      const t = line.slice(3).trim();
-      blocks.push({ kind: 'h2', text: t, id: slugifyHeading(t) });
+      flushTable();
+      flushKeyTakeaways();
+      flushAuthorBio();
+      if (lower === 'key takeaways') {
+        inKeyTakeaways = true;
+        continue;
+      }
+      if (lower === 'fact table') {
+        inTable = true;
+        continue;
+      }
+      if (lower === 'about the author') {
+        inAuthorBio = true;
+        continue;
+      }
+      if (lower === 'frequently asked questions') {
+        blocks.push({ kind: 'h2', text: headingText, id: slugifyHeading(headingText) });
+        continue;
+      }
+      blocks.push({ kind: 'h2', text: headingText, id: slugifyHeading(headingText) });
       continue;
     }
     if (line.startsWith('### ')) {
       flushP();
       flushL();
+      flushTable();
+      flushKeyTakeaways();
+      flushAuthorBio();
       const t = line.slice(4).trim();
       blocks.push({ kind: 'h3', text: t, id: slugifyHeading(t) });
       continue;
     }
-    if (line.startsWith('> ')) {
+    if (inKeyTakeaways && /^[-*]\s+/.test(line)) {
+      keyTakeaways.push(line.replace(/^[-*]\s+/, '').trim());
+      continue;
+    }
+    if (inTable && line.includes('|') && !line.startsWith('|---')) {
+      const cells = line.split('|').map((c) => c.trim()).filter(Boolean);
+      if (cells.length >= 2) {
+        tableRows.push({ label: cells[0], value: cells.slice(1).join(' | ') });
+      }
+      continue;
+    }
+    if (inAuthorBio) {
+      const nameMatch = line.match(/^\*\*(.+?)\*\*\s*—\s*(.+)$/);
+      if (nameMatch) {
+        if (currentBio && (currentBio.name || currentBio.bio)) {
+          authorBios.push({
+            name: currentBio.name || '',
+            role: currentBio.role || '',
+            bio: currentBio.bio || '',
+          });
+        }
+        currentBio = { name: nameMatch[1].trim(), role: nameMatch[2].trim(), bio: '' };
+        continue;
+      }
+      if (currentBio && !currentBio.bio) {
+        currentBio.bio = line;
+        continue;
+      }
+      if (!currentBio) {
+        currentBio = { name: '', role: '', bio: line };
+        continue;
+      }
+    }
+    if (/^\*\*.+\*\*$/.test(line) && !inAuthorBio && !inTable && !inKeyTakeaways) {
       flushP();
       flushL();
-      blocks.push({ kind: 'quote', text: line.slice(2).trim() });
+      flushTable();
+      flushKeyTakeaways();
+      flushAuthorBio();
+      const question = line.replace(/\*\*/g, '').trim();
+      blocks.push({ kind: 'faq', question, answer: '' });
       continue;
     }
     if (/^[-*]\s+/.test(line)) {
@@ -113,10 +227,25 @@ function parseContent(raw: string): Block[] {
       list.push(line.replace(/^\d+\.\s+/, '').trim());
       continue;
     }
+    if (
+      !inAuthorBio &&
+      !inTable &&
+      !inKeyTakeaways &&
+      blocks.length > 0 &&
+      blocks[blocks.length - 1].kind === 'faq' &&
+      (blocks[blocks.length - 1] as { kind: 'faq'; answer: string }).answer === ''
+    ) {
+      const last = blocks[blocks.length - 1] as { kind: 'faq'; answer: string };
+      last.answer = line;
+      continue;
+    }
     para.push(line);
   }
   flushP();
   flushL();
+  flushTable();
+  flushKeyTakeaways();
+  flushAuthorBio();
   return blocks;
 }
 
@@ -151,7 +280,7 @@ const BlogDetailPage: React.FC = () => {
               ? {
                   title: cms.title || staticPost.title,
                   excerpt: cms.excerpt || staticPost.excerpt,
-                  content: cms.content || blogFullContent[slug] || staticPost.excerpt,
+                  content: blogFullContent[slug] || cms.content || staticPost.excerpt,
                   author: cms.author || staticPost.author,
                   date: cms.date || staticPost.date,
                   category: cms.category || staticPost.category,
@@ -204,6 +333,29 @@ const BlogDetailPage: React.FC = () => {
     const w = (post?.content || '').split(/\s+/).filter(Boolean).length;
     return Math.max(3, Math.round(w / 200));
   }, [post?.content]);
+
+  const [activeHeadingId, setActiveHeadingId] = useState<string | null>(null);
+
+  // Scroll spy: track which heading is currently in view
+  useEffect(() => {
+    if (!toc.length) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('id');
+            if (id) setActiveHeadingId(id);
+          }
+        }
+      },
+      { rootMargin: '-100px 0% -70% 0%', threshold: 0 }
+    );
+    toc.forEach((h) => {
+      const el = document.getElementById(h.id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [toc]);
 
   const handleShare = async () => {
     if (!post) return;
@@ -308,25 +460,6 @@ const BlogDetailPage: React.FC = () => {
                     loading="eager"
                   />
                 </figure>
-                {toc.length > 0 && (
-                  <nav
-                    aria-label="Table of contents"
-                    className="bg-slate-50 border border-slate-200 rounded-xl p-5 mb-8"
-                  >
-                    <h2 className="font-bold text-slate-900 text-sm uppercase tracking-wide mb-3">
-                      In this guide
-                    </h2>
-                    <ol className="space-y-1.5 text-sm">
-                      {toc.map((h) => (
-                        <li key={h.id}>
-                          <a href={`#${encodeURIComponent(h.id)}`} className="text-slate-600 hover:text-primary">
-                            → {h.text}
-                          </a>
-                        </li>
-                      ))}
-                    </ol>
-                  </nav>
-                )}
                 <div className="text-slate-700 leading-relaxed text-[1.05rem]">
                   {blocks.map((block, i) => {
                     if (block.kind === 'h2')
@@ -348,6 +481,88 @@ const BlogDetailPage: React.FC = () => {
                         >
                           {block.text}
                         </h3>
+                      );
+                    if (block.kind === 'key-takeaways')
+                      return (
+                        <section key={i} className="my-8 rounded-2xl bg-[#FDF8F5] border border-[#DCE5ED] p-6">
+                          <div className="flex items-center gap-2 mb-4">
+                            <FileText className="w-5 h-5 text-primary" />
+                            <h3 className="font-bold text-slate-900 text-sm uppercase tracking-widest">
+                              Key Takeaways
+                            </h3>
+                          </div>
+                          <ul className="space-y-3">
+                            {block.items.map((item, j) => (
+                              <li key={j} className="flex items-start gap-3">
+                                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                                <p className="text-slate-700 text-[0.95rem] leading-relaxed">
+                                  {renderInline(item)}
+                                </p>
+                              </li>
+                            ))}
+                          </ul>
+                        </section>
+                      );
+                    if (block.kind === 'fact-table')
+                      return (
+                        <div key={i} className="my-8 rounded-xl border border-slate-200/80 shadow-lg shadow-slate-900/5 overflow-hidden bg-white transition-all duration-200 hover:shadow-md">
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm">
+                              <thead className="bg-gradient-to-r from-primary via-[#213448] to-[#1a2a3a] text-white">
+                                <tr>
+                                  <th className="px-4 py-3 font-bold text-sm tracking-wide text-white/90">Label</th>
+                                  <th className="px-4 py-3 font-bold text-sm tracking-wide text-white/90">Value</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                {block.rows.map((row, j) => (
+                                  <tr key={j} className="transition-colors duration-150 group hover:bg-white/50">
+                                    <td className="px-4 py-3.5 font-semibold text-slate-800">
+                                      {row.label}
+                                    </td>
+                                    <td className="px-4 py-3.5 text-slate-600">{row.value}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      );
+                    if (block.kind === 'author-bio')
+                      return (
+                        <section key={i} className="my-10 rounded-2xl border border-slate-200 bg-white overflow-hidden">
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-0">
+                            <div className="md:col-span-4 bg-[#213448] p-6 flex flex-col justify-center">
+                              <div className="flex flex-col items-center text-white">
+                                <h3 className="font-bold text-lg mb-1">
+                                  {block.bios.map((b) => b.name).join(' & ')}
+                                </h3>
+                                <p className="text-primary/30 text-xs font-medium uppercase tracking-widest mb-3">
+                                  {block.bios.map((b) => b.role).join(' / ')}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="md:col-span-8 p-6">
+                              <h4 className="font-bold text-slate-900 mb-3 text-sm uppercase tracking-widest">
+                                About the Author
+                              </h4>
+                              <div className="space-y-3">
+                                {block.bios.map((bio, bi) => (
+                                  <div key={bi} className="text-slate-700 leading-relaxed text-[0.98rem]">
+                                    {renderInline(bio.bio)}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </section>
+                      );
+                    if (block.kind === 'faq')
+                      return (
+                        <div key={i} className="mb-6 border-b border-slate-100 pb-4 last:border-0 last:pb-0">
+                          <p className="font-bold text-slate-900 text-[0.98rem] mb-1">{block.question}</p>
+                          <p className="text-slate-600 text-[0.95rem] leading-relaxed">{block.answer}</p>
+                        </div>
                       );
                     if (block.kind === 'quote')
                       return (
@@ -400,6 +615,61 @@ const BlogDetailPage: React.FC = () => {
               </article>
 
               <aside className="lg:w-1/3 space-y-6 lg:sticky lg:top-24 self-start w-full">
+                {toc.length > 0 && (
+                  <nav
+                    aria-label="Table of contents"
+                    className="rounded-2xl border border-slate-200/70 bg-white/95 p-4 shadow-xl shadow-slate-900/6 backdrop-blur-md"
+                  >
+                    <div className="mb-3 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-primary" />
+                        <h2 className="text-xs font-bold tracking-widest text-slate-800 uppercase flex items-center gap-2">
+                          Guide Contents
+                        </h2>
+                      </div>
+                      <span className="text-[10px] font-medium tracking-wider text-slate-400 bg-slate-100/80 px-2 py-0.5 rounded-full">
+                        {toc.length} sections
+                      </span>
+                    </div>
+
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary to-amber-500/60 rounded-l-xl pointer-events-none" />
+                      <ol className="space-y-1">
+                        {toc.map((h, idx) => {
+                          const isActive = activeHeadingId === h.id;
+                          return (
+                            <li key={h.id}>
+                              <a
+                                href={`#${encodeURIComponent(h.id)}`}
+                                onClick={() => {
+                                  const el = document.getElementById(h.id);
+                                  if (el) {
+                                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                  }
+                                }}
+                                className={`group flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-all duration-200 relative ${isActive
+                                    ? 'bg-gradient-to-r from-primary/10 to-[#213448]/5 border border-primary/20 text-white shadow-sm'
+                                    : 'text-slate-600 hover:bg-slate-50 hover:border-slate-200/80 hover:text-slate-900 hover:pl-2.5 hover:shadow-sm'
+                                }`}
+                              >
+                                <span className={`flex-shrink-0 w-5 h-5 rounded-md flex items-center justify-center text-xs font-bold transition-all duration-200 ${isActive
+                                    ? 'bg-gradient-to-br from-primary to-[#213448] text-white'
+                                    : 'bg-slate-100/80 text-slate-400 group-hover:bg-slate-200 group-hover:text-slate-600'
+                                }`}>
+                                  {idx + 1}
+                                </span>
+                                <span className="flex-1 leading-snug tracking-tight text-sm text-black">
+                                  {h.text}
+                                </span>
+                                <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-all duration-200 group-hover:translate-x-1 ${isActive ? 'rotate-90 text-black' : 'text-slate-400 group-hover:text-slate-600'}`} />
+                              </a>
+                            </li>
+                          );
+                        })}
+                      </ol>
+                    </div>
+                  </nav>
+                )}
                 <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
                   <h3 className="font-bold text-slate-900 mb-1">Related Reading</h3>
                   <p className="text-xs text-slate-500 mb-4">

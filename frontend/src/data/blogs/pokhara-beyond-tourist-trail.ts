@@ -6,12 +6,12 @@ This guide moves in a sensible order: lake, waterfalls, Sarangkot without crowds
 
 ![Phewa Lake and the Annapurnas](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80 "Calm mornings on Phewa Lake can mirror Machhapuchhre and the Annapurnas.")
 
-## At a Glance
+## Fact Table
 
-- **Best views:** October to April. May and June turn hazy; July to September is monsoon green with limited peaks.
-- **Getting around:** The centre is walkable. Taxis are cheap, local buses reach Begnas and Sarangkot, and bicycles or scooters rent easily in Lakeside.
-- **Money:** ATMs cluster in Lakeside. Carry cash for villages, homestays, and trail snacks.
-- **Altitude:** No altitude worry in town, but rest here a day or two before heading higher.
+Best views|October to April. May and June turn hazy; July to September is monsoon green with limited peaks
+Getting around|The centre is walkable. Taxis are cheap, local buses reach Begnas and Sarangkot, and bicycles or scooters rent easily in Lakeside
+Money|ATMs cluster in Lakeside. Carry cash for villages, homestays, and trail snacks
+Altitude|No altitude worry in town, but rest here a day or two before heading higher
 
 ## Beyond Phewa Lake
 
@@ -29,9 +29,9 @@ Around Sarangkot's lower paths, seasonal falls run during and after monsoon (Jun
 
 Sarangkot's main platform can hold hundreds at sunrise in peak season. Better options:
 
-- **Hike up:** The village-to-summit trail takes **2 to 3 hours** through farms and rhododendron. Leave Pokhara around 3:00 AM to arrive before dawn with a handful of hikers instead of jeep convoys.
-- **Walk past the platform:** A few minutes beyond the main viewpoint are equally fine ridges with room to breathe.
-- **Come at sunset:** Softer light, thinner crowds, and peaks shifting colour as the sun drops.
+**Hike up:** The village-to-summit trail takes **2 to 3 hours** through farms and rhododendron. Leave Pokhara around 3:00 AM to arrive before dawn with a handful of hikers instead of jeep convoys.
+**Walk past the platform:** A few minutes beyond the main viewpoint are equally fine ridges with room to breathe.
+**Come at sunset:** Softer light, thinner crowds, and peaks shifting colour as the sun drops.
 
 > Trivia: Sarangkot doubles as Pokhara's main **paragliding launch**. Morning thermals lift pilots right over the viewpoint.
 
@@ -57,17 +57,19 @@ Pokhara is among the world's great paragliding bowls. For a calmer experience, p
 
 ## Where to Stay Beyond Lakeside
 
-- **Hemja:** Village air, mountain views, direct trail access.
-- **Sardar / Bagar:** Residential calm, local restaurants, handy for early flights.
-- **Begnas Lake:** Homestays and small eco-resorts on still water.
-- **Village homestays:** Eat with the family, learn customs, and get the hikes tourists miss.
+**Hemja:** Village air, mountain views, direct trail access.
+**Sardar / Bagar:** Residential calm, local restaurants, handy for early flights.
+**Begnas Lake:** Homestays and small eco-resorts on still water.
+**Village homestays:** Eat with the family, learn customs, and get the hikes tourists miss.
 
-![Sunrise over the Annapurnas](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80"Sarangkot sunrises face Machhapuchhre, Annapurna South, and Hiunchuli.")
+![Sunrise over the Annapurnas](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80 "Sarangkot sunrises face Machhapuchhre, Annapurna South, and Hiunchuli.")
+
+## Fact Table
+
+Day one|Eastern Phewa by kayak, old bazaar lunch, Peace Pagoda forest trail at golden hour
+Day two|Sarangkot on foot for sunrise, Batulechour falls after breakfast, Begnas for sunset
+Day three|Gupteshwor Cave and Davis Falls early, Chipledhunga food crawl, paragliding or landing-field coffee
 
 ## A Slow Three-Day Plan
-
-- **Day one:** Eastern Phewa by kayak, old bazaar lunch, Peace Pagoda forest trail at golden hour.
-- **Day two:** Sarangkot on foot for sunrise, Batulechour falls after breakfast, Begnas for sunset.
-- **Day three:** Gupteshwor Cave and Davis Falls early, Chipledhunga food crawl, paragliding or landing-field coffee.
 
 > Pokhara's charm is patience. Take the longer trail, the second cup of tea, and the village invitation. That is where the city actually lives.`;

@@ -6,12 +6,12 @@ Bhaktapur, also called Bhadgaon or Khwopa, is the third royal city of the valley
 
 ![Nyatapola Temple at Taumadhi Square](https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1200&q=80 "Five-tiered Nyatapola dominates Taumadhi Square and the Bhaktapur skyline.")
 
-## At a Glance
+## Fact Table
 
-- **Entry:** Around **NPR 1,500** for foreign visitors and **NPR 500** for SAARC nationals, covering the main squares for the day. Ticket booths sit at the main gates.
-- **Best light:** **8:00 to 11:00 AM** for photography and potters; **3:00 to 5:00 PM** for golden temples. Midday brings harsh sun and big groups.
-- **Getting there:** About 13 km east of Kathmandu: 45 to 60 minutes by taxi, about an hour by local bus from Ratna Park.
-- **Stay over if you can:** Evenings and early mornings belong to residents once day-trippers leave.
+Entry|Around **NPR 1,500** for foreign visitors and **NPR 500** for SAARC nationals, covering the main squares for the day. Ticket booths sit at the main gates
+Best light|**8:00 to 11:00 AM** for photography and potters; **3:00 to 5:00 PM** for golden temples. Midday brings harsh sun and big groups
+Getting there|About 13 km east of Kathmandu: 45 to 60 minutes by taxi, about an hour by local bus from Ratna Park
+Stay over|Evenings and early mornings belong to residents once day-trippers leave
 
 ## Durbar Square: Palace, Gate, and Gallery
 
@@ -50,12 +50,12 @@ Evening is prime curd time, after the temples empty and the squares cool.
 
 The loop is compact and mostly flat. Allow **three to four hours** without rushing, longer if you stop for demonstrations.
 
-## Festivals Worth Timing
+## Fact Table
 
-- **Bisket Jatra (April):** New Year chariot processions and the famous tongue-boring ritual.
-- **Gai Jatra (August):** Cow processions honouring the departed, with satire and humour.
-- **Indra Jatra (September):** Masked dances for the rain god.
-- **Dashain (October):** Family gatherings and packed temple courtyards.
+Bisket Jatra (April)|New Year chariot processions and the famous tongue-boring ritual
+Gai Jatra (August)|Cow processions honouring the departed, with satire and humour
+Indra Jatra (September)|Masked dances for the rain god
+Dashain (October)|Family gatherings and packed temple courtyards
 
 Festival days are crowded and unforgettable. Entry fees still apply, but the cultural payoff is unmatched.
 
@@ -63,10 +63,10 @@ Festival days are crowded and unforgettable. Entry fees still apply, but the cul
 
 ## Practical Notes
 
-- **Dress:** Shoulders and knees covered; shoes off in courtyards; avoid leather inside Hindu shrines.
-- **Photos:** Squares are fine; inner sanctums often forbid it. Ask during ceremonies.
-- **Facilities:** Paid toilets near Durbar Square, street snacks everywhere, ATMs near the main gates but rare inside.
-- **Food:** Newari snacks near Durbar Square, courtyard cafes at Pottery Square, fuller menus at heritage guesthouses.
-- **Sleep:** Heritage guesthouses in restored houses glow after dark and make dawn walks effortless.
+**Dress:** Shoulders and knees covered; shoes off in courtyards; avoid leather inside Hindu shrines.
+**Photos:** Squares are fine; inner sanctums often forbid it. Ask during ceremonies.
+**Facilities:** Paid toilets near Durbar Square, street snacks everywhere, ATMs near the main gates but rare inside.
+**Food:** Newari snacks near Durbar Square, courtyard cafes at Pottery Square, fuller menus at heritage guesthouses.
+**Sleep:** Heritage guesthouses in restored houses glow after dark and make dawn walks effortless.
 
 > Bhaktapur is not a museum with residents. It is a living city that happens to be beautiful. Wander without a map and let it set the pace.`;

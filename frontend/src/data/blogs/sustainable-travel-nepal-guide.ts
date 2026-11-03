@@ -6,12 +6,12 @@ Sustainable travel here is not sacrifice. It is a set of simple choices that kee
 
 ![Himalayan trail with lodges](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80 "Popular routes face waste and water pressure; travelling light helps keep them open.")
 
-## At a Glance
+## Fact Table
 
-- **Sleep local:** Homestays, eco-lodges, and family guesthouses keep income in the village.
-- **Hire fair:** Ask operators how porters are paid, equipped, and insured.
-- **Carry in, carry out:** Refill bottles, refuse excess packaging, pack out what the mountains cannot process.
-- **Eat seasonal:** Winter root vegetables, summer mangoes and cucumbers, autumn Mustang apples.
+Sleep local|Homestays, eco-lodges, and family guesthouses keep income in the village
+Hire fair|Ask operators how porters are paid, equipped, and insured
+Carry in, carry out|Refill bottles, refuse excess packaging, pack out what the mountains cannot process
+Eat seasonal|Winter root vegetables, summer mangoes and cucumbers, autumn Mustang apples
 
 ## Sleep Somewhere That Gives Back
 
@@ -33,19 +33,19 @@ A local guide reads weather, trails, plants, and festivals the way no app can. H
 
 If you use a porter, insist on fair terms recommended by the **International Porter Protection Group (IPPG)**:
 
-- **Maximum load:** about 25 kg per porter.
-- **Proper kit:** warm clothing, decent footwear, shelter, and food.
-- **Insurance and fair daily wages** appropriate to the region and season.
-- **No summit-at-all-costs pressure** when health or weather turns.
+**Maximum load:** About 25 kg per porter
+**Proper kit:** Warm clothing, decent footwear, shelter, and food
+**Insurance and fair daily wages:** Appropriate to the region and season
+**No summit-at-all-costs pressure:** When health or weather turns
 
 Agencies registered with **TAAN** or the **Nepal Mountaineering Association (NMA)** are more likely to meet porter-welfare standards. Ask for specifics before you pay a deposit.
 
 ## Cut Waste on the Trail
 
-- **Refill, do not rebuy:** Carry a bottle plus purification (filter, UV, or tablets). Safe-water stations now serve many teahouses.
-- **Pack out batteries, wipes, and wrappers** where lodges cannot process them.
-- **Skip single-use toiletries** where possible; bring bar soap and shampoo in reusable cases.
-- **Stay on marked trails** to protect thin alpine soils and terraced fields.
+**Refill, do not rebuy:** Carry a bottle plus purification (filter, UV, or tablets). Safe-water stations now serve many teahouses.
+**Pack out:** Batteries, wipes, and wrappers where lodges cannot process them.
+**Skip:** Single-use toiletries where possible; bring bar soap and shampoo in reusable cases.
+**Stay on:** Marked trails to protect thin alpine soils and terraced fields.
 
 ![Village homestay in the hills](https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80"Community homestays in villages like Ghalegaun keep trip income with host families.")
 
@@ -83,11 +83,13 @@ You cannot eliminate flight emissions, but you can balance them: donate to commu
 
 Give through established organisations rather than handing cash to individuals. Trusted names include **Room to Read Nepal**, **Khumbu Climbing Center**, **ACAP**, and the **Community Homestay Network**.
 
-## A Sample Low-Impact Itinerary
+## Fact Table
 
-- **Days 1 to 3, Kathmandu:** Family guesthouse, Newari kitchens, handicraft cooperatives, walking and public transport.
-- **Days 4 to 8, Annapurna foothills:** Ethical agency, local guide and porter, community lodges, refill bottle, packed-out waste.
-- **Days 9 to 11, Pokhara:** Lakeside homestay or eco-lodge, seasonal fish and vegetables, bicycle over taxi.
-- **Days 12 to 14, homestay village:** Ghalegaun or Sirubari for cooking, farming, and village life.
+Days 1 to 3, Kathmandu|Family guesthouse, Newari kitchens, handicraft cooperatives, walking and public transport
+Days 4 to 8, Annapurna foothills|Ethical agency, local guide and porter, community lodges, refill bottle, packed-out waste
+Days 9 to 11, Pokhara|Lakeside homestay or eco-lodge, seasonal fish and vegetables, bicycle over taxi
+Days 12 to 14, homestay village|Ghalegaun or Sirubari for cooking, farming, and village life
+
+## A Sample Low-Impact Itinerary
 
 > Perfection is not the goal. Conscious choices, repeated daily, keep Nepal welcoming for generations.`;

@@ -22,6 +22,7 @@ import { pokharaBeyondTouristTrail } from './blogs/pokhara-beyond-tourist-trail'
 import { sustainableTravelNepalGuide } from './blogs/sustainable-travel-nepal-guide';
 import { bhaktapurWalkingLivingHistory } from './blogs/bhaktapur-walking-living-history';
 import { howToBecomeLocalGuideNepal } from './blogs/how-to-become-local-guide-nepal';
+import { bardiyaNationalPark } from './blogs/bardiya-national-park';
 
 export const blogFullContent: BlogFullContent = {
   'hidden-gems-kathmandu': hiddenGemsKathmandu,
@@ -30,4 +31,5 @@ export const blogFullContent: BlogFullContent = {
   'sustainable-travel-nepal-guide': sustainableTravelNepalGuide,
   'bhaktapur-walking-living-history': bhaktapurWalkingLivingHistory,
   'how-to-become-local-guide-nepal': howToBecomeLocalGuideNepal,
+  'bardiya-national-park': bardiyaNationalPark,
 };

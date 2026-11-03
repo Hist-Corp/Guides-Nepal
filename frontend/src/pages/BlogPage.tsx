@@ -7,6 +7,12 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getCmsBlogPosts } from '../services/cms';
 
+function readingTime(text: string): number {
+  const wordsPerMinute = 200;
+  const wordCount = text.split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+}
+
 // eslint-disable-next-line react-refresh/only-export-components
 export const staticBlogPosts = [
   {
@@ -84,6 +90,19 @@ export const staticBlogPosts = [
     category: 'Community',
     status: 'published',
   },
+  {
+    id: 7,
+    slug: 'bardiya-national-park',
+    title: 'Bardiya National Park: Tiger Safari Guide to Nepal (2026)',
+    excerpt:
+      'Nepal’s premier tiger-viewing destination — 112 Royal Bengal tigers across 968 sq km of lowland wilderness, walking safaris, and far fewer visitors than Chitwan.',
+    author: 'Krishna Prasad Bhatta',
+    date: '2026-10-15',
+    image:
+      'https://www.magicalnepal.com/wp-content/uploads/2026/10/view-from-the-bardiya-national-park.jpg',
+    category: 'Wildlife',
+    status: 'published',
+  },
 ];
 
 const BlogPage: React.FC = () => {
@@ -159,45 +178,58 @@ const BlogPage: React.FC = () => {
 
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {blogPosts.map((post) => (
-                <article
+                <Link
                   key={post.id}
-                  className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow group"
+                  to={`/blog/${post.slug}`}
+                  className="block"
                 >
-                  <div className="h-48 overflow-hidden">
-                    <img
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <span className="text-xs font-bold text-primary uppercase tracking-wide">
-                      {post.category}
-                    </span>
-                    <h2 className="font-bold text-lg mt-2 mb-2 text-slate-900 group-hover:text-primary transition-colors">
-                      {post.title}
-                    </h2>
-                    <p className="text-slate-600 text-sm mb-4 line-clamp-2">{post.excerpt}</p>
-                    <div className="flex items-center justify-between text-xs text-slate-500">
-                      <span className="flex items-center gap-1">
-                        <User className="w-3 h-3" />
-                        {post.author}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {new Date(post.date).toLocaleDateString()}
+                  <article
+                    className="group relative bg-white rounded-2xl border border-slate-100 overflow-hidden hover:border-primary/30 hover:shadow-xl transition-all duration-300"
+                  >
+                    <div className="h-48 relative overflow-hidden">
+                      <img
+                        src={post.image}
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#213448]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <span
+                        className="absolute top-4 left-4 z-10 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur text-xs font-bold text-primary uppercase tracking-wider shadow-sm border border-slate-100"
+                      >
+                        {post.category}
                       </span>
                     </div>
-                    <Link
-                      to={`/blog/${post.slug}`}
-                      className="mt-4 text-primary font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all"
-                    >
-                      Read More <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </div>
-                </article>
+                    <div className="p-5">
+                      <div className="flex items-center justify-between mb-2.5">
+                        <span
+                          className="flex items-center gap-1 text-xs text-slate-400"
+                        >
+                          <User className="w-3 h-3" />
+                          {post.author}
+                        </span>
+                        <span className="flex items-center gap-1 text-xs text-slate-400">
+                          <Clock className="w-3 h-3" />
+                          {readingTime(post.excerpt)} min read
+                        </span>
+                      </div>
+                      <h2
+                        className="font-bold text-lg mt-1 mb-2 text-slate-900 group-hover:text-primary transition-colors line-clamp-2 leading-tight"
+                      >
+                        {post.title}
+                      </h2>
+                      <p className="text-slate-500 text-sm mb-5 line-clamp-3 leading-relaxed">
+                        {post.excerpt}
+                      </p>
+                      <div className="flex items-center gap-1 text-xs font-bold text-primary uppercase tracking-wide">
+                        Read story
+                        <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </article>
+                </Link>
               ))}
             </div>
           </div>

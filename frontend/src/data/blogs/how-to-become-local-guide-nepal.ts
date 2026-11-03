@@ -6,12 +6,12 @@ Guiding offers flexible seasons, a front-row seat to world cultures, and income 
 
 ![Guiding a Himalayan trail](https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80 "Trekking guides handle navigation, safety, logistics, and cultural interpretation.")
 
-## At a Glance
+## Fact Table
 
-- **Regulator path:** NATHM training plus the relevant association licence (TAAN for trekking, NMA for mountaineering, local bodies for city guiding).
-- **Timeline:** Training courses run weeks to months; apprenticeship seasons build the judgement agencies hire for.
-- **Earnings:** Agency day rates rise steeply with experience and languages; independents keep more but find their own clients.
-- **Peak seasons:** Spring and autumn carry most work; monsoon and winter need backup plans.
+Regulator path|NATHM training plus the relevant association licence (TAAN for trekking, NMA for mountaineering, local bodies for city guiding)
+Timeline|Training courses run weeks to months; apprenticeship seasons build the judgement agencies hire for
+Earnings|Agency day rates rise steeply with experience and languages; independents keep more but find their own clients
+Peak seasons|Spring and autumn carry most work; monsoon and winter need backup plans
 
 ## Choose Your Track
 
@@ -71,14 +71,12 @@ Independent guiding keeps more per day but adds marketing, admin, and risk. To l
 
 ## Money, Kit, and Hard Truths
 
-### What Guides Earn
+## Fact Table
 
-Rates swing with season, language, and employer. Typical agency day-rate bands:
-
-- **New guides:** around NPR 1,500 to 2,500 per day.
-- **Experienced guides:** around NPR 3,000 to 5,000 per day.
-- **Specialists and rare-language guides:** NPR 5,000 to 8,000 or more.
-- **Independents:** Higher gross, but you cover kit, insurance gaps, and client-finding.
+New guides|Around NPR 1,500 to 2,500 per day
+Experienced guides|Around NPR 3,000 to 5,000 per day
+Specialists and rare-language guides|NPR 5,000 to 8,000 or more
+Independents|Higher gross, but you cover kit, insurance gaps, and client-finding
 
 Tips often add **10 to 15 percent** of trek cost, shared with porters. Agree the split before the trailhead.
 
@@ -88,9 +86,9 @@ Boots, layered clothing plus down, rain shell, sleeping bag for camping routes, 
 
 ### Expect These Challenges
 
-- **Seasonality:** Spring and autumn pay the bills. Monsoon and winter mean study, low-altitude work, or second jobs.
-- **Competition:** Popular routes are crowded. Languages, specialisms, and calm crisis handling differentiate you.
-- **Altitude risk:** Know acute mountain sickness symptoms, carry the right medication, and turn back before clients want to.
-- **Expectation gaps:** Brief fitness, comfort, and weather honestly before deposits. Most conflicts start as vague promises.
+**Seasonality:** Spring and autumn pay the bills. Monsoon and winter mean study, low-altitude work, or second jobs.
+**Competition:** Popular routes are crowded. Languages, specialisms, and calm crisis handling differentiate you.
+**Altitude risk:** Know acute mountain sickness symptoms, carry the right medication, and turn back before clients want to.
+**Expectation gaps:** Brief fitness, comfort, and weather honestly before deposits. Most conflicts start as vague promises.
 
 > The best guides never stop studying: new routes, changing politics and park rules, rescue refreshers, and daily language practice separate careers from seasons.`;

@@ -4,36 +4,48 @@ The Newar people are the valley's Indigenous inhabitants, and their cuisine blen
 
 Use this guide to eat in logical order: the icons first, then the feast platter, then drinks, then where to find each dish across Kathmandu, Patan, and Bhaktapur.
 
-![Newari feast spread](https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80 "A Newari spread: bara, chatamari, pickles, and curdanchor the table.")
+![Newari feast spread](https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80 "A Newari spread: bara, chatamari, pickles, and curda anchor the table.")
 
-## At a Glance
+## Fact Table
 
-- **Spice:** Assume medium-hot. Say **"less spicy"** if you are sensitive; kitchens happily adjust.
-- **When kitchens close:** Many traditional spots shut **2:00 to 4:00 PM** and reopen for dinner around 6:00 PM.
-- **Payment:** Small eateries are cash-first. Carry small rupee notes.
-- **Diet notes:** Vegetarian options are everywhere. Vegan is harder because ghee and yoghurt appear often.
+Spice|Assume medium-hot. Say "less spicy" if you are sensitive; kitchens happily adjust
+When kitchens close|Many traditional spots shut 2:00 to 4:00 PM and reopen for dinner around 6:00 PM
+Payment|Small eateries are cash-first. Carry small rupee notes
+Diet notes|Vegetarian options are everywhere. Vegan is harder because ghee and yoghurt appear often
 
 ## Start With These Icons
 
 ### Yomari
 
-Steamed rice-flour dumplings shaped like pointed fish, filled with **chaku** (molasses) and sesame. They headline **Yomari Punhi**, the late-autumn harvest festival, but good sweet shops in Patan and Bhaktapur sell them year-round. The shell should be soft and faintly chewy; the filling warm and aromatic.
+Steamed rice-flour dumplings shaped like pointed fish, filled with **chaku** (molasses) and sesame. They headline **Yomari Punhi**, the late-autumn harvest festival, but good sweet shops in Patan and Bhaktapur sell them year-round.
+
+**What to look for:** Shell should be soft and faintly chewy; filling warm and aromatic
 
 ### Bara
 
-Savoury black-lentil pancakes, fried crisp outside and soft inside, sometimes topped with egg or minced buffalo. Eat them hot with **achaar** and raw onion. Old-city vendors charge roughly **NPR 40 to 100** for two or three.
+Savoury black-lentil pancakes, fried crisp outside and soft inside, sometimes topped with egg or minced buffalo. Eat them hot with **achaar** and raw onion.
+
+**Price:** Old-city vendors charge roughly **NPR 40 to 100** for two or three
 
 ### Chatamari
 
 The so-called **Newari pizza**: a thin rice crepe set on a griddle with egg, minced meat, onion, and tomato. Fold it, eat with your hands, and order it fresh rather than reheated.
 
+**Tip:** Order fresh, not reheated
+
 ### Kwati
 
 A sprouted nine-bean soup eaten during **Janai Purnima** in August but nourishing any cold evening. Nine beans are sprouted, slow-cooked with warming spices, and believed to restore strength after the monsoon.
 
+**Best time:** During Janai Purnima in August, or any cold evening
+**Believed to:** Restore strength after the monsoon
+
 ### Samay Baji: The Feast on One Plate
 
-If you eat one Newari meal, make it **samay baji**: beaten rice, bara, boiled egg, smoked buffalo, black soybeans, pickles, and greens. It is the ritual platter of festivals and the fastest education in Newari flavour. Share one platter between two light eaters and order extras of whatever disappears first.
+If you eat one Newari meal, make it **samay baji**: beaten rice, bara, boiled egg, smoked buffalo, black soybeans, pickles, and greens. It is the ritual platter of festivals and the fastest education in Newari flavour.
+
+**Share:** One platter between two light eaters
+**Tip:** Order extras of whatever disappears first
 
 ![Beaten rice and pickles](https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=1200&q=80 "Samay baji centres on beaten rice with smoked meat, beans, egg, and pickles.")
 
