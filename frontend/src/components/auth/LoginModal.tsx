@@ -102,6 +102,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       });
       if (resp.ok) {
         const data = await resp.json();
+        if (data.user?.role !== userType) {
+          setError(`This account is not a ${userType} account.`);
+          setLoading(false);
+          return;
+        }
         setRememberMe(remember);
         login({
           firstName: data.user.firstName || (userType === 'traveler' ? 'John' : 'Guide'),
