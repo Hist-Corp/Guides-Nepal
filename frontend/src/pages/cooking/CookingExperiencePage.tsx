@@ -14,6 +14,7 @@ import {
   X,
   User,
   Clock,
+  MessageCircle,
 } from 'lucide-react';
 
 import { Price } from '../../components/common/Price';
@@ -23,6 +24,7 @@ import { TimePicker } from '../../components/common/TimePicker';
 import { useBookingStore } from '../../store/bookingStore';
 import { BookingLoginPrompt } from '../../components/common/BookingLoginPrompt';
 import { useAuthStore } from '../../store/authStore';
+import { useMessageStore } from '../../store/messageStore';
 import { getApiUrl } from '../../config/api';
 import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
 import { getAvailableGuides } from '../../utils/guides';
@@ -253,12 +255,15 @@ const CookingExperiencePage: React.FC = () => {
   const [disabledDates, setDisabledDates] = useState<string[]>([]);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [sendingRequest, setSendingRequest] = useState(false);
 
   // Active bookings decide which guides are still available to show/select
   const bookings = useBookingStore((s) => s.bookings);
   const addBooking = useBookingStore((s) => s.addBooking);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const accessToken = useAuthStore((s) => s.accessToken);
+  const ensureConversation = useMessageStore((s) => s.ensureConversation);
+  const sendMessage = useMessageStore((s) => s.sendMessage);
 
   const fetchUnavailableDates = async (year: number, month: number) => {
     if (!accessToken) return;
@@ -362,6 +367,55 @@ const handleBookNow = async (): Promise<boolean> => {
     if (success) {
       setConfirmPopup(false);
       setBookingConfirmed(true);
+    }
+  };
+
+  /** Send a booking request as a direct message to the selected guide/chef. */
+  const handleSendRequest = async () => {
+    if (!isAuthenticated) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    if (!selectedGuide || !data) return;
+    const date = checkIn || '';
+    if (!date) {
+      const infoElement = document.getElementById('booking-info-message');
+      if (infoElement) {
+        infoElement.textContent = 'Please select a date before sending a request.';
+        infoElement.classList.remove('hidden');
+        infoElement.classList.add('text-red-500');
+      }
+      return;
+    }
+    setSendingRequest(true);
+    try {
+      const booked = await addBooking({
+        id: Math.random().toString(36).substr(2, 9),
+        experienceId: data.id,
+        experienceTitle: data.title,
+        city: '',
+        date,
+        guests: guestCount,
+        price: total,
+        image: data.heroImage,
+        status: 'upcoming',
+        guideId: selectedGuide.id,
+        guideName: selectedGuide.name,
+      });
+      if (!booked) return;
+      const convId = ensureConversation({
+        id: selectedGuide.id,
+        name: selectedGuide.name,
+        image: selectedGuide.image,
+      });
+      await sendMessage(
+        convId,
+        selectedGuide.id,
+        `Hi ${selectedGuide.name}, I'd like to request to book "${data.title}" on ${date} for ${guestCount} guest(s).`
+      );
+      navigate(`/messages/guide/${selectedGuide.id}`);
+    } finally {
+      setSendingRequest(false);
     }
   };
 
@@ -1107,9 +1161,16 @@ const handleBookNow = async (): Promise<boolean> => {
                     </div>
                     <div className="space-y-1">
                       <label className="text-xs font-bold text-gray-500 uppercase">Date</label>
-                      <input
-                        type="date"
-                        className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#ffba0a] focus:border-transparent outline-none transition-all"
+                      <BookingCalendar
+                        checkIn={checkIn}
+                        checkOut={checkOut}
+                        onChange={(ci, co) => {
+                          setCheckIn(ci);
+                          setCheckOut(co);
+                        }}
+                        idPrefix="form"
+                        disabledDates={disabledDates}
+                        onMonthChange={fetchUnavailableDates}
                       />
                     </div>
                   </div>
@@ -1137,9 +1198,11 @@ const handleBookNow = async (): Promise<boolean> => {
 
                   <button
                     type="button"
-                    className="bg-[#ffba0a] hover:bg-[#ffba0a] text-white font-bold py-3 px-8 rounded-full uppercase tracking-wider transition-all shadow-lg shadow-[#ffba0a]/30 flex items-center gap-2"
+                    disabled={sendingRequest || !selectedGuide}
+                    onClick={handleSendRequest}
+                    className="bg-[#ffba0a] hover:bg-[#ffba0a] text-white font-bold py-3 px-8 rounded-full uppercase tracking-wider transition-all shadow-lg shadow-[#ffba0a]/30 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    Send Request
+                    {sendingRequest ? 'Sending…' : 'Send Request'}
                   </button>
                 </form>
               </div>
@@ -1174,10 +1237,23 @@ const handleBookNow = async (): Promise<boolean> => {
                     </div>
                   </div>
 
-                  <div className="mt-8">
-                    <h3 className="font-bold text-xl text-gray-900">
-                      {selectedGuide ? selectedGuide.name : data.host.name}
-                    </h3>
+                  <div className="mt-8 flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-xl text-gray-900">
+                        {selectedGuide ? selectedGuide.name : data.host.name}
+                      </h3>
+                      {selectedGuide && (
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/messages/guide/${selectedGuide.id}`)}
+                          className="p-2 hover:bg-gray-100 rounded-full text-gray-600 hover:text-primary transition-colors"
+                          title={`Message ${selectedGuide.name}`}
+                          aria-label={`Message ${selectedGuide.name}`}
+                        >
+                          <MessageCircle className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
                     <p className="text-[#ffba0a] font-medium">
                       {selectedGuide ? selectedGuide.role : data.host.type}
                     </p>

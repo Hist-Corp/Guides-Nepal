@@ -384,6 +384,16 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     setCoText(formatFromKey(checkOut));
     setTypeErr((prev) => (prev?.field === 'checkout' ? null : prev));
   }, [checkOut]);
+  // If a previously committed date becomes unavailable (e.g. the guide was
+  // booked for it), clear the selection so only free dates remain selected.
+  useEffect(() => {
+    if (checkIn && isDisabled(checkIn)) {
+      onChange('', '');
+    }
+    if (!single && checkOut && isDisabled(checkOut)) {
+      onChange(checkIn, '');
+    }
+  }, [checkIn, checkOut, disabledDates, minDate, maxDate, single, onChange]);
   useEffect(() => {
     if (!isOpen) {
       // Never leave a rejected or half-typed date sitting in the card fields.

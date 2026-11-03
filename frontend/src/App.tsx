@@ -72,6 +72,8 @@ import ConsentPage from './pages/ConsentPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import NotFoundPage from './pages/NotFoundPage';
 import MailaDaiChatPage from './pages/MailaDaiChatPage';
+import GuideChatPage from './pages/messages/GuideChatPage';
+import TravellerMessagesPage from './pages/messages/TravellerMessagesPage';
 import OAuthCallback from './pages/auth/OAuthCallback';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 
@@ -168,6 +170,8 @@ function App() {
             <Route path="/account" element={<AccountSettingsPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/chat" element={<ChatPage />} />
+            <Route path="/messages" element={<TravellerMessagesPage />} />
+            <Route path="/messages/guide/:guideId" element={<GuideChatPage />} />
             <Route path="/maila-dai" element={<MailaDaiChatPage />} />
             <Route path="/consent" element={<ConsentPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />

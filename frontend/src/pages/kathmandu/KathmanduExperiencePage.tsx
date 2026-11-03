@@ -13,6 +13,7 @@ import {
   Globe,
   X,
   User,
+  MessageCircle,
 } from 'lucide-react';
 import { kathmanduRichData, Guide } from '../../data/kathmanduRichData';
 import { Price } from '../../components/common/Price';
@@ -22,6 +23,7 @@ import { TimePicker } from '../../components/common/TimePicker';
 import { useBookingStore } from '../../store/bookingStore';
 import { BookingLoginPrompt } from '../../components/common/BookingLoginPrompt';
 import { useAuthStore } from '../../store/authStore';
+import { useMessageStore } from '../../store/messageStore';
 import { getApiUrl } from '../../config/api';
 import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
 import { getAvailableGuides } from '../../utils/guides';
@@ -104,12 +106,15 @@ const KathmanduExperiencePage: React.FC = () => {
   const [disabledDates, setDisabledDates] = useState<string[]>([]);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [sendingRequest, setSendingRequest] = useState(false);
 
   // Active bookings decide which guides are still available to show/select
   const bookings = useBookingStore((s) => s.bookings);
   const addBooking = useBookingStore((s) => s.addBooking);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const accessToken = useAuthStore((s) => s.accessToken);
+  const ensureConversation = useMessageStore((s) => s.ensureConversation);
+  const sendMessage = useMessageStore((s) => s.sendMessage);
 
   const fetchUnavailableDates = async (year: number, month: number) => {
     if (!accessToken) return;
@@ -279,6 +284,55 @@ const KathmanduExperiencePage: React.FC = () => {
   const days = getDaysDifference();
   const subtotal = pricePerPerson * guestCount * days;
   const total = subtotal + cleaningFee + serviceFee;
+
+  /** Send a booking request as a direct message to the selected guide. */
+  const handleSendRequest = async () => {
+    if (!isAuthenticated) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    if (!selectedGuide || !data) return;
+    const date = checkIn || '';
+    if (!date) {
+      const infoElement = document.getElementById('booking-info-message');
+      if (infoElement) {
+        infoElement.textContent = 'Please select a date before sending a request.';
+        infoElement.classList.remove('hidden');
+        infoElement.classList.add('text-red-500');
+      }
+      return;
+    }
+    setSendingRequest(true);
+    try {
+      const booked = await addBooking({
+        id: Math.random().toString(36).substr(2, 9),
+        experienceId: data.id,
+        experienceTitle: data.title,
+        city: data.city ?? '',
+        date,
+        guests: guestCount,
+        price: total,
+        image: data.heroImage,
+        status: 'upcoming',
+        guideId: selectedGuide.id,
+        guideName: selectedGuide.name,
+      });
+      if (!booked) return;
+      const convId = ensureConversation({
+        id: selectedGuide.id,
+        name: selectedGuide.name,
+        image: selectedGuide.image,
+      });
+      await sendMessage(
+        convId,
+        selectedGuide.id,
+        `Hi ${selectedGuide.name}, I'd like to request to book "${data.title}" on ${date} for ${guestCount} guest(s).`
+      );
+      navigate(`/messages/guide/${selectedGuide.id}`);
+    } finally {
+      setSendingRequest(false);
+    }
+  };
 
   if (!data) {
     return (
@@ -909,9 +963,17 @@ const KathmanduExperiencePage: React.FC = () => {
                     </div>
                     <div className="space-y-1">
                       <label className="text-xs font-bold text-gray-500 uppercase">Date</label>
-                      <input
-                        type="date"
-                        className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                      <BookingCalendar
+                        checkIn={checkIn}
+                        checkOut={checkOut}
+                        onChange={(ci, co) => {
+                          setCheckIn(ci);
+                          setCheckOut(singleDateTrip ? '' : co);
+                        }}
+                        idPrefix="form"
+                        single={singleDateTrip}
+                        disabledDates={disabledDates}
+                        onMonthChange={fetchUnavailableDates}
                       />
                     </div>
                   </div>
@@ -939,9 +1001,11 @@ const KathmanduExperiencePage: React.FC = () => {
 
                   <button
                     type="button"
-                    className="bg-primary hover:bg-primary-hover text-white font-bold py-3 px-8 rounded-full uppercase tracking-wider transition-all shadow-lg shadow-primary/30 flex items-center gap-2"
+                    disabled={sendingRequest || !selectedGuide}
+                    onClick={handleSendRequest}
+                    className="bg-primary hover:bg-primary-hover text-white font-bold py-3 px-8 rounded-full uppercase tracking-wider transition-all shadow-lg shadow-primary/30 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    Send Request
+                    {sendingRequest ? 'Sending…' : 'Send Request'}
                   </button>
                 </form>
               </div>
@@ -965,10 +1029,23 @@ const KathmanduExperiencePage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="mt-8">
-                    <h3 className="font-bold text-xl text-gray-900">
-                      {selectedGuide ? selectedGuide.name : data.host.name}
-                    </h3>
+                  <div className="mt-8 flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-xl text-gray-900">
+                        {selectedGuide ? selectedGuide.name : data.host.name}
+                      </h3>
+                      {selectedGuide && (
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/messages/guide/${selectedGuide.id}`)}
+                          className="p-2 hover:bg-gray-100 rounded-full text-gray-600 hover:text-primary transition-colors"
+                          title={`Message ${selectedGuide.name}`}
+                          aria-label={`Message ${selectedGuide.name}`}
+                        >
+                          <MessageCircle className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
                     <p className="text-secondary font-medium">
                       {selectedGuide ? selectedGuide.role : data.host.type}
                     </p>
