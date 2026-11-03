@@ -451,6 +451,46 @@ const BharatpurExperiencePage: React.FC = () => {
 
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Hidden Gems</h3>
                 <p className="mb-6">{data.hiddenGems}</p>
+
+                {/* Practical Info */}
+                <div className="my-12 border-t border-gray-200 pt-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Practical Info</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-gray-50 p-5 rounded-xl border border-gray-100">
+                      <h3 className="text-base font-bold text-gray-900 mb-2">What to bring</h3>
+                      <ul className="text-sm text-gray-600 space-y-2 list-disc pl-5 leading-relaxed">
+                        <li>Binoculars for wildlife spotting</li>
+                        <li>Camera with zoom lens</li>
+                        <li>Insect repellent</li>
+                        <li>Light jacket for dawn safaris</li>
+                        <li>Cash in NPR for park fees</li>
+                      </ul>
+                    </div>
+                    <div className="bg-gray-50 p-5 rounded-xl border border-gray-100">
+                      <h3 className="text-base font-bold text-gray-900 mb-2">Best time to go</h3>
+                      <ul className="text-sm text-gray-600 space-y-2 list-disc pl-5 leading-relaxed">
+                        <li><strong>October–March:</strong> best wildlife spotting</li>
+                        <li><strong>Late Jan–March:</strong> prime for tiger sightings</li>
+                        <li><strong>April–June:</strong> very hot, up to 43°C</li>
+                        <li><strong>June–September:</strong> monsoon — park partly closed</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm mt-6">
+                    <h3 className="text-base font-bold text-gray-900 mb-3">Getting there &amp; meeting point</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                      Bharatpur is the gateway to Chitwan National Park, 146 km by road or 20 minutes by
+                      air from Kathmandu. The park headquarters at Kasara is a 21 km drive from Bharatpur
+                      city. Most safaris depart from Sauraha or nearby Tharu villages.
+                    </p>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      Tigers are elusive — look for pugmarks, scratch marks, and alarm calls from deer
+                      and monkeys rather than guaranteed sightings. Book safaris through local hosts
+                      rather than online middlemen, and bring a warm layer for chilly open-jeep dawn
+                      drives.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 

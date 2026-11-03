@@ -15,24 +15,26 @@ const BhaktapurExperiencesPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white">
       <Header />
-      
+
       <main className="container mx-auto px-4 py-16 max-w-7xl flex-grow">
         <div className="mb-12">
-          <button 
-            onClick={goBack} 
+          <button
+            onClick={goBack}
             className="flex items-center gap-2 text-gray-600 hover:text-brand-yellow font-bold mb-6 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
             Back
           </button>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">All Experiences in Bhaktapur</h1>
-          <p className="text-gray-600">Discover all the amazing things you can do with our locals in the City of Devotees.</p>
+          <p className="text-gray-600">
+            Discover all the amazing things you can do with our locals in the City of Devotees.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {bhaktapurRichData.map((tour) => (
-            <div 
-              key={tour.id} 
+            <div
+              key={tour.id}
               className="flex flex-col border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 bg-white group cursor-pointer"
               onClick={() => {
                 navigate(experienceDetailPath('bhaktapur', tour.slug));
@@ -40,7 +42,11 @@ const BhaktapurExperiencesPage: React.FC = () => {
               }}
             >
               <div className="relative h-48 overflow-hidden">
-                <img src={tour.heroImage} alt={tour.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                <img
+                  src={tour.heroImage}
+                  alt={tour.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
                 <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide text-gray-800">
                   {tour.type}
                 </div>
@@ -49,29 +55,36 @@ const BhaktapurExperiencesPage: React.FC = () => {
                   {tour.rating}
                 </div>
               </div>
-              
+
               <div className="flex-1 p-5 flex flex-col">
                 <h3 className="text-lg font-bold text-gray-900 mb-2 leading-snug line-clamp-2 group-hover:text-brand-yellow transition-colors">
                   {tour.title}
                 </h3>
-                
+
                 <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
-                   <Clock className="w-3 h-3" />
-                   <span>{tour.duration}</span>
-                   <span>•</span>
-                   <span>{tour.reviews} reviews</span>
+                  <Clock className="w-3 h-3" />
+                  <span>{tour.duration}</span>
+                  <span>•</span>
+                  <span>{tour.reviews} reviews</span>
                 </div>
 
                 <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                   <div className="flex -space-x-2">
-                      {tour.guides.slice(0, 2).map((guide) => (
-                         <img key={guide.id} src={guide.image} className="w-8 h-8 rounded-full border-2 border-white object-cover" alt={guide.name} />
-                      ))}
-                   </div>
-                   <div className="text-right">
-                      <div className="text-[10px] text-gray-400 uppercase">From</div>
-                      <div className="text-lg font-bold text-secondary"><Price amount={Math.floor(tour.price)} /></div>
-                   </div>
+                  <div className="flex -space-x-2">
+                    {tour.guides.slice(0, 2).map((guide) => (
+                      <img
+                        key={guide.id}
+                        src={guide.image}
+                        className="w-8 h-8 rounded-full border-2 border-white object-cover"
+                        alt={guide.name}
+                      />
+                    ))}
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] text-gray-400 uppercase">From</div>
+                    <div className="text-lg font-bold text-secondary">
+                      <Price amount={Math.floor(tour.price)} />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

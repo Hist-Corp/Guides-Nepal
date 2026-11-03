@@ -177,11 +177,11 @@ export const LalitpurPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="flex flex-row gap-4 overflow-x-auto pb-4 scroll-snap-x scroll-snap-mandatory no-scrollbar">
             {displayedTours.slice(0, 2).map((tour) => (
               <div
                 key={tour.id}
-                className="group relative rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300"
+                className="flex-none w-[400px] shrink-0 scroll-snap-start group relative rounded-3xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-300"
                 onClick={() => {
                   navigate(experienceDetailPath('lalitpur', tour.slug));
                   window.scrollTo({ top: 0, behavior: 'instant' });

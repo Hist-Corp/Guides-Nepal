@@ -451,6 +451,45 @@ const LalitpurExperiencePage: React.FC = () => {
 
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Hidden Gems</h3>
                 <p className="mb-6">{data.hiddenGems}</p>
+
+                {/* Practical Info */}
+                <div className="my-12 border-t border-gray-200 pt-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Practical Info</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-gray-50 p-5 rounded-xl border border-gray-100">
+                      <h3 className="text-base font-bold text-gray-900 mb-2">What to bring</h3>
+                      <ul className="text-sm text-gray-600 space-y-2 list-disc pl-5 leading-relaxed">
+                        <li>Comfortable walking shoes</li>
+                        <li>Water bottle</li>
+                        <li>Small backpack for souvenirs</li>
+                        <li>Cash in NPR for entry fees &amp; crafts</li>
+                        <li>Sun hat or light scarf</li>
+                      </ul>
+                    </div>
+                    <div className="bg-gray-50 p-5 rounded-xl border border-gray-100">
+                      <h3 className="text-base font-bold text-gray-900 mb-2">Best time to go</h3>
+                      <ul className="text-sm text-gray-600 space-y-2 list-disc pl-5 leading-relaxed">
+                        <li><strong>October–November:</strong> clearest light, festival season</li>
+                        <li><strong>March–April:</strong> mild, Rato Machhindranath festival</li>
+                        <li><strong>December–February:</strong> cool, crisp sunny days</li>
+                        <li><strong>June–September:</strong> monsoon — wet brick lanes</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm mt-6">
+                    <h3 className="text-base font-bold text-gray-900 mb-3">Getting there &amp; meeting point</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                      Lalitpur (Patan) lies just 5 km southeast of Kathmandu across the Bagmati river —
+                      about 20–30 minutes by taxi from Thamel. Use Pathao or inDriver, or take a local
+                      micro-bus asking for Patan Dhoka or Durbar Square.
+                    </p>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      Patan Durbar Square is compact and best explored on foot. Come early for the calmest
+                      atmosphere and best light. Dress modestly when visiting temples, remove shoes where
+                      required, and ask before photographing rituals or worshippers.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 

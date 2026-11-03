@@ -61,6 +61,7 @@ export const Header: React.FC = () => {
   const [isCurrencyPickerOpen, setIsCurrencyPickerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'experiences' | 'guides'>('experiences');
   const [isVisible, setIsVisible] = useState(true);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   // Ref (not state) so the scroll effect can attach ONE stable listener and
   // read the previous position without re-running/re-triggering on every scroll
   const lastScrollYRef = useRef(0);
@@ -112,6 +113,9 @@ export const Header: React.FC = () => {
       } else {
         setIsVisible(true);
       }
+
+      // Collapse profile dropdown when user starts scrolling
+      setIsProfileDropdownOpen(false);
 
       // Background colour + (home) search reveal: peach & collapsed while the
       // page's top hero block is still visible, solid white & expanded once
@@ -173,7 +177,6 @@ export const Header: React.FC = () => {
     };
   }, [isMenuOpen, isSearchOpen]);
 
-  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const mobileProfileDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -182,7 +185,8 @@ export const Header: React.FC = () => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
       const inDesktop = profileDropdownRef.current && profileDropdownRef.current.contains(target);
-      const inMobile = mobileProfileDropdownRef.current && mobileProfileDropdownRef.current.contains(target);
+      const inMobile =
+        mobileProfileDropdownRef.current && mobileProfileDropdownRef.current.contains(target);
       if (!inDesktop && !inMobile) {
         setIsProfileDropdownOpen(false);
       }
@@ -384,7 +388,7 @@ export const Header: React.FC = () => {
                         </Link>
                       </>
                     )}
-                    {(user?.role !== 'host' && user?.role !== 'guide') && (
+                    {user?.role !== 'host' && user?.role !== 'guide' && (
                       <Link
                         to="/bookings"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
@@ -486,71 +490,71 @@ export const Header: React.FC = () => {
                       )}
                     </div>
                   </button>
-                {isProfileDropdownOpen && (
-                  <div className="absolute right-0 top-full pt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[100] animate-in fade-in zoom-in-95">
-                    <div className="px-4 py-2 border-b border-gray-100 mb-2">
-                      <p className="font-bold text-gray-900 truncate">
-                        {user?.firstName} {user?.lastName}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                  {isProfileDropdownOpen && (
+                    <div className="absolute right-0 top-full pt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[100] animate-in fade-in zoom-in-95">
+                      <div className="px-4 py-2 border-b border-gray-100 mb-2">
+                        <p className="font-bold text-gray-900 truncate">
+                          {user?.firstName} {user?.lastName}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                      </div>
+                      <Link
+                        to="/profile"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        Profile
+                      </Link>
+                      {user?.role === 'guide' ? (
+                        <Link
+                          to="/guide/dashboard"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          Dashboard
+                        </Link>
+                      ) : (
+                        <Link
+                          to="/bookings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          Travel lists
+                        </Link>
+                      )}
+                      {user?.role === 'guide' && (
+                        <>
+                          <Link
+                            to="/guide/listings"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                            onClick={() => setIsProfileDropdownOpen(false)}
+                          >
+                            My listings
+                          </Link>
+                          <Link
+                            to="/guide/onboarding"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                            onClick={() => setIsProfileDropdownOpen(false)}
+                          >
+                            Onboarding
+                          </Link>
+                        </>
+                      )}
+                      <button
+                        onClick={() => {
+                          logout();
+                          useBookingStore.setState({ bookings: [] });
+                          navigate('/');
+                          setIsProfileDropdownOpen(false);
+                        }}
+                        className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-bold"
+                      >
+                        Log out
+                      </button>
                     </div>
-                    <Link
-                      to="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
-                      onClick={() => setIsProfileDropdownOpen(false)}
-                    >
-                      Profile
-                    </Link>
-                    {user?.role === 'guide' ? (
-                      <Link
-                        to="/guide/dashboard"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
-                        onClick={() => setIsProfileDropdownOpen(false)}
-                      >
-                        Dashboard
-                      </Link>
-                    ) : (
-                      <Link
-                        to="/bookings"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
-                        onClick={() => setIsProfileDropdownOpen(false)}
-                      >
-                        Travel lists
-                      </Link>
-                    )}
-                    {user?.role === 'guide' && (
-                      <>
-                        <Link
-                          to="/guide/listings"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
-                          onClick={() => setIsProfileDropdownOpen(false)}
-                        >
-                          My listings
-                        </Link>
-                        <Link
-                          to="/guide/onboarding"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
-                          onClick={() => setIsProfileDropdownOpen(false)}
-                        >
-                          Onboarding
-                        </Link>
-                      </>
-                    )}
-                    <button
-                      onClick={() => {
-                        logout();
-                        useBookingStore.setState({ bookings: [] });
-                        navigate('/');
-                        setIsProfileDropdownOpen(false);
-                      }}
-                      className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-bold"
-                    >
-                      Log out
-                    </button>
-                  </div>
-                )}
-              </div>
-            </>
+                  )}
+                </div>
+              </>
             )}
             {!isAuthenticated && (
               <>
@@ -743,7 +747,7 @@ export const Header: React.FC = () => {
                               </Link>
                             </>
                           )}
-                          {(user?.role !== 'host' && user?.role !== 'guide') && (
+                          {user?.role !== 'host' && user?.role !== 'guide' && (
                             <Link
                               to="/bookings"
                               className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
@@ -753,12 +757,12 @@ export const Header: React.FC = () => {
                             </Link>
                           )}
                           <button
-                          onClick={() => {
-                            logout();
-                            useBookingStore.setState({ bookings: [] });
-                            setIsMenuOpen(false);
-                            navigate('/');
-                          }}
+                            onClick={() => {
+                              logout();
+                              useBookingStore.setState({ bookings: [] });
+                              setIsMenuOpen(false);
+                              navigate('/');
+                            }}
                             className="w-full text-left block px-4 py-2 text-red-600 font-bold hover:bg-red-50 rounded-lg transition-colors mx-2"
                           >
                             Log out

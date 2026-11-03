@@ -682,6 +682,45 @@ const PokharaExperiencePage: React.FC = () => {
 
                   <h3 className="text-xl font-bold text-gray-900 mb-3">Hidden Gems</h3>
                   <p className="mb-6">{data.hiddenGems}</p>
+
+                  {/* Practical Info */}
+                  <div className="my-12 border-t border-gray-200 pt-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Practical Info</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="bg-gray-50 p-5 rounded-xl border border-gray-100">
+                        <h3 className="text-base font-bold text-gray-900 mb-2">What to bring</h3>
+                        <ul className="text-sm text-gray-600 space-y-2 list-disc pl-5 leading-relaxed">
+                          <li>Comfortable walking shoes</li>
+                          <li>Water bottle &amp; sunscreen</li>
+                          <li>Light jacket for early mornings</li>
+                          <li>Camera for mountain views</li>
+                          <li>Cash in NPR for boat &amp; entry fees</li>
+                        </ul>
+                      </div>
+                      <div className="bg-gray-50 p-5 rounded-xl border border-gray-100">
+                        <h3 className="text-base font-bold text-gray-900 mb-2">Best time to go</h3>
+                        <ul className="text-sm text-gray-600 space-y-2 list-disc pl-5 leading-relaxed">
+                          <li><strong>October–November:</strong> clearest mountain views</li>
+                          <li><strong>March–April:</strong> spring blooms, clear mornings</li>
+                          <li><strong>December–February:</strong> cool, crisp dawns</li>
+                          <li><strong>June–September:</strong> monsoon — lush but cloudy</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm mt-6">
+                      <h3 className="text-base font-bold text-gray-900 mb-3">Getting there &amp; meeting point</h3>
+                      <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                        Pokhara&apos;s Lakeside area runs along Phewa Lake, with most experiences starting
+                        from the lakeside promenade or a short drive to Sarangkot ridge (25–30 minutes).
+                        Taxis and ride-hailing apps are readily available in Lakeside.
+                      </p>
+                      <p className="text-sm text-gray-600 leading-relaxed">
+                        Mountain views are clearest at dawn — sunrise trips to Sarangkot depart around
+                        4:30–5:00 AM. Paragliding runs from late morning through early afternoon when
+                        thermals are strongest (roughly October–May season).
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

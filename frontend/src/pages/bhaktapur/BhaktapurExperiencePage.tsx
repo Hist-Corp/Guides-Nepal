@@ -459,6 +459,45 @@ const BhaktapurExperiencePage: React.FC = () => {
 
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Hidden Gems</h3>
                 <p className="mb-6">{data.hiddenGems}</p>
+
+                {/* Practical Info */}
+                <div className="my-12 border-t border-gray-200 pt-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Practical Info</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-gray-50 p-5 rounded-xl border border-gray-100">
+                      <h3 className="text-base font-bold text-gray-900 mb-2">What to bring</h3>
+                      <ul className="text-sm text-gray-600 space-y-2 list-disc pl-5 leading-relaxed">
+                        <li>Comfortable walking shoes</li>
+                        <li>Water bottle</li>
+                        <li>Cash in NPR for Juju Dhau &amp; pottery</li>
+                        <li>Camera — photogenic brick squares</li>
+                        <li>Light jacket for early mornings</li>
+                      </ul>
+                    </div>
+                    <div className="bg-gray-50 p-5 rounded-xl border border-gray-100">
+                      <h3 className="text-base font-bold text-gray-900 mb-2">Best time to go</h3>
+                      <ul className="text-sm text-gray-600 space-y-2 list-disc pl-5 leading-relaxed">
+                        <li><strong>October–November:</strong> crisp air, golden light</li>
+                        <li><strong>March–April:</strong> Bisket Jatra festival (mid-April)</li>
+                        <li><strong>December–February:</strong> cool, fewer crowds</li>
+                        <li><strong>June–September:</strong> monsoon — wet brick lanes</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm mt-6">
+                    <h3 className="text-base font-bold text-gray-900 mb-3">Getting there &amp; meeting point</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                      Bhaktapur lies 12 km east of Kathmandu on the Arniko Highway — about 45–60 minutes
+                      by taxi from Thamel. Motorized vehicles stay outside the heritage perimeter, so the
+                      squares are pedestrian-only.
+                    </p>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      Consider staying overnight to see the squares at dawn and dusk when day-trippers
+                      have left. Try Juju Dhau (&apos;King Curd&apos;) and Newari dishes like bara, chatamari,
+                      and yomari. Dress modestly at temples and ask before photographing potters at work.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 

@@ -47,9 +47,16 @@ export const SearchPage: React.FC = () => {
         const hostRows = live
           .filter((e: any) => typeof e.slug === 'string' && e.slug.startsWith('host-'))
           .map((e: any) => ({
-            id: e.id, slug: e.slug, title: e.title, city: e.city ?? 'Kathmandu',
-            category: e.category ?? 'Experience', heroImage: e.heroImage, description: e.description,
-            price: e.price ?? 0, duration: e.duration ?? '', rating: e.rating ?? 4.8,
+            id: e.id,
+            slug: e.slug,
+            title: e.title,
+            city: e.city ?? 'Kathmandu',
+            category: e.category ?? 'Experience',
+            heroImage: e.heroImage,
+            description: e.description,
+            price: e.price ?? 0,
+            duration: e.duration ?? '',
+            rating: e.rating ?? 4.8,
             reviews: e.reviews ?? 0,
             host: e.host ? { name: e.host.name, image: e.host.image } : undefined,
             path: `/experience/${e.slug}`,
@@ -64,7 +71,9 @@ export const SearchPage: React.FC = () => {
         /* offline — static catalog still renders */
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
   const [searchQuery, setSearchQuery] = useState(query);
   const [selectedCity, setSelectedCity] = useState('All');
@@ -139,9 +148,9 @@ export const SearchPage: React.FC = () => {
       <Header />
       <PageBackButton />
       <main className="flex-grow">
-        <section className="bg-primary py-12">
-          <div className="container mx-auto px-4">
-            <h1 className="text-3xl md:text-4xl font-bold text-white text-center mb-6">
+        <section className="bg-white">
+          <div className="container  px-4">
+            <h1 className="text-3xl md:text-4xl font-bold text-black text-center mb-6">
               Search Experiences
             </h1>
             <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
@@ -247,7 +256,8 @@ export const SearchPage: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Price: {formatPrice(priceRange[0], 'USD')} - {formatPrice(priceRange[1], 'USD')}
+                      Price: {formatPrice(priceRange[0], 'USD')} -{' '}
+                      {formatPrice(priceRange[1], 'USD')}
                     </label>
                     <div className="space-y-2">
                       <input
@@ -312,7 +322,12 @@ export const SearchPage: React.FC = () => {
                     >
                       <div className="h-48 overflow-hidden relative">
                         <img
-                          src={typeof exp.heroImage === 'string' && /^(https?:\/\/|\/)/i.test(exp.heroImage) ? encodeURI(exp.heroImage) : ''}
+                          src={
+                            typeof exp.heroImage === 'string' &&
+                            /^(https?:\/\/|\/)/i.test(exp.heroImage)
+                              ? encodeURI(exp.heroImage)
+                              : ''
+                          }
                           alt={exp.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
@@ -348,7 +363,9 @@ export const SearchPage: React.FC = () => {
                               {exp.reviews} reviews
                             </span>
                           </div>
-                          <div className="font-bold text-primary">{formatPrice(exp.price, 'USD')}</div>
+                          <div className="font-bold text-primary">
+                            {formatPrice(exp.price, 'USD')}
+                          </div>
                         </div>
                         {exp.host && (
                           <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2">
