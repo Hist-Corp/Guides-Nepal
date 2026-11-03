@@ -165,7 +165,7 @@ const BlogPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <PageBackButton />
+      <PageBackButton label="Back to Blog" />
       <main className="flex-grow">
         <section className="bg-primary py-20 text-white">
           <div className="container mx-auto px-4 text-center">

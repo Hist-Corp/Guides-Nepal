@@ -390,7 +390,7 @@ const FoodTourCulturePage: React.FC = () => {
         {/* Navigation button */}
         <button
           onClick={goBack}
-          className="absolute top-8 left-4 z-20 flex items-center gap-2 text-white hover:text-brand-yellow font-bold transition-colors"
+          className="absolute top-8 left-4 z-20 flex items-center gap-2 text-white bg-black/20 hover:bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full transition-colors font-bold"
         >
           <ArrowLeft className="w-5 h-5" />
           Back

@@ -388,7 +388,7 @@ export const TrekHikingPage: React.FC = () => {
         <div className="container mx-auto px-4 relative z-10">
           <button
             onClick={goBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-[#213448] font-bold mb-6 transition-colors"
+            className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full"
           >
             <ArrowLeft className="w-5 h-5" />
             Back

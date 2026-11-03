@@ -148,24 +148,34 @@ export const SearchPage: React.FC = () => {
       <Header />
       <PageBackButton />
       <main className="flex-grow">
-        <section className="bg-white">
-          <div className="container  px-4">
-            <h1 className="text-3xl md:text-4xl font-bold text-black text-center mb-6">
-              Search Experiences
-            </h1>
+        <section className="relative bg-primary overflow-hidden pt-12 pb-8 md:pt-14 md:pb-10 min-h-[340px] md:min-h-[380px]">
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-primary"></div>
+          <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none"></div>
+
+          <div className="relative container px-4">
+            <div className="text-center mb-6">
+              <h1 className="text-2xl md:text-3xl font-bold text-white mb-1 tracking-tight">
+                Search Experiences
+              </h1>
+              <p className="text-sm md:text-base text-primary/80">
+                Discover authentic local experiences across Nepal
+              </p>
+            </div>
+
             <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
               <div className="relative">
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/5 to-primary/0 pointer-events-none"></div>
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search experiences, cities, or activities..."
-                  className="w-full px-5 py-4 pl-12 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-yellow shadow-lg"
+                  className="w-full px-5 py-3.5 pl-12 pr-14 rounded-xl text-slate-900 placeholder-slate-400 bg-white/80 backdrop-blur-sm border-2 border-white/60 focus:bg-white focus:border-brand-yellow/50 focus:border-2 focus:ring-2 focus:ring-brand-yellow/20 focus:ring-offset-2 focus:ring-offset-primary transition-all duration-300 shadow-sm"
                 />
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 focus:ring-brand-yellow transition-colors" />
                 <button
                   type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-white px-4 py-2 rounded-lg font-semibold hover:bg-primary-hover transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-gradient-to-r from-brand-yellow to-[#ffba0a] text-[#213448] px-6 py-2.5 rounded-lg font-bold tracking-wide hover:from-[#ffb300] hover:to-[#e6a800] hover:text-[#213448] transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2"
                 >
                   Search
                 </button>

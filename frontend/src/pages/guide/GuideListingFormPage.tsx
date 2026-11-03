@@ -99,7 +99,7 @@ const GuideListingFormPage: React.FC = () => {
     <div className="flex min-h-screen flex-col bg-gray-50 font-sans">
       <Header />
       <main className="container mx-auto max-w-4xl flex-grow px-4 py-10">
-        <button onClick={goBack} className="mb-6 flex items-center gap-2 text-sm font-bold text-gray-600 hover:text-gray-900">
+        <button onClick={goBack} className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full text-sm">
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
         <h1 className="text-3xl font-bold text-gray-900">{editingId ? 'Edit listing' : 'List a new experience'}</h1>

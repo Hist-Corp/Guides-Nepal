@@ -399,11 +399,12 @@ const BlogDetailPage: React.FC = () => {
           <section className="py-16 bg-white">
             <div className="container mx-auto px-4 text-center">
               <Link
-                to="/blog"
-                className="text-primary font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all inline-block mt-8"
-              >
-                <ArrowLeft className="w-4 h-4" /> Back to Blog
-              </Link>
+    to="/blog"
+    className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full"
+  >
+    <ArrowLeft className="w-4 h-4" />
+    Back to Blog
+  </Link>
             </div>
           </section>
         </main>
@@ -714,11 +715,12 @@ const BlogDetailPage: React.FC = () => {
 
             <div className="mt-12 pt-8 border-t border-slate-200 text-center">
               <Link
-                to="/blog"
-                className="text-primary font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all inline-block"
-              >
-                <ArrowLeft className="w-4 h-4" /> Back to Blog
-              </Link>
+    to="/blog"
+    className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full"
+  >
+    <ArrowLeft className="w-4 h-4" />
+    Back to Blog
+  </Link>
             </div>
           </div>
         </section>
