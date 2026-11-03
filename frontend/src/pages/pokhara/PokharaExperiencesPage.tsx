@@ -21,7 +21,7 @@ export const PokharaExperiencesPage: React.FC = () => {
         <div className="mb-8">
           <button
             onClick={goBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-brand-yellow font-bold mb-4 transition-colors"
+            className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full"
           >
             <ArrowLeft className="w-5 h-5" />
             Back

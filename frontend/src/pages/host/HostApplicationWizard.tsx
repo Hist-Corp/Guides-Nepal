@@ -230,7 +230,7 @@ export default function HostApplicationWizard() {
     <Shell>
       <button
         onClick={goBack}
-        className="mb-5 inline-flex items-center gap-2 text-sm text-gray-600"
+        className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full text-sm"
       >
         <ArrowLeft className="h-4 w-4" />
         Back

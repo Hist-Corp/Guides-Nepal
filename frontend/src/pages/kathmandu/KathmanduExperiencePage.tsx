@@ -286,7 +286,8 @@ const KathmanduExperiencePage: React.FC = () => {
         <Header />
         <main className="flex-grow container mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold">Experience not found</h1>
-          <button onClick={goBack} className="text-primary hover:underline mt-4">
+          <button onClick={goBack} className="flex items-center gap-2 font-bold text-primary hover:text-primary/80 transition-colors mt-4">
+            <ArrowLeft className="w-4 h-4" />
             Back
           </button>
         </main>
@@ -303,7 +304,7 @@ const KathmanduExperiencePage: React.FC = () => {
         <div className="container mx-auto px-4 py-12 max-w-6xl">
           <button
             onClick={goBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-[#213448] font-bold mb-6 transition-colors"
+            className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full"
           >
             <ArrowLeft className="w-5 h-5" />
             Back
