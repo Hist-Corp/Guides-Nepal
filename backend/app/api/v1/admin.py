@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional, Dict, Any
 from app.core.database import get_db
 from app.core.dependencies import require_role
-from app.core.roles import ADMIN, is_assignable_role, normalize_role
+from app.core.roles import ADMIN, REGIONAL_HEAD, is_assignable_role, normalize_role
 from app.models.user import User
 from app.models.guide import Guide
 from app.models.booking import Booking
@@ -34,6 +34,7 @@ def list_users(role: Optional[str] = None, db: Session = Depends(get_db), curren
         "firstName": u.firstName,
         "lastName": u.lastName,
         "role": u.role,
+        "region": u.region,
         "is_active": u.is_active,
         "phone": u.phone,
     } for u in users]
@@ -44,6 +45,17 @@ def update_user(user_id: int, payload: dict, db: Session = Depends(get_db), curr
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    if "region" in payload:
+        target_role = normalize_role(payload.get("role", user.role))
+        if target_role != REGIONAL_HEAD:
+            raise HTTPException(
+                status_code=400,
+                detail="Region can only be updated for a regional head.",
+            )
+        region = payload["region"]
+        if region is not None and not isinstance(region, str):
+            raise HTTPException(status_code=422, detail="Region must be a string.")
+        payload["region"] = region.strip() or None if region is not None else None
     for key, value in payload.items():
         if key in PROTECTED_USER_FIELDS:
             raise HTTPException(

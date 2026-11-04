@@ -9,6 +9,7 @@ interface User {
   avatarUrl?: string;
   phone?: string;
   role?: string;
+  region?: string;
 }
 
 interface AuthStore {

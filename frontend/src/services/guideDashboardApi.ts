@@ -90,6 +90,11 @@ export const guideDashboardApi = {
     if (!res.ok) throw new Error('Unable to load listings.');
     return res.json();
   },
+  listPublicListings: async (): Promise<GuideListing[]> => {
+    const res = await fetch(`${API_BASE_URL}/guide/listings/public`);
+    if (!res.ok) throw new Error('Unable to load listings.');
+    return res.json();
+  },
   createListing: async (token: string, payload: Record<string, unknown>): Promise<GuideListing> => {
     const res = await fetch(`${API_BASE_URL}/guide/listings`, {
       method: 'POST',

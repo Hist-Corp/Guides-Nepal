@@ -1,20 +1,63 @@
 import { useEffect, useState } from "react"
 import { ChevronDown } from "lucide-react"
-import { getGuideApplications, reviewGuideApplication } from "../services/api"
+import {
+  deleteGuideApplication,
+  getGuideApplicationDocument,
+  getGuideApplications,
+  reviewGuideApplication,
+} from "../services/api"
+import Modal from "./Modal"
 
 export default function GuideApplicationsPanel() {
   const [apps, setApps] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>("")
   const [msg, setMsg] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedApplication, setSelectedApplication] = useState<any | null>(null)
+  const [documentUrls, setDocumentUrls] = useState<Record<string, string>>({})
+  const [documentError, setDocumentError] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (!selectedApplication) {
+      setDocumentUrls({})
+      return
+    }
+
+    let cancelled = false
+    const urls: string[] = []
+    setDocumentError(null)
+    Promise.all(
+      (selectedApplication.uploaded_files ?? []).map(async (file: { key: string }) => {
+        const blob = await getGuideApplicationDocument(selectedApplication.id, file.key)
+        const url = URL.createObjectURL(blob)
+        urls.push(url)
+        return [file.key, url] as const
+      }),
+    )
+      .then((entries) => {
+        if (!cancelled) setDocumentUrls(Object.fromEntries(entries))
+      })
+      .catch(() => {
+        if (!cancelled) setDocumentError("Unable to load application documents.")
+      })
+
+    return () => {
+      cancelled = true
+      urls.forEach((url) => URL.revokeObjectURL(url))
+    }
+  }, [selectedApplication])
 
   const load = async () => {
     setLoading(true)
+    setError(null)
     try {
-      const data = await getGuideApplications(filter ? { status: filter } : undefined)
+      const data = await getGuideApplications(filter ? { status_filter: filter } : undefined)
       setApps(Array.isArray(data) ? data : [])
-    } catch {
+    } catch (e: any) {
       setApps([])
+      setError(e?.response?.data?.detail || "Unable to load guide applications.")
     } finally {
       setLoading(false)
     }
@@ -31,6 +74,25 @@ export default function GuideApplicationsPanel() {
       await load()
     } catch (e: any) {
       setMsg(e?.response?.data?.detail || "Action failed")
+    }
+  }
+
+  const removeApplication = async (application: any) => {
+    if (!window.confirm(`Delete the application from ${application.full_name}? Uploaded documents will also be deleted.`)) {
+      return
+    }
+    setDeletingId(application.id)
+    setError(null)
+    setMsg(null)
+    try {
+      await deleteGuideApplication(application.id)
+      setSelectedApplication(null)
+      setMsg(`Guide application #${application.id} deleted.`)
+      await load()
+    } catch (e: any) {
+      setError(e?.response?.data?.detail || "Unable to delete guide application.")
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -55,6 +117,11 @@ export default function GuideApplicationsPanel() {
       {msg && (
         <div className="rounded-lg bg-green-50 border border-green-200 text-green-700 px-3 py-2 text-sm">
           {msg}
+        </div>
+      )}
+      {error && (
+        <div role="alert" className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-3 py-2 text-sm">
+          {error}
         </div>
       )}
       <div className="rounded-2xl bg-white border overflow-x-auto">
@@ -96,6 +163,12 @@ export default function GuideApplicationsPanel() {
                   </td>
                   <td className="p-3 space-x-2">
                     <button
+                      onClick={() => setSelectedApplication(a)}
+                      className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-darkBlue hover:bg-gray-50"
+                    >
+                      Review
+                    </button>
+                    <button
                       onClick={() => review(a.id, "approved")}
                       disabled={a.status === "approved"}
                       className="rounded-lg bg-green-600 text-white px-3 py-1.5 text-xs font-semibold hover:bg-green-700 disabled:opacity-40"
@@ -109,6 +182,13 @@ export default function GuideApplicationsPanel() {
                     >
                       Reject
                     </button>
+                    <button
+                      onClick={() => void removeApplication(a)}
+                      disabled={deletingId === a.id}
+                      className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-40"
+                    >
+                      {deletingId === a.id ? "Deleting…" : "Delete"}
+                    </button>
                   </td>
                 </tr>
               ))
@@ -116,6 +196,106 @@ export default function GuideApplicationsPanel() {
           </tbody>
         </table>
       </div>
+      <Modal
+        open={selectedApplication !== null}
+        title="Guide application details"
+        onClose={() => setSelectedApplication(null)}
+      >
+        {selectedApplication && (
+          <div className="space-y-6">
+          <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
+            <div>
+              <dt className="font-semibold text-gray-500">Full name</dt>
+              <dd className="mt-1 text-darkBlue">{selectedApplication.full_name || "—"}</dd>
+            </div>
+            <div>
+              <dt className="font-semibold text-gray-500">Email</dt>
+              <dd className="mt-1 break-all text-darkBlue">{selectedApplication.email || "—"}</dd>
+            </div>
+            <div>
+              <dt className="font-semibold text-gray-500">Phone</dt>
+              <dd className="mt-1 text-darkBlue">{selectedApplication.phone || "—"}</dd>
+            </div>
+            <div>
+              <dt className="font-semibold text-gray-500">City</dt>
+              <dd className="mt-1 text-darkBlue">{selectedApplication.city || "—"}</dd>
+            </div>
+            <div>
+              <dt className="font-semibold text-gray-500">Region</dt>
+              <dd className="mt-1 text-darkBlue">{selectedApplication.region || "—"}</dd>
+            </div>
+            <div>
+              <dt className="font-semibold text-gray-500">National identity number</dt>
+              <dd className="mt-1 text-darkBlue">{selectedApplication.nin_number || "—"}</dd>
+            </div>
+            <div>
+              <dt className="font-semibold text-gray-500">Application status</dt>
+              <dd className="mt-1 capitalize text-darkBlue">{selectedApplication.status || "pending"}</dd>
+            </div>
+            <div>
+              <dt className="font-semibold text-gray-500">Submitted</dt>
+              <dd className="mt-1 text-darkBlue">
+                {selectedApplication.created_at
+                  ? new Date(selectedApplication.created_at).toLocaleString()
+                  : "—"}
+              </dd>
+            </div>
+            <div className="sm:col-span-2">
+              <dt className="font-semibold text-gray-500">Uploaded documents</dt>
+              {documentError && <dd role="alert" className="mt-2 text-red-700">{documentError}</dd>}
+              {(selectedApplication.uploaded_files ?? []).length === 0 ? (
+                <dd className="mt-1 text-darkBlue">No uploaded documents.</dd>
+              ) : (
+                <dd className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {selectedApplication.uploaded_files.map((file: {
+                    key: string;
+                    filename: string;
+                    content_type: string;
+                  }) => (
+                    <div key={file.key} className="overflow-hidden rounded-xl border border-line bg-white">
+                      <div className="border-b border-line px-3 py-2 text-xs font-semibold text-darkBlue">
+                        {file.filename}
+                      </div>
+                      {documentUrls[file.key] ? (
+                        file.content_type.startsWith("image/") ? (
+                          <a href={documentUrls[file.key]} target="_blank" rel="noreferrer">
+                            <img
+                              src={documentUrls[file.key]}
+                              alt={file.filename}
+                              className="max-h-80 w-full bg-gray-50 object-contain"
+                            />
+                          </a>
+                        ) : (
+                          <iframe
+                            src={documentUrls[file.key]}
+                            title={file.filename}
+                            className="h-80 w-full"
+                          />
+                        )
+                      ) : (
+                        <div className="flex h-40 items-center justify-center text-sm text-gray-500">
+                          Loading document…
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </dd>
+              )}
+            </div>
+          </dl>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => void removeApplication(selectedApplication)}
+              disabled={deletingId === selectedApplication.id}
+              className="rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-40"
+            >
+              {deletingId === selectedApplication.id ? "Deleting…" : "Delete application"}
+            </button>
+          </div>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }

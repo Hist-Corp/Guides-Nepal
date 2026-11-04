@@ -108,6 +108,23 @@ def ensure_database_schema() -> None:
         if "guide_user_id" not in booking_columns:
             with engine.begin() as connection:
                 connection.execute(text("ALTER TABLE bookings ADD COLUMN guide_user_id INTEGER"))
+        # Add credential-lifecycle columns to guide_applications if missing
+        # (mirrors the host_applications columns so guides can be approved
+        # and provisioned a login account by a regional head/admin).
+        guide_app_columns = {column["name"] for column in inspector.get_columns("guide_applications")}
+        if guide_app_columns:
+            with engine.begin() as connection:
+                for name, ddl in {
+                    "credential_token_hash": "VARCHAR",
+                    "credential_password_hash": "VARCHAR",
+                    "details_json": "TEXT",
+                    "user_id": "INTEGER",
+                    "reviewed_by": "VARCHAR",
+                    "review_note": "VARCHAR",
+                    "reviewed_at": "DATETIME",
+                }.items():
+                    if name not in guide_app_columns:
+                        connection.execute(text(f"ALTER TABLE guide_applications ADD COLUMN {name} {ddl}"))
         logger.info("Database schema verified/created successfully.")
     except Exception as e:  # pragma: no cover - depends on DB availability
         logger.error(f"Could not create/verify database schema: {e}")

@@ -2,9 +2,10 @@ from typing import List, Optional
 import json
 import os
 import uuid
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, TypeAdapter
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -19,6 +20,17 @@ from app.schemas.public import ExperienceResponse, GuideResponse
 from app.services.guide_service import GuideService
 
 router = APIRouter()
+
+GUIDE_UPLOAD_FIELDS = (
+    "citizenshipFront",
+    "citizenshipBack",
+    "liveSelfie",
+    "holdingCitizenship",
+    "certificate",
+)
+MAX_GUIDE_UPLOAD_BYTES = 10 * 1024 * 1024
+ALLOWED_GUIDE_UPLOAD_TYPES = {"application/pdf", "image/jpeg", "image/png", "image/webp"}
+GUIDE_APPLICATION_UPLOAD_ROOT = Path(__file__).resolve().parents[2] / "private_guide_applications"
 
 
 # ---------------- Public inquiry / application forms ----------------
@@ -85,16 +97,30 @@ def submit_host_application(
 
 class PublicGuideApplicationCreate(BaseModel):
     full_name: str
-    email: str
+    email: EmailStr
+    password: str
     phone: Optional[str] = None
     city: Optional[str] = None
+    region: Optional[str] = None
     nin_number: Optional[str] = None
     documents: Optional[str] = None  # names of uploaded documents
 
 
 @router.post("/guide-applications", status_code=status.HTTP_201_CREATED)
-def submit_guide_application(
-    payload: PublicGuideApplicationCreate, db: Session = Depends(get_db)
+async def submit_guide_application(
+    full_name: str = Form(...),
+    email: str = Form(...),
+    password: str = Form(...),
+    region: str = Form(...),
+    phone: Optional[str] = Form(None),
+    city: Optional[str] = Form(None),
+    nin_number: Optional[str] = Form(None),
+    citizenshipFront: UploadFile = File(...),
+    citizenshipBack: UploadFile = File(...),
+    liveSelfie: UploadFile = File(...),
+    holdingCitizenship: UploadFile = File(...),
+    certificate: UploadFile = File(...),
+    db: Session = Depends(get_db),
 ):
     """Public guide registration form from the marketing website.
 
@@ -102,19 +128,86 @@ def submit_guide_application(
     ``guide_applications`` table so guides are never mixed into the host
     funnel (``host_applications``).
     """
-    application = GuideApplication(
-        full_name=payload.full_name,
-        email=payload.email,
-        phone=payload.phone,
-        city=payload.city,
-        region=payload.city,
-        nin_number=payload.nin_number,
-        documents=payload.documents or "Guide registration via website",
-        status="pending",
-    )
-    db.add(application)
-    db.commit()
-    db.refresh(application)
+    valid_password, password_error = validate_password_strength(password)
+    if not valid_password:
+        raise HTTPException(status_code=422, detail=password_error)
+    try:
+        normalized_email = str(TypeAdapter(EmailStr).validate_python(email)).strip().lower()
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail="Enter a valid email address.") from exc
+
+    uploads = {
+        "citizenshipFront": citizenshipFront,
+        "citizenshipBack": citizenshipBack,
+        "liveSelfie": liveSelfie,
+        "holdingCitizenship": holdingCitizenship,
+        "certificate": certificate,
+    }
+    upload_root = GUIDE_APPLICATION_UPLOAD_ROOT
+    saved_paths: list[Path] = []
+    files_metadata: dict[str, dict[str, str]] = {}
+    try:
+        for field_name in GUIDE_UPLOAD_FIELDS:
+            upload = uploads[field_name]
+            content_type = upload.content_type or ""
+            if content_type not in ALLOWED_GUIDE_UPLOAD_TYPES:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"{field_name}: upload a JPG, PNG, WebP, or PDF file.",
+                )
+            if field_name in {"liveSelfie", "holdingCitizenship"} and not content_type.startswith("image/"):
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"{field_name}: upload an image.",
+                )
+            content = await upload.read(MAX_GUIDE_UPLOAD_BYTES + 1)
+            if not content or len(content) > MAX_GUIDE_UPLOAD_BYTES:
+                raise HTTPException(
+                    status_code=422,
+                    detail=f"{field_name}: file must be non-empty and no larger than 10 MB.",
+                )
+            stored_name = f"{uuid.uuid4().hex}"
+            if content_type == "application/pdf":
+                stored_name += ".pdf"
+            elif content_type == "image/jpeg":
+                stored_name += ".jpg"
+            elif content_type == "image/png":
+                stored_name += ".png"
+            else:
+                stored_name += ".webp"
+            stored_path = upload_root / stored_name
+            upload_root.mkdir(parents=True, exist_ok=True)
+            stored_path.write_bytes(content)
+            saved_paths.append(stored_path)
+            files_metadata[field_name] = {
+                "filename": os.path.basename(upload.filename or field_name),
+                "content_type": content_type,
+                "stored_name": stored_name,
+            }
+
+        application = GuideApplication(
+            full_name=full_name.strip(),
+            email=normalized_email,
+            credential_password_hash=get_password_hash(password),
+            phone=phone,
+            city=city,
+            region=region,
+            nin_number=nin_number,
+            documents=", ".join(
+                f"{field_name}: {metadata['filename']}"
+                for field_name, metadata in files_metadata.items()
+            ),
+            details_json=json.dumps({"files": files_metadata}),
+            status="pending",
+        )
+        db.add(application)
+        db.commit()
+        db.refresh(application)
+    except Exception:
+        db.rollback()
+        for stored_path in saved_paths:
+            stored_path.unlink(missing_ok=True)
+        raise
     return {"status": "ok", "id": application.id, "message": "Application received"}
 
 
