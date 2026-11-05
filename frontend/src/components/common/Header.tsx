@@ -35,17 +35,6 @@ export const Header: React.FC = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Listen for open-login-modal and open-signup-modal events from BookingLoginPrompt
-  useEffect(() => {
-    const openLogin = () => setIsLoginOpen(true);
-    const openSignup = () => setIsSignupOpen(true);
-    window.addEventListener('open-login-modal', openLogin);
-    window.addEventListener('open-signup-modal', openSignup);
-    return () => {
-      window.removeEventListener('open-login-modal', openLogin);
-      window.removeEventListener('open-signup-modal', openSignup);
-    };
-  }, []);
   const { isSearchOpen, openSearch, closeSearch, searchQuery, setSearchQuery, openCart } =
     useUIStore();
   const { isAuthenticated, user, logout } = useAuthStore();
@@ -241,6 +230,7 @@ export const Header: React.FC = () => {
                 <button
                   onClick={openSearch}
                   tabIndex={showHeaderSearch ? 0 : -1}
+                  title="Search"
                   className="absolute right-1 top-1 bottom-1 w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center text-[#213448] transition-transform group-hover:scale-105"
                 >
                   <Search className="w-4 h-4" />
@@ -287,19 +277,20 @@ export const Header: React.FC = () => {
                 <Link
                   to="/favorites"
                   className="text-gray-800 hover:text-primary transition-colors"
+                  title="Bookmarks"
                 >
                   <Heart className={`w-6 h-6 ${hasFavorites ? 'text-red-500 fill-red-500' : ''}`} />
                 </Link>
                 <div
                   ref={profileDropdownRef}
                   className="relative inline-block"
-                  onMouseEnter={() => setIsProfileDropdownOpen(true)}
                 >
                   <button
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                    className="flex items-center gap-2 text-gray-800 hover:text-primary transition-colors"
+                    title="Profile"
+                    className="flex items-center gap-2 text-gray-800 transition-all duration-200"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-300">
+                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-300 transition-all duration-200 hover:scale-110 hover:shadow-md hover:bg-yellow-100 hover:border-yellow-200">
                       {user?.firstName ? (
                         <span className="font-bold text-sm text-gray-700">{user.firstName[0]}</span>
                       ) : (
@@ -424,7 +415,7 @@ export const Header: React.FC = () => {
               code pill (USD / NPR / EUR ...), original white background. */}
             <button
               onClick={() => setIsCurrencyPickerOpen(true)}
-              title={`Currency: ${currencyInfo.name} (${currencyInfo.label}) - Change currency`}
+              title="Currency"
               aria-label={`Change currency, current: ${currencyInfo.name}`}
               data-testid="currency-picker-button"
               className="group flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2.5 shadow-sm transition-colors hover:border-primary hover:shadow"
@@ -439,6 +430,7 @@ export const Header: React.FC = () => {
             {isAuthenticated && (
               <button
                 onClick={openCart}
+                title="Cart"
                 className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <ShoppingCart className="h-6 w-6 text-gray-700" />
@@ -452,6 +444,7 @@ export const Header: React.FC = () => {
 
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              title="Menu"
               className="w-10 h-10 bg-white hover:bg-gray-50 text-gray-800 rounded-lg flex items-center justify-center transition-colors shadow-sm"
             >
               <AlignJustify className="w-5 h-5" />
@@ -466,6 +459,7 @@ export const Header: React.FC = () => {
                 onClick={openSearch}
                 tabIndex={showHeaderSearch ? 0 : -1}
                 aria-hidden={!showHeaderSearch}
+                title="Search"
                 className={`overflow-hidden flex items-center justify-center bg-brand-yellow text-[#213448] rounded-full shadow-sm transition-all duration-300 ease-in-out ${
                   showHeaderSearch
                     ? 'w-10 h-10 opacity-100 scale-100'
@@ -484,12 +478,16 @@ export const Header: React.FC = () => {
                 >
                   <MessageCircle className="w-5 h-5" />
                 </Link>
-                <div className="relative" ref={mobileProfileDropdownRef}>
+                <div
+                  className="relative"
+                  ref={mobileProfileDropdownRef}
+                >
                   <button
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                    className="w-10 h-10 bg-white hover:bg-slate-50 text-gray-800 rounded-lg flex items-center justify-center transition-colors shadow-sm"
+                    title="Profile"
+                    className="w-10 h-10 bg-white hover:bg-yellow-50 text-gray-800 rounded-full flex items-center justify-center transition-colors shadow-sm"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-300">
+                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-300 transition-all duration-200 hover:scale-110 hover:bg-yellow-100 hover:border-yellow-200">
                       {user?.firstName ? (
                         <span className="font-bold text-sm text-gray-700">{user.firstName[0]}</span>
                       ) : (
@@ -581,6 +579,7 @@ export const Header: React.FC = () => {
             )}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              title="Menu"
               className="w-10 h-10 bg-white hover:bg-slate-50 text-gray-800 rounded-lg flex items-center justify-center transition-colors shadow-sm"
             >
               <AlignJustify className="w-5 h-5" />

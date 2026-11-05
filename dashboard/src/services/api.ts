@@ -215,7 +215,7 @@ export async function reviewHostApplication(id: number, status: "approved" | "re
   return res.data
 }
 
-export async function getGuideApplications(params?: { status?: string; region?: string }) {
+export async function getGuideApplications(params?: { status_filter?: string; region?: string }) {
   const res = await http.get("/operations/guide-applications", { params })
   return res.data
 }
@@ -223,6 +223,18 @@ export async function getGuideApplications(params?: { status?: string; region?: 
 export async function reviewGuideApplication(id: number, status: "approved" | "rejected" | "pending") {
   const res = await http.patch(`/operations/guide-applications/${id}`, { status })
   return res.data
+}
+
+export async function getGuideApplicationDocument(id: number, documentKey: string) {
+  const res = await http.get(
+    `/operations/guide-applications/${id}/documents/${encodeURIComponent(documentKey)}`,
+    { responseType: "blob" },
+  )
+  return res.data as Blob
+}
+
+export async function deleteGuideApplication(id: number) {
+  await http.delete(`/operations/guide-applications/${id}`)
 }
 
 export async function getSupportTickets(params?: { status?: string }) {
@@ -298,7 +310,10 @@ export async function getAdminUsers(role?: string) {
   return res.data
 }
 
-export async function updateAdminUser(userId: number, payload: any) {
+export async function updateAdminUser(
+  userId: number,
+  payload: { region?: string | null; role?: string },
+) {
   const res = await http.patch(`/admin/users/${userId}`, payload)
   return res.data
 }

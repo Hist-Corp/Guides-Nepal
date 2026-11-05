@@ -19,6 +19,7 @@ import { BookingLoginPrompt } from '../components/common/BookingLoginPrompt';
 import { useAuthStore } from '../store/authStore';
 import { useProfileStore } from '../store/profileStore';
 import guidesApi from '../services/guidesApi';
+import { guideDashboardApi } from '../services/guideDashboardApi';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { getApiUrl } from '../config/api';
 import { ReviewCard } from '../components/common/ReviewCard';
@@ -613,13 +614,17 @@ const ExperiencePage: React.FC = () => {
   // so storing it in state would leave the previous experience on screen.
   const staticExperience = experienceId ? experiencesData[experienceId] : undefined;
   const [apiExperience, setApiExperience] = useState<Experience | undefined>(undefined);
+  const [listingExperience, setListingExperience] = useState<Experience | undefined>(undefined);
   const [loading, setLoading] = useState(!staticExperience);
-  const experience = staticExperience ?? apiExperience;
+  const experience = staticExperience ?? apiExperience ?? listingExperience;
 
   // If the id is not in the static map (e.g. it comes from the backend
-  // catalog surfaced via Search), resolve it from the API.
+  // catalog surfaced via Search), resolve it from the API. Also try the
+  // public guide/host listings (created at /guide/listings) as a fallback
+  // so traveler-facing /experience/:id pages show database listings.
   useEffect(() => {
     setApiExperience(undefined);
+    setListingExperience(undefined);
 
     if (staticExperience || !experienceId) {
       setLoading(false);
@@ -657,6 +662,35 @@ const ExperiencePage: React.FC = () => {
                   reviews: 0,
                   about: 'A passionate local guide ready to show you the best of Nepal.',
                 }) as Host,
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Fallback: public guide/host listings stored in the database.
+        const listings = await guideDashboardApi.listPublicListings();
+        if (cancelled) return;
+        const listingMatch = listings.find((l) => String(l.id) === experienceId);
+        if (listingMatch) {
+          setListingExperience({
+            id: listingMatch.id,
+            title: listingMatch.title,
+            city: listingMatch.city,
+            rating: 4.5,
+            reviews: 0,
+            price: listingMatch.price,
+            duration: listingMatch.duration,
+            images: ['/images/placeholder.svg'],
+            description: listingMatch.description,
+            highlights: [],
+            host: {
+              name: 'Local Guide',
+              image: '/images/placeholder.svg',
+              rating: 4.5,
+              reviews: 0,
+              about: 'A local guide offering this experience.',
+            },
+            meetingPoint: listingMatch.meeting_point ?? undefined,
           });
         }
       } catch (error) {

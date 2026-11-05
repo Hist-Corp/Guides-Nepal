@@ -62,9 +62,11 @@ import GuideProposalFormPage from './pages/guide/GuideProposalFormPage';
 import GuideProposalDetailPage from './pages/guide/GuideProposalDetailPage';
 import GuideChangeRequestFormPage from './pages/guide/GuideChangeRequestFormPage';
 import GuideChangeRequestDetailPage from './pages/guide/GuideChangeRequestDetailPage';
+import RegionalGuideApplications from './pages/regional/RegionalGuideApplications';
 import BookingsPage from './pages/user/BookingsPage';
 import GuideBookingsPage from './pages/guide/GuideBookingsPage';
-import ProfilePage from './pages/user/ProfilePage';
+import RoleProfilePage from './pages/user/RoleProfilePage';
+import PublicGuideListingsPage from './pages/user/PublicGuideListingsPage';
 import AccountSettingsPage from './pages/user/AccountSettingsPage';
 import FavoritesPage from './pages/user/FavoritesPage';
 import ChatPage from './pages/user/ChatPage';
@@ -166,7 +168,9 @@ function App() {
             <Route path="/guide/proposals/:id/edit" element={<GuideProposalFormPage />} />
             <Route path="/guide/change-requests/:id" element={<GuideChangeRequestDetailPage />} />
             <Route path="/guide/bookings" element={<GuideBookingsPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/regional/guide-applications" element={<RegionalGuideApplications />} />
+            <Route path="/profile" element={<RoleProfilePage />} />
+            <Route path="/listings" element={<PublicGuideListingsPage />} />
             <Route path="/account" element={<AccountSettingsPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/chat" element={<ChatPage />} />

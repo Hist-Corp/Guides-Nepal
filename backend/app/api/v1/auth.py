@@ -154,16 +154,26 @@ def login(login_data: UserLogin, db: Session = Depends(get_db)) -> dict:
     auth_service = AuthService(db)
     user = auth_service.authenticate_user(login_data.email, login_data.password)
     if not user:
-        # Host accounts are gated on an approved registration. If the password
-        # is correct but the application is still pending or was rejected, say
-        # so explicitly instead of a generic credential error — the applicant
-        # needs to know they're waiting on a regional head/admin.
-        if normalize_role(user_role_for(db, login_data.email)) == "host":
+        # Provider accounts are gated on an approved registration. If the
+        # password is correct but the application is still pending or was
+        # rejected, say so explicitly instead of a generic credential error
+        # — the applicant needs to know they're waiting on approval.
+        role = normalize_role(user_role_for(db, login_data.email))
+        if role == "host":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=(
                     "Your host account is not active yet. It is activated once "
                     "a regional manager approves your registration."
+                ),
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        if role == "guide":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=(
+                    "Your guide account is not active yet. It is activated once "
+                    "a regional head approves your application."
                 ),
                 headers={"WWW-Authenticate": "Bearer"},
             )

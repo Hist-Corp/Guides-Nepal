@@ -36,9 +36,16 @@ export async function flushPendingSubmissions() {
   try {
     const raw = localStorage.getItem(QUEUE_KEY);
     if (!raw) return;
-    const queue: { kind: string; path?: string; payload: any }[] = JSON.parse(raw);
+    const queue = JSON.parse(raw) as {
+      kind: string;
+      path?: string;
+      payload: Record<string, unknown>;
+    }[];
     const remaining: typeof queue = [];
     for (const item of queue) {
+      // Older versions queued guide passwords in plaintext. Never retry or
+      // retain those credential-bearing submissions from localStorage.
+      if (item.kind === 'guide-application') continue;
       try {
         await axios.post(`${API_BASE_URL}${item.path ?? pathFor(item.kind)}`, item.payload, { timeout: 8000 });
       } catch {
@@ -99,10 +106,89 @@ export function submitHostApplication(payload: {
 export function submitGuideApplication(payload: {
   full_name: string;
   email: string;
+  password: string;
   phone?: string;
   city?: string;
+  region?: string;
   nin_number?: string;
-  documents?: string;
+  files: {
+    citizenshipFront: File;
+    citizenshipBack: File;
+    liveSelfie: File;
+    holdingCitizenship: File;
+    certificate: File;
+  };
 }) {
-  return submit('guide-application', '/guide-applications', payload);
+  // Unlike other public forms, guide applications carry a password. Do not
+  // use the generic offline queue, which stores its payload in localStorage.
+  const formData = new FormData();
+  formData.append('full_name', payload.full_name);
+  formData.append('email', payload.email);
+  formData.append('password', payload.password);
+  if (payload.phone) formData.append('phone', payload.phone);
+  if (payload.city) formData.append('city', payload.city);
+  if (payload.region) formData.append('region', payload.region);
+  if (payload.nin_number) formData.append('nin_number', payload.nin_number);
+  Object.entries(payload.files).forEach(([key, file]) => formData.append(key, file));
+  return axios
+    .post(`${API_BASE_URL}/guide-applications`, formData, { timeout: 30000 })
+    .then(() => ({ ok: true as const, synced: true }))
+    .catch((error: unknown) => {
+      if (axios.isAxiosError(error)) {
+        const detail: unknown = error.response?.data?.detail;
+        if (typeof detail === 'string') throw new Error(detail);
+      }
+      throw error;
+    });
+}
+
+// ---------------- Authenticated: regional-head guide application review ----------------
+
+export interface GuideApplicationItem {
+  id: number;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  city: string | null;
+  region: string | null;
+  nin_number: string | null;
+  documents: string | null;
+  status: string;
+  created_at: string | null;
+}
+
+export async function fetchGuideApplications(
+  token: string,
+  region?: string,
+  statusFilter?: string,
+): Promise<GuideApplicationItem[]> {
+  const params = new URLSearchParams();
+  if (region) params.set('region', region);
+  if (statusFilter) params.set('status_filter', statusFilter);
+  const r = await fetch(`${API_BASE_URL}/operations/guide-applications?${params}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!r.ok) throw new Error('Unable to load guide applications.');
+  return r.json();
+}
+
+export async function reviewGuideApplication(
+  token: string,
+  applicationId: number,
+  status: 'approved' | 'rejected' | 'pending',
+  reviewNote?: string,
+) {
+  const r = await fetch(`${API_BASE_URL}/operations/guide-applications/${applicationId}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ status, review_note: reviewNote }),
+  });
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({ detail: 'Unable to review application.' }));
+    throw new Error(err.detail || 'Unable to review application.');
+  }
+  return r.json();
 }

@@ -25,7 +25,7 @@ class AuthService:
         self.db = db
 
     def get_user_by_email(self, email: str) -> User | None:
-        return self.db.query(User).filter(User.email == email).first()
+        return self.db.query(User).filter(User.email == email.strip().lower()).first()
 
     def check_supabase_user_exists(self, email: str) -> dict[str, Any]:
         """
@@ -192,21 +192,10 @@ class AuthService:
         return db_user
 
     def _host_approval_ok(self, email: str) -> bool:
-        """True when a ``host`` account is backed by an *approved* application.
-
-        Host credentials are minted only at approval time (see
-        ``operations.review_host_application``), so any host row without a
-        linked, approved application is treated as unauthorised and refused.
-        This is a defence-in-depth check: the primary control is that no
-        host user row is created until a regional-head/admin approves.
-        """
+        """True when a ``host`` account is backed by an *approved* application."""
         from app.models.host_application import HostApplication
 
         email_l = (email or "").strip().lower()
-        # Ensure the host_applications credential-lifecycle columns exist
-        # before querying (SQLite uses runtime ALTER TABLE instead of Alembic
-        # for these columns; the helper normally runs on operations routes,
-        # but login hits this path directly).
         from app.api.v1.operations import _ensure_host_application_columns
 
         _ensure_host_application_columns(self.db)
@@ -218,6 +207,27 @@ class AuthService:
         )
         return bool(app and (app.status or "").lower() == "approved")
 
+    def _guide_approval_ok(self, email: str) -> bool:
+        """True when a ``guide`` account is backed by an *approved* application.
+
+        Guide credentials are minted only at approval time (see
+        ``operations.review_guide_application``), so any guide row without a
+        linked, approved application is treated as unauthorised and refused.
+        """
+        from app.models.guide_application import GuideApplication
+
+        email_l = (email or "").strip().lower()
+        from app.api.v1.operations import _ensure_guide_application_columns
+
+        _ensure_guide_application_columns(self.db)
+        app = (
+            self.db.query(GuideApplication)
+            .filter(GuideApplication.email == email_l)
+            .order_by(GuideApplication.id.desc())
+            .all()
+        )
+        return any((application.status or "").lower() == "approved" for application in app)
+
     def authenticate_user(self, email: str, password: str) -> User | None:
         user = self.get_user_by_email(email)
         if not user:
@@ -226,10 +236,12 @@ class AuthService:
             return None
         if not verify_password(password, str(user.hashed_password)):
             return None
-        # Unified host login: a host may only sign in once a regional-head or
-        # admin has approved their registration. Wrong password and
-        # not-yet-approved both return None so we never leak account state.
-        if normalize_role(user.role) == "host" and not self._host_approval_ok(email):
+        # Unified provider login: a host/guide may only sign in once a
+        # regional-head or admin has approved their registration.
+        role = normalize_role(user.role)
+        if role == "host" and not self._host_approval_ok(email):
+            return None
+        if role == "guide" and not self._guide_approval_ok(email):
             return None
         return user
 
