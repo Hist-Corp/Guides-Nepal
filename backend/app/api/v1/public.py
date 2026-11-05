@@ -12,10 +12,12 @@ from app.core.database import get_db
 from app.core.security import get_password_hash, validate_password_strength
 from app.models.guide import Guide
 from app.models.guide_application import GuideApplication
+from app.models.guide_listing import GuideListing
 from app.models.host_application import HostApplication
 from app.models.host_guide import HostExperienceGuide
 from app.models.booking import HostExperience
 from app.models.support_ticket import SupportTicket
+from app.models.user import User
 from app.schemas.public import ExperienceResponse, GuideResponse
 from app.services.guide_service import GuideService
 
@@ -535,6 +537,56 @@ def _host_experience_to_public(db: Session, experience: HostExperience) -> Optio
     }
 
 
+_GUIDE_LISTING_CATEGORY_MAP = {
+    "trekking": "Adventure",
+    "tour": "Cultural",
+    "specialized": "Workshop",
+}
+
+
+def _user_to_host_payload(user: Optional[User]) -> dict:
+    """Derive a public host payload from the guide's user account."""
+    name = f"{(user.firstName or '')} {(user.lastName or '')}".strip() if user else ""
+    return {
+        "id": int(user.id) if user else 0,
+        "name": name or (user.email if user else "Guide"),
+        "image": user.avatar_url if (user and user.avatar_url) else MOCK_GUIDES[0]["image"],
+        "role": "Experience Guide",
+        "rating": 4.8,
+        "reviews": 0,
+        "bio": user.bio if (user and user.bio) else "",
+        "languages": ["English", "Nepali"],
+        "verified": False,
+        "livesIn": None,
+        "cities": [],
+        "gallery": [],
+        "is_active": True,
+    }
+
+
+def _guide_listing_to_public(db: Session, listing: GuideListing) -> Optional[dict]:
+    """Map a published GuideListing (approved proposal) to the public experience shape."""
+    user = db.get(User, listing.guide_user_id)
+    host = _user_to_host_payload(user)
+    if listing.city:
+        host["livesIn"] = listing.city
+        host["cities"] = [listing.city]
+    return {
+        "id": 200000 + int(listing.id),
+        "slug": f"guide-{listing.id}",
+        "title": listing.title,
+        "heroImage": MOCK_GUIDES[0]["image"],
+        "description": listing.description,
+        "price": float(listing.price or 0.0),
+        "duration": listing.duration,
+        "rating": 4.8,
+        "reviews": 0,
+        "city": listing.city,
+        "category": _GUIDE_LISTING_CATEGORY_MAP.get(listing.category, listing.category),
+        "host": host,
+    }
+
+
 @router.get("/experiences", response_model=List[ExperienceResponse])
 def list_experiences(
     city: Optional[str] = None,
@@ -552,6 +604,17 @@ def list_experiences(
         host_rows = db.query(HostExperience).filter(HostExperience.is_active.is_(True)).all()
         for experience in host_rows:
             public_row = _host_experience_to_public(db, experience)
+            if public_row:
+                results.append(public_row)
+    except Exception:
+        pass
+
+    # Live approved guide proposals (published via Content Manager approval)
+    # surface on the public Traveller pages.
+    try:
+        guide_rows = db.query(GuideListing).filter(GuideListing.is_active.is_(True)).all()
+        for listing in guide_rows:
+            public_row = _guide_listing_to_public(db, listing)
             if public_row:
                 results.append(public_row)
     except Exception:
@@ -616,6 +679,21 @@ def get_experience(slug: str, db: Session = Depends(get_db)) -> dict:
                     return public_row
         except Exception:
             pass
+
+    # Published guide proposals are addressed as guide-{id}.
+    if slug.startswith("guide-"):
+        try:
+            listing_id = int(slug.removeprefix("guide-"))
+            listing = (
+                db.query(GuideListing)
+                .filter(GuideListing.id == listing_id, GuideListing.is_active.is_(True))
+                .first()
+            )
+            if listing:
+                return _guide_listing_to_public(db, listing)
+        except Exception:
+            pass
+
     raise HTTPException(status_code=404, detail="Experience not found")
 
 

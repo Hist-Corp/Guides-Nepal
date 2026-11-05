@@ -57,6 +57,7 @@ import GuideOnboardingPage from './pages/guide/GuideOnboardingPage';
 import GuideDashboardPage from './pages/guide/GuideDashboardPage';
 import GuideListingsPage from './pages/guide/GuideListingsPage';
 import GuideListingFormPage from './pages/guide/GuideListingFormPage';
+import GuideExperienceRequestPage from './pages/guide/GuideExperienceRequestPage';
 import GuideProposalsPage from './pages/guide/GuideProposalsPage';
 import GuideProposalFormPage from './pages/guide/GuideProposalFormPage';
 import GuideProposalDetailPage from './pages/guide/GuideProposalDetailPage';
@@ -156,7 +157,7 @@ function App() {
             <Route path="/guide/onboarding" element={<GuideOnboardingPage />} />
             <Route path="/guide/dashboard" element={<GuideDashboardPage />} />
             <Route path="/guide/listings" element={<GuideListingsPage />} />
-            <Route path="/guide/listings/new" element={<GuideListingFormPage />} />
+            <Route path="/guide/listings/new" element={<GuideExperienceRequestPage />} />
             <Route path="/guide/listings/:id/edit" element={<GuideListingFormPage />} />
             <Route
               path="/guide/listings/:id/propose-change"

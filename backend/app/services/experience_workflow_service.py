@@ -271,10 +271,21 @@ class ExperienceWorkflowService:
             raise HTTPException(
                 status_code=422, detail="Only an approved proposal can be published"
             )
+        self._publish_proposal(row)
+        self.db.commit()
+        self.db.refresh(row)
+        return _proposal_to_dict(row)
+
+    def _publish_proposal(self, row: ExperienceProposal) -> None:
+        """Create the live GuideListing from an approved proposal (idempotent).
+
+        Promotes the proposal to ``published`` so it becomes visible on the
+        public Traveller pages. Safe to call multiple times.
+        """
         if row.listing_id:
-            raise HTTPException(status_code=422, detail="Proposal was already published")
+            return
         listing = GuideListing(
-            guide_user_id=guide_id,
+            guide_user_id=row.guide_user_id,
             title=row.title,
             category=row.category,
             city=row.city,
@@ -293,6 +304,25 @@ class ExperienceWorkflowService:
         row.listing_id = listing.id
         row.status = STATUS_PUBLISHED
         row.published_at = _now()
+
+    def edit_proposal_as_manager(
+        self, proposal_id: int, payload: ExperienceProposalUpdate
+    ) -> dict:
+        """Content Manager override: edit the details of any proposal.
+
+        Ownership is not required and the proposal need not be in an editable
+        state. A published proposal cannot be edited here because its live
+        listing is already public.
+        """
+        row = self.db.get(ExperienceProposal, proposal_id)
+        if not row:
+            raise HTTPException(status_code=404, detail="Proposal not found")
+        if row.status == STATUS_PUBLISHED:
+            raise HTTPException(
+                status_code=422, detail="A published proposal cannot be edited"
+            )
+        for key, value in payload.model_dump(exclude_unset=True).items():
+            setattr(row, key, value)
         self.db.commit()
         self.db.refresh(row)
         return _proposal_to_dict(row)
@@ -315,7 +345,9 @@ class ExperienceWorkflowService:
                 status_code=422, detail="Notes are required for 'request_changes' and 'reject'"
             )
         if payload.action == "approve":
-            row.status = STATUS_APPROVED
+            # Approval promotes straight to a live listing so the experience is
+            # visible on the public Traveller pages (approve -> visible).
+            self._publish_proposal(row)
         elif payload.action == "request_changes":
             row.status = STATUS_CHANGES_REQUESTED
         else:

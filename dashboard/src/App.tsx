@@ -41,6 +41,7 @@ const RegionalHeadOverview = lazy(() => import('./regionalhead/Overview'));
 const RegionalApplications = lazy(() => import('./regionalhead/Applications'));
 const RegionalInfo = lazy(() => import('./regionalhead/Region'));
 const RegionalExperienceReview = lazy(() => import('./regionalhead/ExperienceReview'));
+const RegionalGuideExperienceRequests = lazy(() => import('./regionalhead/GuideExperienceRequests'));
 const SupportOverview = lazy(() => import('./support/Overview'));
 const SupportTickets = lazy(() => import('./support/Tickets'));
 const SupportFaq = lazy(() => import('./support/Faq'));
@@ -113,6 +114,7 @@ export default function App() {
             <Route index element={<RegionalHeadOverview />} />
             <Route path="applications" element={<RegionalApplications />} />
             <Route path="experiences" element={<RegionalExperienceReview />} />
+            <Route path="guide-experience-requests" element={<RegionalGuideExperienceRequests />} />
             <Route path="region" element={<RegionalInfo />} />
             <Route
               path="customers"

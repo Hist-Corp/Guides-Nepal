@@ -1,7 +1,55 @@
 import { API_BASE_URL } from '../config/api';
+import { useAuthStore } from '../store/authStore';
 
 export type GuideCategory = 'trekking' | 'tour' | 'specialized';
 export type GuideUpdateType = 'availability' | 'capacity' | 'booking' | 'schedule' | 'announcement';
+export type GuideExperienceRequestType = 'experience' | 'booking';
+export type GuideExperienceRequestStatus = 'pending' | 'approved' | 'rejected';
+
+export interface GuideExperienceRequest {
+  id: number;
+  guide_user_id: number;
+  experience_id: number | null;
+  booking_id: number | null;
+  request_type: GuideExperienceRequestType;
+  status: GuideExperienceRequestStatus;
+  reviewed_by: number | null;
+  reviewed_at: string | null;
+  review_notes: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  guide_name?: string;
+  guide_email?: string;
+  experience_title?: string;
+  booking_title?: string;
+  booking_date?: string;
+}
+
+export interface GuideExperienceRequestCreate {
+  request_type: GuideExperienceRequestType;
+  experience_id?: number;
+  booking_id?: number;
+}
+
+export interface GuideExperienceRequestReview {
+  status: GuideExperienceRequestStatus;
+  review_notes?: string;
+}
+
+export interface GuideExperienceOption {
+  id: number;
+  title: string;
+  city: string;
+  price: number;
+}
+
+export interface GuideBookingOption {
+  id: number;
+  experience_title: string;
+  city: string;
+  date: string;
+  status: string;
+}
 
 export interface GuideListing {
   id: number;
@@ -65,6 +113,19 @@ function authHeaders(token: string) {
   return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
 }
 
+async function authenticatedFetch(token: string, input: RequestInfo | URL, init?: RequestInit) {
+  const fetchWithToken = (accessToken: string) =>
+    fetch(input, { ...init, headers: authHeaders(accessToken) });
+  const response = await fetchWithToken(token);
+  if (response.status !== 401) return response;
+
+  const refreshed = await useAuthStore.getState().refreshTokens();
+  const nextToken = useAuthStore.getState().accessToken;
+  if (!refreshed || !nextToken) return response;
+
+  return fetchWithToken(nextToken);
+}
+
 export const guideDashboardApi = {
   getDashboard: async (token: string): Promise<GuideDashboardPayload> => {
     const res = await fetch(`${API_BASE_URL}/guide/dashboard`, { headers: authHeaders(token) });
@@ -72,14 +133,23 @@ export const guideDashboardApi = {
     return res.json();
   },
   getOnboarding: async (token: string) => {
-    const res = await fetch(`${API_BASE_URL}/guide/onboarding`, { headers: authHeaders(token) });
+    const res = await authenticatedFetch(token, `${API_BASE_URL}/guide/onboarding`);
     if (!res.ok) throw new Error('Unable to load onboarding.');
     return res.json() as Promise<{ onboarding: GuideOnboarding | null; completed: boolean }>;
   },
+  listExperienceOptions: async (token: string): Promise<GuideExperienceOption[]> => {
+    const res = await authenticatedFetch(token, `${API_BASE_URL}/guide/experience-options`);
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Unable to load experiences.');
+    return res.json();
+  },
+  listBookings: async (token: string): Promise<GuideBookingOption[]> => {
+    const res = await authenticatedFetch(token, `${API_BASE_URL}/guide/bookings`);
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Unable to load bookings.');
+    return res.json();
+  },
   saveOnboarding: async (token: string, payload: Partial<GuideOnboarding>) => {
-    const res = await fetch(`${API_BASE_URL}/guide/onboarding`, {
+    const res = await authenticatedFetch(token, `${API_BASE_URL}/guide/onboarding`, {
       method: 'PUT',
-      headers: authHeaders(token),
       body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Unable to save onboarding.');
@@ -161,6 +231,50 @@ export const guideDashboardApi = {
       body: JSON.stringify({ status }),
     });
     if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Unable to update booking.');
+    return res.json();
+  },
+
+  createExperienceRequest: async (
+    token: string,
+    payload: GuideExperienceRequestCreate,
+  ): Promise<GuideExperienceRequest> => {
+    const res = await authenticatedFetch(token, `${API_BASE_URL}/guide/experience-requests`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Unable to create request.');
+    return res.json();
+  },
+
+  listExperienceRequests: async (token: string): Promise<GuideExperienceRequest[]> => {
+    const res = await authenticatedFetch(token, `${API_BASE_URL}/guide/experience-requests`);
+    if (!res.ok) throw new Error('Unable to load requests.');
+    return res.json();
+  },
+
+  listExperienceRequestsForReview: async (
+    token: string,
+    statusFilter?: string,
+  ): Promise<GuideExperienceRequest[]> => {
+    const url = statusFilter
+      ? `${API_BASE_URL}/operations/guide-experience-requests?status_filter=${encodeURIComponent(statusFilter)}`
+      : `${API_BASE_URL}/operations/guide-experience-requests`;
+    const res = await fetch(url, { headers: authHeaders(token) });
+    if (!res.ok) throw new Error('Unable to load review queue.');
+    return res.json();
+  },
+
+  reviewExperienceRequest: async (
+    token: string,
+    requestId: number,
+    payload: GuideExperienceRequestReview,
+  ): Promise<GuideExperienceRequest> => {
+    const res = await fetch(`${API_BASE_URL}/operations/guide-experience-requests/${requestId}/review`, {
+      method: 'PATCH',
+      headers: authHeaders(token),
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Unable to review request.');
     return res.json();
   },
 };

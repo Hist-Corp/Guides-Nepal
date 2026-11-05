@@ -52,6 +52,32 @@ class GuideStatusUpdate(Base):
     max_capacity = Column(Integer, nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+
+class GuideExperienceRequest(Base):
+    """A guide's request to be assigned as the 'Who you'll meet' guide on an
+    existing host experience or booking.
+
+    Lifecycle: pending → approved / rejected.  Approval is decided by a
+    Regional Head (or admin).  When approved, a ``HostExperienceGuide`` row is
+    created linking the guide's catalog profile to the host experience so the
+    guide appears in the Traveller-facing 'Who you'll meet' section.
+    """
+
+    __tablename__ = "guide_experience_requests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    guide_user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    experience_id = Column(Integer, ForeignKey("host_experiences.id"), nullable=True, index=True)
+    booking_id = Column(Integer, ForeignKey("host_bookings.id"), nullable=True, index=True)
+    request_type = Column(String, nullable=False)  # 'experience' | 'booking'
+    status = Column(String, nullable=False, default="pending", index=True)  # pending | approved | rejected
+    reviewed_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+    reviewed_at = Column(DateTime(timezone=True), nullable=True)
+    review_notes = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
 
 class GuideProfile(Base):

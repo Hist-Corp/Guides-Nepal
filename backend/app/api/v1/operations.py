@@ -30,10 +30,17 @@ from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_role
 from app.core.roles import ADMIN, CUSTOMER_SUPPORT, GUIDE, HOST, REGIONAL_HEAD
 from app.core.security import get_password_hash, validate_password_strength
+from app.models.booking import Booking, HostExperience
 from app.models.guide_application import GuideApplication
+from app.models.guide_listing import GuideExperienceRequest
 from app.models.host_application import HostApplication
+from app.models.host_guide import HostExperienceGuide, HostGuide
 from app.models.support_ticket import SupportTicket
 from app.models.user import User
+from app.schemas.guide_dashboard import (
+    GuideExperienceRequestReview,
+    GuideExperienceRequestResponse,
+)
 
 router = APIRouter()
 
@@ -547,6 +554,158 @@ def review_guide_application(
         "status": app.status,
         "login_email": user.email if user else None,
         "user_id": user.id if user else app.user_id,
+    }
+
+
+# ---------------- Guide experience requests (Regional Head review queue) ----------------
+
+
+@router.get("/guide-experience-requests")
+def list_guide_experience_requests(
+    status_filter: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role(*APPLICATION_STAFF)),
+):
+    """Regional Head (or admin) queue of guide experience assignment requests.
+
+    Regional heads only see requests for guides in their assigned region.
+    """
+    query = db.query(GuideExperienceRequest)
+    # Regional heads only see requests for guides in their region.
+    if current_user.role == REGIONAL_HEAD:
+        if not current_user.region:
+            raise HTTPException(status_code=403, detail="Regional head has no assigned region")
+        # Join users to filter by region.
+        query = query.join(User, GuideExperienceRequest.guide_user_id == User.id).filter(
+            User.region == current_user.region
+        )
+    if status_filter:
+        query = query.filter(GuideExperienceRequest.status == status_filter)
+    rows = query.order_by(GuideExperienceRequest.created_at.desc()).all()
+    results = []
+    for row in rows:
+        guide = db.get(User, row.guide_user_id)
+        experience = None
+        booking = None
+        if row.experience_id:
+            experience = db.query(HostExperience).filter(HostExperience.id == row.experience_id).first()
+        if row.booking_id:
+            booking = db.get(Booking, row.booking_id)
+        results.append({
+            "id": row.id,
+            "guide_user_id": row.guide_user_id,
+            "guide_name": f"{(guide.firstName or '')} {(guide.lastName or '')}".strip() or guide.email if guide else None,
+            "guide_email": guide.email if guide else None,
+            "guide_region": guide.region if guide else None,
+            "experience_id": row.experience_id,
+            "experience_title": experience.title if experience else None,
+            "booking_id": row.booking_id,
+            "booking_title": booking.experience_title if booking else None,
+            "booking_date": booking.date.isoformat() if booking and booking.date else None,
+            "request_type": row.request_type,
+            "status": row.status,
+            "reviewed_by": row.reviewed_by,
+            "reviewed_at": row.reviewed_at.isoformat() if row.reviewed_at else None,
+            "review_notes": row.review_notes,
+            "created_at": row.created_at.isoformat() if row.created_at else None,
+        })
+    return results
+
+
+@router.patch("/guide-experience-requests/{request_id}/review")
+def review_guide_experience_request(
+    request_id: int,
+    payload: GuideExperienceRequestReview,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role(*APPLICATION_STAFF)),
+):
+    """Regional Head (or admin) approves or rejects a guide experience request.
+
+    On approval, a HostExperienceGuide link is created so the guide appears
+    in the Traveller-facing 'Who you'll meet' section of the experience page.
+    """
+    if payload.status not in ("approved", "rejected"):
+        raise HTTPException(status_code=422, detail="Invalid status")
+
+    row = db.get(GuideExperienceRequest, request_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="Guide experience request not found")
+
+    # Regional heads may only act on guides in their region.
+    if current_user.role == REGIONAL_HEAD:
+        if not current_user.region:
+            raise HTTPException(status_code=403, detail="Regional head has no assigned region")
+        guide = db.get(User, row.guide_user_id)
+        if not guide or guide.region != current_user.region:
+            raise HTTPException(status_code=403, detail="Request outside your region")
+
+    row.status = payload.status
+    row.reviewed_by = current_user.id
+    row.reviewed_at = func.now()
+    row.review_notes = payload.review_notes
+
+    # On approval, create the HostExperienceGuide link so the guide shows on
+    # the Traveller-facing experience page.
+    if payload.status == "approved":
+
+        if row.request_type == "experience" and row.experience_id:
+            existing_link = (
+                db.query(HostExperienceGuide)
+                .filter(
+                    HostExperienceGuide.experience_id == row.experience_id,
+                    HostExperienceGuide.guide_id.isnot(None),
+                )
+                .first()
+            )
+            if not existing_link:
+                # Resolve the guide's catalog profile id via host_guides.
+                hg = (
+                    db.query(HostGuide)
+                    .filter(HostGuide.guide_user_id == row.guide_user_id)
+                    .first()
+                )
+                if hg and hg.guide_id:
+                    link = HostExperienceGuide(
+                        host_id=current_user.id if current_user.role == REGIONAL_HEAD else 0,
+                        experience_id=row.experience_id,
+                        guide_id=hg.guide_id,
+                        is_primary=True,
+                    )
+                    db.add(link)
+        elif row.request_type == "booking" and row.booking_id:
+            booking = db.get(Booking, row.booking_id)
+            if booking:
+                hg = (
+                    db.query(HostGuide)
+                    .filter(HostGuide.guide_user_id == row.guide_user_id)
+                    .first()
+                )
+                if hg and hg.guide_id:
+                    existing_link = (
+                        db.query(HostExperienceGuide)
+                        .filter(
+                            HostExperienceGuide.experience_id == booking.experience_id,
+                            HostExperienceGuide.guide_id.isnot(None),
+                        )
+                        .first()
+                    )
+                    if not existing_link:
+                        link = HostExperienceGuide(
+                            host_id=current_user.id if current_user.role == REGIONAL_HEAD else 0,
+                            experience_id=booking.experience_id,
+                            guide_id=hg.guide_id,
+                            is_primary=False,
+                        )
+                        db.add(link)
+
+    db.commit()
+    db.refresh(row)
+    return {
+        "id": row.id,
+        "status": row.status,
+        "reviewed_by": row.reviewed_by,
+        "reviewed_at": row.reviewed_at.isoformat() if row.reviewed_at else None,
+        "review_notes": row.review_notes,
     }
 
 

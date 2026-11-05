@@ -11,6 +11,7 @@ from app.models.guide import Guide as Guide
 from app.models.guide_listing import GuideListing as GuideListing
 from app.models.guide_listing import GuideProfile as GuideProfile
 from app.models.guide_listing import GuideStatusUpdate as GuideStatusUpdate
+from app.models.guide_listing import GuideExperienceRequest as GuideExperienceRequest
 from app.models.guide_application import GuideApplication as GuideApplication
 from app.models.host_application import HostApplication as HostApplication
 from app.models.host_guide import HostGuide as HostGuide
@@ -27,6 +28,7 @@ __all__ = [
     "GuideListing",
     "GuideProfile",
     "GuideStatusUpdate",
+    "GuideExperienceRequest",
     "GuideApplication",
     "HostApplication",
     "HostGuide",

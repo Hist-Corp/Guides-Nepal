@@ -5,20 +5,24 @@ by :func:`app.core.dependencies.require_role` and scoped to the authenticated
 user id.  ``guide`` is *not* in ``SELF_REGISTERABLE_ROLES``, so the only ways to
 obtain one are ``backend/seed_credentials.py`` or an admin role reassignment.
 """
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.dependencies import require_role
 from app.core.roles import GUIDE, GUIDE_CAPABILITIES, role_rank
 from app.models.user import User
-from app.models.booking import Booking
+from app.models.booking import Booking, HostExperience
+from app.models.guide_listing import GuideExperienceRequest
 from app.schemas.guide_dashboard import (
     GuideListingCapacityUpdate,
     GuideListingCreate,
     GuideListingUpdate,
     GuideOnboardingCreate,
     GuideStatusCreate,
+    GuideExperienceRequestCreate,
+    GuideExperienceRequestResponse,
+    GuideExperienceRequestReview,
 )
 from app.services.guide_dashboard_service import GuideDashboardService
 
@@ -70,6 +74,21 @@ def guide_bookings(guide: User = Depends(GUIDE_ONLY), db: Session = Depends(get_
             "traveler_email": traveler.email,
         }
         for booking, traveler in rows
+    ]
+
+
+@router.get("/experience-options")
+def guide_experience_options(guide: User = Depends(GUIDE_ONLY), db: Session = Depends(get_db)) -> list[dict]:
+    """Active host experiences with database IDs suitable for assignment requests."""
+    rows = (
+        db.query(HostExperience)
+        .filter(HostExperience.is_active.is_(True))
+        .order_by(HostExperience.title)
+        .all()
+    )
+    return [
+        {"id": row.id, "title": row.title, "city": row.city, "price": row.price}
+        for row in rows
     ]
 
 
@@ -198,7 +217,77 @@ def guide_post_status(
 @router.delete("/status/{status_id}")
 def guide_delete_status(
     status_id: int, guide: User = Depends(GUIDE_ONLY), db: Session = Depends(get_db)
-) -> dict:
+):
     GuideDashboardService(db).delete_status(int(guide.id), status_id)
     return {"status": "ok"}
 
+
+# --------------------------------------------------------------------------- #
+# Guide experience requests (SOP-GN-GEA-001)                                  #
+# --------------------------------------------------------------------------- #
+
+
+@router.post("/experience-requests", status_code=201)
+def guide_create_experience_request(
+    payload: GuideExperienceRequestCreate,
+    guide: User = Depends(GUIDE_ONLY),
+    db: Session = Depends(get_db),
+) -> dict:
+    """A guide requests to be assigned as the 'Who you'll meet' guide on an
+    existing host experience or booking.  Routes to Regional Head for review."""
+    req_type = payload.request_type
+    if req_type == "experience" and not payload.experience_id:
+        raise HTTPException(status_code=422, detail="experience_id is required for experience requests")
+    if req_type == "booking" and not payload.booking_id:
+        raise HTTPException(status_code=422, detail="booking_id is required for booking requests")
+    if req_type == "experience" and not db.query(HostExperience).filter(
+        HostExperience.id == payload.experience_id,
+        HostExperience.is_active.is_(True),
+    ).first():
+        raise HTTPException(status_code=404, detail="Active experience not found")
+
+    # Prevent duplicate pending requests for the same target.
+    existing = (
+        db.query(GuideExperienceRequest)
+        .filter(
+            GuideExperienceRequest.guide_user_id == guide.id,
+            GuideExperienceRequest.request_type == req_type,
+            GuideExperienceRequest.status == "pending",
+        )
+    )
+    if req_type == "experience":
+        existing = existing.filter(GuideExperienceRequest.experience_id == payload.experience_id)
+    else:
+        existing = existing.filter(GuideExperienceRequest.booking_id == payload.booking_id)
+    if existing.first():
+        raise HTTPException(
+            status_code=422,
+            detail=f"A pending {req_type} request already exists for this target.",
+        )
+
+    row = GuideExperienceRequest(
+        guide_user_id=guide.id,
+        request_type=req_type,
+        experience_id=payload.experience_id,
+        booking_id=payload.booking_id,
+        status="pending",
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return GuideExperienceRequestResponse.from_orm(row)
+
+
+@router.get("/experience-requests", response_model=list[GuideExperienceRequestResponse])
+def guide_list_experience_requests(
+    guide: User = Depends(GUIDE_ONLY),
+    db: Session = Depends(get_db),
+) -> list:
+    """List the signed-in guide's own experience/booking assignment requests."""
+    rows = (
+        db.query(GuideExperienceRequest)
+        .filter(GuideExperienceRequest.guide_user_id == guide.id)
+        .order_by(GuideExperienceRequest.created_at.desc())
+        .all()
+    )
+    return [GuideExperienceRequestResponse.from_orm(r) for r in rows]

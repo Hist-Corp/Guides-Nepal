@@ -1227,6 +1227,35 @@ const ExperiencePage: React.FC = () => {
                   </div>
                 </div>
               </div>
+              {/* Who you'll meet — approved guides assigned to this experience */}
+              {(experience.guides && experience.guides.length > 0) && (
+                <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-bold text-slate-900">Who you'll meet</h2>
+                  </div>
+                  <div className="flex flex-wrap gap-4">
+                    {experience.guides.map((g: any) => (
+                      <div key={g.id} className="flex flex-col items-center gap-2">
+                        <img
+                          src={g.image}
+                          alt={g.name}
+                          className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md mb-2"
+                          onError={(e) => (e.currentTarget.src = "/images/placeholder.svg")}
+                        />
+                        <div className="text-center">
+                          <div className="font-bold text-gray-900">{g.name}</div>
+                          <div className="text-xs text-gray-500">
+                            {g.role || "Experience Guide"}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {g.rating} ★ ({g.reviews} reviews)
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               {/* Reviews Section */}
               <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm space-y-4">
                 <div className="flex items-center justify-between">

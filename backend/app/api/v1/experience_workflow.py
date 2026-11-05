@@ -110,6 +110,25 @@ def publish_my_proposal(
 
 
 # --------------------------------------------------------------------------- #
+# Proposals — content-manager edit (management override)                      #
+# --------------------------------------------------------------------------- #
+@router.patch("/proposals/{proposal_id}/edit")
+def edit_proposal_as_manager(
+    proposal_id: int,
+    payload: ExperienceProposalUpdate,
+    approver: User = Depends(require_role(CONTENT_MANAGER)),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Content Manager (or admin) edits the details of any proposal.
+
+    This is a management override: ownership is not required and the proposal
+    does not need to be in an editable state. A published proposal cannot be
+    edited here because its live listing is already public.
+    """
+    return ExperienceWorkflowService(db).edit_proposal_as_manager(proposal_id, payload)
+
+
+# --------------------------------------------------------------------------- #
 # Proposals — approver side (approval gate)                                   #
 # --------------------------------------------------------------------------- #
 @router.get("/queue/proposals")

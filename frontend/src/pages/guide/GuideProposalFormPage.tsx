@@ -175,7 +175,13 @@ const GuideProposalFormPage: React.FC = () => {
             </label>
             <label className="text-sm font-semibold text-gray-700">
               City *
-              <input className={input} value={form.city} onChange={(e) => set('city', e.target.value)} />
+              <select className={input} value={form.city} onChange={(e) => set('city', e.target.value)}>
+                <option value="Kathmandu">Kathmandu</option>
+                <option value="Pokhara">Pokhara</option>
+                <option value="Lalitpur">Lalitpur</option>
+                <option value="Bhaktapur">Bhaktapur</option>
+                <option value="Bharatpur">Bharatpur</option>
+              </select>
             </label>
             <label className="text-sm font-semibold text-gray-700">
               Finer area

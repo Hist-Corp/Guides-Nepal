@@ -225,6 +225,21 @@ export async function reviewGuideApplication(id: number, status: "approved" | "r
   return res.data
 }
 
+// --- Guide experience requests (Regional Head review queue) ---
+export async function getGuideExperienceRequests(params?: { status_filter?: string }) {
+  const res = await http.get("/operations/guide-experience-requests", { params })
+  return res.data
+}
+
+export async function reviewGuideExperienceRequest(
+  id: number,
+  status: "approved" | "rejected",
+  review_notes?: string
+) {
+  const res = await http.patch(`/operations/guide-experience-requests/${id}/review`, { status, review_notes })
+  return res.data
+}
+
 export async function getGuideApplicationDocument(id: number, documentKey: string) {
   const res = await http.get(
     `/operations/guide-applications/${id}/documents/${encodeURIComponent(documentKey)}`,
@@ -281,6 +296,17 @@ export async function decideProposal(
   notes?: string
 ) {
   const res = await http.post(`/experience-workflow/proposals/${id}/decision`, { action, notes })
+  return res.data
+}
+
+/**
+ * Content Manager override: edit the details of any (non-published) proposal.
+ */
+export async function updateProposal(
+  id: number,
+  payload: Record<string, unknown>
+) {
+  const res = await http.patch(`/experience-workflow/proposals/${id}/edit`, payload)
   return res.data
 }
 

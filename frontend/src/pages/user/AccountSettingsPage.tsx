@@ -94,7 +94,7 @@ const AccountSettingsPage: React.FC = () => {
         }),
       });
       if (res.ok) {
-        login({ firstName: form.firstName, lastName: form.lastName, email: form.email, phone: form.phone });
+        login({ ...user, firstName: form.firstName, lastName: form.lastName, email: form.email, phone: form.phone });
         setProfileMsg({ type: 'ok', text: 'Profile updated successfully.' });
       } else {
         const data = await res.json().catch(() => ({}));
@@ -152,7 +152,7 @@ const AccountSettingsPage: React.FC = () => {
       setPwMsg({ type: 'error', text: 'New password must contain at least one number.' });
       return;
     }
-    if (!/[!@#$%^&*()_+\-=\[\]{};:,.<>?]/.test(newPassword)) {
+    if (!/[!@#$%^&*()_+\-=[\]{};:,.<>?]/.test(newPassword)) {
       setPwMsg({ type: 'error', text: 'New password must contain at least one special character (!@#$%^&*).' });
       return;
     }

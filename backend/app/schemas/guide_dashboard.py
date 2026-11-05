@@ -5,6 +5,8 @@ from pydantic import BaseModel, Field
 
 GuideCategory = Literal["trekking", "tour", "specialized"]
 GuideUpdateType = Literal["availability", "capacity", "booking", "schedule", "announcement"]
+GuideExperienceRequestType = Literal["experience", "booking"]
+GuideExperienceRequestStatus = Literal["pending", "approved", "rejected"]
 
 
 class GuideListingCreate(BaseModel):
@@ -84,3 +86,34 @@ class GuideOnboardingCreate(BaseModel):
 
 class GuideOnboardingResponse(GuideOnboardingCreate):
     guide_user_id: int
+
+
+class GuideExperienceRequestCreate(BaseModel):
+    """A guide's request to be assigned as the 'Who you'll meet' guide on an
+    existing host experience or booking."""
+
+    request_type: GuideExperienceRequestType
+    experience_id: Optional[int] = None
+    booking_id: Optional[int] = None
+
+
+class GuideExperienceRequestResponse(BaseModel):
+    id: int
+    guide_user_id: int
+    experience_id: Optional[int] = None
+    booking_id: Optional[int] = None
+    request_type: GuideExperienceRequestType
+    status: GuideExperienceRequestStatus
+    reviewed_by: Optional[int] = None
+    reviewed_at: Optional[datetime] = None
+    review_notes: Optional[str] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class GuideExperienceRequestReview(BaseModel):
+    status: GuideExperienceRequestStatus
+    review_notes: Optional[str] = Field(default=None, max_length=2000)

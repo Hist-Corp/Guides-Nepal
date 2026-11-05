@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown, X } from "lucide-react"
 import {
   decideChangeRequest,
   decideProposal,
   getChangeRequestQueue,
   getProposalQueue,
+  updateProposal,
 } from "../services/api"
 
 type DecisionAction = "approve" | "request_changes" | "reject"
@@ -35,10 +36,14 @@ function ReviewCard({
   item,
   kind,
   onDecided,
+  isEditing,
+  onEdit,
 }: {
   item: any
   kind: "proposal" | "change-request"
   onDecided: (action: DecisionAction, notes: string) => Promise<void>
+  isEditing: boolean
+  onEdit: () => void
 }) {
   const [open, setOpen] = useState(false)
   const [notes, setNotes] = useState("")
@@ -171,8 +176,165 @@ function ReviewCard({
               </div>
             </div>
           )}
+          {kind === "proposal" && item.status !== "published" && (
+            <button
+              onClick={onEdit}
+              disabled={isEditing}
+              className="rounded-lg bg-blue-600 text-white px-3 py-1.5 text-xs font-semibold hover:bg-blue-700 disabled:opacity-40"
+            >
+              {isEditing ? "Editing…" : "Edit details"}
+            </button>
+          )}
         </div>
       )}
+    </div>
+  )
+}
+
+/**
+ * Content Manager edit form: lets a manager revise the details of any
+ * non-published proposal before approving it.
+ */
+function ProposalEditForm({
+  item,
+  onSave,
+  onClose,
+}: {
+  item: any
+  onSave: (payload: Record<string, unknown>) => Promise<void>
+  onClose: () => void
+}) {
+  const [form, setForm] = useState({
+    title: item.title ?? "",
+    category: item.category ?? "tour",
+    city: item.city ?? "",
+    area: item.area ?? "",
+    description: item.description ?? "",
+    itinerary: item.itinerary ?? "",
+    meeting_point: item.meeting_point ?? "",
+    duration: item.duration ?? "",
+    difficulty: item.difficulty ?? "",
+    price: String(item.price ?? ""),
+    max_guests: String(item.max_guests ?? ""),
+  })
+  const [error, setError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+
+  const set = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }))
+
+  const save = async () => {
+    if (!form.title.trim()) { setError("Title is required"); return }
+    if (!form.city.trim()) { setError("City is required"); return }
+    if (!form.description.trim()) { setError("Description is required"); return }
+    const price = Number(form.price)
+    const guests = Number(form.max_guests)
+    if (Number.isNaN(price) || price < 0) { setError("Price must be a non-negative number"); return }
+    if (!Number.isInteger(guests) || guests < 1 || guests > 100) {
+      setError("Max guests must be a whole number between 1 and 100")
+      return
+    }
+    setError(null)
+    setSaving(true)
+    try {
+      await onSave({
+        title: form.title.trim(),
+        category: form.category,
+        city: form.city.trim(),
+        area: form.area.trim() || undefined,
+        description: form.description.trim(),
+        itinerary: form.itinerary.trim() || undefined,
+        meeting_point: form.meeting_point.trim() || undefined,
+        duration: form.duration.trim(),
+        difficulty: form.difficulty.trim(),
+        price,
+        max_guests: guests,
+      })
+      onClose()
+    } catch (e: any) {
+      setError(e?.response?.data?.detail || "Unable to save changes.")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const input =
+    "w-full rounded-xl border border-gray-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-yellow"
+
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-bold text-gray-900">Edit proposal details</h3>
+        <button onClick={onClose} className="rounded-full p-1.5 text-gray-400 hover:text-gray-600">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+      {error && (
+        <p className="mb-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+          {error}
+        </p>
+      )}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="col-span-2">
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Title *</label>
+          <input className={input} value={form.title} onChange={(e) => set("title", e.target.value)} />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Category *</label>
+          <select className={input} value={form.category} onChange={(e) => set("category", e.target.value)}>
+            <option value="tour">Tour</option>
+            <option value="trekking">Trekking</option>
+            <option value="specialized">Specialized</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">City *</label>
+          <input className={input} value={form.city} onChange={(e) => set("city", e.target.value)} />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Finer area</label>
+          <input className={input} value={form.area} onChange={(e) => set("area", e.target.value)} />
+        </div>
+      </div>
+      <div className="col-span-2">
+        <label className="block text-sm font-semibold text-gray-700 mb-1">Description *</label>
+        <textarea className={`${input} min-h-32`} value={form.description} onChange={(e) => set("description", e.target.value)} />
+      </div>
+      <div className="col-span-2">
+        <label className="block text-sm font-semibold text-gray-700 mb-1">Itinerary</label>
+        <textarea className={`${input} min-h-24`} value={form.itinerary} onChange={(e) => set("itinerary", e.target.value)} />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Meeting point</label>
+          <input className={input} value={form.meeting_point} onChange={(e) => set("meeting_point", e.target.value)} />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Duration *</label>
+          <input className={input} value={form.duration} onChange={(e) => set("duration", e.target.value)} />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Difficulty *</label>
+          <input className={input} value={form.difficulty} onChange={(e) => set("difficulty", e.target.value)} />
+        </div>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Price per guest (USD) *</label>
+          <input className={input} type="number" min={0} value={form.price} onChange={(e) => set("price", e.target.value)} />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">Max guests (1-100) *</label>
+          <input className={input} type="number" min={1} max={100} value={form.max_guests} onChange={(e) => set("max_guests", e.target.value)} />
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-3 pt-4">
+        <button onClick={onClose} disabled={saving} className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-bold text-gray-800 hover:bg-gray-100 disabled:opacity-60">
+          Cancel
+        </button>
+        <button onClick={save} disabled={saving} className="rounded-full bg-[#213448] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#1a2a3a] disabled:opacity-60">
+          {saving ? "Saving…" : "Save changes"}
+        </button>
+      </div>
     </div>
   )
 }
@@ -188,6 +350,8 @@ export default function ExperienceReviewPanel({ scope }: { scope: "both" | "prop
   const [items, setItems] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [msg, setMsg] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [editError, setEditError] = useState<string | null>(null)
 
   const load = async (kind: "proposals" | "changes", status: string) => {
     setLoading(true)
@@ -213,6 +377,20 @@ export default function ExperienceReviewPanel({ scope }: { scope: "both" | "prop
     setMsg(`#${id} ${action.replace("_", " ")}`)
     await load(tab, filter)
   }
+
+  const handleEditSave = async (payload: Record<string, unknown>) => {
+    if (!editingId) return
+    try {
+      await updateProposal(editingId, payload)
+      setMsg(`#${editingId} details updated`)
+      await load(tab, filter)
+      setEditingId(null)
+    } catch (e: any) {
+      setEditError(e?.response?.data?.detail || "Unable to save changes.")
+    }
+  }
+
+  const editItem = items.find((i) => i.id === editingId)
 
   return (
     <div className="space-y-4">
@@ -270,8 +448,24 @@ export default function ExperienceReviewPanel({ scope }: { scope: "both" | "prop
               item={item}
               kind={tab === "proposals" ? "proposal" : "change-request"}
               onDecided={(action, notes) => onDecided(item.id, action, notes)}
+              isEditing={editingId === item.id}
+              onEdit={() => setEditingId(item.id)}
             />
           ))}
+        </div>
+      )}
+      {editingId !== null && editItem && (
+        <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-4">
+          <ProposalEditForm
+            item={editItem}
+            onSave={handleEditSave}
+            onClose={() => setEditingId(null)}
+          />
+        </div>
+      )}
+      {editError && (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+          {editError}
         </div>
       )}
     </div>
