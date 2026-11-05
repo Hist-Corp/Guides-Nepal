@@ -258,22 +258,6 @@ export const Header: React.FC = () => {
               </>
             ) : (
               <>
-                {user?.role === 'guide' && (
-                  <Link
-                    to="/guide/dashboard"
-                    className="text-sm font-bold text-gray-800 hover:text-primary transition-colors flex items-center gap-2"
-                  >
-                    Dashboard
-                  </Link>
-                )}
-                {user?.role === 'host' && (
-                  <Link
-                    to="/host/dashboard"
-                    className="text-sm font-bold text-gray-800 hover:text-primary transition-colors flex items-center gap-2"
-                  >
-                    <LayoutDashboard className="w-4 h-4" /> Dashboard
-                  </Link>
-                )}
                 <Link
                   to="/favorites"
                   className="text-gray-800 hover:text-primary transition-colors"
@@ -510,15 +494,7 @@ export const Header: React.FC = () => {
                       >
                         Profile
                       </Link>
-                      {user?.role === 'guide' ? (
-                        <Link
-                          to="/guide/dashboard"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
-                          onClick={() => setIsProfileDropdownOpen(false)}
-                        >
-                          Dashboard
-                        </Link>
-                      ) : (
+                      {user?.role !== 'guide' && (
                         <Link
                           to="/bookings"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
@@ -689,54 +665,8 @@ export const Header: React.FC = () => {
                           >
                             Profile
                           </Link>
-                          {user?.role === 'host' && (
-                            <>
-                              <Link
-                                to="/host/dashboard"
-                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2 flex items-center gap-2"
-                                onClick={() => setIsMenuOpen(false)}
-                              >
-                                <LayoutDashboard className="w-4 h-4" /> Host dashboard
-                              </Link>
-                              <Link
-                                to="/host/experiences"
-                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
-                                onClick={() => setIsMenuOpen(false)}
-                              >
-                                My experiences
-                              </Link>
-                              <Link
-                                to="/host/bookings"
-                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
-                                onClick={() => setIsMenuOpen(false)}
-                              >
-                                Bookings
-                              </Link>
-                              <Link
-                                to="/host/earnings"
-                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
-                                onClick={() => setIsMenuOpen(false)}
-                              >
-                                Earnings
-                              </Link>
-                              <Link
-                                to="/host/settings"
-                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
-                                onClick={() => setIsMenuOpen(false)}
-                              >
-                                Settings
-                              </Link>
-                            </>
-                          )}
                           {user?.role === 'guide' && (
                             <>
-                              <Link
-                                to="/guide/dashboard"
-                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
-                                onClick={() => setIsMenuOpen(false)}
-                              >
-                                Dashboard
-                              </Link>
                               <Link
                                 to="/guide/listings"
                                 className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"

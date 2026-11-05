@@ -23,7 +23,13 @@ export default function Field({
   return (
     <div className="flex flex-col gap-1.5">
       {label ? (
-        <label className="text-sm font-medium text-main">{label}</label>
+        <label className="text-sm font-medium text-main">
+          {label.split('*').flatMap((part, i, arr) =>
+            i < arr.length - 1
+              ? [part, <span key={i} className="text-red-600">*</span>]
+              : part
+          )}
+        </label>
       ) : null}
       {as === "textarea" ? (
         <textarea className={inputCls} {...props} />
