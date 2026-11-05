@@ -411,7 +411,7 @@ function ExperienceFormModal({
         </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Title *</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Title <span className="text-red-600">*</span></label>
             <input
               type="text"
               required
@@ -421,7 +421,7 @@ function ExperienceFormModal({
             />
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">City *</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">City <span className="text-red-600">*</span></label>
             <select
               required
               value={form.city}
@@ -433,7 +433,7 @@ function ExperienceFormModal({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Category *</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Category <span className="text-red-600">*</span></label>
             <select
               required
               value={form.category}
@@ -445,7 +445,7 @@ function ExperienceFormModal({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Description *</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Description <span className="text-red-600">*</span></label>
             <textarea
               required
               minLength={30}
@@ -457,7 +457,7 @@ function ExperienceFormModal({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Price per guest (USD) *</label>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Price per guest (USD) <span className="text-red-600">*</span></label>
               <input
                 type="number"
                 required
@@ -469,7 +469,7 @@ function ExperienceFormModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Duration *</label>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Duration <span className="text-red-600">*</span></label>
               <input
                 type="text"
                 required

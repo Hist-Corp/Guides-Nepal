@@ -162,11 +162,11 @@ const GuideProposalFormPage: React.FC = () => {
         <div className="mt-6 space-y-4 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="text-sm font-semibold text-gray-700">
-              Title *
+              Title <span className="text-red-600">*</span>
               <input className={input} value={form.title} onChange={(e) => set('title', e.target.value)} placeholder="Sunrise kayak on Phewa Lake" />
             </label>
             <label className="text-sm font-semibold text-gray-700">
-              Category *
+              Category <span className="text-red-600">*</span>
               <select className={input} value={form.category} onChange={(e) => set('category', e.target.value)}>
                 <option value="tour">Tour</option>
                 <option value="trekking">Trekking</option>
@@ -190,7 +190,7 @@ const GuideProposalFormPage: React.FC = () => {
           </div>
 
           <label className="block text-sm font-semibold text-gray-700">
-            Description * (what guests do)
+            Description <span className="text-red-600">*</span> (what guests do)
             <textarea className={`${input} min-h-28`} value={form.description} onChange={(e) => set('description', e.target.value)} />
           </label>
           <label className="block text-sm font-semibold text-gray-700">
@@ -204,11 +204,11 @@ const GuideProposalFormPage: React.FC = () => {
               <input className={input} value={form.meeting_point} onChange={(e) => set('meeting_point', e.target.value)} />
             </label>
             <label className="text-sm font-semibold text-gray-700">
-              Duration *
+              Duration <span className="text-red-600">*</span>
               <input className={input} value={form.duration} onChange={(e) => set('duration', e.target.value)} placeholder="3 hours" />
             </label>
             <label className="text-sm font-semibold text-gray-700">
-              Difficulty *
+              Difficulty <span className="text-red-600">*</span>
               <select className={input} value={form.difficulty} onChange={(e) => set('difficulty', e.target.value)}>
                 <option>Easy</option>
                 <option>Moderate</option>
@@ -217,11 +217,11 @@ const GuideProposalFormPage: React.FC = () => {
               </select>
             </label>
             <label className="text-sm font-semibold text-gray-700">
-              Price per guest (USD) *
+              Price per guest (USD) <span className="text-red-600">*</span>
               <input className={input} type="number" min={0} value={form.price} onChange={(e) => set('price', e.target.value)} />
             </label>
             <label className="text-sm font-semibold text-gray-700">
-              Max guests (1–100) *
+              Max guests (1–100) <span className="text-red-600">*</span>
               <input className={input} type="number" min={1} max={100} value={form.max_guests} onChange={(e) => set('max_guests', e.target.value)} />
             </label>
           </div>
