@@ -505,6 +505,31 @@ def _guide_to_host_payload(guide: Guide) -> dict:
     }
 
 
+def _experience_guides(db: Session, experience_id: int) -> list[dict]:
+    """Return approved guide payloads assigned to an experience (mock or live)."""
+    rows = (
+        db.query(HostExperienceGuide, Guide)
+        .join(Guide, HostExperienceGuide.guide_id == Guide.id)
+        .filter(
+            HostExperienceGuide.experience_id == experience_id,
+            Guide.is_active.is_(True),
+        )
+        .order_by(HostExperienceGuide.is_primary.desc(), HostExperienceGuide.created_at.desc())
+        .all()
+    )
+    return [_guide_to_host_payload(g) for _, g in rows]
+
+
+def _enrich_experience_with_guides(db: Session, experience: dict) -> dict:
+    """Attach approved guides to an experience dict (mock or live)."""
+    exp_id = experience.get("id")
+    if exp_id is not None:
+        guides = _experience_guides(db, int(exp_id))
+        if guides:
+            experience["guides"] = guides
+    return experience
+
+
 def _host_experience_to_public(db: Session, experience: HostExperience) -> Optional[dict]:
     """Host-owned experience enriched with its assigned guide for travelers."""
     rows = (
@@ -598,6 +623,13 @@ def list_experiences(
     db: Session = Depends(get_db),
 ) -> List[dict]:
     results = MOCK_EXPERIENCES.copy()
+
+    # Attach approved guides to mock experiences from HostExperienceGuide links.
+    try:
+        for i, exp in enumerate(results):
+            results[i] = _enrich_experience_with_guides(db, exp)
+    except Exception:
+        pass
 
     # Live host experiences with an assigned guide surface alongside mocks.
     try:

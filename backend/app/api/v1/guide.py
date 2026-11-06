@@ -25,6 +25,7 @@ from app.schemas.guide_dashboard import (
     GuideExperienceRequestReview,
 )
 from app.services.guide_dashboard_service import GuideDashboardService
+from app.api.v1.public import MOCK_EXPERIENCES
 
 router = APIRouter(prefix="/guide", tags=["guide"])
 
@@ -79,17 +80,22 @@ def guide_bookings(guide: User = Depends(GUIDE_ONLY), db: Session = Depends(get_
 
 @router.get("/experience-options")
 def guide_experience_options(guide: User = Depends(GUIDE_ONLY), db: Session = Depends(get_db)) -> list[dict]:
-    """Active host experiences with database IDs suitable for assignment requests."""
+    """Active host experiences plus mock experiences suitable for assignment requests."""
     rows = (
         db.query(HostExperience)
         .filter(HostExperience.is_active.is_(True))
         .order_by(HostExperience.title)
         .all()
     )
-    return [
+    options = [
         {"id": row.id, "title": row.title, "city": row.city, "price": row.price}
         for row in rows
     ]
+    from app.api.v1.public import MOCK_EXPERIENCES
+
+    for m in MOCK_EXPERIENCES:
+        options.append({"id": m["id"], "title": m["title"], "city": m["city"], "price": m["price"]})
+    return options
 
 
 @router.patch("/bookings/{booking_id}")
@@ -227,12 +233,12 @@ def guide_delete_status(
 # --------------------------------------------------------------------------- #
 
 
-@router.post("/experience-requests", status_code=201)
+@router.post("/experience-requests", status_code=201, response_model=GuideExperienceRequestResponse)
 def guide_create_experience_request(
     payload: GuideExperienceRequestCreate,
     guide: User = Depends(GUIDE_ONLY),
     db: Session = Depends(get_db),
-) -> dict:
+) -> GuideExperienceRequestResponse:
     """A guide requests to be assigned as the 'Who you'll meet' guide on an
     existing host experience or booking.  Routes to Regional Head for review."""
     req_type = payload.request_type
@@ -240,11 +246,14 @@ def guide_create_experience_request(
         raise HTTPException(status_code=422, detail="experience_id is required for experience requests")
     if req_type == "booking" and not payload.booking_id:
         raise HTTPException(status_code=422, detail="booking_id is required for booking requests")
-    if req_type == "experience" and not db.query(HostExperience).filter(
-        HostExperience.id == payload.experience_id,
-        HostExperience.is_active.is_(True),
-    ).first():
-        raise HTTPException(status_code=404, detail="Active experience not found")
+    if req_type == "experience":
+        active_host = db.query(HostExperience).filter(
+            HostExperience.id == payload.experience_id,
+            HostExperience.is_active.is_(True),
+        ).first()
+        mock_match = next((m for m in MOCK_EXPERIENCES if m["id"] == payload.experience_id), None)
+        if not active_host and not mock_match:
+            raise HTTPException(status_code=404, detail="Active experience not found")
 
     # Prevent duplicate pending requests for the same target.
     existing = (
@@ -275,7 +284,7 @@ def guide_create_experience_request(
     db.add(row)
     db.commit()
     db.refresh(row)
-    return GuideExperienceRequestResponse.from_orm(row)
+    return GuideExperienceRequestResponse.model_validate(row)
 
 
 @router.get("/experience-requests", response_model=list[GuideExperienceRequestResponse])
@@ -290,4 +299,4 @@ def guide_list_experience_requests(
         .order_by(GuideExperienceRequest.created_at.desc())
         .all()
     )
-    return [GuideExperienceRequestResponse.from_orm(r) for r in rows]
+    return [GuideExperienceRequestResponse.model_validate(r) for r in rows]

@@ -23,7 +23,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, EmailStr
-from sqlalchemy import inspect, text
+from sqlalchemy import inspect, text, func
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db

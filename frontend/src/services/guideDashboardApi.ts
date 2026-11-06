@@ -20,6 +20,7 @@ export interface GuideExperienceRequest {
   updated_at: string | null;
   guide_name?: string;
   guide_email?: string;
+  guide_region?: string;
   experience_title?: string;
   booking_title?: string;
   booking_date?: string;

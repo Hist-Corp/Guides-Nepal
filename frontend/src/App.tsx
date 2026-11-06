@@ -64,6 +64,7 @@ import GuideProposalDetailPage from './pages/guide/GuideProposalDetailPage';
 import GuideChangeRequestFormPage from './pages/guide/GuideChangeRequestFormPage';
 import GuideChangeRequestDetailPage from './pages/guide/GuideChangeRequestDetailPage';
 import RegionalGuideApplications from './pages/regional/RegionalGuideApplications';
+import RegionalExperienceRequestReview from './pages/regional/RegionalExperienceRequestReview';
 import BookingsPage from './pages/user/BookingsPage';
 import GuideBookingsPage from './pages/guide/GuideBookingsPage';
 import RoleProfilePage from './pages/user/RoleProfilePage';
@@ -170,6 +171,7 @@ function App() {
             <Route path="/guide/change-requests/:id" element={<GuideChangeRequestDetailPage />} />
             <Route path="/guide/bookings" element={<GuideBookingsPage />} />
             <Route path="/regional/guide-applications" element={<RegionalGuideApplications />} />
+            <Route path="/regional/experience-requests" element={<RegionalExperienceRequestReview />} />
             <Route path="/profile" element={<RoleProfilePage />} />
             <Route path="/listings" element={<PublicGuideListingsPage />} />
             <Route path="/account" element={<AccountSettingsPage />} />

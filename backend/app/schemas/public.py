@@ -57,6 +57,7 @@ class ExperienceBase(BaseModel):
 class ExperienceResponse(ExperienceBase):
     id: int
     host: GuideResponse
+    guides: List[GuideResponse] = []
 
     class Config:
         from_attributes = True

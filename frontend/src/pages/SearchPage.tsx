@@ -36,23 +36,24 @@ export const SearchPage: React.FC = () => {
   // Search is a mixed-city discovery feed. Static catalog first, then live
   // host experiences (with their assigned guide as host) merged from the API.
   const [experiences, setExperiences] = useState(() => shuffle(getCatalogSearchExperiences()));
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-      const live = await guidesApi.getExperiences();
-      if (cancelled || !Array.isArray(live)) return;
-      // Live backend experiences include host- (host-owned) and guide- (Content
-      // Manager-approved proposal) rows, both of which are traveller-facing.
-      const hostRows = live
-        .filter(
-          (e: any) =>
-            typeof e.slug === 'string' &&
-            (e.slug.startsWith('host-') || e.slug.startsWith('guide-'))
-        )
-          .map((e: any) => ({
+        setLoading(true);
+        const live = await guidesApi.getExperiences();
+        if (cancelled || !Array.isArray(live)) return;
+        // Live backend experiences include host- (host-owned) and guide- (Content
+        // Manager-approved proposal) rows, both of which are traveller-facing.
+        const hostRows = live
+          .filter(
+            (e) =>
+              typeof e.slug === 'string' &&
+              (e.slug.startsWith('host-') || e.slug.startsWith('guide-'))
+          )
+          .map((e) => ({
             id: e.id,
             slug: e.slug,
             title: e.title,
@@ -75,6 +76,8 @@ export const SearchPage: React.FC = () => {
         }
       } catch {
         /* offline — static catalog still renders */
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     })();
     return () => {
