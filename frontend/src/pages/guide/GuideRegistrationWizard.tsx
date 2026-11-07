@@ -196,7 +196,6 @@ export default function GuideRegistrationWizard() {
   const [busy, setBusy] = useState(false);
   const [complete, setComplete] = useState<number | null>(null);
   const [showSelfieAuth, setShowSelfieAuth] = useState(false);
-  const [selfieReady, setSelfieReady] = useState(false);
 
   const update = (key: keyof Draft, value: string | boolean) => {
     const next = { ...draft, [key]: value };
@@ -753,24 +752,14 @@ export default function GuideRegistrationWizard() {
                   </span>
 
                   <div className="mt-auto flex items-center justify-between gap-2 w-full px-2 pt-3">
-                      {selfieReady ? (
-                        <button
-                          className="flex-1 cursor-pointer rounded-xl border px-3 py-2 text-sm font-semibold tracking-tight transition-all duration-200 bg-[#213448] text-white border-[#213448] hover:bg-[#213448]/90 shadow-sm"
-                          onClick={() => {
-                            setSelfieReady(false);
-                            setShowSelfieAuth(true);
-                          }}
-                        >
-                          Start Selfie Capture
-                        </button>
-                      ) : (
-                        <button
-                          className={`cursor-pointer rounded-lg border px-3 py-2 text-[10px] font-medium tracking-tight transition-all duration-200 group border-slate-300 text-slate-700 bg-white hover:border-[#213448]/50 hover:bg-[#213448]/5 ${draft.liveSelfieImages.front ? 'border-[#213448] text-[#213448] bg-[#213448]/5' : ''}`}
-                          onClick={() => setSelfieReady(true)}
-                        >
-                          {draft.liveSelfieImages.front ? 'Retake' : 'Capture selfie'}
-                        </button>
-                      )}
+                      <button
+                        className="flex-1 cursor-pointer rounded-xl border px-3 py-2 text-sm font-semibold tracking-tight transition-all duration-200 bg-[#213448] text-white border-[#213448] hover:bg-[#213448]/90 shadow-sm"
+                        onClick={() => {
+                          setShowSelfieAuth(true);
+                        }}
+                      >
+                        {draft.liveSelfieImages.front ? 'Retake' : 'Capture selfie'}
+                      </button>
                     {draft.liveSelfieImages.front && (
                       <button
                         className="text-[10px] text-red-400 font-medium hover:text-red-600 underline underline-offset-4 transition-colors"
