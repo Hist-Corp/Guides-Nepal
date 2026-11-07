@@ -121,7 +121,13 @@ The system comes with the following pre-configured users for development and tes
 |-------|------|----------|--------------|
 | `admin@guides-nepal.com` | Admin | `Admin@12345` | Full system |
 | `content@guides-nepal.com` | Content Manager | `Content@2024` | Pages · Blog · Media · SEO |
-| `regional@guides-nepal.com` | Regional Head | `Regional@2024` | Kathmandu Valley |
+| `regional-1@guides-nepal.com` | Regional Head | `RegionalManager123!` | Koshi Province |
+| `regional-2@guides-nepal.com` | Regional Head | `RegionalManager123!` | Madhesh Province |
+| `regional-3@guides-nepal.com` | Regional Head | `RegionalManager123!` | Bagmati Province |
+| `regional-4@guides-nepal.com` | Regional Head | `RegionalManager123!` | Gandaki Province |
+| `regional-5@guides-nepal.com` | Regional Head | `RegionalManager123!` | Lumbini Province |
+| `regional-6@guides-nepal.com` | Regional Head | `RegionalManager123!` | Karnali Province |
+| `regional-7@guides-nepal.com` | Regional Head | `RegionalManager123!` | Sudurpashchim Province |
 | `support@guides-nepal.com` | Customer Support | `Support@2024` | Tickets · FAQ |
 | `host@guides-nepal.com` | Host | `Host@2024` | Tours · Bookings · Earnings |
 | `guide@guides-nepal.com` | Guide | `Guide@2024` | Public frontend · **cannot sign in to the dashboard** |
@@ -511,10 +517,15 @@ pre-seeded accounts:
 - Email: `content@guides-nepal.com`
 - Password: `Content@2024`
 
-**Regional Head Login:**
-- Email: `regional@guides-nepal.com`
-- Password: `Regional@2024`
-- Region: Kathmandu Valley
+**Regional Head Login (7 accounts — one per Nepal province):**
+- Email: `regional-1@guides-nepal.com` — Region: Koshi Province
+- Email: `regional-2@guides-nepal.com` — Region: Madhesh Province
+- Email: `regional-3@guides-nepal.com` — Region: Bagmati Province
+- Email: `regional-4@guides-nepal.com` — Region: Gandaki Province
+- Email: `regional-5@guides-nepal.com` — Region: Lumbini Province
+- Email: `regional-6@guides-nepal.com` — Region: Karnali Province
+- Email: `regional-7@guides-nepal.com` — Region: Sudurpashchim Province
+- Password (all): `RegionalManager123!`
 
 **Customer Support Login:**
 - Email: `support@guides-nepal.com`
