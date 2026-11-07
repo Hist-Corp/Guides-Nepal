@@ -94,7 +94,7 @@ const empty: Draft = {
 
 const steps = ['Basics', 'Profile', 'Experience', 'Documents', 'Preview & Submit'];
 
-const REGIONS = ['Koshi', 'Madhesh', 'Bagmati', 'Gandaki', 'Lumbini', 'Karnali', 'Sudurpashchim'];
+const REGIONS = ['Koshi Province', 'Madhesh Province', 'Bagmati Province', 'Gandaki Province', 'Lumbini Province', 'Karnali Province', 'Sudurpashchim Province'];
 
 const loadDraft = (): Draft => {
   try {
