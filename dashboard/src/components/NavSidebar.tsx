@@ -206,6 +206,7 @@ export default function NavSidebar() {
             heading: "Regional ops",
             items: [
               { to: `${base}/applications`, label: "Applications", icon: "mail" },
+              { to: `${base}/host-applications`, label: "Host Applications", icon: "home" },
               { to: `${base}/experiences`, label: "Guide Applications & Reviews", icon: "compass" },
               { to: `${base}/region`, label: "My Region", icon: "map" },
               { to: `${base}/customers`, label: "Customers", icon: "user" },

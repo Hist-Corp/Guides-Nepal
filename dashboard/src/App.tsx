@@ -101,31 +101,32 @@ export default function App() {
             <Route path="revenue" element={<AdminRevenue />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
-          <Route
-            path="regional-head/*"
-            element={
-              <RequireAuth>
-                <RequireRole role="regional-head">
-                  <AdminLayout />
-                </RequireRole>
-              </RequireAuth>
-            }
-          >
-            <Route index element={<RegionalHeadOverview />} />
-            <Route path="applications" element={<RegionalApplications />} />
-            <Route path="experiences" element={<RegionalExperienceReview />} />
-            <Route path="guide-experience-requests" element={<RegionalGuideExperienceRequests />} />
-            <Route path="region" element={<RegionalInfo />} />
-            <Route
-              path="customers"
+<Route
+              path="regional-head/*"
               element={
-                <Customers
-                  title="Customers"
-                  description="Travelers and bookings within your region."
-                />
+                <RequireAuth>
+                  <RequireRole role="regional-head">
+                    <AdminLayout />
+                  </RequireRole>
+                </RequireAuth>
               }
-            />
-          </Route>
+            >
+              <Route index element={<RegionalHeadOverview />} />
+              <Route path="applications" element={<RegionalApplications />} />
+              <Route path="host-applications" element={<HostApplicationsPanel />} />
+              <Route path="experiences" element={<RegionalExperienceReview />} />
+              <Route path="guide-experience-requests" element={<RegionalGuideExperienceRequests />} />
+              <Route path="region" element={<RegionalInfo />} />
+              <Route
+                path="customers"
+                element={
+                  <Customers
+                    title="Customers"
+                    description="Travelers and bookings within your region."
+                  />
+                }
+              />
+            </Route>
           <Route
             path="customer-support/*"
             element={

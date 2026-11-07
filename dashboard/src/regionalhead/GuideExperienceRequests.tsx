@@ -138,9 +138,10 @@ export default function RegionalGuideExperienceRequests() {
           </tbody>
         </table>
       </div>
-      <p className="text-sm text-gray-500 mt-2">
-        Approving a request assigns the guide as the “Who you’ll meet” guide on
+<p className="text-sm text-gray-500 mt-2">
+        Approving a request assigns the guide as the "Who you'll meet" guide on
         the corresponding Traveller-facing experience page.
       </p>
     </div>
   )
+}
