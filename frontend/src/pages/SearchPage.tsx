@@ -223,11 +223,11 @@ export const SearchPage: React.FC = () => {
                 <span className="text-sm text-slate-500">
                   {filteredExperiences.length} experiences found
                 </span>
-                <div className="relative">
+                <div className="relative group">
                   <select
                     value={selectedSort}
                     onChange={(e) => setSelectedSort(e.target.value)}
-                    className="appearance-none bg-white border border-slate-200 px-4 py-2 pr-8 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="appearance-none bg-white border border-slate-200 px-4 py-2 pr-10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
                   >
                     {sortOptions.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -235,7 +235,7 @@ export const SearchPage: React.FC = () => {
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-hover:text-slate-600 pointer-events-none transition-colors" />
                 </div>
               </div>
             </div>

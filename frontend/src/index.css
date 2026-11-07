@@ -29,3 +29,10 @@ body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Shutter flash animation - transparent to white to transparent in 150ms */
+@keyframes shutterFlash {
+  0% { background-color: transparent; }
+  50% { background-color: #ffffff; }
+  100% { background-color: transparent; }
+}

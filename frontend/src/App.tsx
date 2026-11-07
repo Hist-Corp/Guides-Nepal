@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Routes, Route } from 'react-router-dom';
 import ScrollToTop from './components/common/ScrollToTop';
 import MailaDaiWidget from './components/common/MailaDaiWidget';
 import CookieConsent from './components/common/CookieConsent';
@@ -52,7 +52,7 @@ import HostExperiencesPage from './pages/host/HostExperiencesPage';
 import HostBookingsPage from './pages/host/HostBookingsPage';
 import HostEarningsPage from './pages/host/HostEarningsPage';
 import HostSettingsPage from './pages/host/HostSettingsPage';
-import BecomeGuidePage from './pages/guide/BecomeGuidePage';
+import GuideRegistrationWizard from './pages/guide/GuideRegistrationWizard';
 import GuideOnboardingPage from './pages/guide/GuideOnboardingPage';
 import GuideDashboardPage from './pages/guide/GuideDashboardPage';
 import GuideListingsPage from './pages/guide/GuideListingsPage';
@@ -152,8 +152,12 @@ function App() {
             <Route path="/host/bookings" element={<HostBookingsPage />} />
             <Route path="/host/earnings" element={<HostEarningsPage />} />
             <Route path="/host/settings" element={<HostSettingsPage />} />
-            <Route path="/become-guide" element={<BecomeGuidePage />} />
-            <Route path="/guide-application" element={<BecomeGuidePage />} />
+            <Route path="/guide-registration" element={<GuideRegistrationWizard />} />
+            <Route path="/become-guide" element={<Navigate to="/guide-registration" replace />} />
+            <Route
+              path="/guide-application"
+              element={<Navigate to="/guide-registration" replace />}
+            />
             <Route path="/bookings" element={<BookingsPage />} />
             <Route path="/guide/onboarding" element={<GuideOnboardingPage />} />
             <Route path="/guide/dashboard" element={<GuideDashboardPage />} />
@@ -171,7 +175,10 @@ function App() {
             <Route path="/guide/change-requests/:id" element={<GuideChangeRequestDetailPage />} />
             <Route path="/guide/bookings" element={<GuideBookingsPage />} />
             <Route path="/regional/guide-applications" element={<RegionalGuideApplications />} />
-            <Route path="/regional/experience-requests" element={<RegionalExperienceRequestReview />} />
+            <Route
+              path="/regional/experience-requests"
+              element={<RegionalExperienceRequestReview />}
+            />
             <Route path="/profile" element={<RoleProfilePage />} />
             <Route path="/listings" element={<PublicGuideListingsPage />} />
             <Route path="/account" element={<AccountSettingsPage />} />
