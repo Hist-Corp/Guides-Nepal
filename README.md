@@ -159,6 +159,20 @@ Each Regional Head manages guide applications for their assigned province. The 8
 
 To approve guide applications, sign in as a Regional Head at `http://localhost:5176` and navigate to `/regional-head/applications`.
 
+### Experience Guide Assignments
+
+Each experience is assigned a minimum of **two guides** (one primary, one secondary) to ensure coverage and provide travelers with options. The 5 seeded experiences are distributed across the 8 guides:
+
+| Experience | City | Primary Guide | Secondary Guide |
+|------------|------|---------------|-----------------|
+| Pokhara Lakeside Sunrise Walk | Pokhara | `guide@guides-nepal.com` | `guide2@guides-nepal.com` |
+| Traditional Nepali Cooking Session | Lalitpur | `guide2@guides-nepal.com` | `guide3@guides-nepal.com` |
+| Kathmandu Heritage Temple Tour | Kathmandu | `guide3@guides-nepal.com` | `guide4@guides-nepal.com` |
+| Chitwan Jungle Safari Experience | Bharatpur | `guide4@guides-nepal.com` | `guide5@guides-nepal.com` |
+| Bhaktapur Pottery & Culture Workshop | Bhaktapur | `guide5@guides-nepal.com` | `guide6@guides-nepal.com` |
+
+These assignments are created via the `host_experience_guides` table linking `GuideListing` catalog profiles to `HostExperience` records. The primary guide is displayed first in the "Who you'll meet" section on the frontend.
+
 ### Traveller & Guide Test Credentials (public frontend)
 
 Twelve frontend test accounts are seeded (4 travellers + 8 guides) so every
@@ -310,6 +324,63 @@ is assigned to:
 - **Traveler endpoints** (`GET/POST /api/v1/bookings/`, `POST /{id}/cancel`, `POST /{id}/archive`) require the `traveler` role and are filtered by `user_id` — a traveler sees only their own bookings and can only cancel/archive their own.
 - **Guide endpoints** (`GET /api/v1/guide/bookings`, `PATCH /api/v1/guide/bookings/{id}`) require the `guide` role and are filtered by `guide_user_id` — a guide sees only bookings assigned to them and can only accept/reject/complete their own.
 - **Admin** has full oversight via `GET /api/v1/admin/bookings` (all bookings).
+
+#### Guide Portfolio View for Travelers
+
+When a traveler books an experience, they can now view the professional portfolio of the specific guide assigned to their booking. This feature provides transparency and helps travelers make informed decisions.
+
+**API Response Enhancement:**
+The `GET /api/v1/bookings/` endpoint now includes a `guide_portfolio` field in each booking response containing:
+
+| Field | Description |
+|-------|-------------|
+| `id` | Guide catalog profile ID |
+| `name` | Guide's display name |
+| `image` | Profile photo URL |
+| `role` | Guide's specialty/role (e.g., "Foodie & Local Expert") |
+| `rating` | Average rating (0-5) |
+| `reviews` | Number of reviews |
+| `bio` | Professional biography |
+| `languages` | Languages spoken |
+| `verified` | Verification status |
+| `lives_in` | Current city |
+| `cities` | Cities of expertise |
+| `gallery` | Photo gallery URLs |
+| `years_experience` | Years of guiding experience |
+| `expertise_areas` | Areas of expertise (tour, trekking, specialized) |
+| `listings_count` | Number of active experience listings |
+
+**Example Response:**
+```json
+{
+  "id": 1,
+  "experience_id": 6,
+  "experience_title": "Pokhara Lakeside Sunrise Walk",
+  "city": "Pokhara",
+  "date": "2026-11-15T10:00:00",
+  "guests": 2,
+  "price": 42.0,
+  "status": "upcoming",
+  "guide_user_id": 13,
+  "guide_portfolio": {
+    "id": 1,
+    "name": "Apicha",
+    "image": "https://images.unsplash.com/...",
+    "role": "Foodie & Local Expert",
+    "rating": 4.98,
+    "reviews": 124,
+    "bio": "Born and raised in Kathmandu...",
+    "languages": ["English", "Nepali", "Hindi"],
+    "verified": true,
+    "lives_in": "Kathmandu",
+    "cities": ["Kathmandu"],
+    "gallery": ["https://images.unsplash.com/..."],
+    "years_experience": "5+",
+    "expertise_areas": ["tour", "specialized"],
+    "listings_count": 2
+  }
+}
+```
 
 #### Shopping cart isolation
 
