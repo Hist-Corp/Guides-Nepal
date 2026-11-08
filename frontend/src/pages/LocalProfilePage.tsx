@@ -270,7 +270,7 @@ const LocalProfilePage: React.FC = () => {
                       <button
                         className="flex-1 text-gray-500 text-xs font-medium hover:text-gray-900 flex items-center justify-center gap-1.5 py-1.5 rounded-full hover:bg-gray-50 transition-colors"
                         onClick={() => {
-                          navigate(`/local/${guide.id}/contact`);
+                          navigate(`/local/${guide.id}/portfolio`);
                           window.scrollTo({ top: 0, behavior: 'instant' });
                         }}
                       >
@@ -832,11 +832,7 @@ const LocalProfilePage: React.FC = () => {
       )}
 
       {lightbox && (
-        <ImageLightbox
-          src={lightbox.src}
-          alt={lightbox.alt}
-          onClose={() => setLightbox(null)}
-        />
+        <ImageLightbox src={lightbox.src} alt={lightbox.alt} onClose={() => setLightbox(null)} />
       )}
 
       <Footer />

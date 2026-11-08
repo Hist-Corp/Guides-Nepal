@@ -1,12 +1,15 @@
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from app.models.booking import Booking, BookingStatus
-from app.models.host_guide import HostGuide
+from app.models.host_guide import HostGuide, HostExperienceGuide
+from app.models.guide_listing import GuideListing, GuideProfile
+from app.models.guide import Guide
 from app.models.user import User
 from app.core.roles import GUIDE
 from fastapi import HTTPException
 from app.schemas.booking import BookingCreate
 from typing import List, Optional
+from datetime import datetime
 
 
 class BookingService:
@@ -53,6 +56,41 @@ class BookingService:
         if guide:
             return guide.id
         return None
+
+    def _get_guide_portfolio(self, guide_user_id: int) -> Optional[dict]:
+        """Build guide portfolio from guide catalog profile and listings."""
+        # Get the guide catalog profile (guides table)
+        link = self.db.query(HostGuide).filter(HostGuide.guide_user_id == guide_user_id, HostGuide.status == "active").first()
+        if not link or not link.guide_id:
+            return None
+        
+        catalog_guide = self.db.query(Guide).filter(Guide.id == link.guide_id, Guide.is_active.is_(True)).first()
+        if not catalog_guide:
+            return None
+        
+        # Get guide profile
+        profile = self.db.query(GuideProfile).filter(GuideProfile.guide_user_id == guide_user_id).first()
+        
+        # Count listings
+        listings_count = self.db.query(GuideListing).filter(GuideListing.guide_user_id == guide_user_id, GuideListing.is_active.is_(True)).count()
+        
+        return {
+            "id": catalog_guide.id,
+            "name": catalog_guide.name,
+            "image": catalog_guide.image,
+            "role": catalog_guide.role,
+            "rating": catalog_guide.rating,
+            "reviews": catalog_guide.reviews,
+            "bio": catalog_guide.bio,
+            "languages": catalog_guide.languages,
+            "verified": catalog_guide.verified,
+            "lives_in": catalog_guide.lives_in,
+            "cities": catalog_guide.cities,
+            "gallery": catalog_guide.gallery,
+            "years_experience": profile.years_experience if profile else None,
+            "expertise_areas": profile.expertise_areas if profile else [],
+            "listings_count": listings_count,
+        }
 
     def availability_for_date(self, date: str, guide_id: Optional[int] = None) -> dict:
         if guide_id is not None:
