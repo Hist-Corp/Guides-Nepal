@@ -1,10 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Wallet, TrendingUp, DollarSign, Clock, Calendar, Download, CreditCard, ArrowUpRight } from 'lucide-react';
+import { Wallet, TrendingUp, DollarSign, Download, CreditCard, ArrowUpRight } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
-import hostApi, { type HostEarnings, type Payout, type EarningsSummary } from '../../services/hostApi';
+import hostApi, {
+  type HostEarnings,
+  type Payout,
+  type EarningsSummary,
+} from '../../services/hostApi';
 
 const HostEarningsPage: React.FC = () => {
   const { isAuthenticated, user, accessToken } = useAuthStore();
@@ -17,7 +21,6 @@ const HostEarningsPage: React.FC = () => {
   });
   const [summary, setSummary] = useState<EarningsSummary | null>(null);
   const [payouts, setPayouts] = useState<Payout[]>([]);
-  const [loading, setLoading] = useState(true);
   const [payoutsLoading, setPayoutsLoading] = useState(true);
   const [error, setError] = useState('');
   const [filters, setFilters] = useState({ dateFrom: '', dateTo: '', status: '' });
@@ -28,7 +31,6 @@ const HostEarningsPage: React.FC = () => {
 
   const load = useCallback(async () => {
     if (!accessToken) return;
-    setLoading(true);
     setPayoutsLoading(true);
     setError('');
     try {
@@ -46,16 +48,21 @@ const HostEarningsPage: React.FC = () => {
       try {
         const earningsData = await hostApi.getEarnings(accessToken);
         setEarnings(earningsData);
-      } catch {}
+      } catch (e) {
+        console.error(e);
+      }
     } finally {
-      setLoading(false);
       setPayoutsLoading(false);
     }
   }, [accessToken]);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    if (accessToken && user?.role === 'host') load();
-  }, [accessToken, user?.role, load]);
+    if (accessToken && user?.role === 'host') {
+      load();
+    }
+  }, [accessToken, user?.role, load()]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!isAuthenticated) return <Navigate to="/" replace />;
   if (user?.role !== 'host') return <Navigate to="/" replace />;
@@ -68,7 +75,7 @@ const HostEarningsPage: React.FC = () => {
       setShowRequestPayout(false);
       setRequestAmount('');
       await load();
-    } catch (e) {
+    } catch {
       alert('Failed to request payout');
     } finally {
       setRequesting(false);
@@ -77,8 +84,15 @@ const HostEarningsPage: React.FC = () => {
 
   const exportData = () => {
     const headers = ['Run', 'Date', 'Amount', 'Status', 'Items', 'Method'];
-    const rows = payouts.map(p => [p.id, p.date, `$${p.amount}`, p.status, String(p.items), p.method]);
-    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const rows = payouts.map((p) => [
+      p.id,
+      p.date,
+      `$${p.amount}`,
+      p.status,
+      String(p.items),
+      p.method,
+    ]);
+    const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -97,13 +111,15 @@ const HostEarningsPage: React.FC = () => {
     };
     const v = variants[status] || variants.completed;
     return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${v.bg} ${v.text}`}>
+      <span
+        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${v.bg} ${v.text}`}
+      >
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
   };
 
-  const filteredPayouts = payouts.filter(p => {
+  const filteredPayouts = payouts.filter((p) => {
     if (filters.dateFrom && p.date < filters.dateFrom) return false;
     if (filters.dateTo && p.date > filters.dateTo) return false;
     if (filters.status && p.status !== filters.status) return false;
@@ -113,7 +129,11 @@ const HostEarningsPage: React.FC = () => {
   const totalEarnings = summary?.total_earnings ?? earnings.total_earnings;
   const thisPeriod = summary?.this_period ?? earnings.revenue_this_month;
   const bestDay = summary?.best_day ?? { date: '—', amount: 0 };
-  const avgPerBooking = summary?.avg_per_booking ?? (earnings.completed_bookings > 0 ? Math.round(earnings.total_earnings / earnings.completed_bookings) : 0);
+  const avgPerBooking =
+    summary?.avg_per_booking ??
+    (earnings.completed_bookings > 0
+      ? Math.round(earnings.total_earnings / earnings.completed_bookings)
+      : 0);
   const byExperience = summary?.by_experience ?? [
     { label: 'Bhaktapur Heritage Walk', value: 2130, display: '$2,130' },
     { label: 'Patan Cultural Circuit', value: 1480, display: '$1,480' },
@@ -127,7 +147,9 @@ const HostEarningsPage: React.FC = () => {
         <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Earnings</h1>
-            <p className="mt-1 text-gray-600 text-sm">Payout history, earnings trends, and performance by experience.</p>
+            <p className="mt-1 text-gray-600 text-sm">
+              Payout history, earnings trends, and performance by experience.
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -153,15 +175,40 @@ const HostEarningsPage: React.FC = () => {
         )}
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-8">
-          <KPICard title="Total earnings" value={`$${totalEarnings.toLocaleString()}`} sub="Across all payouts" delta={{ value: '+18%', positive: true }} Icon={Wallet} />
-          <KPICard title="This period" value={`$${thisPeriod.toLocaleString()}`} sub="Latest entry" Icon={DollarSign} />
-          <KPICard title="Best day" value={`$${bestDay.amount.toLocaleString()}`} sub={bestDay.date} Icon={TrendingUp} />
-          <KPICard title="Avg per booking" value={`$${avgPerBooking}`} sub="Across completed tours" Icon={ArrowUpRight} />
+          <KPICard
+            title="Total earnings"
+            value={`$${totalEarnings.toLocaleString()}`}
+            sub="Across all payouts"
+            delta={{ value: '+18%', positive: true }}
+            Icon={Wallet}
+          />
+          <KPICard
+            title="This period"
+            value={`$${thisPeriod.toLocaleString()}`}
+            sub="Latest entry"
+            Icon={DollarSign}
+          />
+          <KPICard
+            title="Best day"
+            value={`$${bestDay.amount.toLocaleString()}`}
+            sub={bestDay.date}
+            Icon={TrendingUp}
+          />
+          <KPICard
+            title="Avg per booking"
+            value={`$${avgPerBooking}`}
+            sub="Across completed tours"
+            Icon={ArrowUpRight}
+          />
         </div>
 
         <div className="grid gap-4 lg:grid-cols-3 mb-8">
-          <SectionCard title="Earnings trend" subtitle="Daily net earnings" className="lg:col-span-2">
-            <EarningsChart data={byExperience.map(e => ({ label: e.label, value: e.value }))} />
+          <SectionCard
+            title="Earnings trend"
+            subtitle="Daily net earnings"
+            className="lg:col-span-2"
+          >
+            <EarningsChart data={byExperience.map((e) => ({ label: e.label, value: e.value }))} />
           </SectionCard>
           <SectionCard title="Earnings by experience" subtitle="Where your income comes from">
             <ExperienceEarningsChart data={byExperience} />
@@ -173,18 +220,18 @@ const HostEarningsPage: React.FC = () => {
             <input
               type="date"
               value={filters.dateFrom}
-              onChange={(e) => setFilters(f => ({ ...f, dateFrom: e.target.value }))}
+              onChange={(e) => setFilters((f) => ({ ...f, dateFrom: e.target.value }))}
               className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm max-w-xs focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
             />
             <input
               type="date"
               value={filters.dateTo}
-              onChange={(e) => setFilters(f => ({ ...f, dateTo: e.target.value }))}
+              onChange={(e) => setFilters((f) => ({ ...f, dateTo: e.target.value }))}
               className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm max-w-xs focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
             />
             <select
               value={filters.status}
-              onChange={(e) => setFilters(f => ({ ...f, status: e.target.value }))}
+              onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
               className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm max-w-xs focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
             >
               <option value="">All statuses</option>
@@ -209,7 +256,9 @@ const HostEarningsPage: React.FC = () => {
                     <th className="px-6 py-3 text-xs font-bold uppercase text-gray-500">Status</th>
                     <th className="px-6 py-3 text-xs font-bold uppercase text-gray-500">Items</th>
                     <th className="px-6 py-3 text-xs font-bold uppercase text-gray-500">Method</th>
-                    <th className="px-6 py-3 text-xs font-bold uppercase text-gray-500 text-right">Action</th>
+                    <th className="px-6 py-3 text-xs font-bold uppercase text-gray-500 text-right">
+                      Action
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -217,7 +266,9 @@ const HostEarningsPage: React.FC = () => {
                     <tr key={payout.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 font-medium text-gray-900">{payout.id}</td>
                       <td className="px-6 py-4 text-gray-600">{payout.date}</td>
-                      <td className="px-6 py-4 text-gray-900 font-medium">${payout.amount.toLocaleString()}</td>
+                      <td className="px-6 py-4 text-gray-900 font-medium">
+                        ${payout.amount.toLocaleString()}
+                      </td>
                       <td className="px-6 py-4">{getStatusBadge(payout.status)}</td>
                       <td className="px-6 py-4 text-gray-600">{payout.items}</td>
                       <td className="px-6 py-4 text-gray-600">{payout.method}</td>
@@ -248,10 +299,7 @@ const HostEarningsPage: React.FC = () => {
         )}
 
         {viewingPayout && (
-          <PayoutDetailModal
-            payout={viewingPayout}
-            onClose={() => setViewingPayout(null)}
-          />
+          <PayoutDetailModal payout={viewingPayout} onClose={() => setViewingPayout(null)} />
         )}
       </main>
       <Footer />
@@ -259,7 +307,19 @@ const HostEarningsPage: React.FC = () => {
   );
 };
 
-function KPICard({ title, value, sub, delta, Icon }: { title: string; value: string; sub: string; delta?: { value: string; positive: boolean }; Icon: React.ComponentType<{ className?: string }> }) {
+function KPICard({
+  title,
+  value,
+  sub,
+  delta,
+  Icon,
+}: {
+  title: string;
+  value: string;
+  sub: string;
+  delta?: { value: string; positive: boolean };
+  Icon: React.ComponentType<{ className?: string }>;
+}) {
   return (
     <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
       <div className="flex items-start justify-between">
@@ -273,7 +333,10 @@ function KPICard({ title, value, sub, delta, Icon }: { title: string; value: str
       </div>
       <p className="mt-2 text-sm text-gray-500">{sub}</p>
       {delta && (
-        <p className="mt-2 text-sm font-bold" style={{ color: delta.positive ? '#10b981' : '#ef4444' }}>
+        <p
+          className="mt-2 text-sm font-bold"
+          style={{ color: delta.positive ? '#10b981' : '#ef4444' }}
+        >
           {delta.value}
         </p>
       )}
@@ -281,9 +344,21 @@ function KPICard({ title, value, sub, delta, Icon }: { title: string; value: str
   );
 }
 
-function SectionCard({ title, subtitle, className = '', children }: { title: string; subtitle?: string; className?: string; children: React.ReactNode }) {
+function SectionCard({
+  title,
+  subtitle,
+  className = '',
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div className={`rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden ${className}`}>
+    <div
+      className={`rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden ${className}`}
+    >
       <div className="px-6 py-4 border-b border-gray-100">
         <h2 className="flex items-center gap-2 text-xl font-bold text-gray-900">{title}</h2>
         {subtitle && <p className="mt-1 text-sm text-gray-500">{subtitle}</p>}
@@ -295,7 +370,7 @@ function SectionCard({ title, subtitle, className = '', children }: { title: str
 
 function EarningsChart({ data }: { data: { label: string; value: number }[] }) {
   // Simple bar chart using CSS
-  const maxValue = Math.max(...data.map(d => d.value));
+  const maxValue = Math.max(...data.map((d) => d.value));
   return (
     <div className="h-64 flex items-end justify-around gap-2 px-2">
       {data.map((item) => (
@@ -304,7 +379,9 @@ function EarningsChart({ data }: { data: { label: string; value: number }[] }) {
             className="w-full bg-brand-yellow rounded-t transition-all duration-500"
             style={{ height: `${(item.value / maxValue) * 100}%` }}
           />
-          <span className="text-xs text-gray-500 text-center mt-2 w-[80px] truncate">{item.label}</span>
+          <span className="text-xs text-gray-500 text-center mt-2 w-[80px] truncate">
+            {item.label}
+          </span>
           <span className="text-sm font-bold text-gray-900">${item.value.toLocaleString()}</span>
         </div>
       ))}
@@ -312,8 +389,12 @@ function EarningsChart({ data }: { data: { label: string; value: number }[] }) {
   );
 }
 
-function ExperienceEarningsChart({ data }: { data: { label: string; value: number; display: string }[] }) {
-  const maxValue = Math.max(...data.map(d => d.value));
+function ExperienceEarningsChart({
+  data,
+}: {
+  data: { label: string; value: number; display: string }[];
+}) {
+  const maxValue = Math.max(...data.map((d) => d.value));
   return (
     <div className="space-y-4">
       {data.map((item) => (
@@ -346,7 +427,10 @@ function RequestPayoutModal({
   setRequestAmount: (value: string) => void;
 }) {
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
       <div
         className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 border border-gray-100"
         onClick={(e) => e.stopPropagation()}
@@ -387,13 +471,7 @@ function RequestPayoutModal({
   );
 }
 
-function PayoutDetailModal({
-  payout,
-  onClose,
-}: {
-  payout: Payout;
-  onClose: () => void;
-}) {
+function PayoutDetailModal({ payout, onClose }: { payout: Payout; onClose: () => void }) {
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { bg: string; text: string }> = {
       completed: { bg: 'bg-emerald-100', text: 'text-emerald-700' },
@@ -403,14 +481,19 @@ function PayoutDetailModal({
     };
     const v = variants[status] || variants.completed;
     return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${v.bg} ${v.text}`}>
+      <span
+        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${v.bg} ${v.text}`}
+      >
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
       <div
         className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 border border-gray-100"
         onClick={(e) => e.stopPropagation()}

@@ -1,13 +1,29 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
-import { Plus, Trash2, Edit3, Eye, CalendarDays, AlertCircle, CheckCircle, XCircle, ExternalLink } from 'lucide-react';
+import {
+  Plus,
+  Trash2,
+  Edit3,
+  Eye,
+  CalendarDays,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+} from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import hostApi, { type HostExperience, type HostExperienceCreate } from '../../services/hostApi';
 
 const cities = ['Kathmandu', 'Pokhara', 'Lalitpur', 'Bhaktapur', 'Bharatpur'];
-const categories = ['Heritage & Culture', 'Nature & Adventure', 'Food & Drink', 'Wellness', 'Arts & Crafts', 'Photography'];
+const categories = [
+  'Heritage & Culture',
+  'Nature & Adventure',
+  'Food & Drink',
+  'Wellness',
+  'Arts & Crafts',
+  'Photography',
+];
 
 const getStatusBadge = (status: string) => {
   const variants: Record<string, { bg: string; text: string }> = {
@@ -17,7 +33,9 @@ const getStatusBadge = (status: string) => {
   };
   const v = variants[status] || variants.draft;
   return (
-    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${v.bg} ${v.text}`}>
+    <span
+      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${v.bg} ${v.text}`}
+    >
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );
@@ -59,15 +77,27 @@ const HostExperiencesPage: React.FC = () => {
     }
   }, [accessToken]);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    if (accessToken && user?.role === 'host') load();
-  }, [accessToken, user?.role, load]);
+    if (accessToken && user?.role === 'host') {
+      load();
+    }
+  }, [accessToken, user?.role, load()]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!isAuthenticated) return <Navigate to="/" replace />;
   if (user?.role !== 'host') return <Navigate to="/" replace />;
 
   const resetForm = () => {
-    setForm({ title: '', city: '', category: '', description: '', price: 0, duration: '', hero_image: '' });
+    setForm({
+      title: '',
+      city: '',
+      category: '',
+      description: '',
+      price: 0,
+      duration: '',
+      hero_image: '',
+    });
     setEditingId(null);
   };
 
@@ -158,7 +188,10 @@ const HostExperiencesPage: React.FC = () => {
             </p>
           </div>
           <button
-            onClick={() => { resetForm(); setOpenForm(true); }}
+            onClick={() => {
+              resetForm();
+              setOpenForm(true);
+            }}
             className="flex items-center gap-2 rounded-full bg-[#213448] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#1a2a3a]"
           >
             <Plus className="h-4 w-4" /> New experience
@@ -184,7 +217,10 @@ const HostExperiencesPage: React.FC = () => {
                 Create your first experience to start hosting travelers.
               </p>
               <button
-                onClick={() => { resetForm(); setOpenForm(true); }}
+                onClick={() => {
+                  resetForm();
+                  setOpenForm(true);
+                }}
                 className="rounded-full bg-brand-yellow px-5 py-2.5 text-sm font-bold text-[#213448] hover:bg-[#ffba0a]"
               >
                 Add experience
@@ -198,7 +234,11 @@ const HostExperiencesPage: React.FC = () => {
               >
                 <div className="h-48 bg-gray-100 relative overflow-hidden">
                   {exp.hero_image ? (
-                    <img src={exp.hero_image} alt={exp.title} className="w-full h-full object-cover" />
+                    <img
+                      src={exp.hero_image}
+                      alt={exp.title}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400">
                       <Eye className="w-8 h-8" />
@@ -279,10 +319,16 @@ const HostExperiencesPage: React.FC = () => {
         <ExperienceDetailModal
           experience={viewingExp}
           onClose={() => setViewingExp(null)}
-          onEdit={() => { handleEdit(viewingExp!); setViewingExp(null) }}
+          onEdit={() => {
+            handleEdit(viewingExp!);
+            setViewingExp(null);
+          }}
           onPublish={handlePublish}
           onUnpublish={handleUnpublish}
-          onDelete={() => { handleDelete(viewingExp!.id); setViewingExp(null) }}
+          onDelete={() => {
+            handleDelete(viewingExp!.id);
+            setViewingExp(null);
+          }}
         />
       )}
 
@@ -293,7 +339,10 @@ const HostExperiencesPage: React.FC = () => {
           editingId={editingId}
           saving={saving}
           onSubmit={handleSubmit}
-          onClose={() => { resetForm(); setOpenForm(false); }}
+          onClose={() => {
+            resetForm();
+            setOpenForm(false);
+          }}
         />
       )}
     </div>
@@ -316,7 +365,10 @@ function ExperienceDetailModal({
   onDelete: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
       <div
         className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 border border-gray-100 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
@@ -330,20 +382,42 @@ function ExperienceDetailModal({
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row gap-4">
             {experience.hero_image && (
-              <img src={experience.hero_image} alt={experience.title} className="h-48 w-full sm:w-72 rounded-2xl object-cover flex-shrink-0" />
+              <img
+                src={experience.hero_image}
+                alt={experience.title}
+                className="h-48 w-full sm:w-72 rounded-2xl object-cover flex-shrink-0"
+              />
             )}
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="text-sm text-gray-500">{experience.city} · {experience.category}</p>
+                  <p className="text-sm text-gray-500">
+                    {experience.city} · {experience.category}
+                  </p>
                 </div>
                 <StatusBadge status={experience.status} />
               </div>
               <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-                <div><span className="text-gray-400 block">Duration</span><span className="font-medium">{experience.duration}</span></div>
-                <div><span className="text-gray-400 block">Price</span><span className="font-medium text-[#213448]">${experience.price.toFixed(2)}</span></div>
-                <div><span className="text-gray-400 block">Bookings</span><span className="font-medium">{experience.bookings_count}</span></div>
-                <div><span className="text-gray-400 block">Rating</span><span className="font-medium">{experience.rating > 0 ? `★ ${experience.rating.toFixed(1)} (${experience.review_count})` : 'No ratings'}</span></div>
+                <div>
+                  <span className="text-gray-400 block">Duration</span>
+                  <span className="font-medium">{experience.duration}</span>
+                </div>
+                <div>
+                  <span className="text-gray-400 block">Price</span>
+                  <span className="font-medium text-[#213448]">${experience.price.toFixed(2)}</span>
+                </div>
+                <div>
+                  <span className="text-gray-400 block">Bookings</span>
+                  <span className="font-medium">{experience.bookings_count}</span>
+                </div>
+                <div>
+                  <span className="text-gray-400 block">Rating</span>
+                  <span className="font-medium">
+                    {experience.rating > 0
+                      ? `★ ${experience.rating.toFixed(1)} (${experience.review_count})`
+                      : 'No ratings'}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -354,19 +428,31 @@ function ExperienceDetailModal({
           </div>
 
           <div className="flex flex-wrap gap-2 pt-4 border-t">
-            <button onClick={onEdit} className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-800 hover:bg-gray-50">
+            <button
+              onClick={onEdit}
+              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-800 hover:bg-gray-50"
+            >
               Edit experience
             </button>
             {experience.status === 'listed' ? (
-              <button onClick={() => onUnpublish(experience.id)} className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-bold text-amber-600 hover:bg-amber-50">
+              <button
+                onClick={() => onUnpublish(experience.id)}
+                className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-bold text-amber-600 hover:bg-amber-50"
+              >
                 Unpublish
               </button>
             ) : (
-              <button onClick={() => onPublish(experience.id)} className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700">
+              <button
+                onClick={() => onPublish(experience.id)}
+                className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700"
+              >
                 Publish
               </button>
             )}
-            <button onClick={onDelete} className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-bold text-red-600 hover:bg-red-50">
+            <button
+              onClick={onDelete}
+              className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-bold text-red-600 hover:bg-red-50"
+            >
               Delete
             </button>
           </div>
@@ -396,7 +482,10 @@ function ExperienceFormModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
       <div
         className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 border border-gray-100 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
@@ -411,7 +500,9 @@ function ExperienceFormModal({
         </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Title <span className="text-red-600">*</span></label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">
+              Title <span className="text-red-600">*</span>
+            </label>
             <input
               type="text"
               required
@@ -421,7 +512,9 @@ function ExperienceFormModal({
             />
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">City <span className="text-red-600">*</span></label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">
+              City <span className="text-red-600">*</span>
+            </label>
             <select
               required
               value={form.city}
@@ -429,11 +522,17 @@ function ExperienceFormModal({
               className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
             >
               <option value="">Select city</option>
-              {cities.map(c => <option key={c} value={c}>{c}</option>)}
+              {cities.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Category <span className="text-red-600">*</span></label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">
+              Category <span className="text-red-600">*</span>
+            </label>
             <select
               required
               value={form.category}
@@ -441,11 +540,17 @@ function ExperienceFormModal({
               className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
             >
               <option value="">Select category</option>
-              {categories.map(c => <option key={c} value={c}>{c}</option>)}
+              {categories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Description <span className="text-red-600">*</span></label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">
+              Description <span className="text-red-600">*</span>
+            </label>
             <textarea
               required
               minLength={30}
@@ -457,7 +562,9 @@ function ExperienceFormModal({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Price per guest (USD) <span className="text-red-600">*</span></label>
+              <label className="block text-sm font-bold text-gray-700 mb-1">
+                Price per guest (USD) <span className="text-red-600">*</span>
+              </label>
               <input
                 type="number"
                 required
@@ -469,7 +576,9 @@ function ExperienceFormModal({
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Duration <span className="text-red-600">*</span></label>
+              <label className="block text-sm font-bold text-gray-700 mb-1">
+                Duration <span className="text-red-600">*</span>
+              </label>
               <input
                 type="text"
                 required
@@ -481,7 +590,9 @@ function ExperienceFormModal({
             </div>
           </div>
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Hero image URL (optional)</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">
+              Hero image URL (optional)
+            </label>
             <input
               type="text"
               value={form.hero_image}

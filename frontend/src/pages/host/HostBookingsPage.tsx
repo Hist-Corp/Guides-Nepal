@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Calendar, MapPin, Users, CreditCard, Clock, MessageSquare, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Users, MessageSquare } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
+import { PageBackButton } from '../../components/common/PageBackButton';
 import { useAuthStore } from '../../store/authStore';
 import hostApi, { type HostBooking } from '../../services/hostApi';
 
@@ -34,6 +35,7 @@ const HostBookingsPage: React.FC = () => {
     }
   }, [accessToken]);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (accessToken && user?.role === 'host') load();
   }, [accessToken, user?.role, load]);
@@ -41,9 +43,7 @@ const HostBookingsPage: React.FC = () => {
   if (!isAuthenticated) return <Navigate to="/" replace />;
   if (user?.role !== 'host') return <Navigate to="/" replace />;
 
-  const filtered = bookings.filter(
-    (b) => activeTab === 'all' || b.status === activeTab
-  );
+  const filtered = bookings.filter((b) => activeTab === 'all' || b.status === activeTab);
 
   const decide = async (id: number, status: 'accepted' | 'rejected' | 'completed') => {
     try {
@@ -69,15 +69,15 @@ const HostBookingsPage: React.FC = () => {
     }
   };
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSendMessage = async (event: React.FormEvent) => {
+    event.preventDefault();
     if (!messageText.trim() || !viewingBooking) return;
     try {
       await hostApi.messageGuest(accessToken!, viewingBooking.id, messageText);
       const detail = await hostApi.getBookingDetail(accessToken!, viewingBooking.id);
       setViewingBooking(detail);
       setMessageText('');
-    } catch (e) {
+    } catch {
       alert('Failed to send message');
     }
   };
@@ -119,26 +119,24 @@ const HostBookingsPage: React.FC = () => {
     const cls = isActive ? base + ' ' + activeCls : base + ' ' + inactiveCls;
     const label = tab.charAt(0).toUpperCase() + tab.slice(1);
     return (
-      <button
-        key={tab}
-        onClick={() => setActiveTab(tab)}
-        className={cls}
-      >
+      <button key={tab} onClick={() => setActiveTab(tab)} className={cls}>
         {label}
       </button>
     );
   };
 
-  const formatDate = (dateStr: string) => new Date(dateStr).toLocaleString();
   const formatDateOnly = (dateStr: string) => new Date(dateStr).toLocaleDateString();
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Header />
       <main className="flex-grow container mx-auto max-w-6xl px-4 py-8">
+        <PageBackButton />
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Bookings</h1>
-          <p className="mt-1 text-gray-600 text-sm">Review, accept, and track upcoming and past bookings.</p>
+          <p className="mt-1 text-gray-600 text-sm">
+            Review, accept, and track upcoming and past bookings.
+          </p>
         </div>
 
         {error && (
@@ -166,9 +164,7 @@ const HostBookingsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex gap-2 mb-6 flex-wrap">
-          {TABS.map(renderTabButton)}
-        </div>
+        <div className="flex gap-2 mb-6 flex-wrap">{TABS.map(renderTabButton)}</div>
 
         {loading ? (
           <div className="py-20 text-center text-gray-500 text-sm">Loading bookings...</div>
@@ -183,13 +179,17 @@ const HostBookingsPage: React.FC = () => {
             <table className="w-full text-left divide-y divide-gray-100">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="px-6 py-3 text-xs font-bold uppercase text-gray-500">Experience</th>
+                  <th className="px-6 py-3 text-xs font-bold uppercase text-gray-500">
+                    Experience
+                  </th>
                   <th className="px-6 py-3 text-xs font-bold uppercase text-gray-500">Guest</th>
                   <th className="px-6 py-3 text-xs font-bold uppercase text-gray-500">Date</th>
                   <th className="px-6 py-3 text-xs font-bold uppercase text-gray-500">Guests</th>
                   <th className="px-6 py-3 text-xs font-bold uppercase text-gray-500">Price</th>
                   <th className="px-6 py-3 text-xs font-bold uppercase text-gray-500">Status</th>
-                  <th className="px-6 py-3 text-xs font-bold uppercase text-gray-500 text-right">Action</th>
+                  <th className="px-6 py-3 text-xs font-bold uppercase text-gray-500 text-right">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -302,13 +302,20 @@ function BookingDetailModal({
 }) {
   const statusColor = (status: string): string => {
     switch (status) {
-      case 'upcoming': return 'bg-brand-yellow/20 text-[#213448]';
-      case 'accepted': return 'bg-green-600/20 text-green-700';
-      case 'rejected': return 'bg-red-600/20 text-red-700';
-      case 'completed': return 'bg-gray-600/20 text-gray-700';
-      case 'cancelled': return 'bg-red-600/20 text-red-700';
-      case 'pending': return 'bg-amber-100 text-amber-700';
-      default: return 'bg-gray-100 text-gray-600';
+      case 'upcoming':
+        return 'bg-brand-yellow/20 text-[#213448]';
+      case 'accepted':
+        return 'bg-green-600/20 text-green-700';
+      case 'rejected':
+        return 'bg-red-600/20 text-red-700';
+      case 'completed':
+        return 'bg-gray-600/20 text-gray-700';
+      case 'cancelled':
+        return 'bg-red-600/20 text-red-700';
+      case 'pending':
+        return 'bg-amber-100 text-amber-700';
+      default:
+        return 'bg-gray-100 text-gray-600';
     }
   };
 
@@ -317,17 +324,29 @@ function BookingDetailModal({
   const actorIcons: Record<string, string> = { guest: '👤', host: '🏠', system: '⚙️' };
   const actorLabels: Record<string, string> = { guest: 'Guest', host: 'You', system: 'System' };
   const typeColors: Record<string, string> = {
-    created: 'text-blue-600', accepted: 'text-green-600', rejected: 'text-red-600',
-    cancelled: 'text-red-600', completed: 'text-gray-600', message: 'text-purple-600', reminder: 'text-amber-600'
+    created: 'text-blue-600',
+    accepted: 'text-green-600',
+    rejected: 'text-red-600',
+    cancelled: 'text-red-600',
+    completed: 'text-gray-600',
+    message: 'text-purple-600',
+    reminder: 'text-amber-600',
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
       <div
         className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-6 border border-gray-100 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {loading && <div className="flex justify-center py-8"><p className="text-gray-500">Loading details…</p></div>}
+        {loading && (
+          <div className="flex justify-center py-8">
+            <p className="text-gray-500">Loading details…</p>
+          </div>
+        )}
         {!loading && (
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
@@ -335,7 +354,9 @@ function BookingDetailModal({
                 <h2 className="text-xl font-bold text-gray-900">{booking.experience_title}</h2>
                 <p className="text-sm text-gray-500">{booking.experience_city}</p>
               </div>
-              <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap ${statusColor(booking.status)}`}>
+              <span
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap ${statusColor(booking.status)}`}
+              >
                 {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
               </span>
             </div>
@@ -369,7 +390,10 @@ function BookingDetailModal({
                     placeholder="Message guest…"
                     className="flex-1 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none"
                   />
-                  <button type="submit" className="px-3 py-2 rounded-xl bg-brand-yellow text-[#213448] font-bold hover:bg-[#ffba0a] text-sm">
+                  <button
+                    type="submit"
+                    className="px-3 py-2 rounded-xl bg-brand-yellow text-[#213448] font-bold hover:bg-[#ffba0a] text-sm"
+                  >
                     Send
                   </button>
                 </form>
@@ -385,10 +409,16 @@ function BookingDetailModal({
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900">{actorLabels[event.actor] || event.actor}</span>
-                          <span className="text-xs text-gray-500">{new Date(event.created_at).toLocaleString()}</span>
+                          <span className="font-medium text-gray-900">
+                            {actorLabels[event.actor] || event.actor}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {new Date(event.created_at).toLocaleString()}
+                          </span>
                         </div>
-                        <p className={`text-sm ${typeColors[event.event_type] || ''}`}>{event.description}</p>
+                        <p className={`text-sm ${typeColors[event.event_type] || ''}`}>
+                          {event.description}
+                        </p>
                       </div>
                     </div>
                   ))

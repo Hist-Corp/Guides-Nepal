@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { User, RotateCcw, Bell, CreditCard, Lock, Eye, EyeOff } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
+import { PageBackButton } from '../../components/common/PageBackButton';
 import { useAuthStore } from '../../store/authStore';
 import hostApi, { type NotificationSettings, type PayoutSettings } from '../../services/hostApi';
 
@@ -173,6 +174,7 @@ const HostSettingsPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Header />
       <main className="flex-grow container mx-auto max-w-4xl px-4 py-8">
+        <PageBackButton />
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
           <p className="mt-1 text-gray-600 text-sm">

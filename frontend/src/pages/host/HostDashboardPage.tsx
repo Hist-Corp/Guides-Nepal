@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
+import { PageBackButton } from '../../components/common/PageBackButton';
 import { useAuthStore } from '../../store/authStore';
 import { useBookingStore } from '../../store/bookingStore';
 
@@ -121,6 +122,7 @@ const HostDashboardPage: React.FC = () => {
           </div>
         </section>
         <section className="container mx-auto px-4 py-12">
+          <PageBackButton />
           {approval && approval.status === 'approved' && (
             <div className="mb-8 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-800">
               <p className="font-bold flex items-center gap-2">
