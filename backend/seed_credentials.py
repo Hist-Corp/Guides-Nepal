@@ -1,4 +1,6 @@
+#!/usr/bin/env python3
 """Set known passwords for dev seed users that had undocumented passwords."""
+
 # All credentials for every dashboard role in the project.
 # Role hierarchy: admin > content-manager > regional-head > customer-support > host > guide
 #
@@ -25,12 +27,30 @@ from app.models.host_application import HostApplication
 from app.models.user import User
 
 CREDENTIALS = {
-    "admin@guides-nepal.com":        {"password": os.environ.get("ADMIN_PASSWORD"),            "role": ADMIN},
-    "content@guides-nepal.com":      {"password": os.environ.get("CONTENT_MANAGER_PASSWORD"),  "role": CONTENT_MANAGER},
-    "regional@guides-nepal.com":     {"password": os.environ.get("REGIONAL_HEAD_PASSWORD"),    "role": REGIONAL_HEAD},
-    "support@guides-nepal.com":      {"password": os.environ.get("CUSTOMER_SUPPORT_PASSWORD"), "role": CUSTOMER_SUPPORT},
-    "host@guides-nepal.com":         {"password": os.environ.get("HOST_PASSWORD"),             "role": HOST},
-    "guide@guides-nepal.com":        {"password": os.environ.get("GUIDE_PASSWORD"),            "role": GUIDE},
+    "admin@guides-nepal.com": {
+        "password": os.environ.get("ADMIN_PASSWORD", "Admin@12345"),
+        "role": ADMIN,
+    },
+    "content@guides-nepal.com": {
+        "password": os.environ.get("CONTENT_MANAGER_PASSWORD", "Content@2024"),
+        "role": CONTENT_MANAGER,
+    },
+    "regional@guides-nepal.com": {
+        "password": os.environ.get("REGIONAL_HEAD_PASSWORD", "Regional@2024"),
+        "role": REGIONAL_HEAD,
+    },
+    "support@guides-nepal.com": {
+        "password": os.environ.get("CUSTOMER_SUPPORT_PASSWORD", "Support@2024"),
+        "role": CUSTOMER_SUPPORT,
+    },
+    "host@guides-nepal.com": {
+        "password": os.environ.get("HOST_PASSWORD", "Host@2024"),
+        "role": HOST,
+    },
+    "guide@guides-nepal.com": {
+        "password": os.environ.get("GUIDE_PASSWORD", "Guide@2024"),
+        "role": GUIDE,
+    },
 }
 
 db = SessionLocal()
@@ -60,20 +80,28 @@ for email, info in CREDENTIALS.items():
         db.refresh(user)
         # Verify the password works
         ok = verify_password(password, user.hashed_password)
-        print(f"  [UPDATED] {email:35s} | Role: {role:20s} | Password: {password:20s} | Verified: {ok}")
+        print(
+            f"  [UPDATED] {email:35s} | Role: {role:20s} | Password: {password:20s} | Verified: {ok}"
+        )
     else:
         # Create new user
-        db.add(User(
-            email=email,
-            firstName=email.split("@")[0].title(),
-            lastName="User",
-            hashed_password=get_password_hash(password),
-            role=role,
-            is_active=True,
-        ))
+        db.add(
+            User(
+                email=email,
+                firstName=email.split("@")[0].title(),
+                lastName="User",
+                hashed_password=get_password_hash(password),
+                role=role,
+                is_active=True,
+            )
+        )
         db.commit()
-        ok = verify_password(password, db.query(User).filter(User.email == email).first().hashed_password)
-        print(f"  [CREATED] {email:35s} | Role: {role:20s} | Password: {password:20s} | Verified: {ok}")
+        ok = verify_password(
+            password, db.query(User).filter(User.email == email).first().hashed_password
+        )
+        print(
+            f"  [CREATED] {email:35s} | Role: {role:20s} | Password: {password:20s} | Verified: {ok}"
+        )
 
     # Host login is gated on an approved HostApplication. Seed one so the
     # directly-created host account can log in (mirrors staff approval).

@@ -29,6 +29,24 @@ This repository contains a Vite + React frontend, an optional dashboard app, and
   runtime `ALTER TABLE`, fixing `no such column: host_applications.credential_token_hash`
   on existing SQLite databases.
 
+**Traveler Signup (SignupModal)**
+
+- Added **Confirm Password** field to the traveler registration form with
+  real-time validation — both password fields must match before signup is allowed.
+- Removed the **Back** button from the traveler signup form step.
+- Linked **Terms & Conditions** (`/terms`) and **Privacy Policy** (`/privacy`)
+  to their respective pages in the traveler signup consent checkbox.
+- Added show/hide **eye icon** toggle on both the password and confirm-password fields.
+
+**Guide Registration Wizard**
+
+- Linked **Terms & Conditions** (`/terms`) and **Privacy Policy** (`/privacy`)
+  to their respective pages in the guide registration Basics step.
+- Redesigned step indicators: numbered circles **1–2–3–4–5** with a straight
+  connecting line behind them.
+- Added a **Registration Progress** section below the step indicators showing
+  percentage completion and an animated progress bar as the user advances through steps.
+
 **Host Frontend Pages**
 
 - New host pages on the public frontend (`http://localhost:5175`):

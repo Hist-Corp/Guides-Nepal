@@ -13,6 +13,7 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
   const navigate = useNavigate();
   const [step, setStep] = useState<'role' | 'form'>('role');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { login, setTokens } = useAuthStore();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -22,8 +23,10 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
     email: '',
     phone: '',
     password: '',
+    confirmPassword: '',
   });
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [confirmPasswordError, setConfirmPasswordError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
@@ -87,6 +90,20 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, password: e.target.value });
     if (passwordError) validatePassword(e.target.value);
+    if (formData.confirmPassword) validateConfirmPassword(e.target.value, formData.confirmPassword);
+  };
+
+  const validateConfirmPassword = (password: string, confirmPassword: string) => {
+    if (!confirmPassword) {
+      setConfirmPasswordError(null);
+      return true;
+    }
+    if (password !== confirmPassword) {
+      setConfirmPasswordError('Passwords do not match');
+      return false;
+    }
+    setConfirmPasswordError(null);
+    return true;
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -95,8 +112,12 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
 
     const isEmailValid = validateEmail(formData.email);
     const isPasswordValid = validatePassword(formData.password);
+    const isConfirmPasswordValid = validateConfirmPassword(
+      formData.password,
+      formData.confirmPassword
+    );
 
-    if (!isEmailValid || !isPasswordValid) {
+    if (!isEmailValid || !isPasswordValid || !isConfirmPasswordValid) {
       return;
     }
 
@@ -129,6 +150,7 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
+          confirmPassword: formData.confirmPassword,
           firstName: formData.firstName,
           lastName: formData.lastName,
           phone: formData.phone,
@@ -148,7 +170,14 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
         // Reset state
         setTimeout(() => {
           setStep('role');
-          setFormData({ firstName: '', lastName: '', email: '', phone: '', password: '' });
+          setFormData({
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            password: '',
+            confirmPassword: '',
+          });
         }, 300);
       } else {
         try {
@@ -315,8 +344,8 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
 
                 <div className="relative">
                   <input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Password"
+                    type="password"
+                    placeholder="Create a password"
                     required
                     className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none transition-all placeholder:text-gray-400 text-gray-900 pr-12 bg-gray-50 focus:bg-white ${passwordError ? 'border-red-500' : 'border-gray-200'}`}
                     value={formData.password}
@@ -334,6 +363,35 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
                   )}
                 </div>
 
+                <div className="relative">
+                  <input
+                    type="password"
+                    placeholder="Confirm Password"
+                    required
+                    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none transition-all placeholder:text-gray-400 text-gray-900 pr-12 bg-gray-50 focus:bg-white ${confirmPasswordError ? 'border-red-500' : 'border-gray-200'}`}
+                    value={formData.confirmPassword}
+                    onChange={(e) => {
+                      setFormData({ ...formData, confirmPassword: e.target.value });
+                      if (formData.password)
+                        validateConfirmPassword(formData.password, e.target.value);
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#213448]"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                  {confirmPasswordError && (
+                    <div className="text-red-600 text-xs mt-1">{confirmPasswordError}</div>
+                  )}
+                </div>
+
                 {error && <div className="text-red-600 text-sm text-center">{error}</div>}
 
                 <label className="flex items-start gap-3 text-xs text-gray-500 px-1 cursor-pointer select-none">
@@ -346,14 +404,18 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
                   <span>
                     When using Guides-Nepal you accept our{' '}
                     <a
-                      href="#"
+                      href="/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-[#213448] font-bold hover:text-brand-yellow hover:underline transition-colors"
                     >
                       Terms & Conditions
                     </a>{' '}
                     and{' '}
                     <a
-                      href="#"
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-[#213448] font-bold hover:text-brand-yellow hover:underline transition-colors"
                     >
                       Privacy Policy
@@ -372,12 +434,6 @@ export const SignupModal: React.FC<SignupModalProps> = ({ isOpen, onClose, onSwi
               </form>
 
               <div className="text-center mt-5 text-sm text-gray-500">
-                <button
-                  onClick={() => setStep('role')}
-                  className="text-gray-400 hover:text-gray-600 mr-4"
-                >
-                  Back
-                </button>
                 Already have an account?{' '}
                 <button
                   onClick={onSwitchToLogin}

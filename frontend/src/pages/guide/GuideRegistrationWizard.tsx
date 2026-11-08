@@ -94,7 +94,15 @@ const empty: Draft = {
 
 const steps = ['Basics', 'Profile', 'Experience', 'Documents', 'Preview & Submit'];
 
-const REGIONS = ['Koshi Province', 'Madhesh Province', 'Bagmati Province', 'Gandaki Province', 'Lumbini Province', 'Karnali Province', 'Sudurpashchim Province'];
+const REGIONS = [
+  'Koshi Province',
+  'Madhesh Province',
+  'Bagmati Province',
+  'Gandaki Province',
+  'Lumbini Province',
+  'Karnali Province',
+  'Sudurpashchim Province',
+];
 
 const loadDraft = (): Draft => {
   try {
@@ -375,30 +383,17 @@ export default function GuideRegistrationWizard() {
           Join our community of authentic local experts. Complete each section. Your progress is
           saved on this device.
         </p>
-        <div className="my-8">
-          {/* Progress Bar */}
-          <div className="mb-2 flex items-center justify-between text-xs font-semibold text-slate-600">
-            <span>Registration Progress</span>
-            <span>{Math.round((step / (steps.length - 1)) * 100)}%</span>
-          </div>
-          <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-[#213448] transition-all duration-500 ease-out"
-              style={{
-                width: `${(step / (steps.length - 1)) * 100}%`,
-              }}
-            />
-          </div>
-        </div>
+
         <div className="my-8 grid grid-cols-5 gap-2 relative">
-          {/* Connecting line between steps */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-full h-0.5 bg-slate-200 z-0" />
+          {/* Straight line crossing through the middle of the circles (behind circles) */}
+          <div className="absolute top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-0.5 bg-slate-200 z-0" />
+
           {steps.map((name, i) => (
             <div key={name} className="text-center relative z-10">
               <div
-                className={`mx-auto flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold z-10 ${i < step ? 'bg-emerald-600 text-white border border-emerald-600' : i === step ? 'bg-[#213448] text-white border border-[#213448]' : 'bg-white text-gray-400 border border-slate-300'}`}
+                className={`mx-auto flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-all duration-300 z-10 ${i < step ? 'bg-emerald-600 text-white border border-emerald-600 shadow-lg shadow-emerald-200' : i === step ? 'bg-[#213448] text-white border border-[#213448] shadow-lg shadow-[#213448]/20' : 'bg-white text-gray-400 border border-slate-300'}`}
               >
-                {i < step ? '✓' : i + 1}
+                {i + 1}
               </div>
               <p
                 className={`mt-2 text-xs font-medium ${i < step || i === step ? 'text-[#213448]' : 'text-gray-400'} sm:block`}
@@ -408,6 +403,23 @@ export default function GuideRegistrationWizard() {
             </div>
           ))}
         </div>
+
+        {/* Registration Progress */}
+        <div className="my-6">
+          <div className="flex justify-between text-sm font-medium mb-1">
+            <span className="text-gray-600">Registration Progress</span>
+            <span className="text-[#213448] font-bold">
+              {Math.round((step / (steps.length - 1)) * 100)}%
+            </span>
+          </div>
+          <div className="w-full bg-slate-200 rounded-full h-2">
+            <div
+              className="h-2 rounded-full bg-[#213448] transition-all duration-500"
+              style={{ width: `${Math.round((step / (steps.length - 1)) * 100)}%` }}
+            />
+          </div>
+        </div>
+
         {serverError && (
           <p role="alert" className="mb-5 rounded-xl bg-red-50 p-3 text-sm text-red-700">
             {serverError}
@@ -752,14 +764,14 @@ export default function GuideRegistrationWizard() {
                   </span>
 
                   <div className="mt-auto flex items-center justify-between gap-2 w-full px-2 pt-3">
-                      <button
-                        className="flex-1 cursor-pointer rounded-xl border px-3 py-2 text-sm font-semibold tracking-tight transition-all duration-200 bg-[#213448] text-white border-[#213448] hover:bg-[#213448]/90 shadow-sm"
-                        onClick={() => {
-                          setShowSelfieAuth(true);
-                        }}
-                      >
-                        {draft.liveSelfieImages.front ? 'Retake' : 'Capture selfie'}
-                      </button>
+                    <button
+                      className="flex-1 cursor-pointer rounded-xl border px-3 py-2 text-sm font-semibold tracking-tight transition-all duration-200 bg-[#213448] text-white border-[#213448] hover:bg-[#213448]/90 shadow-sm"
+                      onClick={() => {
+                        setShowSelfieAuth(true);
+                      }}
+                    >
+                      {draft.liveSelfieImages.front ? 'Retake' : 'Capture selfie'}
+                    </button>
                     {draft.liveSelfieImages.front && (
                       <button
                         className="text-[10px] text-red-400 font-medium hover:text-red-600 underline underline-offset-4 transition-colors"
