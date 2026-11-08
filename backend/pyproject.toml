@@ -4,6 +4,7 @@ extend-exclude = [
     "verify_auth.py",
     ".venv",
 ]
+ignore = ["B008"]
 
 [tool.mypy]
 python_version = "3.11"
