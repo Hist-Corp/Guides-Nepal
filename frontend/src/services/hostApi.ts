@@ -11,7 +11,6 @@ interface HostExperience {
   duration: string;
   hero_image: string | null;
   is_active: boolean;
-  status: 'draft' | 'listed' | 'archived';
   created_at: string;
   updated_at: string;
   bookings_count: number;
@@ -51,7 +50,8 @@ interface HostBooking {
 interface TimelineEvent {
   id: number;
   booking_id: number;
-  event_type: 'created' | 'accepted' | 'rejected' | 'cancelled' | 'completed' | 'message' | 'reminder';
+  event_type:
+    'created' | 'accepted' | 'rejected' | 'cancelled' | 'completed' | 'message' | 'reminder';
   description: string;
   created_at: string;
   actor: 'guest' | 'host' | 'system';
@@ -126,7 +126,11 @@ const hostApi = {
     return r.json();
   },
 
-  async updateExperience(token: string, id: number, payload: HostExperienceCreate): Promise<HostExperience> {
+  async updateExperience(
+    token: string,
+    id: number,
+    payload: HostExperienceCreate
+  ): Promise<HostExperience> {
     const r = await fetch(getApiUrl(`/host/experiences/${id}`), {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -182,7 +186,11 @@ const hostApi = {
     return r.json();
   },
 
-  async decideBooking(token: string, id: number, status: 'accepted' | 'rejected' | 'completed'): Promise<{ status: string }> {
+  async decideBooking(
+    token: string,
+    id: number,
+    status: 'accepted' | 'rejected' | 'completed'
+  ): Promise<{ status: string }> {
     const r = await fetch(getApiUrl(`/host/bookings/${id}`), {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -214,7 +222,11 @@ const hostApi = {
     const now = new Date();
     const thisMonth = bookings.filter((b: HostBooking) => {
       const d = new Date(b.date);
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear() && b.status === 'completed';
+      return (
+        d.getMonth() === now.getMonth() &&
+        d.getFullYear() === now.getFullYear() &&
+        b.status === 'completed'
+      );
     });
     return {
       total_earnings: completed.reduce((sum, b) => sum + b.total_price, 0),
@@ -260,7 +272,10 @@ const hostApi = {
     return r.json();
   },
 
-  async updateNotificationSettings(token: string, payload: Partial<NotificationSettings>): Promise<NotificationSettings> {
+  async updateNotificationSettings(
+    token: string,
+    payload: Partial<NotificationSettings>
+  ): Promise<NotificationSettings> {
     const r = await fetch(getApiUrl('/host/settings/notifications'), {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -278,7 +293,10 @@ const hostApi = {
     return r.json();
   },
 
-  async updatePayoutSettings(token: string, payload: Partial<PayoutSettings>): Promise<PayoutSettings> {
+  async updatePayoutSettings(
+    token: string,
+    payload: Partial<PayoutSettings>
+  ): Promise<PayoutSettings> {
     const r = await fetch(getApiUrl('/host/settings/payout'), {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -288,7 +306,10 @@ const hostApi = {
     return r.json();
   },
 
-  async updateProfile(token: string, payload: { firstName?: string; lastName?: string; phone?: string }): Promise<void> {
+  async updateProfile(
+    token: string,
+    payload: { firstName?: string; lastName?: string; phone?: string }
+  ): Promise<void> {
     const r = await fetch(getApiUrl('/profile/me'), {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -299,4 +320,14 @@ const hostApi = {
 };
 
 export default hostApi;
-export type { HostExperience, HostExperienceCreate, HostBooking, HostEarnings, Payout, EarningsSummary, NotificationSettings, PayoutSettings, TimelineEvent };
+export type {
+  HostExperience,
+  HostExperienceCreate,
+  HostBooking,
+  HostEarnings,
+  Payout,
+  EarningsSummary,
+  NotificationSettings,
+  PayoutSettings,
+  TimelineEvent,
+};

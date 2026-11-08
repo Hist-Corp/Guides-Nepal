@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
 from datetime import datetime
-from typing import Literal, Optional
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -10,13 +12,14 @@ class HostExperienceCreate(BaseModel):
     description: str = Field(min_length=30, max_length=5000)
     price: float = Field(gt=0)
     duration: str = Field(min_length=1, max_length=80)
-    hero_image: Optional[str] = None
+    hero_image: str | None = None
 
 
 class HostExperienceResponse(HostExperienceCreate):
     id: int
     slug: str
     is_active: bool
+    status: Literal["draft", "listed", "archived"] = "draft"
 
 
 class HostTourCreate(BaseModel):
@@ -40,10 +43,10 @@ class HostBookingCreate(BaseModel):
     experience_id: int
     guest_name: str = Field(min_length=2, max_length=120)
     guest_email: str
-    guest_phone: Optional[str] = None
+    guest_phone: str | None = None
     date: datetime
     guests: int = Field(ge=1, le=50)
-    notes: Optional[str] = Field(default=None, max_length=2000)
+    notes: str | None = Field(default=None, max_length=2000)
 
 
 class HostBookingResponse(BaseModel):
@@ -52,11 +55,11 @@ class HostBookingResponse(BaseModel):
     experience_title: str
     guest_name: str
     guest_email: str
-    guest_phone: Optional[str]
+    guest_phone: str | None
     date: datetime
     guests: int
     total_price: float
-    notes: Optional[str]
+    notes: str | None
     status: Literal["upcoming", "accepted", "rejected", "completed", "cancelled"]
 
     class Config:

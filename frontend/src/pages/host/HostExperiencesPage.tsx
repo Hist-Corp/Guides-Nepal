@@ -25,23 +25,22 @@ const categories = [
   'Photography',
 ];
 
-const getStatusBadge = (status: string) => {
+const getStatusBadge = (is_active: boolean) => {
   const variants: Record<string, { bg: string; text: string }> = {
-    draft: { bg: 'bg-amber-100', text: 'text-amber-700' },
-    listed: { bg: 'bg-emerald-100', text: 'text-emerald-700' },
-    archived: { bg: 'bg-gray-100', text: 'text-gray-700' },
+    true: { bg: 'bg-emerald-100', text: 'text-emerald-700' },
+    false: { bg: 'bg-amber-100', text: 'text-amber-700' },
   };
-  const v = variants[status] || variants.draft;
+  const v = variants[String(is_active)] || variants['true'];
   return (
     <span
       className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${v.bg} ${v.text}`}
     >
-      {status.charAt(0).toUpperCase() + status.slice(1)}
+      {is_active ? 'Listed' : 'Draft'}
     </span>
   );
 };
 
-const StatusBadge = ({ status }: { status: string }) => getStatusBadge(status);
+const StatusBadge = ({ is_active }: { is_active: boolean }) => getStatusBadge(is_active);
 
 const HostExperiencesPage: React.FC = () => {
   const { isAuthenticated, user, accessToken } = useAuthStore();
@@ -82,7 +81,7 @@ const HostExperiencesPage: React.FC = () => {
     if (accessToken && user?.role === 'host') {
       load();
     }
-  }, [accessToken, user?.role, load()]);
+  }, [accessToken, user?.role, load]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!isAuthenticated) return <Navigate to="/" replace />;
@@ -250,7 +249,7 @@ const HostExperiencesPage: React.FC = () => {
                   <span className="absolute top-2 right-2 rounded-full bg-white px-2 py-1 text-xs font-bold text-gray-900">
                     ${exp.price}
                   </span>
-                  <StatusBadge status={exp.status} />
+                  <StatusBadge is_active={exp.is_active} />
                 </div>
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-2 mb-2">
@@ -284,7 +283,7 @@ const HostExperiencesPage: React.FC = () => {
                     >
                       <Edit3 className="w-4 h-4 mr-1" /> Edit
                     </button>
-                    {exp.status === 'listed' ? (
+                    {exp.is_active === true ? (
                       <button
                         onClick={() => handleUnpublish(exp.id)}
                         className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-amber-600 hover:bg-amber-50"
@@ -395,7 +394,7 @@ function ExperienceDetailModal({
                     {experience.city} · {experience.category}
                   </p>
                 </div>
-                <StatusBadge status={experience.status} />
+                <StatusBadge is_active={experience.is_active} />
               </div>
               <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
                 <div>
@@ -434,7 +433,7 @@ function ExperienceDetailModal({
             >
               Edit experience
             </button>
-            {experience.status === 'listed' ? (
+            {experience.is_active === true ? (
               <button
                 onClick={() => onUnpublish(experience.id)}
                 className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-bold text-amber-600 hover:bg-amber-50"
