@@ -8,6 +8,7 @@ import { allGuides } from '../data/guidesData';
 import { Guide } from '../data/types';
 import { ImageLightbox } from '../components/common/ImageLightbox';
 import { NEPAL_IMAGES } from '../data/images';
+import guidesApi from '../services/guidesApi';
 
 // Extra masonry tiles beyond the guide's own photos, drawn from the verified
 // Nepal image pool so the grid feels alive instead of repeating one photo.
@@ -27,9 +28,25 @@ const GalleryPage: React.FC = () => {
   const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
 
   useEffect(() => {
-    const guideId = id ? parseInt(id) : 1;
-    const foundGuide = allGuides.find(g => g.id === guideId) || allGuides[0];
-    setGuide(foundGuide);
+    const fetchGuide = async () => {
+      const guideId = id ? parseInt(id) : 1;
+      // First try to find in static data
+      const staticGuide = allGuides.find((g) => g.id === guideId);
+      if (staticGuide) {
+        setGuide(staticGuide);
+        return;
+      }
+      // If not found, try fetching from backend API
+      try {
+        const apiGuide = await guidesApi.getGuide(guideId);
+        setGuide(apiGuide);
+      } catch (error) {
+        console.error('Error fetching guide:', error);
+        // Fallback to first static guide
+        setGuide(allGuides[0]);
+      }
+    };
+    fetchGuide();
   }, [id]);
 
   if (!guide || !guide.gallery) return null;
@@ -48,13 +65,13 @@ const GalleryPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white">
       <Header />
-      
+
       <main className="flex-grow bg-gray-50/50">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           {/* Header */}
           <div className="mb-8">
-            <button 
-              onClick={goBack} 
+            <button
+              onClick={goBack}
               className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -73,7 +90,7 @@ const GalleryPage: React.FC = () => {
                 setLightbox({ src: safeGuideImage, alt: `${guide.name} profile photo` })
               }
             >
-              <img 
+              <img
                 src={safeGuideImage}
                 alt={`${guide.name} Profile`}
                 className="w-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -85,29 +102,31 @@ const GalleryPage: React.FC = () => {
             {guide.gallery.map((img, index) => {
               const safeImg = sanitizeImageUrl(img);
               return (
-              <div 
-                key={index} 
-                onClick={() => setLightbox({ src: safeImg, alt: `${guide.name} gallery photo ${index + 1}` })}
-                className="break-inside-avoid rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative cursor-zoom-in"
-              >
-                <img 
-                  src={safeImg}
-                  alt={`Gallery ${index + 1}`}
-                  className="w-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none" />
-              </div>
+                <div
+                  key={index}
+                  onClick={() =>
+                    setLightbox({ src: safeImg, alt: `${guide.name} gallery photo ${index + 1}` })
+                  }
+                  className="break-inside-avoid rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative cursor-zoom-in"
+                >
+                  <img
+                    src={safeImg}
+                    alt={`Gallery ${index + 1}`}
+                    className="w-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none" />
+                </div>
               );
             })}
 
             {/* Additional photos from the verified Nepal image pool (masonry effect) */}
             {extraGallery.map((photo, i) => (
-              <div 
-                key={`extra-${i}`} 
+              <div
+                key={`extra-${i}`}
                 onClick={() => setLightbox({ src: photo.src, alt: photo.alt })}
                 className="break-inside-avoid rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative cursor-zoom-in"
               >
-                <img 
+                <img
                   src={photo.src}
                   alt={photo.alt}
                   className="w-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -120,11 +139,7 @@ const GalleryPage: React.FC = () => {
       </main>
 
       {lightbox && (
-        <ImageLightbox
-          src={lightbox.src}
-          alt={lightbox.alt}
-          onClose={() => setLightbox(null)}
-        />
+        <ImageLightbox src={lightbox.src} alt={lightbox.alt} onClose={() => setLightbox(null)} />
       )}
 
       <Footer />
