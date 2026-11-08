@@ -40,7 +40,7 @@ This repository contains a Vite + React frontend, an optional dashboard app, and
   `frontend/src/services/hostApi.ts`.
 
 **Host Login Credentials**
-- Email: `host@guides-nepal.com` · Password: `HostPass123!` (set via `HOST_PASSWORD` env var)
+- Email: `host@guides-nepal.com` · Password: `Host@123` (set via `HOST_PASSWORD` env var)
 
 After signing in as host, you land on `/host/dashboard`.
 
@@ -119,17 +119,17 @@ The system comes with the following pre-configured users for development and tes
 
 | Email | Role | Password | Region/Scope |
 |-------|------|----------|--------------|
-| `admin@guides-nepal.com` | Admin | `Admin@12345` | Full system |
-| `content@guides-nepal.com` | Content Manager | `Content@2024` | Pages · Blog · Media · SEO |
-| `regional-1@guides-nepal.com` | Regional Head | `RegionalManager123!` | Koshi Province |
-| `regional-2@guides-nepal.com` | Regional Head | `RegionalManager123!` | Madhesh Province |
-| `regional-3@guides-nepal.com` | Regional Head | `RegionalManager123!` | Bagmati Province |
-| `regional-4@guides-nepal.com` | Regional Head | `RegionalManager123!` | Gandaki Province |
-| `regional-5@guides-nepal.com` | Regional Head | `RegionalManager123!` | Lumbini Province |
-| `regional-6@guides-nepal.com` | Regional Head | `RegionalManager123!` | Karnali Province |
-| `regional-7@guides-nepal.com` | Regional Head | `RegionalManager123!` | Sudurpashchim Province |
-| `support@guides-nepal.com` | Customer Support | `Support@2024` | Tickets · FAQ |
-| `host@guides-nepal.com` | Host | `Host@2024` | Tours · Bookings · Earnings |
+| `admin@guides-nepal.com` | Admin | `Admin@123` | Full system |
+| `content@guides-nepal.com` | Content Manager | `Content@123` | Pages · Blog · Media · SEO |
+| `regional-1@guides-nepal.com` | Regional Head | `Regional@123` | Koshi Province |
+| `regional-2@guides-nepal.com` | Regional Head | `Regional@123` | Madhesh Province |
+| `regional-3@guides-nepal.com` | Regional Head | `Regional@123` | Bagmati Province |
+| `regional-4@guides-nepal.com` | Regional Head | `Regional@123` | Gandaki Province |
+| `regional-5@guides-nepal.com` | Regional Head | `Regional@123` | Lumbini Province |
+| `regional-6@guides-nepal.com` | Regional Head | `Regional@123` | Karnali Province |
+| `regional-7@guides-nepal.com` | Regional Head | `Regional@123` | Sudurpashchim Province |
+| `support@guides-nepal.com` | Customer Support | `Support@123` | Tickets · FAQ |
+| `host@guides-nepal.com` | Host | `Host@123` | Tours · Bookings · Earnings |
 | `guide@guides-nepal.com` | Guide | `Guide@2024` | Public frontend · **cannot sign in to the dashboard** |
 | `traveler@guides-nepal.com` | Traveler | `Traveler@2024` | Public site only · **cannot sign in to the dashboard** |
 
@@ -142,6 +142,22 @@ guide test accounts. Both scripts are idempotent — they upsert by email, so th
 safe to re-run.
 
 > **⚠️ Security Notice:** These are development-only credentials. Always change default passwords before deploying to production. For security, these credentials are stored in `backend/.env` and should never be committed to version control.
+
+### Regional Head & Guide Assignments
+
+Each Regional Head manages guide applications for their assigned province. The 8 seeded guides are distributed across the 7 Nepal provinces:
+
+| Regional Head | Region | Assigned Guides |
+|---------------|--------|-----------------|
+| `regional-1@guides-nepal.com` | Koshi Province | `guide@guides-nepal.com`, `guide8@guides-nepal.com` |
+| `regional-2@guides-nepal.com` | Madhesh Province | `guide2@guides-nepal.com` |
+| `regional-3@guides-nepal.com` | Bagmati Province | `guide3@guides-nepal.com` |
+| `regional-4@guides-nepal.com` | Gandaki Province | `guide4@guides-nepal.com` |
+| `regional-5@guides-nepal.com` | Lumbini Province | `guide5@guides-nepal.com` |
+| `regional-6@guides-nepal.com` | Karnali Province | `guide6@guides-nepal.com` |
+| `regional-7@guides-nepal.com` | Sudurpashchim Province | `guide7@guides-nepal.com` |
+
+To approve guide applications, sign in as a Regional Head at `http://localhost:5176` and navigate to `/regional-head/applications`.
 
 ### Traveller & Guide Test Credentials (public frontend)
 
@@ -511,11 +527,11 @@ pre-seeded accounts:
 
 **Admin Login:**
 - Email: `admin@guides-nepal.com`
-- Password: `Admin@12345`
+- Password: `Admin@123`
 
 **Content Manager Login:**
 - Email: `content@guides-nepal.com`
-- Password: `Content@2024`
+- Password: `Content@123`
 
 **Regional Head Login (7 accounts — one per Nepal province):**
 - Email: `regional-1@guides-nepal.com` — Region: Koshi Province
@@ -525,15 +541,15 @@ pre-seeded accounts:
 - Email: `regional-5@guides-nepal.com` — Region: Lumbini Province
 - Email: `regional-6@guides-nepal.com` — Region: Karnali Province
 - Email: `regional-7@guides-nepal.com` — Region: Sudurpashchim Province
-- Password (all): `RegionalManager123!`
+- Password (all): `Regional@123`
 
 **Customer Support Login:**
 - Email: `support@guides-nepal.com`
-- Password: `Support@2024`
+- Password: `Support@123`
 
 **Host Login:**
 - Email: `host@guides-nepal.com`
-- Password: `Host@2024`
+- Password: `Host@123`
 
 **Traveller Login (public frontend only — no dashboard console):**
 - Email: `traveler@guides-nepal.com`
