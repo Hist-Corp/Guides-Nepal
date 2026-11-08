@@ -29,7 +29,9 @@ const initialPayout: PayoutSettings = {
 
 const HostSettingsPage: React.FC = () => {
   const { isAuthenticated, user, accessToken, login } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'payout' | 'security'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'payout' | 'security'>(
+    'profile'
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -53,30 +55,16 @@ const HostSettingsPage: React.FC = () => {
   const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      setProfile((p) => ({
-        ...p,
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-      }));
+    // Load settings on mount — only reads external API, no setState
+    if (accessToken) {
+      hostApi.getNotificationSettings(accessToken).then((notif) => {
+        if (notif) setNotifications(notif);
+      });
+      hostApi.getPayoutSettings(accessToken).then((payoutData) => {
+        if (payoutData) setPayout(payoutData);
+      });
     }
-    loadSettings();
-  }, [user]);
-
-  const loadSettings = async () => {
-    if (!accessToken) return;
-    try {
-      const [notif, payoutData] = await Promise.all([
-        hostApi.getNotificationSettings(accessToken).catch(() => null),
-        hostApi.getPayoutSettings(accessToken).catch(() => null),
-      ]);
-      if (notif) setNotifications(notif);
-      if (payoutData) setPayout(payoutData);
-    } catch (e) {
-      console.error('Failed to load settings', e);
-    }
-  };
+  }, [accessToken]);
 
   const saveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,12 +73,23 @@ const HostSettingsPage: React.FC = () => {
     setError('');
     setSuccess(false);
     try {
-      await hostApi.updateProfile(accessToken, { firstName: profile.firstName, lastName: profile.lastName, phone: profile.phone });
-      login({ ...user!, firstName: profile.firstName, lastName: profile.lastName, phone: profile.phone });
+      await hostApi.updateProfile(accessToken, {
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        phone: profile.phone,
+      });
+      login({
+        ...user,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+        phone: profile.phone,
+      });
       setSuccess(true);
-    } catch (e: any) {
-      setError(e?.message || 'Failed to update profile');
-    } finally { setSaving(false); }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to update profile');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const saveNotifications = async (e: React.FormEvent) => {
@@ -102,9 +101,11 @@ const HostSettingsPage: React.FC = () => {
     try {
       await hostApi.updateNotificationSettings(accessToken, notifications);
       setSuccess(true);
-    } catch (e: any) {
-      setError(e?.message || 'Failed to save notifications');
-    } finally { setSaving(false); }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to save notifications');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const savePayout = async (e: React.FormEvent) => {
@@ -116,9 +117,11 @@ const HostSettingsPage: React.FC = () => {
     try {
       await hostApi.updatePayoutSettings(accessToken, payout);
       setSuccess(true);
-    } catch (e: any) {
-      setError(e?.message || 'Failed to save payout settings');
-    } finally { setSaving(false); }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to save payout settings');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const changePassword = async (e: React.FormEvent) => {
@@ -136,21 +139,23 @@ const HostSettingsPage: React.FC = () => {
     setSuccess(false);
     try {
       // This would call an API to change password
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise((r) => setTimeout(r, 1000));
       setPasswordForm({ current: '', new: '', confirm: '' });
       setSuccess(true);
-    } catch (e: any) {
-      setError(e?.message || 'Failed to change password');
-    } finally { setSaving(false); }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to change password');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const toggleNotif = (key: keyof NotificationSettings) => {
-    setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
+    setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const togglePayout = (key: keyof PayoutSettings) => {
     if (typeof payout[key] === 'boolean') {
-      setPayout(prev => ({ ...prev, [key]: !prev[key] }));
+      setPayout((prev) => ({ ...prev, [key]: !prev[key] }));
     }
   };
 
@@ -170,12 +175,24 @@ const HostSettingsPage: React.FC = () => {
       <main className="flex-grow container mx-auto max-w-4xl px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-          <p className="mt-1 text-gray-600 text-sm">Manage your profile, notifications, payout preferences, and security.</p>
+          <p className="mt-1 text-gray-600 text-sm">
+            Manage your profile, notifications, payout preferences, and security.
+          </p>
         </div>
 
         {(error || success) && (
-          <div className="mb-6 rounded-xl p-4 text-sm flex items-center gap-2" style={{ background: error ? '#fef2f2' : '#f0fdf4', color: error ? '#dc2626' : '#16a34a', borderColor: error ? '#fecaca' : '#bbf7d0' }}>
-            <RotateCcw className="w-4 h-4" style={{ animation: success ? 'spin 1s linear infinite' : 'none' }} />
+          <div
+            className="mb-6 rounded-xl p-4 text-sm flex items-center gap-2"
+            style={{
+              background: error ? '#fef2f2' : '#f0fdf4',
+              color: error ? '#dc2626' : '#16a34a',
+              borderColor: error ? '#fecaca' : '#bbf7d0',
+            }}
+          >
+            <RotateCcw
+              className="w-4 h-4"
+              style={{ animation: success ? 'spin 1s linear infinite' : 'none' }}
+            />
             {error || 'Saved successfully'}
           </div>
         )}
@@ -188,7 +205,7 @@ const HostSettingsPage: React.FC = () => {
                 { id: 'notifications', label: 'Notifications', icon: Bell },
                 { id: 'payout', label: 'Payout settings', icon: CreditCard },
                 { id: 'security', label: 'Security', icon: Lock },
-              ].map(tab => {
+              ].map((tab) => {
                 const Icon = tab.icon;
                 return (
                   <button
@@ -213,13 +230,45 @@ const HostSettingsPage: React.FC = () => {
               <SettingsCard title="Personal information" Icon={User}>
                 <form onSubmit={saveProfile}>
                   <div className="grid gap-4 md:grid-cols-2">
-                    <Field label="First name" required value={profile.firstName} onChange={(e) => setProfile(p => ({ ...p, firstName: e.target.value }))} />
-                    <Field label="Last name" required value={profile.lastName} onChange={(e) => setProfile(p => ({ ...p, lastName: e.target.value }))} />
-                    <Field label="Email" type="email" value={profile.email} disabled />
-                    <Field label="Phone" type="tel" value={profile.phone} onChange={(e) => setProfile(p => ({ ...p, phone: e.target.value }))} placeholder="+977 98XXXXXXXX" />
+                    <Field
+                      label="First name"
+                      required
+                      value={profile.firstName}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProfile((p) => ({ ...p, firstName: e.target.value }))
+                      }
+                    />
+                    <Field
+                      label="Last name"
+                      required
+                      value={profile.lastName}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProfile((p) => ({ ...p, lastName: e.target.value }))
+                      }
+                    />
+                    <Field
+                      label="Email"
+                      type="email"
+                      value={profile.email}
+                      disabled
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProfile((p) => ({ ...p, email: e.target.value }))
+                      }
+                    />
+                    <Field
+                      label="Phone"
+                      type="tel"
+                      value={profile.phone}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setProfile((p) => ({ ...p, phone: e.target.value }))
+                      }
+                      placeholder="+977 98XXXXXXXX"
+                    />
                   </div>
                   <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:justify-end">
-                    <Button type="submit" disabled={saving} className="px-8 py-3 text-base">{saving ? 'Saving…' : 'Save changes'}</Button>
+                    <Button type="submit" disabled={saving} className="px-8 py-3 text-base">
+                      {saving ? 'Saving…' : 'Save changes'}
+                    </Button>
                   </div>
                 </form>
               </SettingsCard>
@@ -231,13 +280,36 @@ const HostSettingsPage: React.FC = () => {
                   <h3 className="text-lg font-semibold mb-4">Email notifications</h3>
                   <div className="space-y-3 mb-6">
                     {[
-                      { key: 'email_bookings', label: 'New booking requests', desc: 'When a guest requests to book your experience' },
-                      { key: 'email_messages', label: 'Guest messages', desc: 'When a guest sends you a message' },
-                      { key: 'email_reviews', label: 'New reviews', desc: 'When a guest leaves a review' },
-                      { key: 'email_payouts', label: 'Payout updates', desc: 'When a payout is processed or fails' },
-                      { key: 'email_marketing', label: 'Marketing emails', desc: 'Tips, updates, and promotions from Guides Nepal' },
-                    ].map(item => (
-                      <label key={item.key} className="flex items-center justify-between py-3 border-b last:border-0 cursor-pointer">
+                      {
+                        key: 'email_bookings',
+                        label: 'New booking requests',
+                        desc: 'When a guest requests to book your experience',
+                      },
+                      {
+                        key: 'email_messages',
+                        label: 'Guest messages',
+                        desc: 'When a guest sends you a message',
+                      },
+                      {
+                        key: 'email_reviews',
+                        label: 'New reviews',
+                        desc: 'When a guest leaves a review',
+                      },
+                      {
+                        key: 'email_payouts',
+                        label: 'Payout updates',
+                        desc: 'When a payout is processed or fails',
+                      },
+                      {
+                        key: 'email_marketing',
+                        label: 'Marketing emails',
+                        desc: 'Tips, updates, and promotions from Guides Nepal',
+                      },
+                    ].map((item) => (
+                      <label
+                        key={item.key}
+                        className="flex items-center justify-between py-3 border-b last:border-0 cursor-pointer"
+                      >
                         <div>
                           <span className="font-medium text-gray-900">{item.label}</span>
                           <p className="text-sm text-gray-500">{item.desc}</p>
@@ -258,8 +330,11 @@ const HostSettingsPage: React.FC = () => {
                       { key: 'push_bookings', label: 'Booking requests' },
                       { key: 'push_messages', label: 'Guest messages' },
                       { key: 'push_reviews', label: 'New reviews' },
-                    ].map(item => (
-                      <label key={item.key} className="flex items-center justify-between py-3 border-b last:border-0 cursor-pointer">
+                    ].map((item) => (
+                      <label
+                        key={item.key}
+                        className="flex items-center justify-between py-3 border-b last:border-0 cursor-pointer"
+                      >
                         <span className="font-medium text-gray-900">{item.label}</span>
                         <input
                           type="checkbox"
@@ -272,7 +347,9 @@ const HostSettingsPage: React.FC = () => {
                   </div>
 
                   <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:justify-end">
-                    <Button type="submit" disabled={saving} className="px-8 py-3 text-base">{saving ? 'Saving…' : 'Save preferences'}</Button>
+                    <Button type="submit" disabled={saving} className="px-8 py-3 text-base">
+                      {saving ? 'Saving…' : 'Save preferences'}
+                    </Button>
                   </div>
                 </form>
               </SettingsCard>
@@ -284,17 +361,37 @@ const HostSettingsPage: React.FC = () => {
                   <h3 className="text-lg font-semibold mb-4">Payout method</h3>
                   <div className="space-y-3 mb-6">
                     {[
-                      { value: 'bank_transfer', label: 'Bank transfer', desc: 'Direct deposit to your bank account' },
-                      { value: 'wise', label: 'Wise (formerly TransferWise)', desc: 'International transfers with low fees' },
-                      { value: 'paypal', label: 'PayPal', desc: 'Fast payouts to your PayPal account' },
-                    ].map(method => (
-                      <label key={method.value} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition ${payout.method === method.value ? 'border-[#213448] bg-[#213448]/10' : 'border-[#213448]/10 hover:border-[#213448]'}`}>
+                      {
+                        value: 'bank_transfer',
+                        label: 'Bank transfer',
+                        desc: 'Direct deposit to your bank account',
+                      },
+                      {
+                        value: 'wise',
+                        label: 'Wise (formerly TransferWise)',
+                        desc: 'International transfers with low fees',
+                      },
+                      {
+                        value: 'paypal',
+                        label: 'PayPal',
+                        desc: 'Fast payouts to your PayPal account',
+                      },
+                    ].map((method) => (
+                      <label
+                        key={method.value}
+                        className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition ${payout.method === method.value ? 'border-[#213448] bg-[#213448]/10' : 'border-[#213448]/10 hover:border-[#213448]'}`}
+                      >
                         <input
                           type="radio"
                           name="method"
                           value={method.value}
                           checked={payout.method === method.value}
-                          onChange={() => setPayout(prev => ({ ...prev, method: method.value as PayoutSettings['method'] }))}
+                          onChange={() =>
+                            setPayout((prev) => ({
+                              ...prev,
+                              method: method.value as PayoutSettings['method'],
+                            }))
+                          }
                           className="h-5 w-5 text-[#213448] focus:ring-[#213448]"
                         />
                         <div>
@@ -307,23 +404,81 @@ const HostSettingsPage: React.FC = () => {
 
                   {payout.method === 'bank_transfer' && payout.bank_account && (
                     <div className="mb-6 grid gap-4 md:grid-cols-2">
-                      <h4 className="font-medium md:col-span-2 text-gray-900">Bank account details</h4>
-                      <Field label="Account holder name" value={payout.bank_account.name} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPayout(prev => ({ ...prev, bank_account: { ...prev.bank_account!, name: e.target.value } }))} />
-                      <Field label="Account number" value={payout.bank_account.account} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPayout(prev => ({ ...prev, bank_account: { ...prev.bank_account!, account: e.target.value } }))} />
-                      <Field label="Routing number" value={payout.bank_account.routing} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPayout(prev => ({ ...prev, bank_account: { ...prev.bank_account!, routing: e.target.value } }))} />
-                      <Field label="SWIFT/BIC" value={payout.bank_account.swift} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPayout(prev => ({ ...prev, bank_account: { ...prev.bank_account!, swift: e.target.value } }))} />
+                      <h4 className="font-medium md:col-span-2 text-gray-900">
+                        Bank account details
+                      </h4>
+                      <Field
+                        label="Account holder name"
+                        value={payout.bank_account.name}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setPayout((prev) => ({
+                            ...prev,
+                            bank_account: { ...prev.bank_account!, name: e.target.value },
+                          }))
+                        }
+                      />
+                      <Field
+                        label="Account number"
+                        value={payout.bank_account.account}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setPayout((prev) => ({
+                            ...prev,
+                            bank_account: { ...prev.bank_account!, account: e.target.value },
+                          }))
+                        }
+                      />
+                      <Field
+                        label="Routing number"
+                        value={payout.bank_account.routing}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setPayout((prev) => ({
+                            ...prev,
+                            bank_account: { ...prev.bank_account!, routing: e.target.value },
+                          }))
+                        }
+                      />
+                      <Field
+                        label="SWIFT/BIC"
+                        value={payout.bank_account.swift}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setPayout((prev) => ({
+                            ...prev,
+                            bank_account: { ...prev.bank_account!, swift: e.target.value },
+                          }))
+                        }
+                      />
                     </div>
                   )}
 
                   {payout.method === 'wise' && payout.wise_account && (
                     <div className="mb-6">
-                      <Field label="Wise email" type="email" value={payout.wise_account.email} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPayout(prev => ({ ...prev, wise_account: { ...prev.wise_account!, email: e.target.value } }))} />
+                      <Field
+                        label="Wise email"
+                        type="email"
+                        value={payout.wise_account.email}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setPayout((prev) => ({
+                            ...prev,
+                            wise_account: { ...prev.wise_account!, email: e.target.value },
+                          }))
+                        }
+                      />
                     </div>
                   )}
 
                   {payout.method === 'paypal' && payout.paypal_account && (
                     <div className="mb-6">
-                      <Field label="PayPal email" type="email" value={payout.paypal_account.email} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPayout(prev => ({ ...prev, paypal_account: { ...prev.paypal_account!, email: e.target.value } }))} />
+                      <Field
+                        label="PayPal email"
+                        type="email"
+                        value={payout.paypal_account.email}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setPayout((prev) => ({
+                            ...prev,
+                            paypal_account: { ...prev.paypal_account!, email: e.target.value },
+                          }))
+                        }
+                      />
                     </div>
                   )}
 
@@ -332,7 +487,9 @@ const HostSettingsPage: React.FC = () => {
                     <label className="flex items-center justify-between py-3 border-b last:border-0 cursor-pointer">
                       <div>
                         <span className="font-medium text-gray-900">Automatic payouts</span>
-                        <p className="text-sm text-gray-500">Automatically transfer funds when they reach the minimum amount</p>
+                        <p className="text-sm text-gray-500">
+                          Automatically transfer funds when they reach the minimum amount
+                        </p>
                       </div>
                       <input
                         type="checkbox"
@@ -343,8 +500,31 @@ const HostSettingsPage: React.FC = () => {
                     </label>
 
                     <div className="grid gap-4 md:grid-cols-2">
-                      <Field label="Minimum payout amount (USD)" type="number" min="10" step="10" value={String(payout.min_payout_amount)} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPayout(prev => ({ ...prev, min_payout_amount: Number(e.target.value) }))} />
-                      <Field label="Payout schedule" as="select" value={payout.payout_schedule} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setPayout(prev => ({ ...prev, payout_schedule: e.target.value as PayoutSettings['payout_schedule'] }))}>
+                      <Field
+                        label="Minimum payout amount (USD)"
+                        type="number"
+                        min="10"
+                        step="10"
+                        value={String(payout.min_payout_amount)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setPayout((prev) => ({
+                            ...prev,
+                            min_payout_amount: Number(e.target.value),
+                          }))
+                        }
+                      />
+                      <Field
+                        label="Payout schedule"
+                        as="select"
+                        value={payout.payout_schedule}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setPayout((prev) => ({
+                            ...prev,
+                            payout_schedule: (e.target as unknown as HTMLSelectElement)
+                              .value as PayoutSettings['payout_schedule'],
+                          }))
+                        }
+                      >
                         <option value="weekly">Weekly</option>
                         <option value="biweekly">Bi-weekly</option>
                         <option value="monthly">Monthly</option>
@@ -353,7 +533,9 @@ const HostSettingsPage: React.FC = () => {
                   </div>
 
                   <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:justify-end">
-                    <Button type="submit" disabled={saving} className="px-8 py-3 text-base">{saving ? 'Saving…' : 'Save payout settings'}</Button>
+                    <Button type="submit" disabled={saving} className="px-8 py-3 text-base">
+                      {saving ? 'Saving…' : 'Save payout settings'}
+                    </Button>
                   </div>
                 </form>
               </SettingsCard>
@@ -364,12 +546,45 @@ const HostSettingsPage: React.FC = () => {
                 <form onSubmit={changePassword}>
                   <h3 className="text-lg font-semibold mb-4">Change password</h3>
                   <div className="grid gap-4 md:grid-cols-2 max-w-xl">
-                    <PasswordField label="Current password" type="password" required value={passwordForm.current} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPasswordForm(p => ({ ...p, current: e.target.value }))} show={showCurrent} onToggleShow={() => setShowCurrent(!showCurrent)} />
-                    <PasswordField label="New password" type="password" required value={passwordForm.new} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPasswordForm(p => ({ ...p, new: e.target.value }))} minLength={8} show={showNew} onToggleShow={() => setShowNew(!showNew)} />
-                    <PasswordField label="Confirm new password" type="password" required value={passwordForm.confirm} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPasswordForm(p => ({ ...p, confirm: e.target.value }))} show={showConfirm} onToggleShow={() => setShowConfirm(!showConfirm)} />
+                    <PasswordField
+                      label="Current password"
+                      type="password"
+                      required
+                      value={passwordForm.current}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setPasswordForm((p) => ({ ...p, current: e.target.value }))
+                      }
+                      show={showCurrent}
+                      onToggleShow={() => setShowCurrent(!showCurrent)}
+                    />
+                    <PasswordField
+                      label="New password"
+                      type="password"
+                      required
+                      value={passwordForm.new}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setPasswordForm((p) => ({ ...p, new: e.target.value }))
+                      }
+                      minLength={8}
+                      show={showNew}
+                      onToggleShow={() => setShowNew(!showNew)}
+                    />
+                    <PasswordField
+                      label="Confirm new password"
+                      type="password"
+                      required
+                      value={passwordForm.confirm}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setPasswordForm((p) => ({ ...p, confirm: e.target.value }))
+                      }
+                      show={showConfirm}
+                      onToggleShow={() => setShowConfirm(!showConfirm)}
+                    />
                   </div>
                   <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:justify-end">
-                    <Button type="submit" disabled={saving} className="px-8 py-3 text-base">{saving ? 'Saving…' : 'Change password'}</Button>
+                    <Button type="submit" disabled={saving} className="px-8 py-3 text-base">
+                      {saving ? 'Saving…' : 'Change password'}
+                    </Button>
                   </div>
                 </form>
 
@@ -378,13 +593,19 @@ const HostSettingsPage: React.FC = () => {
                   <p className="text-gray-500 mb-4">These actions are irreversible.</p>
                   <div className="flex flex-wrap gap-3">
                     <button
-                      onClick={() => { if (window.confirm('Delete your account? This cannot be undone.')) alert('Account deletion not implemented in demo') }}
+                      onClick={() => {
+                        if (window.confirm('Delete your account? This cannot be undone.'))
+                          alert('Account deletion not implemented in demo');
+                      }}
                       className="px-5 py-2.5 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700"
                     >
                       Delete account
                     </button>
                     <button
-                      onClick={() => { if (window.confirm('Log out of all devices?')) alert('Logged out everywhere') }}
+                      onClick={() => {
+                        if (window.confirm('Log out of all devices?'))
+                          alert('Logged out everywhere');
+                      }}
                       className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-bold hover:bg-gray-50"
                     >
                       Log out everywhere
@@ -401,7 +622,15 @@ const HostSettingsPage: React.FC = () => {
   );
 };
 
-function SettingsCard({ title, Icon, children }: { title: string; Icon: React.ComponentType<{ className?: string }>; children: React.ReactNode }) {
+function SettingsCard({
+  title,
+  Icon,
+  children,
+}: {
+  title: string;
+  Icon: React.ComponentType<{ className?: string }>;
+  children: React.ReactNode;
+}) {
   return (
     <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-100">
@@ -415,15 +644,37 @@ function SettingsCard({ title, Icon, children }: { title: string; Icon: React.Co
   );
 }
 
-function Field({ label, type = 'text', value, onChange, disabled, required, as = 'input', children, ...props }: any) {
+interface FieldProps {
+  label: string;
+  type?: string;
+  value: string | number | boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
+  required?: boolean;
+  as?: 'input' | 'textarea' | 'select';
+  children?: React.ReactNode;
+  [key: string]: unknown;
+}
+
+function Field({
+  label,
+  type = 'text',
+  value,
+  onChange,
+  disabled,
+  required,
+  as = 'input',
+  children,
+  ...props
+}: FieldProps) {
   return (
     <div className="space-y-2">
       <label className="block text-sm font-bold text-gray-700">{label}</label>
       {as === 'textarea' ? (
         <textarea
           {...props}
-          value={value}
-          onChange={onChange}
+          value={value as string}
+          onChange={onChange as unknown as (e: React.ChangeEvent<HTMLTextAreaElement>) => void}
           disabled={disabled}
           required={required}
           className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#213448] focus:border-transparent outline-none ${disabled ? 'bg-gray-50' : ''}`}
@@ -431,8 +682,8 @@ function Field({ label, type = 'text', value, onChange, disabled, required, as =
       ) : as === 'select' ? (
         <select
           {...props}
-          value={value}
-          onChange={onChange}
+          value={value as string}
+          onChange={onChange as unknown as (e: React.ChangeEvent<HTMLSelectElement>) => void}
           disabled={disabled}
           required={required}
           className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#213448] focus:border-transparent outline-none ${disabled ? 'bg-gray-50' : ''}`}
@@ -442,8 +693,8 @@ function Field({ label, type = 'text', value, onChange, disabled, required, as =
       ) : (
         <input
           {...props}
-          type={type}
-          value={value}
+          type={type as string}
+          value={value as string}
           onChange={onChange}
           disabled={disabled}
           required={required}
@@ -454,7 +705,27 @@ function Field({ label, type = 'text', value, onChange, disabled, required, as =
   );
 }
 
-function PasswordField({ label, type = 'password', value, onChange, required, minLength, show, onToggleShow, ...props }: any) {
+interface PasswordFieldProps {
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
+  minLength?: number;
+  show?: boolean;
+  onToggleShow?: () => void;
+  [key: string]: unknown;
+}
+
+function PasswordField({
+  label,
+  value,
+  onChange,
+  required,
+  minLength,
+  show,
+  onToggleShow,
+  ...props
+}: PasswordFieldProps) {
   return (
     <div className="space-y-2">
       <label className="block text-sm font-bold text-gray-700">{label}</label>
@@ -480,8 +751,17 @@ function PasswordField({ label, type = 'password', value, onChange, required, mi
   );
 }
 
-function Button({ type = 'button', children, disabled, className = '', ...props }: any) {
-  const base = 'inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60 disabled:pointer-events-none shadow-sm hover:shadow-md';
+interface ButtonProps {
+  type?: 'button' | 'submit' | 'reset';
+  children: React.ReactNode;
+  disabled?: boolean;
+  className?: string;
+  [key: string]: unknown;
+}
+
+function Button({ type = 'button', children, disabled, className = '', ...props }: ButtonProps) {
+  const base =
+    'inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60 disabled:pointer-events-none shadow-sm hover:shadow-md';
   const variant = 'bg-[#213448] text-white hover:bg-[#1f2d54] focus-visible:ring-[#213448]';
   return (
     <button
