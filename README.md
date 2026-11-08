@@ -125,7 +125,7 @@ The system comes with the following pre-configured users for development and tes
 | `regional-2@guides-nepal.com` | Regional Head | `Regional@123` | Madhesh Province |
 | `regional-3@guides-nepal.com` | Regional Head | `Regional@123` | Bagmati Province |
 | `regional-4@guides-nepal.com` | Regional Head | `Regional@123` | Gandaki Province |
-| `regional-5@guides-nepal.com` | Regional Head | `Regional@123` | Lumbini Province |
+| `regional-5@guides-nepal.com` | Regional Head | `Regional@123 / RegionalManager123!` | Lumbini Province |
 | `regional-6@guides-nepal.com` | Regional Head | `Regional@123` | Karnali Province |
 | `regional-7@guides-nepal.com` | Regional Head | `Regional@123` | Sudurpashchim Province |
 | `support@guides-nepal.com` | Customer Support | `Support@123` | Tickets · FAQ |

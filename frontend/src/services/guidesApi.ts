@@ -31,6 +31,8 @@ export interface Experience {
   rating?: number;
   reviews?: number;
   host: Guide;
+  // Guides a Regional Head approved for this experience ("Who you'll meet").
+  guides?: Guide[];
 }
 
 export const guidesApi = {

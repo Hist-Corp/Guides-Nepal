@@ -208,6 +208,7 @@ export default function NavSidebar() {
               { to: `${base}/applications`, label: "Applications", icon: "mail" },
               { to: `${base}/host-applications`, label: "Host Applications", icon: "home" },
               { to: `${base}/experiences`, label: "Guide Applications & Reviews", icon: "compass" },
+              { to: `${base}/guide-experience-requests`, label: "Experience Requests", icon: "ticket" },
               { to: `${base}/region`, label: "My Region", icon: "map" },
               { to: `${base}/customers`, label: "Customers", icon: "user" },
             ],

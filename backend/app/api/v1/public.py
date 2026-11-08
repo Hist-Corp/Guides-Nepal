@@ -521,13 +521,19 @@ def _experience_guides(db: Session, experience_id: int) -> list[dict]:
 
 
 def _enrich_experience_with_guides(db: Session, experience: dict) -> dict:
-    """Attach approved guides to an experience dict (mock or live)."""
-    exp_id = experience.get("id")
+    """Return a copy of the experience with its approved guides attached.
+
+    The mock catalog is module-level state, so the copy matters: mutating it in
+    place made the guides appear on every later response (including the single
+    experience endpoint) whether or not the database had been read.
+    """
+    enriched = dict(experience)
+    exp_id = enriched.get("id")
     if exp_id is not None:
         guides = _experience_guides(db, int(exp_id))
         if guides:
-            experience["guides"] = guides
-    return experience
+            enriched["guides"] = guides
+    return enriched
 
 
 def _host_experience_to_public(db: Session, experience: HostExperience) -> Optional[dict]:
@@ -696,7 +702,7 @@ def list_experiences(
 def get_experience(slug: str, db: Session = Depends(get_db)) -> dict:
     for exp in MOCK_EXPERIENCES:
         if exp["slug"] == slug:
-            return exp
+            return _enrich_experience_with_guides(db, exp)
     # Live host experiences are addressed as host-{slug} on the frontend.
     if slug.startswith("host-"):
         try:

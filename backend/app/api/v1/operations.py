@@ -17,6 +17,7 @@ row then works on the Host Dashboard and the Host Frontend.
 import hashlib
 import json
 import secrets
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -31,6 +32,7 @@ from app.core.dependencies import get_current_user, require_role
 from app.core.roles import ADMIN, CUSTOMER_SUPPORT, GUIDE, HOST, REGIONAL_HEAD
 from app.core.security import get_password_hash, validate_password_strength
 from app.models.booking import Booking, HostExperience
+from app.models.guide import Guide
 from app.models.guide_application import GuideApplication
 from app.models.guide_listing import GuideExperienceRequest
 from app.models.host_application import HostApplication
@@ -45,6 +47,47 @@ from app.schemas.guide_dashboard import (
 router = APIRouter()
 
 APPLICATION_STAFF = [ADMIN, REGIONAL_HEAD]
+
+# Regions are stored both as the short name ("Lumbini") and as the full
+# province name ("Lumbini Province"), so matching a regional head to their
+# guides has to normalise before comparing.
+_PROVINCE_ALIASES = {
+    "koshi": "koshi province",
+    "koshi province": "koshi province",
+    "province 1": "koshi province",
+    "madhesh": "madhesh province",
+    "madhesh province": "madhesh province",
+    "province 2": "madhesh province",
+    "bagmati": "bagmati province",
+    "bagmati province": "bagmati province",
+    "province 3": "bagmati province",
+    "gandaki": "gandaki province",
+    "gandaki province": "gandaki province",
+    "province 4": "gandaki province",
+    "lumbini": "lumbini province",
+    "lumbini province": "lumbini province",
+    "province 5": "lumbini province",
+    "karnali": "karnali province",
+    "karnali province": "karnali province",
+    "province 6": "karnali province",
+    "sudurpashchim": "sudurpashchim province",
+    "sudurpaschim": "sudurpashchim province",
+    "sudurpashchim province": "sudurpashchim province",
+    "sudurpaschim province": "sudurpashchim province",
+    "province 7": "sudurpashchim province",
+}
+
+
+def _normalize_region(value: Optional[str]) -> str:
+    cleaned = (value or "").strip().lower()
+    return _PROVINCE_ALIASES.get(cleaned, cleaned)
+
+
+def _same_region(left: Optional[str], right: Optional[str]) -> bool:
+    """True when both regions name the same province, whatever the spelling."""
+    if not left or not right:
+        return False
+    return _normalize_region(left) == _normalize_region(right)
 TICKET_STAFF = [ADMIN, CUSTOMER_SUPPORT]
 GUIDE_APPLICATION_UPLOAD_ROOT = Path(__file__).resolve().parents[2] / "private_guide_applications"
 
@@ -571,24 +614,33 @@ def list_guide_experience_requests(
     Regional heads only see requests for guides in their assigned region.
     """
     query = db.query(GuideExperienceRequest)
-    # Regional heads only see requests for guides in their region.
-    if current_user.role == REGIONAL_HEAD:
-        if not current_user.region:
-            raise HTTPException(status_code=403, detail="Regional head has no assigned region")
-        # Join users to filter by region.
-        query = query.join(User, GuideExperienceRequest.guide_user_id == User.id).filter(
-            User.region == current_user.region
-        )
+    if current_user.role == REGIONAL_HEAD and not current_user.region:
+        raise HTTPException(status_code=403, detail="Regional head has no assigned region")
     if status_filter:
         query = query.filter(GuideExperienceRequest.status == status_filter)
     rows = query.order_by(GuideExperienceRequest.created_at.desc()).all()
     results = []
     for row in rows:
         guide = db.get(User, row.guide_user_id)
+        # Regional heads only see requests for guides in their region.  This is
+        # checked in Python so "Lumbini" and "Lumbini Province" both match.
+        if current_user.role == REGIONAL_HEAD and not _same_region(
+            guide.region if guide else None, current_user.region
+        ):
+            continue
         experience = None
         booking = None
         if row.experience_id:
             experience = db.query(HostExperience).filter(HostExperience.id == row.experience_id).first()
+            if experience is None:
+                # Requests can target the mock catalog (ids 1-12), which has no
+                # host_experiences row, so resolve the title from there to keep
+                # the reviewer's "Target" column populated.
+                from app.api.v1.public import MOCK_EXPERIENCES
+
+                experience = next(
+                    (item for item in MOCK_EXPERIENCES if item["id"] == row.experience_id), None
+                )
         if row.booking_id:
             booking = db.get(Booking, row.booking_id)
         results.append({
@@ -598,7 +650,11 @@ def list_guide_experience_requests(
             "guide_email": guide.email if guide else None,
             "guide_region": guide.region if guide else None,
             "experience_id": row.experience_id,
-            "experience_title": experience.title if experience else None,
+            "experience_title": (
+                experience.get("title")
+                if isinstance(experience, dict)
+                else experience.title if experience else None
+            ),
             "booking_id": row.booking_id,
             "booking_title": booking.experience_title if booking else None,
             "booking_date": booking.date.isoformat() if booking and booking.date else None,
@@ -610,6 +666,71 @@ def list_guide_experience_requests(
             "created_at": row.created_at.isoformat() if row.created_at else None,
         })
     return results
+
+
+def _catalog_guide_for_user(
+    db: Session, guide_user: Optional[User], reviewer: User
+) -> Optional[Guide]:
+    """Resolve (or create) the public ``guides`` catalog profile for a guide user.
+
+    Approval is the moment a guide becomes visible to travellers, so a guide
+    who registered through the public application funnel — and therefore has no
+    ``host_guides`` ownership row — still needs a catalog profile.  One is
+    created from the account details when missing and linked back to the
+    account so later approvals reuse it.
+    """
+    if guide_user is None:
+        return None
+
+    links = (
+        db.query(HostGuide)
+        .filter(HostGuide.guide_user_id == guide_user.id, HostGuide.guide_id.isnot(None))
+        .order_by(HostGuide.id.asc())
+        .all()
+    )
+    link = next((item for item in links if (item.status or "") == "active"), links[0] if links else None)
+    if link is not None:
+        profile = db.get(Guide, link.guide_id)
+        if profile is not None:
+            return profile
+
+    name = f"{guide_user.firstName or ''} {guide_user.lastName or ''}".strip() or (guide_user.email or "Guide")
+    # ``guides.created_at`` carries a Postgres-only server default (``now()``)
+    # in databases created from the migrations, so the value is supplied here
+    # rather than left to the column default.
+    now = datetime.now(timezone.utc)
+    profile = Guide(
+        name=name,
+        image="/images/placeholder.svg",
+        role="Experience Guide",
+        rating=4.8,
+        reviews=0,
+        bio=getattr(guide_user, "bio", None) or "",
+        languages=["English", "Nepali"],
+        verified=True,
+        lives_in=guide_user.region,
+        cities=[guide_user.region] if guide_user.region else [],
+        gallery=[],
+        is_active=True,
+        created_at=now,
+        updated_at=now,
+    )
+    db.add(profile)
+    db.flush()
+    db.add(
+        HostGuide(
+            host_id=reviewer.id,
+            guide_user_id=guide_user.id,
+            guide_id=profile.id,
+            full_name=name,
+            email=guide_user.email,
+            city=guide_user.region,
+            region=guide_user.region,
+            documents=[],
+            status="active",
+        )
+    )
+    return profile
 
 
 @router.patch("/guide-experience-requests/{request_id}/review")
@@ -636,7 +757,7 @@ def review_guide_experience_request(
         if not current_user.region:
             raise HTTPException(status_code=403, detail="Regional head has no assigned region")
         guide = db.get(User, row.guide_user_id)
-        if not guide or guide.region != current_user.region:
+        if not guide or not _same_region(guide.region, current_user.region):
             raise HTTPException(status_code=403, detail="Request outside your region")
 
     row.status = payload.status
@@ -645,58 +766,43 @@ def review_guide_experience_request(
     row.review_notes = payload.review_notes
 
     # On approval, create the HostExperienceGuide link so the guide shows on
-    # the Traveller-facing experience page.
+    # the Traveller-facing experience page.  The guide's own catalog profile is
+    # resolved (or created) first: applying through the public funnel mints a
+    # login account without a ``host_guides`` row, and approval must still be
+    # able to put that guide on the experience.
     if payload.status == "approved":
+        profile = _catalog_guide_for_user(db, db.get(User, row.guide_user_id), current_user)
+        experience_id = row.experience_id
+        if row.request_type == "booking" and row.booking_id:
+            booking = db.get(Booking, row.booking_id)
+            experience_id = booking.experience_id if booking else None
 
-        if row.request_type == "experience" and row.experience_id:
-            existing_link = (
+        if profile is not None and experience_id:
+            already_linked = (
                 db.query(HostExperienceGuide)
                 .filter(
-                    HostExperienceGuide.experience_id == row.experience_id,
-                    HostExperienceGuide.guide_id.isnot(None),
+                    HostExperienceGuide.experience_id == experience_id,
+                    HostExperienceGuide.guide_id == profile.id,
                 )
                 .first()
             )
-            if not existing_link:
-                # Resolve the guide's catalog profile id via host_guides.
-                hg = (
-                    db.query(HostGuide)
-                    .filter(HostGuide.guide_user_id == row.guide_user_id)
+            if not already_linked:
+                # The first approved guide is the primary one; later approvals
+                # for the same experience are added alongside it.
+                primary_link = (
+                    db.query(HostExperienceGuide)
+                    .filter(HostExperienceGuide.experience_id == experience_id)
+                    .order_by(HostExperienceGuide.id.asc())
                     .first()
                 )
-                if hg and hg.guide_id:
-                    link = HostExperienceGuide(
-                        host_id=current_user.id if current_user.role == REGIONAL_HEAD else 0,
-                        experience_id=row.experience_id,
-                        guide_id=hg.guide_id,
-                        is_primary=True,
+                db.add(
+                    HostExperienceGuide(
+                        host_id=primary_link.host_id if primary_link else current_user.id,
+                        experience_id=experience_id,
+                        guide_id=profile.id,
+                        is_primary=primary_link is None,
                     )
-                    db.add(link)
-        elif row.request_type == "booking" and row.booking_id:
-            booking = db.get(Booking, row.booking_id)
-            if booking:
-                hg = (
-                    db.query(HostGuide)
-                    .filter(HostGuide.guide_user_id == row.guide_user_id)
-                    .first()
                 )
-                if hg and hg.guide_id:
-                    existing_link = (
-                        db.query(HostExperienceGuide)
-                        .filter(
-                            HostExperienceGuide.experience_id == booking.experience_id,
-                            HostExperienceGuide.guide_id.isnot(None),
-                        )
-                        .first()
-                    )
-                    if not existing_link:
-                        link = HostExperienceGuide(
-                            host_id=current_user.id if current_user.role == REGIONAL_HEAD else 0,
-                            experience_id=booking.experience_id,
-                            guide_id=hg.guide_id,
-                            is_primary=False,
-                        )
-                        db.add(link)
 
     db.commit()
     db.refresh(row)

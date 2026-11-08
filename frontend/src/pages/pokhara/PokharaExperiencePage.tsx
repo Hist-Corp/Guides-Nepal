@@ -98,6 +98,7 @@ import { getApiUrl } from '../../config/api';
 import { useProfileStore } from '../../store/profileStore';
 import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
 import { getAvailableGuides } from '../../utils/guides';
+import { mergeGuides, useAssignedGuides } from '../../utils/approvedGuides';
 import { isPredefinedTrip } from '../../utils/experienceBooking';
 import { BookmarkButton } from '../../components/common/BookmarkButton';
 import { experienceDetailPath } from '../../utils/canonicalExperience';
@@ -298,9 +299,19 @@ const PokharaExperiencePage: React.FC = () => {
   const bookmarkId = data ? `exp-${data.slug}` : '';
   const isSaved = bookmarkId ? profile.bookmarks.some((b) => b.id === bookmarkId) : false;
   const [saveFlash, setSaveFlash] = useState(false);
+  // Guides approved for this experience by a Regional Head (backend catalog).
+  const assignedGuides = useAssignedGuides(data?.slug, data?.title);
   const availableGuides = useMemo(
-    () => (data ? getAvailableGuides(data.guides ?? [], bookings, data.id, data.city ?? '') : []),
-    [data, bookings]
+    () =>
+      data
+        ? getAvailableGuides(
+            mergeGuides(data.guides ?? [], assignedGuides),
+            bookings,
+            data.id,
+            data.city ?? ''
+          )
+        : [],
+    [data, bookings, assignedGuides]
   );
 
   const handleSaveForLater = () => {

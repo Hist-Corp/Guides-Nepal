@@ -42,6 +42,16 @@ interface Host {
   about: string;
 }
 
+/** Guide approved by a Regional Head for this experience. */
+interface AssignedGuide {
+  id: number;
+  name: string;
+  image: string;
+  role?: string;
+  rating: number;
+  reviews: number;
+}
+
 interface Experience {
   id: number;
   title: string;
@@ -54,6 +64,8 @@ interface Experience {
   description: string;
   highlights: string[];
   host: Host;
+  // Approved guides, only returned by the backend catalog.
+  guides?: AssignedGuide[];
   // Trek route extras — only set for the /trek-hiking catalog.
   tagline?: string;
   itinerary?: TrekRouteContent['itinerary'];

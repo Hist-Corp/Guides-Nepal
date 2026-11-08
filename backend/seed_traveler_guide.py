@@ -22,6 +22,7 @@ from app.core.database import Base, engine, SessionLocal
 from app.core.roles import GUIDE, TRAVELER
 from app.core.security import get_password_hash, validate_password_strength, verify_password
 from app import models  # noqa: F401  (register all models so create_all sees them)
+from app.models.guide_application import GuideApplication
 from app.models.user import User
 
 # Default passwords meet the backend password policy (min 8, upper, number, special).
@@ -121,6 +122,35 @@ USERS = [
 ]
 
 
+def _ensure_guide_application(db, user: User, seed: dict) -> None:
+    """Back a seeded guide account with an approved application row.
+
+    Guide login is gated on an approved ``guide_applications`` entry, so a seed
+    that only writes the ``users`` row leaves the documented credentials unable
+    to sign in ("Your guide account is not active yet").
+    """
+    existing = (
+        db.query(GuideApplication)
+        .filter(GuideApplication.email == user.email)
+        .order_by(GuideApplication.id.desc())
+        .first()
+    )
+    if existing is None:
+        db.add(
+            GuideApplication(
+                full_name=f"{seed['firstName']} {seed['lastName']}".strip(),
+                email=user.email,
+                status="approved",
+                user_id=user.id,
+                reviewed_by="seed",
+            )
+        )
+    else:
+        existing.status = "approved"
+        existing.user_id = user.id
+    db.commit()
+
+
 def main() -> None:
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
@@ -165,6 +195,9 @@ def main() -> None:
                     f"  [CREATED] {u['email']:30s} | role: {u['role']:10s} "
                     f"| password: {u['password']:15s} | verified: {ok}"
                 )
+            account = db.query(User).filter(User.email == u["email"]).first()
+            if account is not None and u["role"] == GUIDE:
+                _ensure_guide_application(db, account, u)
         print(f"Total users: {db.query(User).count()}")
         print("Done.")
     finally:
