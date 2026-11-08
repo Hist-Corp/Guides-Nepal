@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { Wallet, TrendingUp, DollarSign, Download, CreditCard, ArrowUpRight } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
+import { PageBackButton } from '../../components/common/PageBackButton';
 import { useAuthStore } from '../../store/authStore';
 import hostApi, {
   type HostEarnings,
@@ -61,7 +62,7 @@ const HostEarningsPage: React.FC = () => {
     if (accessToken && user?.role === 'host') {
       load();
     }
-  }, [accessToken, user?.role, load()]);
+  }, [accessToken, user?.role, load]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!isAuthenticated) return <Navigate to="/" replace />;
@@ -144,6 +145,7 @@ const HostEarningsPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Header />
       <main className="flex-grow container mx-auto max-w-6xl px-4 py-8">
+        <PageBackButton />
         <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Earnings</h1>

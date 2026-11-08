@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
+import { PageBackButton } from '../../components/common/PageBackButton';
 import { useAuthStore } from '../../store/authStore';
 import hostApi, { type HostExperience, type HostExperienceCreate } from '../../services/hostApi';
 
@@ -179,6 +180,7 @@ const HostExperiencesPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Header />
       <main className="flex-grow container mx-auto max-w-6xl px-4 py-8">
+        <PageBackButton />
         <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">My Experiences</h1>
