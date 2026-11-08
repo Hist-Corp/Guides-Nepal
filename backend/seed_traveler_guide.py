@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Dev seed: create Traveller (traveler) + Guide test accounts for frontend testing.
 Seeds 12 frontend test accounts by default (4 travellers + 8 guides) so every
 catalog guide profile can be connected to a backend guide account.
@@ -35,19 +36,13 @@ def _password(env_key: str, default: str) -> str:
 
 
 USERS = [
+    # ---- Travelers (Guests) ----
     {
         "email": "traveler@guides-nepal.com",
         "firstName": "Test",
         "lastName": "Traveler",
         "role": TRAVELER,
         "password": _password("SEED_TRAVELER_PASSWORD", DEFAULT_TRAVELER_PASSWORD),
-    },
-    {
-        "email": "guide@guides-nepal.com",
-        "firstName": "Test",
-        "lastName": "Guide",
-        "role": GUIDE,
-        "password": _password("SEED_GUIDE_PASSWORD", DEFAULT_GUIDE_PASSWORD),
     },
     {
         "email": "traveler2@guides-nepal.com",
@@ -64,60 +59,68 @@ USERS = [
         "password": _password("SEED_TRAVELER3_PASSWORD", "Traveler3@2024"),
     },
     {
-        "email": "guide2@guides-nepal.com",
-        "firstName": "Anita",
-        "lastName": "Sherpa",
-        "role": GUIDE,
-        "password": _password("SEED_GUIDE2_PASSWORD", "Guide2@2024"),
-    },
-    {
-        "email": "guide3@guides-nepal.com",
-        "firstName": "Kiran",
-        "lastName": "Thapa",
-        "role": GUIDE,
-        "password": _password("SEED_GUIDE3_PASSWORD", "Guide3@2024"),
-    },
-    {
         "email": "traveler4@guides-nepal.com",
         "firstName": "Maya",
         "lastName": "Rai",
         "role": TRAVELER,
         "password": _password("SEED_TRAVELER4_PASSWORD", "Traveler4@2024"),
     },
+    # ---- Guides (Guests) ----
     {
-        "email": "guide4@guides-nepal.com",
+        "email": "anita@guides-nepal.com",
+        "firstName": "Anita",
+        "lastName": "Sherpa",
+        "role": GUIDE,
+        "password": _password("SEED_GUIDE1_PASSWORD", "Anita@2024"),
+    },
+    {
+        "email": "kiran@guides-nepal.com",
+        "firstName": "Kiran",
+        "lastName": "Thapa",
+        "role": GUIDE,
+        "password": _password("SEED_GUIDE2_PASSWORD", "Kiran@2024"),
+    },
+    {
+        "email": "sujal@guides-nepal.com",
         "firstName": "Sujal",
         "lastName": "Lama",
         "role": GUIDE,
-        "password": _password("SEED_GUIDE4_PASSWORD", "Guide4@2024"),
+        "password": _password("SEED_GUIDE3_PASSWORD", "Sujal@2024"),
     },
     {
-        "email": "guide5@guides-nepal.com",
+        "email": "priya@guides-nepal.com",
         "firstName": "Priya",
         "lastName": "Sharma",
         "role": GUIDE,
-        "password": _password("SEED_GUIDE5_PASSWORD", "Guide5@2024"),
+        "password": _password("SEED_GUIDE4_PASSWORD", "Priya@2024"),
     },
     {
-        "email": "guide6@guides-nepal.com",
-        "firstName": "Rohan",
-        "lastName": "Rai",
+        "email": "naturist@guides-nepal.com",
+        "firstName": "Naturist",
+        "lastName": "NatureLover",
         "role": GUIDE,
-        "password": _password("SEED_GUIDE6_PASSWORD", "Guide6@2024"),
+        "password": _password("SEED_GUIDE5_PASSWORD", "Naturist@2024"),
     },
     {
-        "email": "guide7@guides-nepal.com",
-        "firstName": "Mingma",
-        "lastName": "Tamang",
+        "email": "adventurer@guides-nepal.com",
+        "firstName": "Adventurer",
+        "lastName": "ThrillSeeker",
         "role": GUIDE,
-        "password": _password("SEED_GUIDE7_PASSWORD", "Guide7@2024"),
+        "password": _password("SEED_GUIDE6_PASSWORD", "Adventurer@2024"),
     },
     {
-        "email": "guide8@guides-nepal.com",
-        "firstName": "Sarita",
-        "lastName": "Gurung",
+        "email": "safari@guides-nepal.com",
+        "firstName": "Safari",
+        "lastName": "WildlifeExpert",
         "role": GUIDE,
-        "password": _password("SEED_GUIDE8_PASSWORD", "Guide8@2024"),
+        "password": _password("SEED_GUIDE7_PASSWORD", "Safari@2024"),
+    },
+    {
+        "email": "kathmandu@guides-nepal.com",
+        "firstName": "Kathmandu",
+        "lastName": "LocalExpert",
+        "role": GUIDE,
+        "password": _password("SEED_GUIDE8_PASSWORD", "Kathmandu@2024"),
     },
 ]
 

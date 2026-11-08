@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { User, Save, ShieldCheck, RotateCcw, Bell, CreditCard, Lock, Eye, EyeOff } from 'lucide-react';
+import { User, RotateCcw, Bell, CreditCard, Lock, Eye, EyeOff } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
@@ -28,7 +28,7 @@ const initialPayout: PayoutSettings = {
 };
 
 const HostSettingsPage: React.FC = () => {
-  const { isAuthenticated, user, accessToken, logout, login } = useAuthStore();
+  const { isAuthenticated, user, accessToken, login } = useAuthStore();
   const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'payout' | 'security'>('profile');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -54,7 +54,12 @@ const HostSettingsPage: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      setProfile(p => ({ ...p, firstName: user.firstName || '', lastName: user.lastName || '', email: user.email || '' }));
+      setProfile((p) => ({
+        ...p,
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+      }));
     }
     loadSettings();
   }, [user]);
@@ -191,7 +196,7 @@ const HostSettingsPage: React.FC = () => {
                     onClick={() => setActiveTab(tab.id as typeof activeTab)}
                     className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
                       activeTab === tab.id
-                        ? 'bg-brand-yellow/10 text-brand-yellow'
+                        ? 'bg-[#213448]/10 text-[#213448]'
                         : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'
                     }`}
                   >
@@ -213,8 +218,8 @@ const HostSettingsPage: React.FC = () => {
                     <Field label="Email" type="email" value={profile.email} disabled />
                     <Field label="Phone" type="tel" value={profile.phone} onChange={(e) => setProfile(p => ({ ...p, phone: e.target.value }))} placeholder="+977 98XXXXXXXX" />
                   </div>
-                  <div className="mt-6 flex justify-end">
-                    <Button type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save changes'}</Button>
+                  <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:justify-end">
+                    <Button type="submit" disabled={saving} className="px-8 py-3 text-base">{saving ? 'Saving…' : 'Save changes'}</Button>
                   </div>
                 </form>
               </SettingsCard>
@@ -241,7 +246,7 @@ const HostSettingsPage: React.FC = () => {
                           type="checkbox"
                           checked={notifications[item.key as keyof NotificationSettings]}
                           onChange={() => toggleNotif(item.key as keyof NotificationSettings)}
-                          className="h-5 w-5 rounded border-gray-300 text-brand-yellow focus:ring-brand-yellow"
+                          className="h-5 w-5 rounded border-gray-300 text-[#213448] focus:ring-[#213448]"
                         />
                       </label>
                     ))}
@@ -260,14 +265,14 @@ const HostSettingsPage: React.FC = () => {
                           type="checkbox"
                           checked={notifications[item.key as keyof NotificationSettings]}
                           onChange={() => toggleNotif(item.key as keyof NotificationSettings)}
-                          className="h-5 w-5 rounded border-gray-300 text-brand-yellow focus:ring-brand-yellow"
+                          className="h-5 w-5 rounded border-gray-300 text-[#213448] focus:ring-[#213448]"
                         />
                       </label>
                     ))}
                   </div>
 
-                  <div className="mt-6 flex justify-end">
-                    <Button type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save preferences'}</Button>
+                  <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:justify-end">
+                    <Button type="submit" disabled={saving} className="px-8 py-3 text-base">{saving ? 'Saving…' : 'Save preferences'}</Button>
                   </div>
                 </form>
               </SettingsCard>
@@ -283,14 +288,14 @@ const HostSettingsPage: React.FC = () => {
                       { value: 'wise', label: 'Wise (formerly TransferWise)', desc: 'International transfers with low fees' },
                       { value: 'paypal', label: 'PayPal', desc: 'Fast payouts to your PayPal account' },
                     ].map(method => (
-                      <label key={method.value} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition ${payout.method === method.value ? 'border-brand-yellow bg-brand-yellow/5' : 'border-gray-200 hover:border-brand-yellow'}`}>
+                      <label key={method.value} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition ${payout.method === method.value ? 'border-[#213448] bg-[#213448]/10' : 'border-[#213448]/10 hover:border-[#213448]'}`}>
                         <input
                           type="radio"
                           name="method"
                           value={method.value}
                           checked={payout.method === method.value}
                           onChange={() => setPayout(prev => ({ ...prev, method: method.value as PayoutSettings['method'] }))}
-                          className="h-5 w-5 text-brand-yellow focus:ring-brand-yellow"
+                          className="h-5 w-5 text-[#213448] focus:ring-[#213448]"
                         />
                         <div>
                           <span className="font-medium text-gray-900">{method.label}</span>
@@ -333,7 +338,7 @@ const HostSettingsPage: React.FC = () => {
                         type="checkbox"
                         checked={payout.auto_payout}
                         onChange={() => togglePayout('auto_payout')}
-                        className="h-5 w-5 rounded border-gray-300 text-brand-yellow focus:ring-brand-yellow"
+                        className="h-5 w-5 rounded border-gray-300 text-[#213448] focus:ring-[#213448]"
                       />
                     </label>
 
@@ -347,8 +352,8 @@ const HostSettingsPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="mt-6 flex justify-end">
-                    <Button type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save payout settings'}</Button>
+                  <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:justify-end">
+                    <Button type="submit" disabled={saving} className="px-8 py-3 text-base">{saving ? 'Saving…' : 'Save payout settings'}</Button>
                   </div>
                 </form>
               </SettingsCard>
@@ -363,8 +368,8 @@ const HostSettingsPage: React.FC = () => {
                     <PasswordField label="New password" type="password" required value={passwordForm.new} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPasswordForm(p => ({ ...p, new: e.target.value }))} minLength={8} show={showNew} onToggleShow={() => setShowNew(!showNew)} />
                     <PasswordField label="Confirm new password" type="password" required value={passwordForm.confirm} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPasswordForm(p => ({ ...p, confirm: e.target.value }))} show={showConfirm} onToggleShow={() => setShowConfirm(!showConfirm)} />
                   </div>
-                  <div className="mt-6 flex justify-end">
-                    <Button type="submit" disabled={saving}>{saving ? 'Saving…' : 'Change password'}</Button>
+                  <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:justify-end">
+                    <Button type="submit" disabled={saving} className="px-8 py-3 text-base">{saving ? 'Saving…' : 'Change password'}</Button>
                   </div>
                 </form>
 
@@ -400,7 +405,7 @@ function SettingsCard({ title, Icon, children }: { title: string; Icon: React.Co
   return (
     <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-100">
-        <h2 className="flex items-center gap-2 text-xl font-bold text-gray-900">
+        <h2 className="flex items-center gap-2 text-xl font-bold text-[#213448]">
           <Icon className="w-5 h-5 text-[#213448]" />
           {title}
         </h2>
@@ -421,7 +426,7 @@ function Field({ label, type = 'text', value, onChange, disabled, required, as =
           onChange={onChange}
           disabled={disabled}
           required={required}
-          className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none ${disabled ? 'bg-gray-50' : ''}`}
+          className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#213448] focus:border-transparent outline-none ${disabled ? 'bg-gray-50' : ''}`}
         />
       ) : as === 'select' ? (
         <select
@@ -430,7 +435,7 @@ function Field({ label, type = 'text', value, onChange, disabled, required, as =
           onChange={onChange}
           disabled={disabled}
           required={required}
-          className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none ${disabled ? 'bg-gray-50' : ''}`}
+          className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#213448] focus:border-transparent outline-none ${disabled ? 'bg-gray-50' : ''}`}
         >
           {children}
         </select>
@@ -442,7 +447,7 @@ function Field({ label, type = 'text', value, onChange, disabled, required, as =
           onChange={onChange}
           disabled={disabled}
           required={required}
-          className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none ${disabled ? 'bg-gray-50' : ''}`}
+          className={`w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#213448] focus:border-transparent outline-none ${disabled ? 'bg-gray-50' : ''}`}
         />
       )}
     </div>
@@ -461,7 +466,7 @@ function PasswordField({ label, type = 'password', value, onChange, required, mi
           onChange={onChange}
           required={required}
           minLength={minLength}
-          className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none pr-12"
+          className="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-[#213448] focus:border-transparent outline-none pr-12"
         />
         <button
           type="button"
@@ -476,8 +481,8 @@ function PasswordField({ label, type = 'password', value, onChange, required, mi
 }
 
 function Button({ type = 'button', children, disabled, className = '', ...props }: any) {
-  const base = 'inline-flex items-center justify-center rounded-xl font-semibold transition-all active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
-  const variant = 'bg-brand-yellow text-[#213448] hover:bg-[#ffba0a] focus-visible:ring-brand-yellow';
+  const base = 'inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60 disabled:pointer-events-none shadow-sm hover:shadow-md';
+  const variant = 'bg-[#213448] text-white hover:bg-[#1f2d54] focus-visible:ring-[#213448]';
   return (
     <button
       type={type}

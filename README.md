@@ -62,6 +62,13 @@ This repository contains a Vite + React frontend, an optional dashboard app, and
 
 After signing in as host, you land on `/host/dashboard`.
 
+**Host Settings UI Improvements (`/host/settings`)**
+
+- **Button redesign**: All action buttons (Save changes, Save preferences, Save payout settings, Change password) now use a professional blue (`#213448`) color scheme with hover state, shadow, and scale animation.
+- **Section titles**: Updated section headers to use blue (`#213448`) text color for consistent branding.
+- **Form field focus**: All input fields now use blue focus rings (`focus:ring-[#213448]`) instead of yellow for better visual consistency.
+- **Form layout**: Submit buttons now have improved padding (`px-8 py-3`), larger text (`text-base`), and responsive layout (stacked on mobile, inline on desktop).
+
 ### v1.3.0 (2026-10-08)
 
 **Search & Discovery**
@@ -206,14 +213,14 @@ flow end-to-end between any traveller and any guide:
 | Traveller (`traveler`) | `traveler2@guides-nepal.com` | `Traveler2@2024` | Public frontend login (`http://localhost:5175`, Login modal → Traveller tab) or `POST /api/v1/auth/login` |
 | Traveller (`traveler`) | `traveler3@guides-nepal.com` | `Traveler3@2024` | Public frontend login (`http://localhost:5175`, Login modal → Traveller tab) or `POST /api/v1/auth/login` |
 | Traveller (`traveler`) | `traveler4@guides-nepal.com` | `Traveler4@2024` | Public frontend login (`http://localhost:5175`, Login modal → Traveller tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `guide@guides-nepal.com` | `Guide@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `guide2@guides-nepal.com` | `Guide2@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `guide3@guides-nepal.com` | `Guide3@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `guide4@guides-nepal.com` | `Guide4@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `guide5@guides-nepal.com` | `Guide5@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `guide6@guides-nepal.com` | `Guide6@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `guide7@guides-nepal.com` | `Guide7@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `guide8@guides-nepal.com` | `Guide8@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `anita@guides-nepal.com` | `Anita@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `kiran@guides-nepal.com` | `Kiran@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `sujal@guides-nepal.com` | `Sujal@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `priya@guides-nepal.com` | `Priya@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `naturist@guides-nepal.com` | `Naturist@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `adventurer@guides-nepal.com` | `Adventurer@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `safari@guides-nepal.com` | `Safari@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+| Guide (`guide`) | `kathmandu@guides-nepal.com` | `Kathmandu@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
 
 **Create / reset them:**
 
@@ -493,6 +500,10 @@ and host. `guide` and `traveler` accounts have no console and are refused at sig
 - `/host/bookings` - Review, accept, reject, and complete traveler bookings
 - `/host/earnings` - View total, pending, and monthly earnings
 - `/host/settings` - Update profile, region, password, and 2FA
+  - **Profile**: Update first name, last name, email, phone, and region
+  - **Notifications**: Configure email and push notification preferences
+  - **Payout settings**: Configure bank transfer, Wise, or PayPal payout details
+  - **Security**: Change account password
 
 
 ### Role Assignment During Registration

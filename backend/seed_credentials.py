@@ -47,8 +47,8 @@ CREDENTIALS = {
         "password": os.environ.get("HOST_PASSWORD", "Host@2024"),
         "role": HOST,
     },
-    "guide@guides-nepal.com": {
-        "password": os.environ.get("GUIDE_PASSWORD", "Guide@2024"),
+    "test@guides-nepal.com": {
+        "password": os.environ.get("GUIDE_PASSWORD", "Test@2024"),
         "role": GUIDE,
     },
 }
