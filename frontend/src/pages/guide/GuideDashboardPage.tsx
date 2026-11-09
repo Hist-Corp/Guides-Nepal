@@ -117,7 +117,7 @@ const GuideDashboardPage: React.FC = () => {
           </div>
           <div className="flex gap-3">
             <Link to="/guide/proposals" className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-bold text-gray-800 hover:bg-gray-100">Proposals</Link>
-            <Link to="/guide/onboarding" className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-bold text-gray-800 hover:bg-gray-100">Edit onboarding</Link>
+            <Link to="/guide/listings" className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-bold text-gray-800 hover:bg-gray-100">My listings</Link>
             <Link to="/guide/listings/new" className="flex items-center gap-2 rounded-full bg-[#213448] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#1a2a3a]">
               <Plus className="h-4 w-4" /> New listing
             </Link>

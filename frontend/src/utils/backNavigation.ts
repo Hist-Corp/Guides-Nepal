@@ -24,7 +24,6 @@ const registeredRoutes: string[] = [
   '/become-guide',
   '/guide-application',
   '/bookings',
-  '/guide/onboarding',
   '/guide/dashboard',
   '/guide/listings',
   '/guide/listings/new',

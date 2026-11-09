@@ -4,7 +4,7 @@ import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import { useProfileStore } from '../../store/profileStore';
-import { LayoutDashboard, Calendar, Book, Star, MapPin, Users, CreditCard } from 'lucide-react';
+import { LayoutDashboard, Calendar, Book, Star, Users, CreditCard } from 'lucide-react';
 
 const RoleProfilePage: React.FC = () => {
   const { isAuthenticated, user } = useAuthStore();
@@ -28,12 +28,6 @@ const RoleProfilePage: React.FC = () => {
       title: 'My Listings',
       description: 'Create and manage your guide listings.',
       to: '/guide/listings',
-    },
-    {
-      icon: Calendar,
-      title: 'Onboarding',
-      description: 'Complete your guide profile setup.',
-      to: '/guide/onboarding',
     },
     {
       icon: Users,
@@ -168,12 +162,6 @@ const RoleProfilePage: React.FC = () => {
                   <p className="text-gray-600 text-sm mb-4">
                     Complete your onboarding to start receiving traveller inquiries and bookings.
                   </p>
-                  <Link
-                    to="/guide/onboarding"
-                    className="inline-flex items-center gap-2 bg-primary text-white text-sm font-bold px-4 py-2 rounded-full hover:bg-primary-hover transition-colors"
-                  >
-                    Start onboarding <MapPin className="w-4 h-4" />
-                  </Link>
                 </div>
               )}
             </div>

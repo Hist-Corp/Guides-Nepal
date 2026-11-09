@@ -52,7 +52,6 @@ import HostBookingsPage from './pages/host/HostBookingsPage';
 import HostEarningsPage from './pages/host/HostEarningsPage';
 import HostSettingsPage from './pages/host/HostSettingsPage';
 import GuideRegistrationWizard from './pages/guide/GuideRegistrationWizard';
-import GuideOnboardingPage from './pages/guide/GuideOnboardingPage';
 import GuideDashboardPage from './pages/guide/GuideDashboardPage';
 import GuideListingsPage from './pages/guide/GuideListingsPage';
 import GuideListingFormPage from './pages/guide/GuideListingFormPage';
@@ -160,7 +159,6 @@ function App() {
               element={<Navigate to="/guide-registration" replace />}
             />
             <Route path="/bookings" element={<BookingsPage />} />
-            <Route path="/guide/onboarding" element={<GuideOnboardingPage />} />
             <Route path="/guide/dashboard" element={<GuideDashboardPage />} />
             <Route path="/guide/listings" element={<GuideListingsPage />} />
             <Route path="/guide/listings/new" element={<GuideExperienceRequestPage />} />

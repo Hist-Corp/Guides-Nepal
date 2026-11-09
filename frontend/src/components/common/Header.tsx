@@ -354,13 +354,6 @@ export const Header: React.FC = () => {
                         >
                           My listings
                         </Link>
-                        <Link
-                          to="/guide/onboarding"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
-                          onClick={() => setIsProfileDropdownOpen(false)}
-                        >
-                          Onboarding
-                        </Link>
                       </>
                     )}
                     {user?.role !== 'host' && user?.role !== 'guide' && (
@@ -512,13 +505,7 @@ export const Header: React.FC = () => {
                           >
                             My listings
                           </Link>
-                          <Link
-                            to="/guide/onboarding"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
-                            onClick={() => setIsProfileDropdownOpen(false)}
-                          >
-                            Onboarding
-                          </Link>
+
                         </>
                       )}
                       <button
@@ -674,13 +661,7 @@ export const Header: React.FC = () => {
                               >
                                 My listings
                               </Link>
-                              <Link
-                                to="/guide/onboarding"
-                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
-                                onClick={() => setIsMenuOpen(false)}
-                              >
-                                Onboarding
-                              </Link>
+
                             </>
                           )}
                           {user?.role !== 'host' && user?.role !== 'guide' && (
