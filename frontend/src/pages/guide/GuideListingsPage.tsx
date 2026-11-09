@@ -1,13 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Pencil, Plus, Trash2, Users } from 'lucide-react';
+import { BadgeCheck, ExternalLink, Pencil, Plus, RefreshCw, Trash2, Users } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import { guideDashboardApi, type GuideListing } from '../../services/guideDashboardApi';
 import { useCurrency } from '../../contexts/CurrencyContext';
 
-/** Full CRUD table for a guide's own listings + inline max-guest capacity edits. */
+/**
+ * My Listings for a guide.
+ *
+ * Two sources are merged by the API on every request:
+ *  - `owned`: listings the guide created and can edit/remove.
+ *  - `assigned`: experiences a Regional Manager assigned to the guide's catalog
+ *    profile. These are read-only here and appear automatically after approval.
+ */
 const GuideListingsPage: React.FC = () => {
   const { accessToken, isAuthenticated, user } = useAuthStore();
   const { formatPrice } = useCurrency();
@@ -15,29 +22,43 @@ const GuideListingsPage: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [capEdits, setCapEdits] = useState<Record<number, string>>({});
+  const [lastSynced, setLastSynced] = useState<Date | null>(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!accessToken) return;
-    setLoading(true);
     try {
       setListings(await guideDashboardApi.listListings(accessToken));
       setError('');
+      setLastSynced(new Date());
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unable to load listings.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [accessToken]);
 
   /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    if (accessToken && user?.role === 'guide') load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accessToken, user?.role]);
+    if (accessToken && user?.role === 'guide') {
+      setLoading(true);
+      void load();
+    }
+  }, [accessToken, user?.role, load]);
   /* eslint-enable react-hooks/set-state-in-effect */
+
+  // Assignments are approved in the staff dashboard, so keep this page in step
+  // with the backend without forcing the guide to reload.
+  useEffect(() => {
+    if (!accessToken || user?.role !== 'guide') return;
+    const id = setInterval(() => void load(), 30_000);
+    return () => clearInterval(id);
+  }, [accessToken, user?.role, load]);
 
   if (!isAuthenticated) return <Navigate to="/" replace />;
   if (user?.role !== 'guide') return <Navigate to="/bookings" replace />;
+
+  const owned = listings.filter((listing) => (listing.source ?? 'owned') === 'owned');
+  const assigned = listings.filter((listing) => listing.source === 'assigned');
 
   const remove = async (id: number) => {
     if (!accessToken || !window.confirm('Remove this listing?')) return;
@@ -74,8 +95,15 @@ const GuideListingsPage: React.FC = () => {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Your experiences</h1>
             <p className="mt-2 text-gray-600">
-              List treks, tours and activities — each with its own max guest capacity.
+              Your own listings sit alongside the experiences your Regional Manager has assigned
+              to you. Assignments are read-only and sync automatically.
             </p>
+            {lastSynced && (
+              <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-gray-500">
+                <RefreshCw className="h-3.5 w-3.5" />
+                Last synced {lastSynced.toLocaleTimeString()} · refreshes every 30 seconds
+              </p>
+            )}
           </div>
           <Link
             to="/guide/listings/new"
@@ -84,6 +112,7 @@ const GuideListingsPage: React.FC = () => {
             <Plus className="h-4 w-4" /> New listing
           </Link>
         </div>
+
         {loading ? (
           <p className="mt-8 text-gray-500">Loading listings...</p>
         ) : error ? (
@@ -95,69 +124,161 @@ const GuideListingsPage: React.FC = () => {
             No listings yet. Create your first trek, tour or specialized activity.
           </div>
         ) : (
-          <div className="mt-8 space-y-4">
-            {listings.map((l) => (
-              <article
-                key={l.id}
-                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="mt-8 space-y-8">
+            {assigned.length > 0 && (
+              <section>
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
-                    <p className="text-xs font-bold uppercase text-gray-500">
-                      {l.category} - {l.city}
-                      {l.area ? ` - ${l.area}` : ''}
-                    </p>
-                    <h2 className="mt-1 text-lg font-bold text-gray-900">{l.title}</h2>
-                    <p className="mt-1 flex items-center gap-1 text-sm text-gray-600">
-                      <Users className="h-4 w-4" />
-                      {l.booked_guests}/{l.max_guests} guests - {l.available_spots} spots left -{' '}
-                      {formatPrice(l.price, 'USD')}
+                    <h2 className="text-xl font-bold text-gray-900">Assigned experiences</h2>
+                    <p className="mt-1 text-sm text-gray-600">
+                      Approved by your Regional Manager. These appear automatically and cannot be
+                      edited here.
                     </p>
                   </div>
-                  <div className="flex gap-2">
-                    <Link
-                      to={`/guide/listings/${l.id}/edit`}
-                      className="flex items-center gap-1 rounded-full border border-gray-300 px-4 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-100"
-                    >
-                      <Pencil className="h-3 w-3" /> Edit
-                    </Link>
-                    <Link
-                      to={`/guide/listings/${l.id}/propose-change`}
-                      className="flex items-center gap-1 rounded-full bg-amber-50 px-4 py-1.5 text-xs font-bold text-amber-700 hover:bg-amber-100"
-                    >
-                      Propose change
-                    </Link>
-                    <button
-                      onClick={() => remove(l.id)}
-                      className="flex items-center gap-1 rounded-full bg-red-50 px-4 py-1.5 text-xs font-bold text-red-600 hover:bg-red-100"
-                    >
-                      <Trash2 className="h-3 w-3" /> Remove
-                    </button>
-                  </div>
+                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
+                    Auto-synced
+                  </span>
                 </div>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <input
-                    type="number"
-                    min={1}
-                    max={100}
-                    placeholder={`Max guests (now ${l.max_guests})`}
-                    value={capEdits[l.id] ?? ''}
-                    onChange={(e) => setCapEdits((c) => ({ ...c, [l.id]: e.target.value }))}
-                    className="w-48 rounded-xl border border-gray-300 p-2 text-sm"
-                  />
-                  <button
-                    onClick={() => saveCapacity(l.id)}
-                    className="rounded-full bg-brand-yellow px-4 py-2 text-xs font-bold text-[#213448] hover:bg-[#ffba0a]"
+                <div className="mt-4 space-y-4">
+                  {assigned.map((l) => (
+                    <article
+                      key={l.id}
+                      className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm"
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="text-xs font-bold uppercase text-gray-500">
+                            {l.category} - {l.city}
+                            {l.area ? ` - ${l.area}` : ''}
+                          </p>
+                          <h3 className="mt-1 flex items-center gap-2 text-lg font-bold text-gray-900">
+                            {l.title}
+                            {l.is_primary && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-brand-yellow/25 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-gray-700">
+                                <BadgeCheck className="h-3 w-3" /> Primary
+                              </span>
+                            )}
+                          </h3>
+                          <p className="mt-1 flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                            <span className="flex items-center gap-1">
+                              <Users className="h-4 w-4" />
+                              {l.booked_guests}/{l.max_guests ?? '—'} guests
+                            </span>
+                            <span>{formatPrice(l.price, 'USD')}</span>
+                            {l.duration && <span>{l.duration}</span>}
+                          </p>
+                        </div>
+                        {l.public_slug && (
+                          <Link
+                            to={`/experience/${l.public_slug}`}
+                            className="flex items-center gap-1 rounded-full border border-gray-300 px-4 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-100"
+                          >
+                            <ExternalLink className="h-3 w-3" /> View public page
+                          </Link>
+                        )}
+                      </div>
+                      <p className="mt-3 text-xs font-medium text-emerald-700">
+                        Assigned by {l.managed_by ?? 'Regional Manager'}
+                        {l.is_primary ? ' as the primary guide' : ''}.
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <section>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Your listings</h2>
+                  <p className="mt-1 text-sm text-gray-600">
+                    List treks, tours and activities — each with its own max guest capacity.
+                  </p>
+                </div>
+                <span className="text-xs font-bold uppercase tracking-wide text-gray-400">
+                  {owned.length} owned
+                </span>
+              </div>
+
+              {owned.length === 0 ? (
+                <div className="mt-4 rounded-2xl border border-dashed border-gray-200 bg-white p-8 text-center text-gray-500">
+                  You have no owned listings yet.{' '}
+                  <Link
+                    to="/guide/listings/new"
+                    className="font-bold text-primary hover:underline"
                   >
-                    Save capacity
-                  </button>
+                    Create one
+                  </Link>
+                  .
                 </div>
-              </article>
-            ))}
+              ) : (
+                <div className="mt-4 space-y-4">
+                  {owned.map((l) => (
+                    <article
+                      key={l.id}
+                      className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="text-xs font-bold uppercase text-gray-500">
+                            {l.category} - {l.city}
+                            {l.area ? ` - ${l.area}` : ''}
+                          </p>
+                          <h3 className="mt-1 text-lg font-bold text-gray-900">{l.title}</h3>
+                          <p className="mt-1 flex items-center gap-1 text-sm text-gray-600">
+                            <Users className="h-4 w-4" />
+                            {l.booked_guests}/{l.max_guests ?? 0} guests -{' '}
+                            {l.available_spots ?? 0} spots left - {formatPrice(l.price, 'USD')}
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Link
+                            to={`/guide/listings/${l.id}/edit`}
+                            className="flex items-center gap-1 rounded-full border border-gray-300 px-4 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-100"
+                          >
+                            <Pencil className="h-3 w-3" /> Edit
+                          </Link>
+                          <Link
+                            to={`/guide/listings/${l.id}/propose-change`}
+                            className="flex items-center gap-1 rounded-full bg-amber-50 px-4 py-1.5 text-xs font-bold text-amber-700 hover:bg-amber-100"
+                          >
+                            Propose change
+                          </Link>
+                          <button
+                            onClick={() => remove(l.id)}
+                            className="flex items-center gap-1 rounded-full bg-red-50 px-4 py-1.5 text-xs font-bold text-red-600 hover:bg-red-100"
+                          >
+                            <Trash2 className="h-3 w-3" /> Remove
+                          </button>
+                        </div>
+                      </div>
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <input
+                          type="number"
+                          min={1}
+                          max={100}
+                          placeholder={`Max guests (now ${l.max_guests ?? 0})`}
+                          value={capEdits[l.id] ?? ''}
+                          onChange={(e) =>
+                            setCapEdits((c) => ({ ...c, [l.id]: e.target.value }))
+                          }
+                          className="w-48 rounded-xl border border-gray-300 p-2 text-sm"
+                        />
+                        <button
+                          onClick={() => saveCapacity(l.id)}
+                          className="rounded-full bg-brand-yellow px-4 py-2 text-xs font-bold text-[#213448] hover:bg-[#ffba0a]"
+                        >
+                          Save capacity
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
         )}
 
-        {/* ── Back to Dashboard: TOP (moved from bottom per UI layout update) ── */}
         <Link
           to="/guide/dashboard"
           className="mt-8 inline-block text-sm font-bold text-primary hover:underline"

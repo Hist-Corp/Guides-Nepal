@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Dev seed: create Traveller (traveler) + Guide test accounts for frontend testing.
-Seeds 12 frontend test accounts by default (4 travellers + 8 guides) so every
-catalog guide profile can be connected to a backend guide account.
+"""Dev seed: create Traveller (traveler) + legacy Guide sample accounts.
+Seeds 4 travellers and a handful of non-catalog sample guides. Catalog guide
+accounts are owned by ``seed_frontend_guide_accounts.py`` and are skipped here
+so this script cannot overwrite their names, passwords or approval records.
 Idempotent — upserts by email, so it is safe to re-run.
 
 Usage (from ``backend/``)::
@@ -18,6 +19,8 @@ codebase canonical role is ``traveler`` (American English, see
 canonical ``traveler`` role, which is what the API / frontend expect.
 """
 import os
+import json
+from pathlib import Path
 
 from app.core.database import Base, engine, SessionLocal
 from app.core.roles import GUIDE, TRAVELER
@@ -29,6 +32,28 @@ from app.models.user import User
 # Default passwords meet the backend password policy (min 8, upper, number, special).
 DEFAULT_TRAVELER_PASSWORD = "Traveler@2024"
 DEFAULT_GUIDE_PASSWORD = "Guide@2024"
+
+
+def _catalog_managed_guide_emails() -> set[str]:
+    """Guide accounts owned by the frontend-catalog manifest.
+
+    ``seed_frontend_guide_accounts.py`` is the authoritative seed for every
+    guide travellers can see.  Skipping those emails here keeps this script's
+    legacy sample accounts from overwriting the catalog names, passwords and
+    approval records when the two seeds are run in either order.
+    """
+    manifest = Path(__file__).resolve().parent / "data" / "guide_accounts.json"
+    if not manifest.is_file():
+        return set()
+    try:
+        rows = json.loads(manifest.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return set()
+    return {
+        str(row.get("email", "")).strip().lower()
+        for row in rows
+        if isinstance(row, dict) and row.get("email")
+    }
 
 
 def _password(env_key: str, default: str) -> str:
@@ -157,8 +182,15 @@ def _ensure_guide_application(db, user: User, seed: dict) -> None:
 def main() -> None:
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
+    catalog_managed = _catalog_managed_guide_emails()
     try:
         for u in USERS:
+            if u["role"] == GUIDE and u["email"].lower() in catalog_managed:
+                print(
+                    f"  [SKIP] {u['email']} - managed by "
+                    "seed_frontend_guide_accounts.py"
+                )
+                continue
             valid, msg = validate_password_strength(u["password"])
             if not valid:
                 print(f"  [SKIP] {u['email']} - weak password: {msg}")

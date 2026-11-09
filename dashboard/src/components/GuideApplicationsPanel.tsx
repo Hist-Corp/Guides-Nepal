@@ -133,14 +133,15 @@ export default function GuideApplicationsPanel() {
               <th className="p-3">City</th>
               <th className="p-3">Region</th>
               <th className="p-3">Status</th>
+              <th className="p-3">Account</th>
               <th className="p-3">Actions</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td className="p-4 text-gray-500" colSpan={6}>Loading…</td></tr>
+              <tr><td className="p-4 text-gray-500" colSpan={7}>Loading…</td></tr>
             ) : apps.length === 0 ? (
-              <tr><td className="p-4 text-gray-500" colSpan={6}>No guide applications found</td></tr>
+              <tr><td className="p-4 text-gray-500" colSpan={7}>No guide applications found</td></tr>
             ) : (
               apps.map((a) => (
                 <tr key={a.id} className="border-b last:border-0">
@@ -159,6 +160,19 @@ export default function GuideApplicationsPanel() {
                       }`}
                     >
                       {a.status}
+                    </span>
+                  </td>
+                  <td className="p-3">
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                        a.account_status === "active"
+                          ? "bg-green-100 text-green-700"
+                          : a.account_status === "inactive"
+                          ? "bg-gray-100 text-gray-700"
+                          : "bg-slate-100 text-slate-600"
+                      }`}
+                    >
+                      {a.account_status || "not provisioned"}
                     </span>
                   </td>
                   <td className="p-3 space-x-2">

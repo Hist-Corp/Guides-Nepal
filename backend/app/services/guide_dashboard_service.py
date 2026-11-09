@@ -4,7 +4,9 @@ from typing import List, Optional
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from app.models.booking import HostExperience
 from app.models.guide_listing import GuideListing, GuideProfile, GuideStatusUpdate
+from app.models.host_guide import HostExperienceGuide, HostGuide
 from app.models.user import User
 from app.schemas.guide_dashboard import (
     GuideListingCapacityUpdate,
@@ -39,6 +41,77 @@ def _listing_to_dict(listing: GuideListing) -> dict:
         "booked_guests": listing.booked_guests or 0,
         "available_spots": available,
         "occupancy_pct": occupancy,
+        "source": "owned",
+        "can_edit": True,
+        "can_delete": True,
+        "public_slug": f"guide-{listing.id}",
+    }
+
+
+def _activity_type(raw: Optional[str]) -> str:
+    """Normalise a free-text experience category onto the guide dashboard set."""
+    value = (raw or "").strip().lower()
+    if value in ("trekking", "tour", "specialized"):
+        return value
+    if any(word in value for word in ("trek", "hik", "climb", "summit", "expedition")):
+        return "trekking"
+    if any(word in value for word in ("cook", "food", "workshop", "craft", "class", "pottery")):
+        return "specialized"
+    return "tour"
+
+
+def _assigned_to_dict(
+    assignment: HostExperienceGuide,
+    experience: HostExperience,
+) -> dict:
+    return {
+        "id": 900_000_000 + int(assignment.id),
+        "title": experience.title,
+        "category": _activity_type(experience.category),
+        "city": experience.city,
+        "area": None,
+        "description": experience.description or "",
+        "itinerary": None,
+        "meeting_point": None,
+        "duration": experience.duration,
+        "difficulty": "",
+        "price": float(experience.price or 0.0),
+        "max_guests": None,
+        "is_active": bool(experience.is_active),
+        "booked_guests": 0,
+        "available_spots": None,
+        "occupancy_pct": 0,
+        "source": "assigned",
+        "can_edit": False,
+        "can_delete": False,
+        "assignment_id": assignment.id,
+        "experience_id": 100_000 + int(experience.id),
+        "public_slug": f"host-{experience.slug}" if experience.slug else f"host-{experience.id}",
+        "is_primary": bool(assignment.is_primary),
+        "assigned_at": assignment.created_at.isoformat() if assignment.created_at else None,
+        "managed_by": "Regional Manager",
+    }
+
+
+def _assigned_listing_to_dict(
+    assignment: HostExperienceGuide,
+    listing: GuideListing,
+) -> dict:
+    base = _listing_to_dict(listing)
+    available = max((listing.max_guests or 0) - (listing.booked_guests or 0), 0)
+    return {
+        **base,
+        "id": 900_000_000 + int(assignment.id),
+        "source": "assigned",
+        "can_edit": False,
+        "can_delete": False,
+        "assignment_id": assignment.id,
+        "experience_id": 200_000 + int(listing.id),
+        "public_slug": f"guide-{listing.id}",
+        "is_primary": bool(assignment.is_primary),
+        "available_spots": available,
+        "assigned_at": assignment.created_at.isoformat() if assignment.created_at else None,
+        "managed_by": "Regional Manager",
     }
 
 
@@ -54,6 +127,54 @@ class GuideDashboardService:
             .all()
         )
         return [_listing_to_dict(row) for row in rows]
+
+    def list_assigned_experiences(self, guide_id: int) -> List[dict]:
+        """Experiences a Regional Manager assigned to this guide's catalog profile.
+
+        Assignments live in ``host_experience_guides``.  The target can be a
+        host-owned experience or another guide's published listing, so both are
+        resolved.  The guide dashboard is read-only for these rows: the Regional
+        Manager owns the assignment, and the list recomputes on every request so
+        approvals and withdrawals appear without a second sync job.
+        """
+        link = (
+            self.db.query(HostGuide)
+            .filter(HostGuide.guide_user_id == guide_id, HostGuide.guide_id.isnot(None))
+            .order_by(HostGuide.id.asc())
+            .first()
+        )
+        if link is None:
+            return []
+
+        assignments = (
+            self.db.query(HostExperienceGuide)
+            .filter(HostExperienceGuide.guide_id == link.guide_id)
+            .order_by(HostExperienceGuide.created_at.desc())
+            .all()
+        )
+        out: List[dict] = []
+        for assignment in assignments:
+            experience = self.db.get(HostExperience, assignment.experience_id)
+            if experience is not None:
+                out.append(_assigned_to_dict(assignment, experience))
+                continue
+
+            # Guide-listing approvals store ``200000 + guide_listings.id`` in
+            # the shared assignment column (host experiences use their raw id).
+            raw_experience_id = int(assignment.experience_id)
+            listing_id = (
+                raw_experience_id - 200_000
+                if raw_experience_id >= 200_000
+                else raw_experience_id
+            )
+            listing = self.db.get(GuideListing, listing_id)
+            if listing is not None and listing.guide_user_id != guide_id:
+                out.append(_assigned_listing_to_dict(assignment, listing))
+        return out
+
+    def list_all_listings(self, guide_id: int) -> List[dict]:
+        """Owned + assigned experiences, used by My Listings and the dashboard."""
+        return [*self.list_listings(guide_id), *self.list_assigned_experiences(guide_id)]
 
     def create_listing(self, guide: User, payload: GuideListingCreate) -> dict:
         listing = GuideListing(guide_user_id=guide.id, **payload.model_dump())

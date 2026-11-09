@@ -5,6 +5,8 @@ by :func:`app.core.dependencies.require_role` and scoped to the authenticated
 user id.  ``guide`` is *not* in ``SELF_REGISTERABLE_ROLES``, so the only ways to
 obtain one are ``backend/seed_credentials.py`` or an admin role reassignment.
 """
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
@@ -22,7 +24,6 @@ from app.schemas.guide_dashboard import (
     GuideStatusCreate,
     GuideExperienceRequestCreate,
     GuideExperienceRequestResponse,
-    GuideExperienceRequestReview,
 )
 from app.services.guide_dashboard_service import GuideDashboardService
 from app.api.v1.public import (
@@ -182,12 +183,14 @@ def guide_decide_booking(
 def guide_dashboard(guide: User = Depends(GUIDE_ONLY), db: Session = Depends(get_db)) -> dict:
     """Aggregated dashboard payload: profile + listings + bookings + capacity."""
     service = GuideDashboardService(db)
-    listings = service.list_listings(int(guide.id))
+    listings = service.list_all_listings(int(guide.id))
+    owned_listings = [item for item in listings if item.get("source") == "owned"]
+    assigned_listings = [item for item in listings if item.get("source") == "assigned"]
     rows = db.query(Booking).filter(Booking.guide_user_id == guide.id).all()
     upcoming = sum(1 for b in rows if str(getattr(b.status, "value", b.status)) in {"upcoming", "accepted"})
     total_guests = sum(int(b.guests or 0) for b in rows)
-    total_capacity = sum(int(item["max_guests"] or 0) for item in listings)
-    booked_capacity = sum(int(item["booked_guests"] or 0) for item in listings)
+    total_capacity = sum(int(item["max_guests"] or 0) for item in owned_listings)
+    booked_capacity = sum(int(item["booked_guests"] or 0) for item in owned_listings)
     return {
         "guide": {
             "id": guide.id,
@@ -198,6 +201,8 @@ def guide_dashboard(guide: User = Depends(GUIDE_ONLY), db: Session = Depends(get
         },
         "stats": {
             "listings": len(listings),
+            "owned_listings": len(owned_listings),
+            "assigned_listings": len(assigned_listings),
             "upcoming_bookings": upcoming,
             "total_guests": total_guests,
             "total_capacity": total_capacity,
@@ -224,7 +229,8 @@ def guide_save_onboarding(
 
 @router.get("/listings")
 def guide_list_listings(guide: User = Depends(GUIDE_ONLY), db: Session = Depends(get_db)) -> list:
-    return GuideDashboardService(db).list_listings(int(guide.id))
+    """The guide's own listings plus Regional-Manager assignments (read-only)."""
+    return GuideDashboardService(db).list_all_listings(int(guide.id))
 
 
 @router.post("/listings", status_code=201)

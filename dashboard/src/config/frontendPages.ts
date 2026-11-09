@@ -37,7 +37,7 @@ export const FRONTEND_PAGES: FrontendPage[] = [
   { title: "Bharatpur Experiences", path: "/city/bharatpur/experiences", slug: "bharatpur-experiences", category: "Cities", description: "Experiences in Bharatpur.", icon: "📋" },
   { title: "Bharatpur Experience", path: "/city/bharatpur/experience/:slug", slug: "bharatpur-experience", category: "Cities", description: "Bharatpur experience detail.", icon: "📍" },
   { title: "City", path: "/city/:cityId", slug: "city", category: "Cities", description: "Generic city index page.", icon: "🗺️" },
-  { title: "Local Profile", path: "/local/:id", slug: "local-profile", category: "Guides", description: "Profile of a local guide.", icon: "👤" },
+  { title: "Local Profile", path: "/guidesprofile/:slug", slug: "local-profile", category: "Guides", description: "Slug-based profile of a local guide.", icon: "👤" },
   { title: "About Us", path: "/about", slug: "about", category: "Company", description: "Company story, mission and values.", icon: "🏢" },
   { title: "Contact Us", path: "/contact", slug: "contact", category: "Company", description: "Contact details and message form.", icon: "✉️" },
 ];

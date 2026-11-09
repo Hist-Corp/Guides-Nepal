@@ -16,7 +16,6 @@ row then works on the Host Dashboard and the Host Frontend.
 
 import hashlib
 import json
-import secrets
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
@@ -34,7 +33,7 @@ from app.core.security import get_password_hash, validate_password_strength
 from app.models.booking import Booking, HostExperience
 from app.models.guide import Guide
 from app.models.guide_application import GuideApplication
-from app.models.guide_listing import GuideExperienceRequest, GuideListing
+from app.models.guide_listing import GuideExperienceRequest, GuideListing, GuideProfile
 from app.models.host_application import HostApplication
 from app.models.host_guide import HostExperienceGuide, HostGuide
 from app.models.support_ticket import SupportTicket
@@ -42,7 +41,6 @@ from app.models.user import User
 from app.api.v1.public import resolve_experience_reference
 from app.schemas.guide_dashboard import (
     GuideExperienceRequestReview,
-    GuideExperienceRequestResponse,
 )
 
 router = APIRouter()
@@ -269,6 +267,172 @@ def _provision_guide_user(db: Session, app: GuideApplication) -> User:
     return user
 
 
+def _application_details(app: GuideApplication) -> dict:
+    """Decode the free-form application details blob without trusting it."""
+    try:
+        details = json.loads(app.details_json or "{}")
+    except (TypeError, json.JSONDecodeError):
+        return {}
+    return details if isinstance(details, dict) else {}
+
+
+def _profile_for_approved_guide(
+    db: Session,
+    app: GuideApplication,
+    guide_user: User,
+    details: dict,
+) -> Guide:
+    """Resolve the public catalog row this approved guide owns.
+
+    Accounts created from the frontend catalog carry the catalog id/name in
+    ``details_json``.  Unique names can reuse an existing backend profile;
+    duplicate names (two "Apicha" or "Sita" entries) must use their own row so
+    one account can never take over the other guide's assignments.
+    """
+    catalog_id = details.get("catalog_guide_id")
+    try:
+        catalog_id = int(catalog_id) if catalog_id is not None else None
+    except (TypeError, ValueError):
+        catalog_id = None
+
+    catalog_name = str(
+        details.get("catalog_guide_name") or app.full_name or guide_user.email or "Guide"
+    ).strip()
+    name_is_unique = bool(details.get("catalog_name_is_unique", True))
+
+    profile = None
+    if catalog_id is not None:
+        candidate = db.get(Guide, catalog_id)
+        if candidate is not None and candidate.name == catalog_name:
+            profile = candidate
+    if profile is None and name_is_unique:
+        profile = (
+            db.query(Guide)
+            .filter(Guide.name == catalog_name)
+            .order_by(Guide.id.asc())
+            .first()
+        )
+
+    if profile is None:
+        now = datetime.now(timezone.utc)
+        image = str(details.get("image") or "/images/placeholder.svg")
+        profile = Guide(
+            name=catalog_name,
+            image=image,
+            role=str(details.get("role") or "Experience Guide"),
+            rating=float(details.get("rating") or 4.8),
+            reviews=int(details.get("reviews") or 0),
+            bio=str(details.get("bio") or guide_user.bio or ""),
+            languages=list(details.get("languages") or ["English", "Nepali"]),
+            verified=True,
+            lives_in=details.get("city") or guide_user.region,
+            cities=list(details.get("cities") or ([guide_user.region] if guide_user.region else [])),
+            gallery=[image],
+            is_active=True,
+            created_at=now,
+            updated_at=now,
+        )
+        # A duplicate-name guide (e.g. the second Apicha/Sita) keeps the
+        # frontend catalog id so links and assignments stay unambiguous.  Only
+        # use it when that exact row id is still free.
+        if catalog_id is not None and db.get(Guide, catalog_id) is None:
+            profile.id = catalog_id
+        db.add(profile)
+        db.flush()
+    else:
+        profile.verified = True
+        profile.is_active = True
+        if not profile.image:
+            profile.image = str(details.get("image") or "/images/placeholder.svg")
+
+    return profile
+
+
+def _activate_guide_account(
+    db: Session,
+    app: GuideApplication,
+    guide_user: User,
+    reviewer: Optional[User],
+) -> Guide:
+    """Make an approved application usable across the guide experience.
+
+    Approval is more than a status flag: the account needs its public catalog
+    profile, an active host-guide ownership row (used to resolve bookings and
+    dashboard assignments), and an onboarding profile so the guide console has
+    a complete identity.  Every step is idempotent.
+    """
+    details = _application_details(app)
+    guide_user.role = GUIDE
+    guide_user.is_active = True
+    if details.get("region"):
+        guide_user.region = details["region"]
+    if details.get("bio") and not guide_user.bio:
+        guide_user.bio = details["bio"]
+    if details.get("image") and not guide_user.avatar_url:
+        guide_user.avatar_url = details["image"]
+
+    profile = _profile_for_approved_guide(db, app, guide_user, details)
+
+    link = (
+        db.query(HostGuide)
+        .filter(HostGuide.guide_user_id == guide_user.id)
+        .order_by(HostGuide.id.asc())
+        .first()
+    )
+    if link is None:
+        link = HostGuide(
+            host_id=reviewer.id if reviewer is not None else guide_user.id,
+            guide_user_id=guide_user.id,
+            guide_id=profile.id,
+            full_name=app.full_name or profile.name,
+            email=guide_user.email,
+            phone=app.phone,
+            city=details.get("city") or app.city,
+            region=details.get("region") or app.region,
+            documents=[],
+            status="active",
+        )
+        db.add(link)
+    else:
+        link.guide_id = profile.id
+        link.status = "active"
+        link.full_name = app.full_name or link.full_name
+        link.email = guide_user.email
+        link.region = details.get("region") or app.region or link.region
+        link.city = details.get("city") or app.city or link.city
+
+    onboarding = (
+        db.query(GuideProfile)
+        .filter(GuideProfile.guide_user_id == guide_user.id)
+        .first()
+    )
+    if onboarding is None:
+        onboarding = GuideProfile(guide_user_id=guide_user.id)
+        db.add(onboarding)
+    onboarding.display_name = onboarding.display_name or app.full_name or profile.name
+    onboarding.cities = onboarding.cities or list(
+        details.get("cities") or profile.cities or []
+    )
+    onboarding.languages = onboarding.languages or list(
+        details.get("languages") or profile.languages or []
+    )
+    onboarding.bio = onboarding.bio or details.get("bio") or profile.bio
+    onboarding.expertise_areas = onboarding.expertise_areas or list(
+        details.get("expertise_areas") or ["tour"]
+    )
+    onboarding.years_experience = onboarding.years_experience or details.get("years_experience")
+    onboarding.default_max_guests = (
+        onboarding.default_max_guests or int(details.get("default_max_guests") or 10)
+    )
+    if details.get("onboarding_completed") is True:
+        onboarding.onboarding_completed = True
+
+    app.user_id = guide_user.id
+    db.commit()
+    db.refresh(profile)
+    return profile
+
+
 class GuideApplicationCreate(BaseModel):
     full_name: str
     email: str
@@ -323,7 +487,7 @@ def list_host_applications(
     apps = query.order_by(HostApplication.created_at.desc()).all()
     return [
         {
-            "id": application.id,
+            "id": a.id,
             "host_name": a.host_name,
             "email": a.email,
             "city": a.city,
@@ -443,11 +607,9 @@ def list_guide_applications(
     apps = query.order_by(GuideApplication.created_at.desc()).all()
     results = []
     for application in apps:
-        try:
-            details = json.loads(application.details_json or "{}")
-        except (TypeError, json.JSONDecodeError):
-            details = {}
+        details = _application_details(application)
         files = details.get("files", {}) if isinstance(details, dict) else {}
+        account = db.get(User, application.user_id) if application.user_id else None
         results.append({
             "id": application.id,
             "full_name": application.full_name,
@@ -463,6 +625,12 @@ def list_guide_applications(
                 if isinstance(item, dict)
             ],
             "status": application.status,
+            "user_id": application.user_id,
+            "account_status": (
+                "active" if account and account.is_active else "inactive" if account else "not provisioned"
+            ),
+            "catalog_guide_id": details.get("catalog_guide_id"),
+            "reviewed_by": application.reviewed_by,
             "created_at": application.created_at.isoformat() if application.created_at else None,
         })
     return results
@@ -592,12 +760,22 @@ def review_guide_application(
         # Approval is the single moment the login account is minted and
         # activated. Before this, the applicant has no usable credentials.
         user = _provision_guide_user(db, app)
+        if user is not None:
+            _activate_guide_account(db, app, user, current_user)
+    elif app.user_id is not None:
+        # Re-opening or rejecting an application must also close the door on
+        # the linked account; otherwise a previously approved guide could keep
+        # signing in after their approval was withdrawn.
+        linked_user = db.get(User, app.user_id)
+        if linked_user is not None:
+            linked_user.is_active = False
     db.commit()
     return {
         "id": app.id,
         "status": app.status,
         "login_email": user.email if user else None,
         "user_id": user.id if user else app.user_id,
+        "catalog_guide_id": _application_details(app).get("catalog_guide_id"),
     }
 
 

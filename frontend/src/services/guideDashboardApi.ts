@@ -73,11 +73,21 @@ export interface GuideListing {
   duration: string;
   difficulty: string;
   price: number;
-  max_guests: number;
+  max_guests: number | null;
   is_active: boolean;
   booked_guests: number;
-  available_spots: number;
+  available_spots: number | null;
   occupancy_pct: number;
+  /** "owned" rows are editable here; "assigned" rows come from a Regional Manager. */
+  source?: 'owned' | 'assigned';
+  can_edit?: boolean;
+  can_delete?: boolean;
+  assignment_id?: number;
+  experience_id?: number;
+  public_slug?: string;
+  is_primary?: boolean;
+  assigned_at?: string | null;
+  managed_by?: string;
 }
 
 export interface GuideStatusItem {
@@ -109,6 +119,8 @@ export interface GuideDashboardPayload {
   guide: { id: number; email: string; firstName?: string; lastName?: string; role: string };
   stats: {
     listings: number;
+    owned_listings?: number;
+    assigned_listings?: number;
     upcoming_bookings: number;
     total_guests: number;
     total_capacity: number;

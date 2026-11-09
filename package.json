@@ -36,6 +36,7 @@
     "typecheck:dashboard": "npm run typecheck --workspace=dashboard",
     "typecheck:backend": "node scripts/run-py.js -m mypy app",
     "setup": "node scripts/setup.js",
+    "sync:guide-docs": "node scripts/export-frontend-guides.mjs && cd backend && python sync_guide_credentials_readme.py",
     "db:migrate": "node scripts/run-py.js -m alembic upgrade head",
     "db:downgrade": "node scripts/run-py.js -m alembic downgrade -1",
     "checks:backend": "npm run lint:backend && npm run typecheck:backend && npm run test:backend",

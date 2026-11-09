@@ -100,7 +100,8 @@ const GuideDashboardPage: React.FC = () => {
 
   const stats = data?.stats;
   const cards = [
-    { label: 'Live listings', value: stats?.listings ?? 0 },
+    { label: 'Experience listings', value: stats?.listings ?? 0 },
+    { label: 'Assigned experiences', value: stats?.assigned_listings ?? 0 },
     { label: 'Upcoming bookings', value: stats?.upcoming_bookings ?? 0 },
     { label: 'Guests booked', value: stats?.total_guests ?? 0 },
     { label: 'Spots left', value: stats?.available_spots ?? 0 },
@@ -129,7 +130,7 @@ const GuideDashboardPage: React.FC = () => {
           <p className="mt-8 rounded-xl border border-red-200 bg-red-50 p-4 text-red-600">{error}</p>
         ) : (
           <>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
               {cards.map((c) => (
                 <div key={c.label} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
                   <p className="text-3xl font-bold text-gray-900">{c.value}</p>
@@ -198,7 +199,7 @@ const GuideDashboardPage: React.FC = () => {
 
             <section className="mt-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between">
-                <h2 className="flex items-center gap-2 text-xl font-bold text-gray-900"><Compass className="h-5 w-5" /> Your listings and capacity</h2>
+                <h2 className="flex items-center gap-2 text-xl font-bold text-gray-900"><Compass className="h-5 w-5" /> Your experiences and capacity</h2>
                 <Link to="/guide/listings" className="text-sm font-bold text-primary hover:underline">Manage all</Link>
               </div>
               {(data?.listings ?? []).length === 0 ? (
@@ -207,12 +208,29 @@ const GuideDashboardPage: React.FC = () => {
                 <div className="mt-4 grid gap-4 md:grid-cols-2">
                   {(data?.listings ?? []).slice(0, 4).map((l) => (
                     <div key={l.id} className="rounded-xl border border-gray-100 p-4">
-                      <p className="text-xs font-bold uppercase text-gray-500">{l.category} - {l.city}</p>
-                      <h3 className="mt-1 font-bold text-gray-900">{l.title}</h3>
-                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-100">
-                        <div className="h-full rounded-full bg-brand-yellow" style={{ width: `${Math.min(l.occupancy_pct, 100)}%` }} />
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="text-xs font-bold uppercase text-gray-500">{l.category} - {l.city}</p>
+                          <h3 className="mt-1 font-bold text-gray-900">{l.title}</h3>
+                        </div>
+                        {l.source === 'assigned' && (
+                          <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700">
+                            Assigned
+                          </span>
+                        )}
                       </div>
-                      <p className="mt-2 text-sm text-gray-600">{l.booked_guests}/{l.max_guests} guests - {l.available_spots} left</p>
+                      {l.source === 'assigned' ? (
+                        <p className="mt-2 text-sm text-gray-600">
+                          Approved by your Regional Manager. Manage it from My listings.
+                        </p>
+                      ) : (
+                        <>
+                          <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-100">
+                            <div className="h-full rounded-full bg-brand-yellow" style={{ width: `${Math.min(l.occupancy_pct, 100)}%` }} />
+                          </div>
+                          <p className="mt-2 text-sm text-gray-600">{l.booked_guests}/{l.max_guests ?? 0} guests - {l.available_spots ?? 0} left</p>
+                        </>
+                      )}
                     </div>
                   ))}
                 </div>

@@ -161,28 +161,29 @@ The system comes with the following pre-configured users for development and tes
 The first five appear in the dashboard role dropdown and land on their console. The guide
 and traveler accounts are seeded for public-frontend/API testing only.
 
+Every catalog guide account is a seed account. See
+[Seed Guide Accounts](#seed-guide-accounts-all-public-guides) for their emails,
+regions, passwords and approving Regional Heads.
+
 Run `python seed_credentials.py` from `backend/` to create or reset the staff/console
-accounts, or `python seed_traveler_guide.py` to create or reset just the traveler +
-guide test accounts. Both scripts are idempotent — they upsert by email, so they are
-safe to re-run.
+accounts, `python seed_traveler_guide.py` for the traveller test accounts, or
+`python seed_frontend_guide_accounts.py` for every catalog guide seed account.
+All are idempotent — they upsert by email, so they are safe to re-run.
 
 > **⚠️ Security Notice:** These are development-only credentials. Always change default passwords before deploying to production. For security, these credentials are stored in `backend/.env` and should never be committed to version control.
 
 ### Regional Head & Guide Assignments
 
-Each Regional Head manages guide applications for their assigned province. The 8 seeded guides are distributed across the 7 Nepal provinces:
+Each Regional Head manages guide applications for their assigned province. Every
+catalog guide is linked to the Regional Head for the guide's province in the
+generated credential table above (Bagmati → `regional-3@`, Gandaki →
+`regional-4@`, Koshi → `regional-1@`; the other provinces currently have no
+frontend-visible guides).
 
-| Regional Head | Region | Assigned Guides |
-|---------------|--------|-----------------|
-| `regional-1@guides-nepal.com` | Koshi Province | `guide@guides-nepal.com`, `guide8@guides-nepal.com` |
-| `regional-2@guides-nepal.com` | Madhesh Province | `guide2@guides-nepal.com` |
-| `regional-3@guides-nepal.com` | Bagmati Province | `guide3@guides-nepal.com` |
-| `regional-4@guides-nepal.com` | Gandaki Province | `guide4@guides-nepal.com` |
-| `regional-5@guides-nepal.com` | Lumbini Province | `guide5@guides-nepal.com` |
-| `regional-6@guides-nepal.com` | Karnali Province | `guide6@guides-nepal.com` |
-| `regional-7@guides-nepal.com` | Sudurpashchim Province | `guide7@guides-nepal.com` |
-
-To approve guide applications, sign in as a Regional Head at `http://localhost:5176` and navigate to `/regional-head/applications`.
+To review or approve a guide, sign in as that Regional Head at
+`http://localhost:5176` and open **Guide Applications & Reviews**
+(`/dashboard/regional-head/experiences`). Approval also activates the linked
+login account, catalog profile, onboarding profile and host-guide assignment.
 
 ### Experience Guide Assignments
 
@@ -200,9 +201,9 @@ These assignments are created via the `host_experience_guides` table linking `Gu
 
 ### Traveller & Guide Test Credentials (public frontend)
 
-Twelve frontend test accounts are seeded (4 travellers + 8 guides) so every
-catalog guide profile is connected to a backend guide account. Test the booking
-flow end-to-end between any traveller and any guide:
+Four traveller test accounts are seeded for the booking flow. Every guide in the
+frontend catalog has a backend account in the generated table below; test the
+booking flow end-to-end between any traveller and any guide.
 
 > **Spelling note:** "Traveller" (British English) maps to the codebase role
 > `traveler` (American English, see `backend/app/core/roles.py`).
@@ -213,23 +214,94 @@ flow end-to-end between any traveller and any guide:
 | Traveller (`traveler`) | `traveler2@guides-nepal.com` | `Traveler2@2024` | Public frontend login (`http://localhost:5175`, Login modal → Traveller tab) or `POST /api/v1/auth/login` |
 | Traveller (`traveler`) | `traveler3@guides-nepal.com` | `Traveler3@2024` | Public frontend login (`http://localhost:5175`, Login modal → Traveller tab) or `POST /api/v1/auth/login` |
 | Traveller (`traveler`) | `traveler4@guides-nepal.com` | `Traveler4@2024` | Public frontend login (`http://localhost:5175`, Login modal → Traveller tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `anita@guides-nepal.com` | `Anita@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `kiran@guides-nepal.com` | `Kiran@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `sujal@guides-nepal.com` | `Sujal@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `priya@guides-nepal.com` | `Priya@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `naturist@guides-nepal.com` | `Naturist@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `adventurer@guides-nepal.com` | `Adventurer@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `safari@guides-nepal.com` | `Safari@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
-| Guide (`guide`) | `kathmandu@guides-nepal.com` | `Kathmandu@2024` | Public frontend login (`http://localhost:5175`, Login modal → Guide tab) or `POST /api/v1/auth/login` |
+
+<!-- GUIDE-ACCOUNT-CREDENTIALS:START -->
+### Seed Guide Accounts (all public guides)
+
+These seed accounts cover every guide currently visible in the frontend
+catalog. The seed marks the already-published guides as approved by the
+Regional Head for their province; use `--pending` to seed them into the
+review queue instead.
+
+```bash
+cd backend
+python seed_frontend_guide_accounts.py
+# or, to test the Regional Head approval queue:
+python seed_frontend_guide_accounts.py --pending
+```
+
+| Catalog ID | Guide | Region | Email (username) | Password | Approved by |
+|-----------:|-------|--------|------------------|----------|-------------|
+| 1 | Apicha | Bagmati Province | `guide@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 2 | Sujal | Bagmati Province | `sujal@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 3 | Priya | Bagmati Province | `priya@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 4 | Rohan | Bagmati Province | `guide6@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 39 | Kung | Bagmati Province | `kung@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 54 | Apicha | Bagmati Province | `apicha-54@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 57 | Jojo | Gandaki Province | `jojo@guides-nepal.com` | `Guide@2024` | regional-4@guides-nepal.com |
+| 156 | Mingma | Gandaki Province | `guide7@guides-nepal.com` | `Guide@2024` | regional-4@guides-nepal.com |
+| 178 | Ang | Gandaki Province | `ang@guides-nepal.com` | `Guide@2024` | regional-4@guides-nepal.com |
+| 195 | Chef Jekky | Bagmati Province | `chef-jekky@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 198 | Dorje | Bagmati Province | `dorje@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 199 | Wasana | Bagmati Province | `wasana@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 203 | Pasang | Gandaki Province | `pasang@guides-nepal.com` | `Guide@2024` | regional-4@guides-nepal.com |
+| 210 | Sammy | Bagmati Province | `sammy@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 267 | Tashi | Bagmati Province | `tashi@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 287 | Pema | Gandaki Province | `pema@guides-nepal.com` | `Guide@2024` | regional-4@guides-nepal.com |
+| 321 | Nima | Bagmati Province | `nima@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 342 | Tenzin | Koshi Province | `tenzin@guides-nepal.com` | `Guide@2024` | regional-1@guides-nepal.com |
+| 420 | Araya | Bagmati Province | `araya@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 445 | Lhakpa | Gandaki Province | `guide2@guides-nepal.com` | `Guide@2024` | regional-4@guides-nepal.com |
+| 814 | Artty | Bagmati Province | `artty@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 933 | Zarut | Bagmati Province | `zarut@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 1001 | Sita | Bagmati Province | `sita-1001@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 1002 | Chef Sita | Bagmati Province | `chef-sita@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 1003 | Maya | Gandaki Province | `maya@guides-nepal.com` | `Guide@2024` | regional-4@guides-nepal.com |
+| 1004 | Raju | Bagmati Province | `raju@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 1005 | Bikash | Gandaki Province | `bikash@guides-nepal.com` | `Guide@2024` | regional-4@guides-nepal.com |
+| 1006 | Anita | Bagmati Province | `anita@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 1007 | Tuangtip | Bagmati Province | `tuangtip@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9001 | Krishna | Bagmati Province | `krishna@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9002 | Radha | Bagmati Province | `radha@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9003 | Prakash | Bagmati Province | `prakash@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9004 | Laxmi | Bagmati Province | `laxmi@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9005 | Ram | Bagmati Province | `ram@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9006 | Sita | Bagmati Province | `sita-9006@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9007 | Bishnu | Bagmati Province | `bishnu@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9008 | Kumar | Bagmati Province | `kumar@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9009 | Ramesh | Bagmati Province | `ramesh@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9010 | Pandit | Bagmati Province | `pandit@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9011 | Piyawee | Bagmati Province | `piyawee@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9012 | Nok | Bagmati Province | `nok@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9013 | Hnoi | Bagmati Province | `hnoi@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9014 | Natcha | Bagmati Province | `natcha@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9015 | Nakarin | Bagmati Province | `nakarin@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9016 | Agrindra | Bagmati Province | `agrindra@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+| 9017 | Sudarat | Bagmati Province | `sudarat@guides-nepal.com` | `Guide@2024` | regional-3@guides-nepal.com |
+
+Sign in at `http://localhost:5175` → **Log in** → **Guide** tab, or call
+`POST /api/v1/auth/login`. A guide can only sign in while their linked
+`guide_applications` row is `approved`.
+<!-- GUIDE-ACCOUNT-CREDENTIALS:END -->
 
 **Create / reset them:**
 
 ```bash
 cd backend
 python seed_traveler_guide.py
+python seed_frontend_guide_accounts.py
 ```
 
-Override any password via environment variables, e.g. `SEED_GUIDE2_PASSWORD=New@2024 python seed_traveler_guide.py`.
+`seed_frontend_guide_accounts.py` is idempotent and creates/updates one
+approval-backed account for every guide in the frontend catalog. Pass
+`--pending` to leave the new accounts in the Regional Head queue instead of
+approving the already-published guides. Regenerate the account manifest and this
+README table after editing the frontend catalog:
+
+```bash
+node scripts/export-frontend-guides.mjs
+cd backend && python sync_guide_credentials_readme.py
+```
 
 **How to use them:**
 
@@ -274,7 +346,8 @@ This is idempotent (safe to re-run) and creates/updates:
 - **Experience-guide links** (`host_experience_guides`) assigning each listing
   to its catalog guide.
 
-The default mapping is:
+The default mapping is a legacy sample set (the generated table above is the
+authoritative credential list for guides visible on the frontend):
 
 | Guide account | Catalog profile | Catalog id | User id | Sample listings |
 |---------------|-----------------|------------|---------|-----------------|
@@ -292,10 +365,10 @@ tab) and visit `/guide/dashboard` to see stats and `/guide/bookings` to manage
 booking requests assigned to that guide.
 
 **Catalog guide id → backend user id:** the frontend sends the catalog profile
-id from the `guides` table as `guide_id` in the booking request. The backend
-resolves it through `host_guides` (catalog `guide_id` → `guide_user_id`), so a
-traveler who picks "Priya" (catalog id 3) gets their booking assigned to
-`guide_user_id=14` (`guide5@guides-nepal.com`), not to user id 3.
+id as `guide_id` in the booking request. The backend resolves it through
+`host_guides` (catalog `guide_id` → `guide_user_id`), so the booking follows the
+approval-backed account created by `seed_frontend_guide_accounts.py` rather than
+assuming the catalog id is a user id.
 
 ### Guide Dashboard & Onboarding (public frontend)
 
@@ -309,7 +382,7 @@ redirects to `/guide/dashboard`.
 |-------|---------|
 | `/guide/onboarding` | 4-step onboarding wizard: expertise areas → cities/languages → profile + default max-guest capacity → review |
 | `/guide/dashboard` | Post-login home: live stats, booking requests (accept/decline/complete), post real-time updates, capacity overview. Auto-refreshes every 30 s |
-| `/guide/listings` | Manage own listings: edit, remove, and adjust max guest capacity inline |
+| `/guide/listings` | My Listings: edit/remove own listings and adjust capacity inline; Regional Manager assignments appear automatically as read-only cards (page refreshes every 30 s) |
 | `/guide/listings/new` | Step-by-step listing wizard (create) |
 | `/guide/listings/:id/edit` | Step-by-step listing wizard (edit) |
 | `/guide/bookings` | Full booking request list |
@@ -326,11 +399,18 @@ list and stats re-poll every 30 seconds so new bookings show up live.
 |---------------|---------|
 | `GET /api/v1/guide/dashboard` | Aggregated stats + listings + recent updates |
 | `GET/PUT /api/v1/guide/onboarding` | Load / save onboarding profile |
-| `GET/POST /api/v1/guide/listings` | List / create own listings |
+| `GET/POST /api/v1/guide/listings` | List owned **and assigned** experiences / create own listing |
 | `PATCH/DELETE /api/v1/guide/listings/{id}` | Edit / delete a listing |
 | `PATCH /api/v1/guide/listings/{id}/capacity` | Set `max_guests` or apply `booked_delta` |
 | `GET/POST /api/v1/guide/status`, `DELETE /api/v1/guide/status/{id}` | Manage real-time updates |
 | `PATCH /api/v1/guide/bookings/{id}` | Accept / reject / complete own bookings |
+
+**Assigned experiences:** `GET /api/v1/guide/listings` merges rows from
+`guide_listings` (owned, editable) with `host_experience_guides` (assigned by a
+Regional Manager, read-only). The assigned half is resolved on every request, so
+approving or withdrawing an assignment in the staff dashboard updates My Listings
+without a separate sync job. Assigned rows carry `source: "assigned"`,
+`public_slug`, `is_primary` and `managed_by`.
 
 #### Booking assignment and access control
 
@@ -457,7 +537,7 @@ and host. `guide` and `traveler` accounts have no console and are refused at sig
 - `/explore` - Explore experiences
 - `/search` - Search
 - `/city/:cityId` - City pages (Kathmandu, Pokhara, Lalitpur, Bhaktapur, Bharatpur)
-- `/local/:id` - Local guide profiles
+- `/guidesprofile/:slug` - Local guide profiles
 - `/contact` - Contact page
 - `/faq` - FAQ
 
