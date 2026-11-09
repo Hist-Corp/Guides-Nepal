@@ -131,7 +131,7 @@ const HostBookingsPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Header />
       <main className="flex-grow container mx-auto max-w-6xl px-4 py-8">
-        <PageBackButton />
+        <PageBackButton fallback="/host/dashboard" />
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Bookings</h1>
           <p className="mt-1 text-gray-600 text-sm">

@@ -64,3 +64,35 @@ class HostBookingResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class HostEarningsSummary(BaseModel):
+    total_earnings: float
+    pending_earnings: float
+    completed_bookings: int
+    upcoming_bookings: int
+    revenue_this_month: float
+
+
+class EarningsSummaryDetail(BaseModel):
+    total_earnings: float
+    this_period: float
+    best_day: dict
+    avg_per_booking: float
+    by_experience: list
+
+
+class Payout(BaseModel):
+    id: str
+    date: str
+    amount: float
+    status: Literal["completed", "processing", "scheduled", "failed"]
+    items: int
+    method: str
+
+    class Config:
+        from_attributes = True
+
+
+class PayoutRequest(BaseModel):
+    amount: float

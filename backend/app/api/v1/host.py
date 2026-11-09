@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import re
+from collections import defaultdict
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
@@ -9,12 +11,16 @@ from app.core.security import get_user_id_from_token
 from app.models.booking import HostBooking, HostExperience, HostTour
 from app.models.user import User
 from app.schemas.host import (
+    EarningsSummaryDetail,
     HostBookingCreate,
     HostBookingResponse,
+    HostEarningsSummary,
     HostExperienceCreate,
     HostExperienceResponse,
     HostTourCreate,
     HostTourResponse,
+    Payout,
+    PayoutRequest,
 )
 
 router = APIRouter(prefix="/host", tags=["host"])
@@ -224,7 +230,7 @@ def create_host_booking(
     booking = HostBooking(
         host_id=host.id,
         total_price=round(experience.price * payload.guests, 2),
-        **payload.model_dump()
+        **payload.model_dump(),
     )
     db.add(booking)
     db.commit()
@@ -254,3 +260,84 @@ def decide_host_booking(
     booking.status = status
     db.commit()
     return {"status": status}
+
+
+@router.get("/earnings", response_model=HostEarningsSummary)
+def get_host_earnings(
+    db: Session = Depends(get_db), host: User = Depends(current_host)
+):
+    bookings = db.query(HostBooking).filter(HostBooking.host_id == host.id).all()
+    now = datetime.now(UTC)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    completed = [b for b in bookings if b.status == "completed"]
+    upcoming = [b for b in bookings if b.status in ("upcoming", "accepted")]
+    pending = [b for b in bookings if b.status == "pending"]
+
+    total_earnings = round(sum(b.total_price for b in completed), 2)
+    pending_earnings = round(sum(b.total_price for b in pending), 2)
+    revenue_this_month = round(
+        sum(b.total_price for b in completed if b.created_at >= month_start), 2
+    )
+
+    return {
+        "total_earnings": total_earnings,
+        "pending_earnings": pending_earnings,
+        "completed_bookings": len(completed),
+        "upcoming_bookings": len(upcoming),
+        "revenue_this_month": revenue_this_month,
+    }
+
+
+@router.get("/earnings/summary", response_model=EarningsSummaryDetail)
+def get_host_earnings_summary(
+    db: Session = Depends(get_db), host: User = Depends(current_host)
+):
+    bookings = db.query(HostBooking).filter(HostBooking.host_id == host.id).all()
+    completed = [b for b in bookings if b.status == "completed"]
+    total_earnings = round(sum(b.total_price for b in completed), 2)
+
+    by_experience = defaultdict(float)
+    for b in completed:
+        by_experience[b.experience_title] += b.total_price
+
+    best_day = max(by_experience.items(), key=lambda x: x[1], default=("", 0))
+
+    return {
+        "total_earnings": total_earnings,
+        "this_period": total_earnings,
+        "best_day": {"date": best_day[0] or "—", "amount": round(best_day[1], 2)},
+        "avg_per_booking": (
+            round(total_earnings / len(completed), 2) if completed else 0
+        ),
+        "by_experience": [
+            {"label": k, "value": round(v, 2), "display": f"${round(v, 2)}"}
+            for k, v in by_experience.items()
+        ],
+    }
+
+
+@router.get("/payouts", response_model=list[Payout])
+def list_host_payouts(
+    db: Session = Depends(get_db), host: User = Depends(current_host)
+):
+    # No persistent payout table yet; return an empty list so the frontend
+    # renders the payouts section gracefully until a payout model is added.
+    return []
+
+
+@router.post("/payouts", response_model=Payout, status_code=201)
+def request_host_payout(
+    payload: PayoutRequest,
+    db: Session = Depends(get_db),
+    host: User = Depends(current_host),
+):
+    # No persistent payout table yet; echo back a pending payout record.
+    return {
+        "id": f"PO-{host.id}-{int(datetime.now(UTC).timestamp())}",
+        "date": datetime.now(UTC).strftime("%Y-%m-%d"),
+        "amount": payload.amount,
+        "status": "pending",
+        "items": 0,
+        "method": "bank_transfer",
+    }

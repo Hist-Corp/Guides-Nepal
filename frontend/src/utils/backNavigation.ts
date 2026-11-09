@@ -73,7 +73,8 @@ const registeredRoutes: string[] = [
   '/help',
   '/hosting',
   '/community',
-  '/host',
+  // '/host' is intentionally NOT a registered route (no page component at /host);
+  // it is only a URL segment prefix. Dashboards live at /host/dashboard etc.
   '/careers',
 ];
 
@@ -96,7 +97,9 @@ const loadStack = () => {
     const raw = window.sessionStorage.getItem(STORAGE_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
     if (Array.isArray(parsed)) {
-      stack = parsed.filter((entry): entry is string => typeof entry === 'string').slice(-MAX_ENTRIES);
+      stack = parsed
+        .filter((entry): entry is string => typeof entry === 'string')
+        .slice(-MAX_ENTRIES);
     }
   } catch {
     stack = [];
@@ -174,12 +177,13 @@ export const recordNavigation = (pathname: string, action: NavigationAction) => 
  * back to the nearest parent page, then the homepage, when this page is the
  * first one visited in the tab.
  */
-export const goBack = (navigate: NavigateFunction) => {
+export const goBack = (navigate: NavigateFunction, fallback = '/') => {
   loadStack();
 
   const current = window.location.pathname;
   const previous = stack.length >= 2 ? stack[stack.length - 2] : undefined;
-  const target = previous && previous !== current ? previous : (resolveBackTarget(current) ?? '/');
+  const target =
+    previous && previous !== current ? previous : (resolveBackTarget(current) ?? fallback);
 
   if (!target || target === current) return;
 
@@ -188,9 +192,9 @@ export const goBack = (navigate: NavigateFunction) => {
 };
 
 /** Hook wrapper around `goBack` for back-button onClick handlers. */
-export const useGoBack = (): (() => void) => {
+export const useGoBack = (fallback = '/'): (() => void) => {
   const navigate = useNavigate();
-  return useCallback(() => goBack(navigate), [navigate]);
+  return useCallback(() => goBack(navigate, fallback), [navigate, fallback]);
 };
 
 /** Test-only: clears the trail and any pending back transition. */

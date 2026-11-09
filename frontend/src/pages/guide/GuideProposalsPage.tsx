@@ -25,6 +25,7 @@ const GuideProposalsPage: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!accessToken || user?.role !== 'guide') return;
     setLoading(true);
@@ -39,8 +40,8 @@ const GuideProposalsPage: React.FC = () => {
       })
       .catch((e) => setError(e instanceof Error ? e.message : 'Unable to load workflow items.'))
       .finally(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken, user?.role]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!isAuthenticated) return <Navigate to="/" replace />;
   if (user?.role !== 'guide') return <Navigate to="/bookings" replace />;
@@ -83,7 +84,9 @@ const GuideProposalsPage: React.FC = () => {
         {loading ? (
           <p className="mt-8 text-gray-500">Loading...</p>
         ) : error ? (
-          <p className="mt-8 rounded-xl border border-red-200 bg-red-50 p-4 text-red-600">{error}</p>
+          <p className="mt-8 rounded-xl border border-red-200 bg-red-50 p-4 text-red-600">
+            {error}
+          </p>
         ) : tab === 'proposals' ? (
           proposals.length === 0 ? (
             <div className="mt-8 rounded-2xl border border-gray-100 bg-white p-10 text-center text-gray-500">
@@ -151,7 +154,10 @@ const GuideProposalsPage: React.FC = () => {
           </div>
         )}
 
-        <Link to="/guide/dashboard" className="mt-8 inline-block text-sm font-bold text-primary hover:underline">
+        <Link
+          to="/guide/dashboard"
+          className="mt-8 inline-block text-sm font-bold text-primary hover:underline"
+        >
           Back to dashboard
         </Link>
       </main>
@@ -161,4 +167,3 @@ const GuideProposalsPage: React.FC = () => {
 };
 
 export default GuideProposalsPage;
-

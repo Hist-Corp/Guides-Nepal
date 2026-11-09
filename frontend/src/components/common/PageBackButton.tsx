@@ -8,18 +8,23 @@ interface PageBackButtonProps {
   label?: string;
   /** Extra classes for the wrapper (e.g. a narrower container). */
   className?: string;
+  /** Fallback route when there is no navigation history (defaults to "/"). */
+  fallback?: string;
 }
 
 /**
  * Back button for standalone pages such as the footer destinations and static
  * content pages. It uses the shared navigation trail, so it returns to the
- * page the user came from instead of blindly rewinding browser history.
+ * page the user came from instead of blindly rewinding browser history. When
+ * there is no history (direct link access), it falls back to `fallback` (or
+ * "/" by default) so the button is never left dangling.
  */
 export const PageBackButton: React.FC<PageBackButtonProps> = ({
   label = 'Back',
   className,
+  fallback = '/',
 }) => {
-  const goBack = useGoBack();
+  const goBack = useGoBack(fallback);
   return (
     <div className={cn('container mx-auto px-4 pt-6', className)}>
       <button
