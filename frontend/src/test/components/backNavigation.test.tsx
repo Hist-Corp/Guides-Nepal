@@ -74,7 +74,6 @@ describe('resolveBackTarget', () => {
   });
 
   it('resolves local profile sub-pages to the profile page', () => {
-    expect(resolveBackTarget('/local/42/portfolio')).toBe('/local/42');
     expect(resolveBackTarget('/local/42/contact')).toBe('/local/42');
   });
 

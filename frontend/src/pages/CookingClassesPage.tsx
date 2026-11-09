@@ -16,63 +16,74 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useGoBack } from '../utils/backNavigation';
 import { Price } from '../components/common/Price';
+import { allGuides } from '../data/guidesData';
 
 const cookingClassLocals = [
   {
+    id: 1002,
     name: 'Chef Sita',
     title: 'Traditional Newari Cooking Expert',
     reviews: 892,
     languages: 'English・Nepali',
   },
   {
+    id: 420,
     name: 'Araya',
     title: 'The Culinary and Culture Admirer',
     reviews: 420,
     languages: 'English・French・Nepali',
   },
   {
+    id: 195,
     name: 'Chef Jekky',
     title: 'Chef Jekky and The Team',
     reviews: 195,
     languages: 'English・French・Nepali',
   },
   {
+    id: 199,
     name: 'Wasana',
     title: 'The Food Maniac & Nepali Cooking Class',
     reviews: 199,
     languages: 'English・Nepali',
   },
   {
+    id: 1003,
     name: 'Maya',
     title: 'Organic Farm to Table Specialist',
     reviews: 567,
     languages: 'English・Nepali',
   },
   {
+    id: 1004,
     name: 'Raju',
     title: 'Momo Master & Street Food Guide',
     reviews: 334,
     languages: 'English・Nepali',
   },
   {
+    id: 3,
     name: 'Priya',
     title: 'Vegetarian Nepali Cuisine Expert',
     reviews: 278,
     languages: 'English・Hindi・Nepali',
   },
   {
+    id: 1005,
     name: 'Bikash',
     title: 'Traditional Thakali Kitchen',
     reviews: 445,
     languages: 'English・Nepali',
   },
   {
+    id: 1006,
     name: 'Anita',
     title: 'Home Cooking & Family Recipes',
     reviews: 189,
     languages: 'English・Nepali',
   },
   {
+    id: 342,
     name: 'Tenzin',
     title: 'Tibetan-Nepali Fusion Chef',
     reviews: 312,
@@ -670,15 +681,13 @@ export const CookingClassesPage: React.FC = () => {
                 key={i}
                 className="flex flex-col items-center group cursor-pointer"
                 onClick={() => {
-                  // Demo: Cycle through the 4 rich profiles we have
-                  const demoId = (i % 4) + 1;
-                  navigate(`/local/${demoId}`);
+                  navigate(`/local/${local.id}`);
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >
                 <div className="relative w-32 h-32 mb-4">
                   <img
-                    src={`https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=128&q=80`}
+                    src={allGuides.find((g) => g.id === local.id)?.image ?? '/images/placeholder.svg'}
                     alt={local.name}
                     className="w-full h-full rounded-full object-cover border-4 border-white shadow-md group-hover:border-brand-yellow transition-all duration-300"
                   />

@@ -17,32 +17,30 @@ import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { getCanonicalExperienceBySlug } from '../utils/canonicalExperience';
 import { useGoBack } from '../utils/backNavigation';
+import { allGuides } from '../data/guidesData';
 
 const outdoorLocals = [
   {
+    id: 342,
     name: 'Tenzin',
     title: 'The Mountain Guide',
     reviews: 342,
     languages: 'English・Nepali・Sherpa',
   },
-  { name: 'Pema', title: 'The Adventure Expert', reviews: 287, languages: 'English・Nepali' },
-  { name: 'Dorje', title: 'The Jungle Explorer', reviews: 198, languages: 'English・Nepali' },
+  { id: 287, name: 'Pema', title: 'The Adventure Expert', reviews: 287, languages: 'English・Nepali' },
+  { id: 198, name: 'Dorje', title: 'The Jungle Explorer', reviews: 198, languages: 'English・Nepali' },
   {
+    id: 445,
     name: 'Lhakpa',
     title: 'The Trekking Specialist',
     reviews: 445,
     languages: 'English・French・Nepali',
   },
-  { name: 'Mingma', title: 'The Rock Climbing Pro', reviews: 156, languages: 'English・Nepali' },
-  { name: 'Pasang', title: 'The River Guide', reviews: 203, languages: 'English・Nepali' },
-  { name: 'Ang', title: 'The Paragliding Pilot', reviews: 178, languages: 'English・Nepali' },
-  { name: 'Nima', title: 'The Wildlife Expert', reviews: 321, languages: 'English・Nepali' },
-  {
-    name: 'Tashi',
-    title: 'The Eco-Tourism Guide',
-    reviews: 267,
-    languages: 'English・German・Nepali',
-  },
+  { id: 156, name: 'Mingma', title: 'The Rock Climbing Pro', reviews: 156, languages: 'English・Nepali' },
+  { id: 203, name: 'Pasang', title: 'The River Guide', reviews: 203, languages: 'English・Nepali' },
+  { id: 178, name: 'Ang', title: 'The Paragliding Pilot', reviews: 178, languages: 'English・Nepali' },
+  { id: 321, name: 'Nima', title: 'The Wildlife Expert', reviews: 321, languages: 'English・Nepali' },
+  { id: 39, name: 'Kung', title: 'The Easygoing Local', reviews: 39, languages: 'English・Nepali' },
 ];
 
 export const outdoorActivities = [
@@ -429,14 +427,13 @@ export const OutdoorActivitiesPage: React.FC = () => {
                 key={i}
                 className="flex flex-col items-center group cursor-pointer"
                 onClick={() => {
-                  const demoId = (i % 4) + 1;
-                  navigate(`/local/${demoId}`);
+                  navigate(`/local/${local.id}`);
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >
                 <div className="relative w-32 h-32 mb-4">
                   <img
-                    src={`https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80`}
+                    src={allGuides.find((g) => g.id === local.id)?.image ?? '/images/placeholder.svg'}
                     alt={local.name}
                     className="w-full h-full rounded-full object-cover border-4 border-white shadow-md group-hover:border-brand-yellow transition-all duration-300"
                   />

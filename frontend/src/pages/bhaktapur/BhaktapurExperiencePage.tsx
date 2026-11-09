@@ -1220,7 +1220,7 @@ const BhaktapurExperiencePage: React.FC = () => {
                     className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
                   >
                     <User className="w-4 h-4" />
-                    View Portfolio
+                    View Profile
                   </button>
                 </div>
               </div>

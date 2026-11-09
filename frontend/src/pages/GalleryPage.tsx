@@ -42,8 +42,7 @@ const GalleryPage: React.FC = () => {
         setGuide(apiGuide);
       } catch (error) {
         console.error('Error fetching guide:', error);
-        // Fallback to first static guide
-        setGuide(allGuides[0]);
+        setGuide(null);
       }
     };
     fetchGuide();

@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { experienceSlugPath } from '../utils/canonicalExperience';
 import { useGoBack } from '../utils/backNavigation';
+import { allGuides } from '../data/guidesData';
 
 type TrekGrade = 'Easy' | 'Moderate' | 'Challenging';
 
@@ -42,18 +43,19 @@ interface TrekRoute {
 // Licensed trekking & hiking guides who lead our routes across Nepal.
 const trekLocals = [
   {
+    id: 445,
     name: 'Lhakpa',
     title: 'The Everest Local',
     reviews: 512,
     languages: 'English・Sherpa・Nepali',
   },
-  { name: 'Tenzin', title: 'The Trekking Specialist', reviews: 445, languages: 'English・Nepali・Tibetan' },
-  { name: 'Pema', title: 'The Annapurna Expert', reviews: 287, languages: 'English・Nepali' },
-  { name: 'Nima', title: 'The Sunrise Hiker', reviews: 198, languages: 'English・Nepali' },
-  { name: 'Dorje', title: 'The Trail Photographer', reviews: 176, languages: 'English・Nepali' },
-  { name: 'Pasang', title: 'The Rhododendron Guide', reviews: 163, languages: 'English・Nepali' },
-  { name: 'Mingma', title: 'The High-Altitude Runner', reviews: 156, languages: 'English・Nepali' },
-  { name: 'Tashi', title: 'The Eco Trekker', reviews: 267, languages: 'English・German・Nepali' },
+  { id: 342, name: 'Tenzin', title: 'The Trekking Specialist', reviews: 445, languages: 'English・Nepali・Tibetan' },
+  { id: 287, name: 'Pema', title: 'The Annapurna Expert', reviews: 287, languages: 'English・Nepali' },
+  { id: 321, name: 'Nima', title: 'The Sunrise Hiker', reviews: 198, languages: 'English・Nepali' },
+  { id: 198, name: 'Dorje', title: 'The Trail Photographer', reviews: 176, languages: 'English・Nepali' },
+  { id: 203, name: 'Pasang', title: 'The Rhododendron Guide', reviews: 163, languages: 'English・Nepali' },
+  { id: 156, name: 'Mingma', title: 'The High-Altitude Runner', reviews: 156, languages: 'English・Nepali' },
+  { id: 267, name: 'Tashi', title: 'The Eco Trekker', reviews: 267, languages: 'English・German・Nepali' },
 ];
 
 // The Trek/Hiking sub-category: multi-day teahouse treks plus single-day
@@ -833,14 +835,13 @@ export const TrekHikingPage: React.FC = () => {
                 key={i}
                 className="flex flex-col items-center group cursor-pointer"
                 onClick={() => {
-                  const demoId = (i % 4) + 1;
-                  navigate(`/local/${demoId}`);
+                  navigate(`/local/${local.id}`);
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >
                 <div className="relative w-32 h-32 mb-4">
                   <img
-                    src={`https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80`}
+                    src={allGuides.find((g) => g.id === local.id)?.image ?? '/images/placeholder.svg'}
                     alt={local.name}
                     className="w-full h-full rounded-full object-cover border-4 border-white shadow-md group-hover:border-brand-yellow transition-all duration-300"
                   />

@@ -13,13 +13,13 @@ import {
   Share,
   Play,
   Package,
-  User,
   Award,
-  Calendar,
   X,
   ArrowLeft,
 } from 'lucide-react';
-import guidesApi, { Guide } from '../services/guidesApi';
+import guidesApi from '../services/guidesApi';
+import { allGuides } from '../data/guidesData';
+import { Guide } from '../data/types';
 import { kathmanduRichData } from '../data/kathmanduRichData';
 import { pokharaRichData } from '../data/pokharaRichData';
 import { lalitpurRichData } from '../data/lalitpurRichData';
@@ -45,33 +45,21 @@ const LocalProfilePage: React.FC = () => {
 
   useEffect(() => {
     const fetchGuide = async () => {
+      const guideId = id ? parseInt(id) : 1;
+      // First try to find in static data so guides not yet in the backend DB
+      // (e.g. Priya, Rohan) still render their own profile correctly.
+      const staticGuide = allGuides.find((g) => g.id === guideId);
+      if (staticGuide) {
+        setGuide(staticGuide);
+        return;
+      }
+      // If not found, try fetching from backend API
       try {
-        const guideId = id ? parseInt(id) : 1;
         const guideData = await guidesApi.getGuide(guideId);
         setGuide(guideData);
       } catch (error) {
         console.error('Error fetching guide:', error);
-        // Fallback to default guide if API fails
-        setGuide({
-          id: 1,
-          name: 'Apicha',
-          image:
-            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80',
-          role: 'Cultural Expert',
-          rating: 4.9,
-          reviews: 120,
-          bio: 'Expert in Kathmandu Valley history, culture, and hidden gems. Passionate about sharing authentic Nepali experiences.',
-          languages: ['English', 'Nepali', 'Newari'],
-          verified: true,
-          livesIn: 'Kathmandu',
-          cities: ['Kathmandu', 'Bhaktapur'],
-          gallery: [
-            'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=1740&q=80',
-            'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1740&q=80',
-            'https://images.unsplash.com/photo-1605640840605-14ac1855827b?auto=format&fit=crop&w=1740&q=80',
-          ],
-          is_active: true,
-        });
+        setGuide(null);
       }
     };
 
@@ -102,37 +90,6 @@ const LocalProfilePage: React.FC = () => {
   };
   const safeGuideImage = sanitizeImageUrl(guide.image);
   const safeHeroImage = sanitizeImageUrl(guide.gallery?.[0] ?? guide.image);
-
-  // Mock Portfolio Data
-  const portfolioHighlights = [
-    {
-      title: 'Everest Base Camp Expedition 2023',
-      role: 'Lead Guide',
-      date: 'April 2023',
-      image:
-        'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?auto=format&fit=crop&w=1740&q=80',
-      description:
-        'Led a group of 12 trekkers to EBC. Successfully managed altitude acclimatization for all members. 100% summit success rate for Kalapatthar.',
-    },
-    {
-      title: 'National Geographic Documentary Fixer',
-      role: 'Local Coordinator',
-      date: 'Nov 2022',
-      image:
-        'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1740&q=80',
-      description:
-        'Assisted a film crew in locating authentic cultural spots in Bhaktapur and Patan. Managed logistics and translation for interviews with local artisans.',
-    },
-    {
-      title: 'Sustainable Tourism Workshop',
-      role: 'Speaker',
-      date: 'Jan 2024',
-      image:
-        'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1740&q=80',
-      description:
-        'Conducted a workshop for new guides on sustainable trekking practices and waste management in the Himalayas.',
-    },
-  ];
 
   // Find tours offered by this guide across ALL cities
   const myTours = allExperiences.filter((tour) => tour.guides?.some((g) => g.id === guide.id));
@@ -267,15 +224,6 @@ const LocalProfilePage: React.FC = () => {
                       <button className="flex-1 text-gray-500 text-xs font-medium hover:text-gray-900 flex items-center justify-center gap-1.5 py-1.5 rounded-full hover:bg-gray-50 transition-colors">
                         <Share className="w-3.5 h-3.5" /> Share
                       </button>
-                      <button
-                        className="flex-1 text-gray-500 text-xs font-medium hover:text-gray-900 flex items-center justify-center gap-1.5 py-1.5 rounded-full hover:bg-gray-50 transition-colors"
-                        onClick={() => {
-                          navigate(`/local/${guide.id}/portfolio`);
-                          window.scrollTo({ top: 0, behavior: 'instant' });
-                        }}
-                      >
-                        <User className="w-3.5 h-3.5" /> Portfolio
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -363,53 +311,14 @@ const LocalProfilePage: React.FC = () => {
                 </div>
               </section>
 
-              {/* Portfolio Highlights Section (Added from Portfolio Page) */}
-              <section className="border-t border-gray-100 pt-12">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  Featured Projects & Expeditions
-                </h2>
-
-                <div className="space-y-8">
-                  {portfolioHighlights.map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-col md:flex-row gap-6 bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow"
-                    >
-                      <div className="md:w-1/3 h-48 md:h-auto">
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="p-6 md:w-2/3 flex flex-col justify-center">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-[#213448] font-bold text-xs uppercase tracking-wide">
-                            {item.role}
-                          </span>
-                          <span className="text-gray-400 text-xs font-medium flex items-center gap-1">
-                            <Calendar className="w-3 h-3" /> {item.date}
-                          </span>
-                        </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2 mt-0 leading-tight">
-                          {item.title}
-                        </h3>
-                        <p className="text-sm text-gray-600 mb-0 leading-relaxed">
-                          {item.description}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="my-12">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">My Philosophy</h2>
-                  <blockquote className="border-l-4 border-[#213448] pl-4 italic text-gray-700 bg-gray-50 p-4 rounded-r-lg">
-                    "Travel is not just about seeing new places; it's about feeling them. I believe
-                    in sustainable tourism that respects local communities and preserves our
-                    heritage for future generations."
-                  </blockquote>
-                </div>
+              {/* Philosophy Section */}
+              <section className="my-12">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">My Philosophy</h2>
+                <blockquote className="border-l-4 border-[#213448] pl-4 italic text-gray-700 bg-gray-50 p-4 rounded-r-lg">
+                  "Travel is not just about seeing new places; it's about feeling them. I believe
+                  in sustainable tourism that respects local communities and preserves our
+                  heritage for future generations."
+                </blockquote>
               </section>
 
               {/* Gallery Section */}

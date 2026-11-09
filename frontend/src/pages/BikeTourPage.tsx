@@ -15,21 +15,24 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useGoBack } from '../utils/backNavigation';
+import { allGuides } from '../data/guidesData';
 
 const bikeLocals = [
   {
+    id: 287,
     name: 'Pema',
     title: 'The Pokhara Cycling Guide',
     reviews: 214,
     languages: 'English・Nepali',
   },
-  { name: 'Lhakpa', title: 'The Kathmandu Valley Cyclist', reviews: 178, languages: 'English・Nepali' },
-  { name: 'Tashi', title: 'The Bhaktapur Activity Explorer', reviews: 163, languages: 'English・Nepali' },
-  { name: 'Mingma', title: 'The Hillside Ride Leader', reviews: 156, languages: 'English・Nepali' },
-  { name: 'Pasang', title: 'The Riverside Cycling Guide', reviews: 142, languages: 'English・Nepali' },
-  { name: 'Ang', title: 'The Lakeside Activity Host', reviews: 139, languages: 'English・Nepali' },
-  { name: 'Nima', title: 'The Cultural Cycling Guide', reviews: 127, languages: 'English・Nepali' },
+  { id: 445, name: 'Lhakpa', title: 'The Kathmandu Valley Cyclist', reviews: 178, languages: 'English・Nepali' },
+  { id: 267, name: 'Tashi', title: 'The Bhaktapur Activity Explorer', reviews: 163, languages: 'English・Nepali' },
+  { id: 156, name: 'Mingma', title: 'The Hillside Ride Leader', reviews: 156, languages: 'English・Nepali' },
+  { id: 203, name: 'Pasang', title: 'The Riverside Cycling Guide', reviews: 142, languages: 'English・Nepali' },
+  { id: 178, name: 'Ang', title: 'The Lakeside Activity Host', reviews: 139, languages: 'English・Nepali' },
+  { id: 321, name: 'Nima', title: 'The Cultural Cycling Guide', reviews: 127, languages: 'English・Nepali' },
   {
+    id: 342,
     name: 'Tenzin',
     title: 'The Mountain Activity Specialist',
     reviews: 118,
@@ -375,14 +378,13 @@ export const ActivityTourPage: React.FC = () => {
                 key={i}
                 className="flex flex-col items-center group cursor-pointer"
                 onClick={() => {
-                  const demoId = (i % 4) + 1;
-                  navigate(`/local/${demoId}`);
+                  navigate(`/local/${local.id}`);
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >
                 <div className="relative w-32 h-32 mb-4">
                   <img
-                    src={`https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80`}
+                    src={allGuides.find((g) => g.id === local.id)?.image ?? '/images/placeholder.svg'}
                     alt={local.name}
                     className="w-full h-full rounded-full object-cover border-4 border-white shadow-md group-hover:border-brand-yellow transition-all duration-300"
                   />

@@ -39,7 +39,6 @@ import BharatpurExperiencesPage from './pages/bharatpur/BharatpurExperiencesPage
 import BharatpurExperiencePage from './pages/bharatpur/BharatpurExperiencePage';
 import LocalProfilePage from './pages/LocalProfilePage';
 import GalleryPage from './pages/GalleryPage';
-import GuidePortfolioPage from './pages/GuidePortfolioPage';
 import ContactGuidePage from './pages/ContactGuidePage';
 import ImpactReportPage from './pages/ImpactReportPage';
 import NightTourPage from './pages/NightTourPage';
@@ -243,7 +242,6 @@ function App() {
 
             <Route path="/local/:id" element={<LocalProfilePage />} />
             <Route path="/local/:id/gallery" element={<GalleryPage />} />
-            <Route path="/local/:id/portfolio" element={<GuidePortfolioPage />} />
             <Route path="/local/:id/contact" element={<ContactGuidePage />} />
             <Route path="/city/:cityId" element={<CityPage />} />
 

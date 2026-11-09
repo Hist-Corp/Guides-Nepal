@@ -43,8 +43,7 @@ const ContactGuidePage: React.FC = () => {
         setGuide(apiGuide);
       } catch (error) {
         console.error('Error fetching guide:', error);
-        // Fallback to first static guide
-        setGuide(commonGuides[0]);
+        setGuide(null);
       }
     };
     fetchGuide();

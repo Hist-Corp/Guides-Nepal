@@ -18,33 +18,37 @@ import { useNavigate } from 'react-router-dom';
 import { useGoBack } from '../../utils/backNavigation';
 import { Price } from '../../components/common/Price';
 import { experienceDetailPath } from '../../utils/canonicalExperience';
+import { allGuides } from '../../data/guidesData';
 
 const kathmanduLocals = [
-  { name: 'Artty', title: 'The Lovely Storyteller', reviews: 814, languages: 'English・Nepali' },
+  { id: 814, name: 'Artty', title: 'The Lovely Storyteller', reviews: 814, languages: 'English・Nepali' },
   {
+    id: 195,
     name: 'Chef Jekky',
     title: 'Chef Jekky and The Team',
     reviews: 195,
     languages: 'English・French・Nepali',
   },
   {
+    id: 199,
     name: 'Wasana',
     title: 'The Food Maniac & Nepali Cooking Class',
     reviews: 199,
     languages: 'English・Nepali',
   },
-  { name: 'Sammy', title: 'The Good Mood Ambassador', reviews: 210, languages: 'English' },
+  { id: 210, name: 'Sammy', title: 'The Good Mood Ambassador', reviews: 210, languages: 'English' },
   {
+    id: 420,
     name: 'Araya',
     title: 'The Culinary and Culture Admirer',
     reviews: 420,
     languages: 'English・French・Nepali',
   },
-  { name: 'Apicha', title: 'The local food expert', reviews: 54, languages: 'English・Nepali' },
-  { name: 'Zarut', title: 'Recommended local insider', reviews: 115, languages: 'English・Nepali' },
-  { name: 'Tuangtip', title: 'The Food Magician', reviews: 933, languages: 'English・Nepali' },
-  { name: 'Jojo', title: 'The Nature Lover', reviews: 57, languages: 'English' },
-  { name: 'Kung', title: 'The Easygoing Local', reviews: 39, languages: 'English・Nepali' },
+  { id: 1, name: 'Apicha', title: 'The local food expert', reviews: 54, languages: 'English・Nepali' },
+  { id: 933, name: 'Zarut', title: 'Recommended local insider', reviews: 115, languages: 'English・Nepali' },
+  { id: 1007, name: 'Tuangtip', title: 'The Food Magician', reviews: 933, languages: 'English・Nepali' },
+  { id: 57, name: 'Jojo', title: 'The Nature Lover', reviews: 57, languages: 'English' },
+  { id: 39, name: 'Kung', title: 'The Easygoing Local', reviews: 39, languages: 'English・Nepali' },
 ];
 
 export const KathmanduPage: React.FC = () => {
@@ -331,15 +335,13 @@ export const KathmanduPage: React.FC = () => {
                 key={i}
                 className="flex flex-col items-center group cursor-pointer"
                 onClick={() => {
-                  // Demo: Cycle through the 4 rich profiles we have
-                  const demoId = (i % 4) + 1;
-                  navigate(`/local/${demoId}`);
+                  navigate(`/local/${local.id}`);
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >
                 <div className="relative w-32 h-32 mb-4">
                   <img
-                    src={`https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=400&q=80`}
+                    src={allGuides.find((g) => g.id === local.id)?.image ?? '/images/placeholder.svg'}
                     alt={local.name}
                     className="w-full h-full rounded-full object-cover border-4 border-white shadow-md group-hover:border-brand-yellow transition-all duration-300"
                   />

@@ -56,7 +56,6 @@ const registeredRoutes: string[] = [
   '/city/:cityId/experience/:slug',
   '/local/:id',
   '/local/:id/gallery',
-  '/local/:id/portfolio',
   '/local/:id/contact',
   '/about',
   '/jobs',
