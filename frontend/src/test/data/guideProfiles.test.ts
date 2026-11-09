@@ -6,6 +6,7 @@ import { kathmanduRichData } from '../../data/kathmanduRichData';
 import { lalitpurRichData } from '../../data/lalitpurRichData';
 import { pokharaRichData } from '../../data/pokharaRichData';
 import { buildLocalGuideProfile } from '../../utils/guideProfile';
+import { findGuideBySlug, guideContactPath, guideProfilePath, guideSlug } from '../../utils/guideUrl';
 
 const experienceCatalogs = [
   kathmanduRichData,
@@ -46,6 +47,24 @@ describe('guide catalog', () => {
     );
 
     expect(mismatches).toEqual([]);
+  });
+
+  it('gives every guide a unique slug', () => {
+    const slugs = allGuides.map(guideSlug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+    expect(slugs.every((slug) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug))).toBe(true);
+  });
+
+  it('builds canonical slug profile URLs and resolves them', () => {
+    const priya = findGuideById(3)!;
+    expect(guideProfilePath(priya)).toBe('/guidesprofile/priya');
+    expect(guideContactPath(priya)).toBe('/guidesprofile/priya/contact');
+    expect(findGuideBySlug('priya')?.id).toBe(3);
+
+    // Duplicate display names stay distinct instead of borrowing the first one.
+    expect(guideSlug(findGuideById(54)!)).toBe('apicha-54');
+    expect(findGuideBySlug('apicha-54')?.id).toBe(54);
+    expect(findGuideBySlug('missing-guide')).toBeUndefined();
   });
 
   it('builds a portfolio for a catalog guide', () => {

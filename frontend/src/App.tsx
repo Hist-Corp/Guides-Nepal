@@ -20,6 +20,7 @@ import SearchPage from './pages/SearchPage';
 import CanonicalExperienceRoute from './components/routing/CanonicalExperienceRoute';
 import { CityExperienceRoute, ExperienceKindRoute } from './components/routing/ExperienceKindRoute';
 import BackNavigationTracker from './components/routing/BackNavigationTracker';
+import LegacyGuideRedirect from './components/routing/LegacyGuideRedirect';
 import SeoExperiencePage from './pages/SeoExperiencePage';
 import CityPage from './pages/CityPage';
 import KathmanduPage from './pages/kathmandu/KathmanduPage';
@@ -246,9 +247,14 @@ function App() {
               element={<CityExperienceRoute Page={BharatpurExperiencePage} />}
             />
 
-            <Route path="/local/:id" element={<LocalProfilePage />} />
-            <Route path="/local/:id/gallery" element={<GalleryPage />} />
-            <Route path="/local/:id/contact" element={<ContactGuidePage />} />
+            <Route path="/guidesprofile/:slug" element={<LocalProfilePage />} />
+            <Route path="/guidesprofile/:slug/gallery" element={<GalleryPage />} />
+            <Route path="/guidesprofile/:slug/contact" element={<ContactGuidePage />} />
+
+            {/* Legacy numeric profile URLs permanently redirect to the slug URL. */}
+            <Route path="/local/:id" element={<LegacyGuideRedirect />} />
+            <Route path="/local/:id/gallery" element={<LegacyGuideRedirect section="gallery" />} />
+            <Route path="/local/:id/contact" element={<LegacyGuideRedirect section="contact" />} />
             <Route path="/city/:cityId" element={<CityPage />} />
 
             {/* Footer Pages */}

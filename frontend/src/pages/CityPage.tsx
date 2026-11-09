@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useGoBack } from '../utils/backNavigation';
+import { guideProfilePath } from '../utils/guideUrl';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { Button } from '../components/common/Button';
@@ -674,7 +675,7 @@ const CityPage: React.FC = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {city.guides.map((guide: Guide) => (
-              <Link to={`/local/${guide.id}`} className="text-center group block">
+              <Link to={guideProfilePath(guide)} className="text-center group block">
                 <div className="relative w-32 h-32 mx-auto mb-4">
                   <img
                     src={guide.image}

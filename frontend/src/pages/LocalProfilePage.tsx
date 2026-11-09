@@ -17,9 +17,6 @@ import {
   X,
   ArrowLeft,
 } from 'lucide-react';
-import guidesApi from '../services/guidesApi';
-import { findGuideById } from '../data/guidesData';
-import { Guide } from '../data/types';
 import { kathmanduRichData } from '../data/kathmanduRichData';
 import { pokharaRichData } from '../data/pokharaRichData';
 import { lalitpurRichData } from '../data/lalitpurRichData';
@@ -27,6 +24,11 @@ import { bhaktapurRichData } from '../data/bhaktapurRichData';
 import { bharatpurRichData } from '../data/bharatpurRichData';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { experienceDetailPath } from '../utils/canonicalExperience';
+import {
+  findGuideBySlug,
+  guideContactPath,
+  guideGalleryPath,
+} from '../utils/guideUrl';
 import { ImageLightbox } from '../components/common/ImageLightbox';
 
 // Combine every city catalog for lookup, so each guide's portfolio is complete.
@@ -39,12 +41,11 @@ const allExperiences = [
 ];
 
 const LocalProfilePage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const goBack = useGoBack();
   const { formatPrice } = useCurrency();
-  const [guide, setGuide] = useState<Guide | null>(null);
-  const [loading, setLoading] = useState(true);
+  const guide = findGuideBySlug(slug);
   const [isBioExpanded, setIsBioExpanded] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showHowItWorksModal, setShowHowItWorksModal] = useState(false);
@@ -53,64 +54,8 @@ const LocalProfilePage: React.FC = () => {
   const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
 
   useEffect(() => {
-    let cancelled = false;
-
-    const fetchGuide = async () => {
-      const guideId = id ? Number(id) : NaN;
-
-      setIsBioExpanded(false);
-      setLoading(true);
-
-      if (!Number.isFinite(guideId)) {
-        if (!cancelled) {
-          setGuide(null);
-          setLoading(false);
-        }
-        return;
-      }
-
-      // The local catalog is authoritative for its own ids: guides that are not
-      // seeded in the backend still open their own profile and portfolio.
-      const staticGuide = findGuideById(guideId);
-      if (staticGuide) {
-        if (!cancelled) {
-          setGuide(staticGuide);
-          setLoading(false);
-        }
-        return;
-      }
-
-      // Backend-only guides (e.g. newly approved ones) are fetched by id.
-      try {
-        const guideData = await guidesApi.getGuide(guideId);
-        if (!cancelled) setGuide(guideData);
-      } catch (error) {
-        console.error('Error fetching guide:', error);
-        if (!cancelled) setGuide(null);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    fetchGuide();
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col font-sans bg-white">
-        <Header />
-        <main className="flex-grow bg-gray-50/50">
-          <div className="container mx-auto px-4 py-20 max-w-6xl text-center">
-            <p className="text-gray-500 font-medium">Loading guide profile...</p>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+    setIsBioExpanded(false);
+  }, [slug]);
 
   if (!guide) {
     return (
@@ -286,7 +231,7 @@ const LocalProfilePage: React.FC = () => {
 
                     <button
                       onClick={() => {
-                        navigate(`/local/${guide.id}/contact`);
+                        navigate(guideContactPath(guide));
                         window.scrollTo({ top: 0, behavior: 'instant' });
                       }}
                       className="w-full mt-6 bg-[#213448] hover:bg-[#1a2a3a] text-white font-bold py-2.5 rounded-full transition-colors shadow-lg shadow-primary/20 text-sm"
@@ -422,7 +367,7 @@ const LocalProfilePage: React.FC = () => {
                   </div>
                   <button
                     onClick={() => {
-                      navigate(`/local/${guide.id}/gallery`);
+                      navigate(guideGalleryPath(guide));
                       window.scrollTo({ top: 0, behavior: 'instant' });
                     }}
                     className="text-[#213448] font-bold text-sm uppercase tracking-wide mt-4 hover:underline"

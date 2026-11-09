@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useGoBack } from '../utils/backNavigation';
 import { Header } from '../components/common/Header';
@@ -12,15 +12,13 @@ import {
   MessageCircle,
   ArrowLeft,
 } from 'lucide-react';
-import { commonGuides } from '../data/kathmanduRichData';
 import { sendGuideRequest } from '../services/publicApi';
-import guidesApi from '../services/guidesApi';
+import { findGuideBySlug } from '../utils/guideUrl';
 
 const ContactGuidePage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const goBack = useGoBack();
-  const [guide, setGuide] = useState<(typeof commonGuides)[number] | null>(null);
-  const [loadingGuide, setLoadingGuide] = useState(true);
+  const guide = findGuideBySlug(slug);
 
   // Form State
   const [adults, setAdults] = useState(2);
@@ -29,64 +27,9 @@ const ContactGuidePage: React.FC = () => {
   const [selectedTime, setSelectedTime] = useState({ hour: '09', minute: '00', period: 'AM' });
   const [duration, setDuration] = useState(3);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    const fetchGuide = async () => {
-      const guideId = id ? Number(id) : NaN;
-      setLoadingGuide(true);
-
-      if (!Number.isFinite(guideId)) {
-        if (!cancelled) {
-          setGuide(null);
-          setLoadingGuide(false);
-        }
-        return;
-      }
-
-      // The local catalog covers the city guides; backend-only guides are
-      // fetched by id afterwards.
-      const staticGuide = commonGuides.find((g) => g.id === guideId);
-      if (staticGuide) {
-        if (!cancelled) {
-          setGuide(staticGuide);
-          setLoadingGuide(false);
-        }
-        return;
-      }
-
-      try {
-        const apiGuide = await guidesApi.getGuide(guideId);
-        if (!cancelled) setGuide(apiGuide);
-      } catch (error) {
-        console.error('Error fetching guide:', error);
-        if (!cancelled) setGuide(null);
-      } finally {
-        if (!cancelled) setLoadingGuide(false);
-      }
-    };
-
-    fetchGuide();
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
-
   // Personalization request submission
   const [sendingRequest, setSendingRequest] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
-
-  if (loadingGuide) {
-    return (
-      <div className="min-h-screen flex flex-col font-sans bg-white">
-        <Header />
-        <main className="flex-grow flex items-center justify-center px-4 py-20">
-          <p className="text-gray-500 font-medium">Loading guide...</p>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   if (!guide) {
     return (

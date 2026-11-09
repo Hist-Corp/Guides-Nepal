@@ -16,6 +16,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { useGoBack } from '../utils/backNavigation';
+import { guideProfilePath } from '../utils/guideUrl';
 import { allGuides } from '../data/guidesData';
 
 const nightLocals = [
@@ -419,7 +420,7 @@ export const NightTourPage: React.FC = () => {
                 key={i}
                 className="flex flex-col items-center group cursor-pointer"
                 onClick={() => {
-                  navigate(`/local/${local.id}`);
+                  navigate(guideProfilePath(local));
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >

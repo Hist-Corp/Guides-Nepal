@@ -16,6 +16,7 @@ import {
 import { kathmanduTours } from '../../data/kathmanduTours';
 import { useNavigate } from 'react-router-dom';
 import { useGoBack } from '../../utils/backNavigation';
+import { guideProfilePath } from '../../utils/guideUrl';
 import { Price } from '../../components/common/Price';
 import { experienceDetailPath } from '../../utils/canonicalExperience';
 import { allGuides } from '../../data/guidesData';
@@ -335,7 +336,7 @@ export const KathmanduPage: React.FC = () => {
                 key={i}
                 className="flex flex-col items-center group cursor-pointer"
                 onClick={() => {
-                  navigate(`/local/${local.id}`);
+                  navigate(guideProfilePath(local));
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >

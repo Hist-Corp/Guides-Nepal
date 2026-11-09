@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { StickyBarPortal } from '../../components/common/StickyBarPortal';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGoBack } from '../../utils/backNavigation';
+import { guideProfilePath } from '../../utils/guideUrl';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { Check, ArrowRight, ArrowLeft, Star, ShieldCheck, Globe, X, User, MessageCircle } from 'lucide-react';
@@ -1209,7 +1210,7 @@ const BharatpurExperiencePage: React.FC = () => {
 
                   <button
                     onClick={() => {
-                      navigate(`/local/${viewingGuide.id}`);
+                      navigate(guideProfilePath(viewingGuide));
                       window.scrollTo({ top: 0, behavior: 'instant' });
                     }}
                     className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"

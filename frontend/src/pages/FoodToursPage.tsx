@@ -5,6 +5,7 @@ import { Button } from '../components/common/Button';
 import { ArrowLeft, Check, ShieldCheck, Users } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useGoBack } from '../utils/backNavigation';
+import { guideProfilePath } from '../utils/guideUrl';
 import { NEPAL_IMAGES } from '../data/images';
 import guidesApi, { Guide } from '../services/guidesApi';
 
@@ -299,7 +300,7 @@ export const FoodToursPage: React.FC = () => {
               ))
             ) : guides.length > 0 ? (
               guides.slice(0, 6).map((guide) => (
-                <Link key={guide.name} to={`/local/${guide.id}`} className="flex flex-col items-center text-center group">
+                <Link key={guide.name} to={guideProfilePath(guide)} className="flex flex-col items-center text-center group">
                   <div className="aspect-[3/4] rounded-sm overflow-hidden shadow-sm mb-1.5 group-hover:shadow-md transition-shadow duration-300">
                     <img
                       src={guide.image}

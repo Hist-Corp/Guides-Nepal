@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useGoBack } from '../utils/backNavigation';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { ArrowLeft } from 'lucide-react';
-import { allGuides } from '../data/guidesData';
-import { Guide } from '../data/types';
 import { ImageLightbox } from '../components/common/ImageLightbox';
 import { NEPAL_IMAGES } from '../data/images';
-import guidesApi from '../services/guidesApi';
+import { findGuideBySlug } from '../utils/guideUrl';
 
 // Extra masonry tiles beyond the guide's own photos, drawn from the verified
 // Nepal image pool so the grid feels alive instead of repeating one photo.
@@ -22,31 +20,10 @@ const extraGallery: { src: string; alt: string }[] = [
 ];
 
 const GalleryPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const goBack = useGoBack();
-  const [guide, setGuide] = useState<Guide | null>(null);
+  const guide = findGuideBySlug(slug);
   const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
-
-  useEffect(() => {
-    const fetchGuide = async () => {
-      const guideId = id ? parseInt(id) : 1;
-      // First try to find in static data
-      const staticGuide = allGuides.find((g) => g.id === guideId);
-      if (staticGuide) {
-        setGuide(staticGuide);
-        return;
-      }
-      // If not found, try fetching from backend API
-      try {
-        const apiGuide = await guidesApi.getGuide(guideId);
-        setGuide(apiGuide);
-      } catch (error) {
-        console.error('Error fetching guide:', error);
-        setGuide(null);
-      }
-    };
-    fetchGuide();
-  }, [id]);
 
   if (!guide || !guide.gallery) return null;
 

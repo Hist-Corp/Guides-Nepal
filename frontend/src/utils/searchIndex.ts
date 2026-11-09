@@ -6,6 +6,7 @@ import { bharatpurRichData } from '../data/bharatpurRichData';
 import { allGuides } from '../data/guidesData';
 import { RichExperienceData } from '../data/types';
 import { experienceDetailPath } from './canonicalExperience';
+import { guideProfilePath } from './guideUrl';
 
 export interface SearchIndexEntry {
   id: string;
@@ -103,7 +104,7 @@ const createIndexEntries = (): SearchIndexEntry[] => {
       subtitle: `${guide.role} • ${guide.livesIn}`,
       description: guide.bio,
       image: guide.image,
-      link: `/local/${guide.id}`,
+      link: guideProfilePath(guide),
       tags: [guide.role, guide.livesIn, ...guide.languages, ...guide.cities].filter(Boolean),
       city: guide.livesIn,
       category: guide.role,

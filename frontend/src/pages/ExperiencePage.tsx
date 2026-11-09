@@ -20,6 +20,7 @@ import { useAuthStore } from '../store/authStore';
 import { useProfileStore } from '../store/profileStore';
 import guidesApi from '../services/guidesApi';
 import { isOwnGuide, useViewerGuideId } from '../utils/guides';
+import { guideContactPath } from '../utils/guideUrl';
 import { guideDashboardApi } from '../services/guideDashboardApi';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { getApiUrl } from '../config/api';
@@ -1320,7 +1321,13 @@ const ExperiencePage: React.FC = () => {
                       variant="outline"
                       size="sm"
                       className="rounded-full"
-                      onClick={() => navigate(`/local/${experience.id}/contact`)}
+                      onClick={() =>
+                        navigate(
+                          visibleGuides[0]
+                            ? guideContactPath(visibleGuides[0])
+                            : '/contact'
+                        )
+                      }
                     >
                       Contact Host
                     </Button>

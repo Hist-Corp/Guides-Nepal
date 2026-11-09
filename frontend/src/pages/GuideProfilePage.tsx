@@ -8,6 +8,8 @@ import { useCurrency } from '../contexts/CurrencyContext';
 import { experienceSlugPath } from '../utils/canonicalExperience';
 import { useGoBack } from '../utils/backNavigation';
 import { getLocalGuideProfile } from '../utils/guideProfile';
+import { findGuideById } from '../data/guidesData';
+import { guideContactPath } from '../utils/guideUrl';
 import {
   ArrowLeft,
   CalendarDays,
@@ -149,6 +151,7 @@ const GuideProfilePage: React.FC = () => {
   const avatar = safeImage(profile.image);
   const joined = monthYear(profile.memberSince);
   const location = profile.livesIn || profile.cities?.[0] || profile.region;
+  const contactGuide = findGuideById(profile.id);
   const languages = profile.languages ?? [];
   const cities = profile.cities ?? [];
   const experiences = profile.experiences ?? [];
@@ -463,7 +466,7 @@ const GuideProfilePage: React.FC = () => {
                 </dl>
 
                 <Link
-                  to={`/local/${profile.id}/contact`}
+                  to={contactGuide ? guideContactPath(contactGuide) : '/contact'}
                   className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 font-bold text-white transition-colors hover:bg-primary-hover"
                 >
                   <MessageCircle className="h-4 w-4" /> Message {profile.name}

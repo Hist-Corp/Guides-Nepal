@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useGoBack } from '../../utils/backNavigation';
+import { guideProfilePath } from '../../utils/guideUrl';
 import { pokharaRichData } from '../../data/pokharaRichData';
 import { allGuides } from '../../data/guidesData';
 import { Price } from '../../components/common/Price';
@@ -302,7 +303,7 @@ export const PokharaPage: React.FC = () => {
                 key={i}
                 className="flex flex-col items-center group cursor-pointer"
                 onClick={() => {
-                  navigate(`/local/${local.id}`);
+                  navigate(guideProfilePath(local));
                   window.scrollTo({ top: 0, behavior: 'instant' });
                 }}
               >

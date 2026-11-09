@@ -73,7 +73,10 @@ describe('resolveBackTarget', () => {
     expect(resolveBackTarget('/city/pokhara/experiences')).toBe(CITY);
   });
 
-  it('resolves local profile sub-pages to the profile page', () => {
+  it('resolves guide profile sub-pages to the profile page', () => {
+    expect(resolveBackTarget('/guidesprofile/priya/contact')).toBe('/guidesprofile/priya');
+    expect(resolveBackTarget('/guidesprofile/priya/gallery')).toBe('/guidesprofile/priya');
+    // Legacy numeric URLs still resolve while their redirects stay registered.
     expect(resolveBackTarget('/local/42/contact')).toBe('/local/42');
   });
 
@@ -94,6 +97,7 @@ describe('resolveBackTarget', () => {
   });
 
   it('has no fallback target for dynamic pages whose parent is not a route', () => {
+    expect(resolveBackTarget('/guidesprofile/priya')).toBeUndefined();
     expect(resolveBackTarget('/local/42')).toBeUndefined();
     expect(resolveBackTarget('/bookings')).toBeUndefined();
   });
