@@ -26,7 +26,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useMessageStore } from '../../store/messageStore';
 import { getApiUrl } from '../../config/api';
 import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
-import { getAvailableGuides } from '../../utils/guides';
+import { getAvailableGuides, useViewerGuideId } from '../../utils/guides';
 import { mergeGuides, useAssignedGuides } from '../../utils/approvedGuides';
 import { isPredefinedTrip } from '../../utils/experienceBooking';
 import { BookmarkButton } from '../../components/common/BookmarkButton';
@@ -141,6 +141,8 @@ const KathmanduExperiencePage: React.FC = () => {
 
   // Guides approved for this experience by a Regional Head (backend catalog).
   const assignedGuides = useAssignedGuides(data?.slug, data?.title);
+  // A signed-in guide never sees (or books) themselves in "Who you'll meet".
+  const viewerGuideId = useViewerGuideId();
   const availableGuides = useMemo(
     () =>
       data
@@ -148,10 +150,11 @@ const KathmanduExperiencePage: React.FC = () => {
             mergeGuides(data.guides ?? [], assignedGuides),
             bookings,
             data.id,
-            data.city ?? ''
+            data.city ?? '',
+            viewerGuideId
           )
         : [],
-    [data, bookings, assignedGuides]
+    [data, bookings, assignedGuides, viewerGuideId]
   );
 
   const handleBookNow = async (): Promise<boolean> => {

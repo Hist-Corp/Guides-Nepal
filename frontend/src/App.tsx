@@ -57,6 +57,7 @@ import GuideDashboardPage from './pages/guide/GuideDashboardPage';
 import GuideListingsPage from './pages/guide/GuideListingsPage';
 import GuideListingFormPage from './pages/guide/GuideListingFormPage';
 import GuideExperienceRequestPage from './pages/guide/GuideExperienceRequestPage';
+import GuideExperienceRequestDetailsPage from './pages/guide/GuideExperienceRequestDetailsPage';
 import GuideProposalsPage from './pages/guide/GuideProposalsPage';
 import GuideProposalFormPage from './pages/guide/GuideProposalFormPage';
 import GuideProposalDetailPage from './pages/guide/GuideProposalDetailPage';
@@ -68,6 +69,7 @@ import BookingsPage from './pages/user/BookingsPage';
 import GuideBookingsPage from './pages/guide/GuideBookingsPage';
 import RoleProfilePage from './pages/user/RoleProfilePage';
 import PublicGuideListingsPage from './pages/user/PublicGuideListingsPage';
+import GuideProfilePage from './pages/GuideProfilePage';
 import AccountSettingsPage from './pages/user/AccountSettingsPage';
 import FavoritesPage from './pages/user/FavoritesPage';
 import ChatPage from './pages/user/ChatPage';
@@ -162,6 +164,10 @@ function App() {
             <Route path="/guide/dashboard" element={<GuideDashboardPage />} />
             <Route path="/guide/listings" element={<GuideListingsPage />} />
             <Route path="/guide/listings/new" element={<GuideExperienceRequestPage />} />
+            <Route
+              path="/guide/listings/new/details"
+              element={<GuideExperienceRequestDetailsPage />}
+            />
             <Route path="/guide/listings/:id/edit" element={<GuideListingFormPage />} />
             <Route
               path="/guide/listings/:id/propose-change"
@@ -180,6 +186,8 @@ function App() {
             />
             <Route path="/profile" element={<RoleProfilePage />} />
             <Route path="/listings" element={<PublicGuideListingsPage />} />
+            {/* Public profile of one guide, linked from "Who you'll meet". */}
+            <Route path="/guides/:id" element={<GuideProfilePage />} />
             <Route path="/account" element={<AccountSettingsPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/chat" element={<ChatPage />} />

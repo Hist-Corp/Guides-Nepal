@@ -77,6 +77,9 @@ export default function RegionalGuideExperienceRequests() {
               <th className="p-3">Region</th>
               <th className="p-3">Target</th>
               <th className="p-3">Type</th>
+              <th className="p-3">Price / person</th>
+              <th className="p-3">Slots</th>
+              <th className="p-3">Meeting point</th>
               <th className="p-3">Status</th>
               <th className="p-3">Submitted</th>
               <th className="p-3">Actions</th>
@@ -84,9 +87,9 @@ export default function RegionalGuideExperienceRequests() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td className="p-4 text-gray-500" colSpan={8}>Loading…</td></tr>
+              <tr><td className="p-4 text-gray-500" colSpan={11}>Loading…</td></tr>
             ) : items.length === 0 ? (
-              <tr><td className="p-4 text-gray-500" colSpan={8}>No guide experience requests found</td></tr>
+              <tr><td className="p-4 text-gray-500" colSpan={11}>No guide experience requests found</td></tr>
             ) : (
               items.map((r) => (
                 <tr key={r.id} className="border-b last:border-0">
@@ -95,6 +98,11 @@ export default function RegionalGuideExperienceRequests() {
                   <td className="p-3">{r.guide_region || "—"}</td>
                   <td className="p-3">{r.experience_title || r.booking_title || "—"}</td>
                   <td className="p-3">{r.request_type}</td>
+                  <td className="p-3">
+                    {typeof r.price_per_person === "number" ? `$${r.price_per_person.toFixed(2)}` : "—"}
+                  </td>
+                  <td className="p-3">{r.slots ?? "—"}</td>
+                  <td className="p-3">{r.meeting_point || "—"}</td>
                   <td className="p-3">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-semibold ${

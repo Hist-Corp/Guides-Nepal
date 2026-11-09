@@ -15,7 +15,7 @@ import { BookingCalendar } from '../components/common/BookingCalendar';
 import { GuestPicker } from '../components/common/GuestPicker';
 import { useBookingStore } from '../store/bookingStore';
 import { useAuthStore } from '../store/authStore';
-import { getAvailableGuides } from '../utils/guides';
+import { getAvailableGuides, useViewerGuideId } from '../utils/guides';
 import { BookmarkButton } from '../components/common/BookmarkButton';
 
 const ReadMoreText = ({ 
@@ -73,9 +73,14 @@ const SeoExperiencePage: React.FC = () => {
   const bookings = useBookingStore((s) => s.bookings);
   const addBooking = useBookingStore((s) => s.addBooking);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  // A signed-in guide never sees (or books) themselves in "Who you'll meet".
+  const viewerGuideId = useViewerGuideId();
   const availableGuides = useMemo(
-    () => (data ? getAvailableGuides(data.guides ?? [], bookings, data.id, data.location) : []),
-    [data, bookings]
+    () =>
+      data
+        ? getAvailableGuides(data.guides ?? [], bookings, data.id, data.location, viewerGuideId)
+        : [],
+    [data, bookings, viewerGuideId]
   );
 
   useEffect(() => {

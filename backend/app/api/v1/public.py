@@ -12,9 +12,9 @@ from app.core.database import get_db
 from app.core.security import get_password_hash, validate_password_strength
 from app.models.guide import Guide
 from app.models.guide_application import GuideApplication
-from app.models.guide_listing import GuideListing
+from app.models.guide_listing import GuideExperienceRequest, GuideListing
 from app.models.host_application import HostApplication
-from app.models.host_guide import HostExperienceGuide
+from app.models.host_guide import HostExperienceGuide, HostGuide
 from app.models.booking import HostExperience
 from app.models.support_ticket import SupportTicket
 from app.models.user import User
@@ -22,6 +22,13 @@ from app.schemas.public import ExperienceResponse, GuideResponse
 from app.services.guide_service import GuideService
 
 router = APIRouter()
+
+# Public experience ids keep their source visible in the number itself: the
+# traveller-facing routes address host-owned experiences as ``100000 + id`` and
+# approved guide listings as ``200000 + id``.  Requests that target an
+# experience must therefore store one of those public ids, not the raw row id.
+HOST_EXPERIENCE_ID_OFFSET = 100000
+GUIDE_LISTING_ID_OFFSET = 200000
 
 GUIDE_UPLOAD_FIELDS = (
     "citizenshipFront",
@@ -488,9 +495,72 @@ MOCK_EXPERIENCES = [
 ]
 
 
-def _guide_to_host_payload(guide: Guide) -> dict:
+def resolve_experience_reference(db: Session, experience_id: Optional[int]) -> Optional[dict]:
+    """Resolve a public experience id to the database record behind it.
+
+    Returns ``id`` (public id), ``title``, ``city``, ``price`` and ``source``
+    (``host_experience`` | ``guide_listing`` | ``mock``) plus ``record_id``, the
+    raw primary key that ``host_experience_guides`` rows are keyed by.  The
+    mock catalogue lives in memory only, so it is matched last: older requests
+    were filed against it and their titles must keep resolving.
+    """
+    if experience_id is None:
+        return None
+    try:
+        value = int(experience_id)
+    except (TypeError, ValueError):
+        return None
+
+    if value >= GUIDE_LISTING_ID_OFFSET:
+        listing = db.get(GuideListing, value - GUIDE_LISTING_ID_OFFSET)
+        if listing is not None:
+            return {
+                "id": value,
+                "title": listing.title,
+                "city": listing.city,
+                "price": float(listing.price or 0.0),
+                "source": "guide_listing",
+                "record_id": int(listing.id),
+                "is_active": bool(listing.is_active),
+            }
+    elif value >= HOST_EXPERIENCE_ID_OFFSET:
+        experience = db.get(HostExperience, value - HOST_EXPERIENCE_ID_OFFSET)
+        if experience is not None:
+            return {
+                "id": value,
+                "title": experience.title,
+                "city": experience.city,
+                "price": float(experience.price or 0.0),
+                "source": "host_experience",
+                "record_id": int(experience.id),
+                "is_active": bool(experience.is_active),
+            }
+
+    mock = next((item for item in MOCK_EXPERIENCES if item["id"] == value), None)
+    if mock is not None:
+        return {
+            "id": value,
+            "title": mock["title"],
+            "city": mock["city"],
+            "price": float(mock["price"] or 0.0),
+            "source": "mock",
+            "record_id": value,
+            "is_active": True,
+        }
+    return None
+
+
+def _guide_to_host_payload(guide: Guide, user_id: Optional[int] = None) -> dict:
+    """Public guide payload.
+
+    ``userId`` is the guide's login account id so the frontend can tell a
+    signed-in guide apart from other guides (a guide must not see or book
+    themselves).  It is resolved from ``host_guides``, which links the catalog
+    profile to the account.
+    """
     return {
         "id": guide.id,
+        "userId": user_id,
         "name": guide.name,
         "image": guide.image,
         "role": guide.role,
@@ -505,6 +575,64 @@ def _guide_to_host_payload(guide: Guide) -> dict:
     }
 
 
+def _guide_account_ids(db: Session, guide_ids: list[int]) -> dict[int, int]:
+    """Map catalog guide ids to the id of the login account that owns them."""
+    ids = [int(guide_id) for guide_id in guide_ids if guide_id is not None]
+    if not ids:
+        return {}
+    rows = (
+        db.query(HostGuide.guide_id, HostGuide.guide_user_id)
+        .filter(HostGuide.guide_id.in_(ids), HostGuide.guide_user_id.isnot(None))
+        .all()
+    )
+    return {int(gid): int(uid) for gid, uid in rows if gid is not None and uid is not None}
+
+
+def _approved_guide_terms(db: Session, experience_id: int) -> dict[int, dict]:
+    """Latest approved assignment terms per guide account for an experience.
+
+    A guide who was approved for an experience quoted their own per-person
+    price when they filed the request, so the traveller-facing "Who you'll
+    meet" list can show a different price per guide.
+    """
+    rows = (
+        db.query(GuideExperienceRequest)
+        .filter(
+            GuideExperienceRequest.experience_id == int(experience_id),
+            GuideExperienceRequest.status == "approved",
+        )
+        .order_by(
+            GuideExperienceRequest.reviewed_at.desc(), GuideExperienceRequest.id.desc()
+        )
+        .all()
+    )
+    terms: dict[int, dict] = {}
+    for row in rows:
+        if row.guide_user_id is None:
+            continue
+        account_id = int(row.guide_user_id)
+        if account_id in terms:
+            continue
+        terms[account_id] = {
+            "price": float(row.price_per_person) if row.price_per_person is not None else None,
+            "slots": row.slots,
+        }
+    return terms
+
+
+def _with_guide_terms(
+    db: Session, experience_id: int, guides: list[dict]
+) -> list[dict]:
+    """Attach each guide's approved per-person price and slots to the payload."""
+    terms = _approved_guide_terms(db, experience_id)
+    for payload in guides:
+        account_id = payload.get("userId")
+        term = terms.get(int(account_id)) if account_id is not None else None
+        payload["price"] = term["price"] if term else None
+        payload["slots"] = term["slots"] if term else None
+    return guides
+
+
 def _experience_guides(db: Session, experience_id: int) -> list[dict]:
     """Return approved guide payloads assigned to an experience (mock or live)."""
     rows = (
@@ -517,7 +645,9 @@ def _experience_guides(db: Session, experience_id: int) -> list[dict]:
         .order_by(HostExperienceGuide.is_primary.desc(), HostExperienceGuide.created_at.desc())
         .all()
     )
-    return [_guide_to_host_payload(g) for _, g in rows]
+    account_ids = _guide_account_ids(db, [g.id for _, g in rows])
+    guides = [_guide_to_host_payload(g, account_ids.get(g.id)) for _, g in rows]
+    return _with_guide_terms(db, experience_id, guides)
 
 
 def _enrich_experience_with_guides(db: Session, experience: dict) -> dict:
@@ -551,8 +681,9 @@ def _host_experience_to_public(db: Session, experience: HostExperience) -> Optio
     if not rows:
         return None
     _assignment, guide = rows[0]
+    account_ids = _guide_account_ids(db, [g.id for _, g in rows])
     return {
-        "id": 100000 + int(experience.id),
+        "id": HOST_EXPERIENCE_ID_OFFSET + int(experience.id),
         "slug": f"host-{experience.slug}",
         "title": experience.title,
         "heroImage": experience.hero_image or MOCK_GUIDES[0]["image"],
@@ -563,8 +694,12 @@ def _host_experience_to_public(db: Session, experience: HostExperience) -> Optio
         "reviews": int(guide.reviews or 0),
         "city": experience.city,
         "category": experience.category,
-        "host": _guide_to_host_payload(guide),
-        "guides": [_guide_to_host_payload(g) for _, g in rows],
+        "host": _guide_to_host_payload(guide, account_ids.get(guide.id)),
+        "guides": _with_guide_terms(
+            db,
+            HOST_EXPERIENCE_ID_OFFSET + int(experience.id),
+            [_guide_to_host_payload(g, account_ids.get(g.id)) for _, g in rows],
+        ),
     }
 
 
@@ -580,6 +715,7 @@ def _user_to_host_payload(user: Optional[User]) -> dict:
     name = f"{(user.firstName or '')} {(user.lastName or '')}".strip() if user else ""
     return {
         "id": int(user.id) if user else 0,
+        "userId": int(user.id) if user else None,
         "name": name or (user.email if user else "Guide"),
         "image": user.avatar_url if (user and user.avatar_url) else MOCK_GUIDES[0]["image"],
         "role": "Experience Guide",
@@ -602,20 +738,33 @@ def _guide_listing_to_public(db: Session, listing: GuideListing) -> Optional[dic
     if listing.city:
         host["livesIn"] = listing.city
         host["cities"] = [listing.city]
-    return {
-        "id": 200000 + int(listing.id),
+    max_guests = int(listing.max_guests or 0)
+    booked_guests = int(listing.booked_guests or 0)
+    payload = {
+        "id": GUIDE_LISTING_ID_OFFSET + int(listing.id),
         "slug": f"guide-{listing.id}",
         "title": listing.title,
         "heroImage": MOCK_GUIDES[0]["image"],
         "description": listing.description,
         "price": float(listing.price or 0.0),
         "duration": listing.duration,
+        # Live capacity, so the booking card can show slots left and stop
+        # bookings once the listing is full.
+        "maxGuests": max_guests,
+        "bookedGuests": booked_guests,
+        "availableSlots": max(max_guests - booked_guests, 0),
         "rating": 4.8,
         "reviews": 0,
         "city": listing.city,
         "category": _GUIDE_LISTING_CATEGORY_MAP.get(listing.category, listing.category),
         "host": host,
     }
+    # Guides approved for this listing are added next to its owner, so the
+    # "Who you'll meet" section stays in step with the assignment requests.
+    guides = _experience_guides(db, payload["id"])
+    if guides:
+        payload["guides"] = guides
+    return payload
 
 
 @router.get("/experiences", response_model=List[ExperienceResponse])
@@ -750,3 +899,146 @@ def get_guide(id: int, db: Session = Depends(get_db)) -> dict:
     if not guide:
         raise HTTPException(status_code=404, detail="Guide not found")
     return guide
+
+
+def _guide_profile_experiences(
+    db: Session, guide: Guide, account_id: Optional[int]
+) -> list[dict]:
+    """Every published experience this guide leads, as card summaries.
+
+    A guide can be assigned to catalogue experiences, to host-created ones, or
+    have published listings of their own; the profile page lists all three so it
+    never sends a traveller to a dead end.
+    """
+    entries: list[dict] = []
+    seen_slugs: set[str] = set()
+
+    def add(entry: dict) -> None:
+        slug = str(entry.get("slug") or "")
+        if not slug or slug in seen_slugs:
+            return
+        seen_slugs.add(slug)
+        entries.append(
+            {
+                "slug": slug,
+                "title": entry.get("title") or "",
+                "city": entry.get("city"),
+                "category": entry.get("category"),
+                "heroImage": entry.get("heroImage") or guide.image,
+                "price": float(entry.get("price") or 0.0),
+                "duration": entry.get("duration"),
+                "rating": float(entry.get("rating") or 0.0),
+                "reviews": int(entry.get("reviews") or 0),
+                "availableSlots": entry.get("availableSlots"),
+            }
+        )
+
+    assignment_ids = {
+        int(experience_id)
+        for (experience_id,) in db.query(HostExperienceGuide.experience_id)
+        .filter(HostExperienceGuide.guide_id == guide.id)
+        .all()
+        if experience_id is not None
+    }
+
+    # Catalogue experiences the guide is assigned to (ids below the host offset).
+    for experience in MOCK_EXPERIENCES:
+        experience_id = int(experience.get("id") or 0)
+        if experience_id in assignment_ids and experience_id < HOST_EXPERIENCE_ID_OFFSET:
+            add(dict(experience))
+
+    # Host-created experiences, addressed publicly as 100000 + row id.
+    host_ids = [
+        experience_id - HOST_EXPERIENCE_ID_OFFSET
+        for experience_id in assignment_ids
+        if HOST_EXPERIENCE_ID_OFFSET <= experience_id < GUIDE_LISTING_ID_OFFSET
+    ]
+    if host_ids:
+        host_rows = (
+            db.query(HostExperience)
+            .filter(HostExperience.id.in_(host_ids), HostExperience.is_active.is_(True))
+            .all()
+        )
+        for experience in host_rows:
+            add(
+                {
+                    "slug": f"host-{experience.slug}",
+                    "title": experience.title,
+                    "city": experience.city,
+                    "category": experience.category,
+                    "heroImage": experience.hero_image,
+                    "price": experience.price,
+                    "duration": experience.duration,
+                    "rating": guide.rating,
+                    "reviews": guide.reviews,
+                }
+            )
+
+    # The guide's own published listings, addressed as guide-{id}.
+    if account_id:
+        listings = (
+            db.query(GuideListing)
+            .filter(
+                GuideListing.guide_user_id == account_id,
+                GuideListing.is_active.is_(True),
+            )
+            .order_by(GuideListing.created_at.desc())
+            .all()
+        )
+        for listing in listings:
+            max_guests = int(listing.max_guests or 0)
+            add(
+                {
+                    "slug": f"guide-{listing.id}",
+                    "title": listing.title,
+                    "city": listing.city,
+                    "category": _GUIDE_LISTING_CATEGORY_MAP.get(
+                        listing.category, listing.category
+                    ),
+                    "heroImage": guide.image,
+                    "price": listing.price,
+                    "duration": listing.duration,
+                    "rating": guide.rating,
+                    "reviews": guide.reviews,
+                    "availableSlots": max(max_guests - int(listing.booked_guests or 0), 0),
+                }
+            )
+
+    return entries
+
+
+@router.get("/guides/{id}/profile")
+def get_guide_profile(id: int, db: Session = Depends(get_db)) -> dict:
+    """Everything the traveller-facing guide profile page shows in one payload."""
+    guide = db.get(Guide, id)
+    if guide is None or not guide.is_active:
+        raise HTTPException(status_code=404, detail="Guide not found")
+
+    account_id = _guide_account_ids(db, [guide.id]).get(guide.id)
+    payload = _guide_to_host_payload(guide, account_id)
+    payload["is_active"] = bool(guide.is_active)
+
+    # The host link carries where the guide works and when they joined.
+    link = (
+        db.query(HostGuide)
+        .filter(HostGuide.guide_id == guide.id)
+        .order_by(HostGuide.id)
+        .first()
+    )
+    joined_at = (link.created_at if link else None) or guide.created_at
+    payload["memberSince"] = joined_at.isoformat() if joined_at else None
+    payload["region"] = link.region if link else None
+
+    experiences = _guide_profile_experiences(db, guide, account_id)
+    payload["experiences"] = experiences
+    payload["stats"] = {
+        "experiences": len(experiences),
+        "cities": len(
+            {str(entry["city"]).strip() for entry in experiences if entry.get("city")}
+            or {str(city).strip() for city in (guide.cities or []) if city}
+        ),
+        "languages": len(list(guide.languages or [])),
+        "rating": float(guide.rating or 0.0),
+        "reviews": int(guide.reviews or 0),
+    }
+    return payload

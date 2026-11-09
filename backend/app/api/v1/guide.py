@@ -13,7 +13,7 @@ from app.core.dependencies import require_role
 from app.core.roles import GUIDE, GUIDE_CAPABILITIES, role_rank
 from app.models.user import User
 from app.models.booking import Booking, HostExperience
-from app.models.guide_listing import GuideExperienceRequest
+from app.models.guide_listing import GuideExperienceRequest, GuideListing
 from app.schemas.guide_dashboard import (
     GuideListingCapacityUpdate,
     GuideListingCreate,
@@ -25,7 +25,11 @@ from app.schemas.guide_dashboard import (
     GuideExperienceRequestReview,
 )
 from app.services.guide_dashboard_service import GuideDashboardService
-from app.api.v1.public import MOCK_EXPERIENCES
+from app.api.v1.public import (
+    GUIDE_LISTING_ID_OFFSET,
+    HOST_EXPERIENCE_ID_OFFSET,
+    resolve_experience_reference,
+)
 
 router = APIRouter(prefix="/guide", tags=["guide"])
 
@@ -78,23 +82,74 @@ def guide_bookings(guide: User = Depends(GUIDE_ONLY), db: Session = Depends(get_
     ]
 
 
+# The activity types the new-listing form offers on its first page.  Listings
+# already use these three values; host experiences carry free text, so their
+# category is normalised onto the same set ("Trekking & Hiking" -> trekking).
+ACTIVITY_TYPES = ("trekking", "tour", "specialized")
+
+_ACTIVITY_KEYWORDS = (
+    ("trekking", ("trek", "hik", "climb", "summit", "expedition", "trail")),
+    ("specialized", ("cook", "food", "workshop", "craft", "class", "pottery")),
+    ("tour", ("tour", "walk", "heritage", "cultur", "sightsee", "city", "museum")),
+)
+
+
+def activity_type(raw: Optional[str]) -> str:
+    """Bucket a stored category onto one of :data:`ACTIVITY_TYPES`."""
+    value = (raw or "").strip().lower()
+    if value in ACTIVITY_TYPES:
+        return value
+    for category, keywords in _ACTIVITY_KEYWORDS:
+        if any(word in value for word in keywords):
+            return category
+    return "tour"
+
+
 @router.get("/experience-options")
 def guide_experience_options(guide: User = Depends(GUIDE_ONLY), db: Session = Depends(get_db)) -> list[dict]:
-    """Active host experiences plus mock experiences suitable for assignment requests."""
-    rows = (
+    """Experiences a guide can request to be assigned to, read from the database.
+
+    Ids are the public ones the traveller routes use — host-owned experiences
+    are ``100000 + id`` and approved guide listings ``200000 + id`` — so a
+    request always points at a record that exists and has a page to land on.
+    Each option carries the ``category`` the new-listing form filters on.  The
+    guide's own listings are left out: assignment to your own experience is
+    what the listing itself already is.
+    """
+    options = []
+    host_rows = (
         db.query(HostExperience)
         .filter(HostExperience.is_active.is_(True))
         .order_by(HostExperience.title)
         .all()
     )
-    options = [
-        {"id": row.id, "title": row.title, "city": row.city, "price": row.price}
-        for row in rows
-    ]
-    from app.api.v1.public import MOCK_EXPERIENCES
-
-    for m in MOCK_EXPERIENCES:
-        options.append({"id": m["id"], "title": m["title"], "city": m["city"], "price": m["price"]})
+    for row in host_rows:
+        options.append(
+            {
+                "id": HOST_EXPERIENCE_ID_OFFSET + int(row.id),
+                "title": row.title,
+                "city": row.city,
+                "price": float(row.price or 0.0),
+                "category": activity_type(row.category),
+            }
+        )
+    listing_rows = (
+        db.query(GuideListing)
+        .filter(GuideListing.is_active.is_(True), GuideListing.guide_user_id != guide.id)
+        .order_by(GuideListing.title)
+        .all()
+    )
+    for listing in listing_rows:
+        options.append(
+            {
+                "id": GUIDE_LISTING_ID_OFFSET + int(listing.id),
+                "title": listing.title,
+                "city": listing.city,
+                "price": float(listing.price or 0.0),
+                "category": activity_type(listing.category),
+            }
+        )
+    options.sort(key=lambda item: ((item["title"] or "").lower(), item["id"]))
     return options
 
 
@@ -247,13 +302,29 @@ def guide_create_experience_request(
     if req_type == "booking" and not payload.booking_id:
         raise HTTPException(status_code=422, detail="booking_id is required for booking requests")
     if req_type == "experience":
-        active_host = db.query(HostExperience).filter(
-            HostExperience.id == payload.experience_id,
-            HostExperience.is_active.is_(True),
-        ).first()
-        mock_match = next((m for m in MOCK_EXPERIENCES if m["id"] == payload.experience_id), None)
-        if not active_host and not mock_match:
+        reference = resolve_experience_reference(db, payload.experience_id)
+        # Only experiences that live in the database can carry an assignment:
+        # approving one creates a ``host_experience_guides`` row for it.
+        if reference is None or reference["source"] == "mock" or not reference["is_active"]:
             raise HTTPException(status_code=404, detail="Active experience not found")
+        if (
+            reference["source"] == "guide_listing"
+            and db.get(GuideListing, reference["record_id"]).guide_user_id == guide.id
+        ):
+            raise HTTPException(
+                status_code=422, detail="You already own this experience listing."
+            )
+        # The guide sets the commercial terms the Regional Head reviews.
+        if payload.price_per_person is None or payload.price_per_person <= 0:
+            raise HTTPException(
+                status_code=422, detail="price_per_person is required for experience requests"
+            )
+        if payload.slots is None:
+            raise HTTPException(status_code=422, detail="slots is required for experience requests")
+        if not (payload.meeting_point or "").strip():
+            raise HTTPException(
+                status_code=422, detail="meeting_point is required for experience requests"
+            )
 
     # Prevent duplicate pending requests for the same target.
     existing = (
@@ -279,6 +350,9 @@ def guide_create_experience_request(
         request_type=req_type,
         experience_id=payload.experience_id,
         booking_id=payload.booking_id,
+        price_per_person=payload.price_per_person,
+        slots=payload.slots,
+        meeting_point=(payload.meeting_point or "").strip() or None,
         status="pending",
     )
     db.add(row)
@@ -299,4 +373,12 @@ def guide_list_experience_requests(
         .order_by(GuideExperienceRequest.created_at.desc())
         .all()
     )
-    return [GuideExperienceRequestResponse.model_validate(r) for r in rows]
+    return [
+        {
+            **GuideExperienceRequestResponse.model_validate(r).model_dump(),
+            "experience_title": (
+                resolve_experience_reference(db, r.experience_id) or {}
+            ).get("title"),
+        }
+        for r in rows
+    ]

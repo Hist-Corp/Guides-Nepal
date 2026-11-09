@@ -28,6 +28,7 @@ const registeredRoutes: string[] = [
   '/guide/dashboard',
   '/guide/listings',
   '/guide/listings/new',
+  '/guide/listings/new/details',
   '/guide/listings/:id/edit',
   '/guide/listings/:id/propose-change',
   '/guide/proposals',

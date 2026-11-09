@@ -72,6 +72,11 @@ class GuideExperienceRequest(Base):
     experience_id = Column(Integer, ForeignKey("host_experiences.id"), nullable=True, index=True)
     booking_id = Column(Integer, ForeignKey("host_bookings.id"), nullable=True, index=True)
     request_type = Column(String, nullable=False)  # 'experience' | 'booking'
+    # Commercial terms the guide offers to the Regional Head for this assignment.
+    price_per_person = Column(Float, nullable=True)
+    slots = Column(Integer, nullable=True)
+    # Where the guide meets travellers for the experience they are requesting.
+    meeting_point = Column(String, nullable=True)
     status = Column(String, nullable=False, default="pending", index=True)  # pending | approved | rejected
     reviewed_by = Column(Integer, ForeignKey("users.id"), nullable=True)
     reviewed_at = Column(DateTime(timezone=True), nullable=True)

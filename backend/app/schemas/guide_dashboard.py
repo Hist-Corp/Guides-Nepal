@@ -95,6 +95,10 @@ class GuideExperienceRequestCreate(BaseModel):
     request_type: GuideExperienceRequestType
     experience_id: Optional[int] = None
     booking_id: Optional[int] = None
+    price_per_person: Optional[float] = Field(default=None, ge=0, le=100000)
+    slots: Optional[int] = Field(default=None, ge=1, le=100)
+    # Where the guide meets travellers; required for experience requests.
+    meeting_point: Optional[str] = Field(default=None, max_length=300)
 
 
 class GuideExperienceRequestResponse(BaseModel):
@@ -103,12 +107,18 @@ class GuideExperienceRequestResponse(BaseModel):
     experience_id: Optional[int] = None
     booking_id: Optional[int] = None
     request_type: GuideExperienceRequestType
+    price_per_person: Optional[float] = None
+    slots: Optional[int] = None
+    meeting_point: Optional[str] = None
     status: GuideExperienceRequestStatus
     reviewed_by: Optional[int] = None
     reviewed_at: Optional[datetime] = None
     review_notes: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+    # Resolved against the experience record so the guide sees the same name
+    # the traveller page and the reviewer queue show.
+    experience_title: Optional[str] = None
 
     class Config:
         from_attributes = True

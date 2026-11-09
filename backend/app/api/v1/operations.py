@@ -34,11 +34,12 @@ from app.core.security import get_password_hash, validate_password_strength
 from app.models.booking import Booking, HostExperience
 from app.models.guide import Guide
 from app.models.guide_application import GuideApplication
-from app.models.guide_listing import GuideExperienceRequest
+from app.models.guide_listing import GuideExperienceRequest, GuideListing
 from app.models.host_application import HostApplication
 from app.models.host_guide import HostExperienceGuide, HostGuide
 from app.models.support_ticket import SupportTicket
 from app.models.user import User
+from app.api.v1.public import resolve_experience_reference
 from app.schemas.guide_dashboard import (
     GuideExperienceRequestReview,
     GuideExperienceRequestResponse,
@@ -631,16 +632,11 @@ def list_guide_experience_requests(
         experience = None
         booking = None
         if row.experience_id:
-            experience = db.query(HostExperience).filter(HostExperience.id == row.experience_id).first()
-            if experience is None:
-                # Requests can target the mock catalog (ids 1-12), which has no
-                # host_experiences row, so resolve the title from there to keep
-                # the reviewer's "Target" column populated.
-                from app.api.v1.public import MOCK_EXPERIENCES
-
-                experience = next(
-                    (item for item in MOCK_EXPERIENCES if item["id"] == row.experience_id), None
-                )
+            # Experience ids carry their source: 100000 + host experience id or
+            # 200000 + guide listing id.  Older requests may still point at the
+            # in-memory mock catalogue (ids 1-12), which the resolver also
+            # matches so the reviewer's "Target" column stays populated.
+            experience = resolve_experience_reference(db, row.experience_id)
         if row.booking_id:
             booking = db.get(Booking, row.booking_id)
         results.append({
@@ -659,6 +655,9 @@ def list_guide_experience_requests(
             "booking_title": booking.experience_title if booking else None,
             "booking_date": booking.date.isoformat() if booking and booking.date else None,
             "request_type": row.request_type,
+            "price_per_person": row.price_per_person,
+            "slots": row.slots,
+            "meeting_point": row.meeting_point,
             "status": row.status,
             "reviewed_by": row.reviewed_by,
             "reviewed_at": row.reviewed_at.isoformat() if row.reviewed_at else None,
@@ -733,6 +732,32 @@ def _catalog_guide_for_user(
     return profile
 
 
+def _experience_owner_id(
+    db: Session,
+    reference: Optional[dict],
+    primary_link: Optional[HostExperienceGuide],
+    fallback_user_id: int,
+) -> int:
+    """Host account that owns an experience, used when linking its first guide.
+
+    Existing links keep their host; otherwise the owner comes from the record
+    the public id points at (the host experience's host or the listing's guide
+    account).  Requests filed against the in-memory mock catalogue have no
+    owner, so the approving reviewer is recorded instead of a dangling id.
+    """
+    if primary_link is not None:
+        return int(primary_link.host_id)
+    if reference and reference["source"] == "host_experience":
+        experience = db.get(HostExperience, reference["record_id"])
+        if experience is not None and experience.host_id:
+            return int(experience.host_id)
+    if reference and reference["source"] == "guide_listing":
+        listing = db.get(GuideListing, reference["record_id"])
+        if listing is not None and listing.guide_user_id:
+            return int(listing.guide_user_id)
+    return int(fallback_user_id)
+
+
 @router.patch("/guide-experience-requests/{request_id}/review")
 def review_guide_experience_request(
     request_id: int,
@@ -777,11 +802,19 @@ def review_guide_experience_request(
             booking = db.get(Booking, row.booking_id)
             experience_id = booking.experience_id if booking else None
 
-        if profile is not None and experience_id:
+        # ``host_experience_guides`` is keyed by the raw host experience id, so
+        # a public ``100000 + id`` target has to be translated back; guard
+        # listings (``200000 + id``) and legacy mock ids are kept as filed.
+        reference = resolve_experience_reference(db, experience_id)
+        link_experience_id = experience_id
+        if reference and reference["source"] == "host_experience":
+            link_experience_id = reference["record_id"]
+
+        if profile is not None and link_experience_id:
             already_linked = (
                 db.query(HostExperienceGuide)
                 .filter(
-                    HostExperienceGuide.experience_id == experience_id,
+                    HostExperienceGuide.experience_id == link_experience_id,
                     HostExperienceGuide.guide_id == profile.id,
                 )
                 .first()
@@ -791,14 +824,16 @@ def review_guide_experience_request(
                 # for the same experience are added alongside it.
                 primary_link = (
                     db.query(HostExperienceGuide)
-                    .filter(HostExperienceGuide.experience_id == experience_id)
+                    .filter(HostExperienceGuide.experience_id == link_experience_id)
                     .order_by(HostExperienceGuide.id.asc())
                     .first()
                 )
                 db.add(
                     HostExperienceGuide(
-                        host_id=primary_link.host_id if primary_link else current_user.id,
-                        experience_id=experience_id,
+                        host_id=_experience_owner_id(
+                            db, reference, primary_link, int(current_user.id)
+                        ),
+                        experience_id=link_experience_id,
                         guide_id=profile.id,
                         is_primary=primary_link is None,
                     )

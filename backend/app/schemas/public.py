@@ -36,8 +36,15 @@ class GuideUpdate(BaseModel):
 
 class GuideResponse(GuideBase):
     id: int
+    # Login account id of the guide, so the frontend can hide a signed-in
+    # guide from their own "Who you'll meet" list.
+    userId: Optional[int] = None
     gallery: List[str] = []
     is_active: bool = True
+    # Commercial terms of the guide's approved assignment for this experience,
+    # so "Who you'll meet" can show a price per guide.
+    price: Optional[float] = None
+    slots: Optional[int] = None
 
     class Config:
         from_attributes = True
@@ -52,6 +59,11 @@ class ExperienceBase(BaseModel):
     duration: Optional[str] = None
     rating: Optional[float] = None
     reviews: Optional[int] = None
+    # Live capacity of a published guide listing, so the traveller booking card
+    # can show the remaining slots. None for rows without capacity tracking.
+    maxGuests: Optional[int] = None
+    bookedGuests: Optional[int] = None
+    availableSlots: Optional[int] = None
 
 
 class ExperienceResponse(ExperienceBase):

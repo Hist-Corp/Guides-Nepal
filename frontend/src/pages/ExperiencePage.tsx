@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { StickyBarPortal } from '../components/common/StickyBarPortal';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Header } from '../components/common/Header';
@@ -19,6 +19,7 @@ import { BookingLoginPrompt } from '../components/common/BookingLoginPrompt';
 import { useAuthStore } from '../store/authStore';
 import { useProfileStore } from '../store/profileStore';
 import guidesApi from '../services/guidesApi';
+import { isOwnGuide, useViewerGuideId } from '../utils/guides';
 import { guideDashboardApi } from '../services/guideDashboardApi';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { getApiUrl } from '../config/api';
@@ -50,6 +51,10 @@ interface AssignedGuide {
   role?: string;
   rating: number;
   reviews: number;
+  // The guide's own per-person price for this experience, when they were
+  // approved with a quote. Falls back to the experience price.
+  price?: number | null;
+  slots?: number | null;
 }
 
 interface Experience {
@@ -66,6 +71,9 @@ interface Experience {
   host: Host;
   // Approved guides, only returned by the backend catalog.
   guides?: AssignedGuide[];
+  // Live capacity of a published guide listing (undefined elsewhere).
+  maxGuests?: number;
+  availableSlots?: number;
   // Trek route extras — only set for the /trek-hiking catalog.
   tagline?: string;
   itinerary?: TrekRouteContent['itinerary'];
@@ -627,6 +635,9 @@ const ExperiencePage: React.FC = () => {
   const staticExperience = experienceId ? experiencesData[experienceId] : undefined;
   const [apiExperience, setApiExperience] = useState<Experience | undefined>(undefined);
   const [listingExperience, setListingExperience] = useState<Experience | undefined>(undefined);
+  // Public slug of a database-backed experience, so capacity can be re-read
+  // after a booking without reloading the page.
+  const [resolvedSlug, setResolvedSlug] = useState<string | null>(null);
   const [loading, setLoading] = useState(!staticExperience);
   const experience = staticExperience ?? apiExperience ?? listingExperience;
 
@@ -637,6 +648,7 @@ const ExperiencePage: React.FC = () => {
   useEffect(() => {
     setApiExperience(undefined);
     setListingExperience(undefined);
+    setResolvedSlug(null);
 
     if (staticExperience || !experienceId) {
       setLoading(false);
@@ -660,6 +672,8 @@ const ExperiencePage: React.FC = () => {
             reviews: match.reviews ?? 0,
             price: match.price ?? 0,
             duration: match.duration ?? '3 hours',
+            maxGuests: match.maxGuests ?? undefined,
+            availableSlots: match.availableSlots ?? undefined,
             host: (match.host
               ? {
                   ...match.host,
@@ -675,6 +689,7 @@ const ExperiencePage: React.FC = () => {
                   about: 'A passionate local guide ready to show you the best of Nepal.',
                 }) as Host,
           });
+          setResolvedSlug(match.slug ?? null);
           setLoading(false);
           return;
         }
@@ -703,7 +718,10 @@ const ExperiencePage: React.FC = () => {
               about: 'A local guide offering this experience.',
             },
             meetingPoint: listingMatch.meeting_point ?? undefined,
+            maxGuests: listingMatch.max_guests,
+            availableSlots: listingMatch.available_spots,
           });
+          setResolvedSlug(`guide-${listingMatch.id}`);
         }
       } catch (error) {
         console.error('Failed to load experience:', error);
@@ -790,18 +808,83 @@ const ExperiencePage: React.FC = () => {
   const [canReview, setCanReview] = useState<boolean | null>(null);
   const [reviewFormOpen, setReviewFormOpen] = useState(false);
 
-  // The sheet offers guide selection; this page only has the host.
+  // A signed-in guide must not see themselves in "Who you'll meet".
+  const viewerGuideId = useViewerGuideId();
+  const visibleGuides = useMemo(
+    () => (experience?.guides ?? []).filter((g) => !isOwnGuide(g, viewerGuideId)),
+    [experience, viewerGuideId]
+  );
+
+  // The guide the traveller picked out of "Who you'll meet". Guides quote their
+  // own per-person price, so the booking card prices the booking for them.
+  const [selectedGuideId, setSelectedGuideId] = useState<number | null>(null);
+  const selectedGuide =
+    selectedGuideId === null
+      ? null
+      : visibleGuides.find((g) => String(g.id) === String(selectedGuideId)) ?? null;
+  const unitPrice = selectedGuide?.price ?? experience?.price ?? 0;
+
+  // A new experience resets the choice so its own price shows first.
+  useEffect(() => {
+    setSelectedGuideId(null);
+  }, [experienceId]);
+
+  // The mobile sheet offers the same guides, so both booking paths agree.
   const hostGuide: SheetGuide | null = experience
     ? {
-        id: `host-${experience.id}`,
-        name: experience.host.name,
-        role: 'Your host',
-        image: experience.host.image,
-        rating: experience.host.rating,
-        reviews: experience.host.reviews,
+        id: selectedGuide ? selectedGuide.id : `host-${experience.id}`,
+        name: selectedGuide?.name ?? experience.host.name,
+        role: selectedGuide?.role ?? 'Your host',
+        image: selectedGuide?.image ?? experience.host.image,
+        rating: selectedGuide?.rating ?? experience.host.rating,
+        reviews: selectedGuide?.reviews ?? experience.host.reviews,
       }
     : null;
-  const sheetGuides: SheetGuide[] = hostGuide ? [hostGuide] : [];
+  const sheetGuides: SheetGuide[] = visibleGuides.length
+    ? visibleGuides.map((g) => ({
+        id: g.id,
+        name: g.name,
+        role: g.role ?? 'Experience Guide',
+        image: g.image,
+        rating: g.rating,
+        reviews: g.reviews,
+      }))
+    : hostGuide
+      ? [hostGuide]
+      : [];
+
+  // Live remaining capacity of a published guide listing. Catalog experiences
+  // do not track slots, so they keep the previous 20-guest ceiling.
+  const slotsLeft =
+    typeof experience?.availableSlots === 'number' ? experience.availableSlots : null;
+  const guestCeiling = slotsLeft === null ? 20 : Math.max(1, Math.min(20, slotsLeft));
+
+  // Other travellers can take slots while this page is open, so re-read the
+  // listing capacity after a booking instead of trusting the first payload.
+  const refreshCapacity = async () => {
+    if (!resolvedSlug) return;
+    try {
+      const fresh = await guidesApi.getExperience(resolvedSlug);
+      setApiExperience((prev) =>
+        prev
+          ? {
+              ...prev,
+              maxGuests: fresh.maxGuests ?? prev.maxGuests,
+              availableSlots: fresh.availableSlots ?? prev.availableSlots,
+            }
+          : prev
+      );
+    } catch {
+      // Keep the last known capacity when the refresh cannot be reached.
+    }
+  };
+
+  // Never leave the guest picker above the remaining slots.
+  useEffect(() => {
+    if (slotsLeft !== null && guests > slotsLeft) {
+      setGuests(Math.max(1, Math.min(slotsLeft, 20)));
+    }
+  }, [slotsLeft, guests]);
 
   const persistBooking = async () => {
     if (!experience) return false;
@@ -812,11 +895,16 @@ const ExperiencePage: React.FC = () => {
       city: experience.city,
       date: selectedDate,
       guests: guests,
-      price: experience.price,
+      price: unitPrice,
       image: experience.images[0],
       status: 'upcoming',
+      ...(selectedGuide ? { guideId: selectedGuide.id, guideName: selectedGuide.name } : {}),
     });
-    if (bookingSaved) { setIsBooked(true); setBookingConfirmed(true); }
+    if (bookingSaved) {
+      setIsBooked(true);
+      setBookingConfirmed(true);
+      void refreshCapacity();
+    }
     return bookingSaved;
   };
 
@@ -1240,31 +1328,70 @@ const ExperiencePage: React.FC = () => {
                 </div>
               </div>
               {/* Who you'll meet — approved guides assigned to this experience */}
-              {(experience.guides && experience.guides.length > 0) && (
+              {visibleGuides.length > 0 && (
                 <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm space-y-4">
-                  <div className="flex items-center justify-between">
+                  <div>
                     <h2 className="text-xl font-bold text-slate-900">Who you'll meet</h2>
+                    <p className="mt-1 text-sm text-slate-500">
+                      Pick your guide — each one sets their own price.
+                    </p>
                   </div>
                   <div className="flex flex-wrap gap-4">
-                    {experience.guides.map((g: any) => (
-                      <div key={g.id} className="flex flex-col items-center gap-2">
-                        <img
-                          src={g.image}
-                          alt={g.name}
-                          className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md mb-2"
-                          onError={(e) => (e.currentTarget.src = "/images/placeholder.svg")}
-                        />
-                        <div className="text-center">
-                          <div className="font-bold text-gray-900">{g.name}</div>
-                          <div className="text-xs text-gray-500">
-                            {g.role || "Experience Guide"}
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            {g.rating} ★ ({g.reviews} reviews)
-                          </div>
+                    {visibleGuides.map((g) => {
+                      const isSelected = String(selectedGuideId) === String(g.id);
+                      return (
+                        <div
+                          key={g.id}
+                          className={`flex w-44 flex-col items-center gap-2 rounded-2xl border p-4 text-center transition-colors ${
+                            isSelected
+                              ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                              : 'border-slate-200 hover:border-slate-400'
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            aria-pressed={isSelected}
+                            aria-label={`Select guide ${g.name}`}
+                            onClick={() => setSelectedGuideId(isSelected ? null : g.id)}
+                            className="flex w-full flex-col items-center gap-2"
+                          >
+                            <img
+                              src={g.image}
+                              alt={g.name}
+                              className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md"
+                              onError={(e) => (e.currentTarget.src = "/images/placeholder.svg")}
+                            />
+                            <div>
+                              <div className="font-bold text-gray-900">{g.name}</div>
+                              <div className="text-xs text-gray-500">
+                                {g.role || "Experience Guide"}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {g.rating} ★ ({g.reviews} reviews)
+                              </div>
+                            </div>
+                            {typeof g.price === 'number' && (
+                              <div className="text-sm font-bold text-secondary">
+                                {formatPrice(g.price, 'USD')}{' '}
+                                <span className="text-xs font-medium text-slate-500">/ person</span>
+                              </div>
+                            )}
+                          </button>
+                          <Link
+                            to={`/guides/${g.id}`}
+                            aria-label={`View ${g.name}'s profile`}
+                            className="text-xs font-bold text-primary hover:underline"
+                          >
+                            View profile
+                          </Link>
+                          {isSelected && (
+                            <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                              Selected
+                            </span>
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -1323,10 +1450,19 @@ const ExperiencePage: React.FC = () => {
                   <div className="flex flex-col">
                     <div className="flex items-baseline gap-1">
                       <span className="text-xl font-bold text-gray-900">
-                        {formatPrice(experience.price, 'USD')}
+                        {formatPrice(unitPrice, 'USD')}
                       </span>
                       <span className="text-gray-500 text-xs">/ person</span>
                     </div>
+                    {slotsLeft !== null && (
+                      <span
+                        className={`text-[11px] font-semibold ${
+                          slotsLeft > 0 ? 'text-green-700' : 'text-amber-700'
+                        }`}
+                      >
+                        {slotsLeft > 0 ? `${slotsLeft} slots left` : 'Fully booked'}
+                      </span>
+                    )}
                     <button
                       type="button"
                       onClick={openSheet}
@@ -1337,7 +1473,8 @@ const ExperiencePage: React.FC = () => {
                   </div>
                   <button
                     onClick={openSheet}
-                    className="bg-primary hover:bg-primary-hover text-white font-bold py-3 px-6 rounded-lg uppercase tracking-wide"
+                    disabled={slotsLeft === 0}
+                    className="bg-primary hover:bg-primary-hover text-white font-bold py-3 px-6 rounded-lg uppercase tracking-wide disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Book Now
                   </button>
@@ -1357,10 +1494,29 @@ const ExperiencePage: React.FC = () => {
 
                 <div className="flex items-baseline space-x-2 mb-6">
                   <span className="text-3xl font-bold text-secondary">
-                    {formatPrice(experience.price, 'USD')}
+                    {formatPrice(unitPrice, 'USD')}
                   </span>
                   <span className="text-gray-500">/ person</span>
+                  {selectedGuide && (
+                    <span className="ml-1 text-sm text-slate-500">with {selectedGuide.name}</span>
+                  )}
                 </div>
+
+                {slotsLeft !== null && (
+                  <div className="mb-4">
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${
+                        slotsLeft > 0
+                          ? 'border-green-100 bg-green-50 text-green-700'
+                          : 'border-amber-100 bg-amber-50 text-amber-700'
+                      }`}
+                    >
+                      {slotsLeft > 0
+                        ? `${slotsLeft} of ${experience.maxGuests ?? slotsLeft} slots left`
+                        : 'Fully booked'}
+                    </span>
+                  </div>
+                )}
 
                 <div className="space-y-4 mb-6">
                   <div>
@@ -1384,16 +1540,17 @@ const ExperiencePage: React.FC = () => {
                       setGuests(g);
                       setBookingError(null);
                     }}
-                    maxGuests={20}
+                    maxGuests={guestCeiling}
                     idPrefix="exp"
                   />
-                  {guests > 1 && experience && (
+                  {experience && (
                     <div className="flex justify-between text-sm text-slate-600 border-t border-slate-100 pt-3">
                       <span>
-                        {formatPrice(experience.price, 'USD')} × {guests} guests
+                        {formatPrice(unitPrice, 'USD')} × {guests} guest
+                        {guests === 1 ? '' : 's'}
                       </span>
                       <span className="font-bold text-secondary">
-                        {formatPrice(experience.price * guests, 'USD')}
+                        {formatPrice(unitPrice * guests, 'USD')}
                       </span>
                     </div>
                   )}
@@ -1408,18 +1565,19 @@ const ExperiencePage: React.FC = () => {
                       <p>{experience.title}</p>
                       <p>Date: {selectedDate}</p>
                       <p>Guests: {guests}</p>
-                      <p>Total: {formatPrice(experience.price * guests, 'USD')}</p>
+                      <p>Total: {formatPrice(unitPrice * guests, 'USD')}</p>
                       <p>City: {experience.city}</p>
-                      <p>Host: {experience.host.name}</p>
+                      <p>Guide: {selectedGuide?.name ?? experience.host.name}</p>
                     </div>
                   )}
                 </div>
 
                 <Button
-                  className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 text-lg rounded-xl mb-4 shadow-lg shadow-primary/20"
+                  className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 text-lg rounded-xl mb-4 shadow-lg shadow-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
                   onClick={handleBooking}
+                  disabled={slotsLeft === 0}
                 >
-                  {isBooked ? 'Booked!' : 'Book Now'}
+                  {isBooked ? 'Booked!' : slotsLeft === 0 ? 'Sold out' : 'Book Now'}
                 </Button>
 
                 <div className="text-center text-xs text-slate-500 space-y-2">
@@ -1453,7 +1611,7 @@ const ExperiencePage: React.FC = () => {
         <MobileBookingSheet
           open={isSheetOpen}
           onClose={closeSheet}
-          pricePerPerson={experience.price}
+          pricePerPerson={unitPrice}
           rating={experience.rating}
           reviews={experience.reviews}
           accentClass="bg-primary hover:bg-primary-hover"
@@ -1469,12 +1627,15 @@ const ExperiencePage: React.FC = () => {
             setGuests(g);
             setBookingError(null);
           }}
-          maxGuests={20}
+          maxGuests={guestCeiling}
           bookingTime={bookingTime}
           onTimeChange={setBookingTime}
           guides={sheetGuides}
           selectedGuide={hostGuide}
-          onSelectGuide={() => undefined}
+          onSelectGuide={(g) => {
+            const id = Number(g.id);
+            if (Number.isFinite(id)) setSelectedGuideId(id);
+          }}
           onConfirm={handleSheetConfirm}
           error={sheetError}
           confirmed={sheetConfirmed}
@@ -1490,7 +1651,7 @@ const ExperiencePage: React.FC = () => {
                 <span className="font-bold">Start time:</span> {bookingTime}
               </li>
               <li>
-                <span className="font-bold">Host:</span> {experience.host.name}
+                <span className="font-bold">Host:</span> {selectedGuide?.name ?? experience.host.name}
               </li>
             </ul>
           }
@@ -1606,16 +1767,18 @@ const ExperiencePage: React.FC = () => {
                 <span className="font-medium">{guests}</span>
               </div>
               <div className="flex justify-between border-b pb-2">
-                <span>Host</span>
-                <span className="font-medium">{experience.host.name}</span>
+                <span>{selectedGuide ? 'Guide' : 'Host'}</span>
+                <span className="font-medium">
+                  {selectedGuide?.name ?? experience.host.name}
+                </span>
               </div>
               <div className="flex justify-between border-b pb-2">
                 <span>Price per person</span>
-                <span className="font-medium">{formatPrice(experience.price, 'USD')}</span>
+                <span className="font-medium">{formatPrice(unitPrice, 'USD')}</span>
               </div>
               <div className="flex justify-between border-b pb-2 font-bold text-primary">
                 <span>Total</span>
-                <span className="font-bold">{formatPrice(experience.price * guests, 'USD')}</span>
+                <span className="font-bold">{formatPrice(unitPrice * guests, 'USD')}</span>
               </div>
             </div>
             <div className="flex gap-3">

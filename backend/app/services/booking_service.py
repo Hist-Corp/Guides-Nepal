@@ -137,10 +137,33 @@ class BookingService:
         )
         return [b.date.strftime("%Y-%m-%d") if hasattr(b.date, "strftime") else str(b.date)[:10] for b in rows]
 
+    def _guide_listing_for(self, experience_id: int | None) -> Optional[GuideListing]:
+        """Return the published guide listing behind a public experience id.
+
+        Traveller-facing ids are offset (``200000 + listing id``), so they are
+        resolved through the same helper the request queue uses.
+        """
+        from app.api.v1.public import resolve_experience_reference
+
+        resolved = resolve_experience_reference(self.db, experience_id)
+        if not resolved or resolved.get("source") != "guide_listing":
+            return None
+        return self.db.get(GuideListing, resolved["record_id"])
+
+    @staticmethod
+    def _slots_left(listing: GuideListing) -> int:
+        return max(int(listing.max_guests or 0) - int(listing.booked_guests or 0), 0)
+
     def create_booking(self, user_id: int, booking_in: BookingCreate) -> Booking:
         # Honor the guide/host the traveler selected when it maps to an active
         # guide account; otherwise fall back to the default bookable guide.
         guide_id = self._resolve_guide_user_id(booking_in.guide_id)
+        # A guide cannot book themselves as the guide for an experience.
+        if guide_id is not None and int(guide_id) == int(user_id):
+            raise HTTPException(
+                status_code=400,
+                detail="You cannot book yourself as the guide for an experience.",
+            )
         if guide_id is None:
             guide = self.get_booking_guide()
         else:
@@ -151,6 +174,20 @@ class BookingService:
                 status_code=409,
                 detail=f"The guide is already {availability['status']} on this date. Please choose another date.",
             )
+        # Published guide listings track live capacity; hold the slots for the
+        # booking so the next traveller sees an updated count.
+        listing = self._guide_listing_for(booking_in.experience_id)
+        if listing is not None:
+            remaining = self._slots_left(listing)
+            if int(booking_in.guests or 0) > remaining:
+                raise HTTPException(
+                    status_code=409,
+                    detail=(
+                        f"Only {remaining} slot{'s' if remaining != 1 else ''} left for this experience."
+                    ),
+                )
+            listing.booked_guests = int(listing.booked_guests or 0) + int(booking_in.guests or 0)
+
         db_booking = Booking(
             user_id=user_id,
             guide_user_id=guide.id,
@@ -168,6 +205,13 @@ class BookingService:
             .first()
         )
         if booking:
+            # Cancelling releases the capacity the booking held on a guide listing.
+            if booking.status in (BookingStatus.upcoming, BookingStatus.accepted):
+                listing = self._guide_listing_for(booking.experience_id)
+                if listing is not None:
+                    listing.booked_guests = max(
+                        int(listing.booked_guests or 0) - int(booking.guests or 0), 0
+                    )
             booking.status = BookingStatus.cancelled  # type: ignore
             self.db.commit()
             self.db.refresh(booking)

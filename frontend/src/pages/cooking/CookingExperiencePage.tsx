@@ -27,7 +27,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useMessageStore } from '../../store/messageStore';
 import { getApiUrl } from '../../config/api';
 import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
-import { getAvailableGuides } from '../../utils/guides';
+import { getAvailableGuides, useViewerGuideId } from '../../utils/guides';
 
 interface Guide {
   id: number;
@@ -287,9 +287,14 @@ const CookingExperiencePage: React.FC = () => {
     }
   }, [selectedGuide, accessToken]);
 
+  // A signed-in guide never sees (or books) themselves in "Who you'll meet".
+  const viewerGuideId = useViewerGuideId();
   const availableGuides = useMemo(
-    () => (data ? getAvailableGuides(data.guides ?? [], bookings, data.id, '') : []),
-    [data, bookings]
+    () =>
+      data
+        ? getAvailableGuides(data.guides ?? [], bookings, data.id, '', viewerGuideId)
+        : [],
+    [data, bookings, viewerGuideId]
   );
 
 const handleBookNow = async (): Promise<boolean> => {

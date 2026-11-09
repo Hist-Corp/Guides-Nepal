@@ -198,6 +198,24 @@ const RegionalExperienceRequestReview: React.FC = () => {
                         <span className="text-sm text-gray-600 truncate">{req.booking_title}</span>
                       </div>
                     )}
+                    {typeof req.price_per_person === 'number' && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-gray-500">Price / person</span>
+                        <span className="text-sm text-gray-600">${req.price_per_person.toFixed(2)}</span>
+                      </div>
+                    )}
+                    {typeof req.slots === 'number' && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-gray-500">Slots</span>
+                        <span className="text-sm text-gray-600">{req.slots}</span>
+                      </div>
+                    )}
+                    {req.meeting_point && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-gray-500">Meeting point</span>
+                        <span className="text-sm text-gray-600 truncate">{req.meeting_point}</span>
+                      </div>
+                    )}
                     {req.booking_date && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-medium text-gray-500">Date</span>

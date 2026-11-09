@@ -12,6 +12,9 @@ export interface GuideExperienceRequest {
   experience_id: number | null;
   booking_id: number | null;
   request_type: GuideExperienceRequestType;
+  price_per_person?: number | null;
+  slots?: number | null;
+  meeting_point?: string | null;
   status: GuideExperienceRequestStatus;
   reviewed_by: number | null;
   reviewed_at: string | null;
@@ -21,7 +24,8 @@ export interface GuideExperienceRequest {
   guide_name?: string;
   guide_email?: string;
   guide_region?: string;
-  experience_title?: string;
+  /** Name resolved from the experience the request targets. */
+  experience_title?: string | null;
   booking_title?: string;
   booking_date?: string;
 }
@@ -30,6 +34,9 @@ export interface GuideExperienceRequestCreate {
   request_type: GuideExperienceRequestType;
   experience_id?: number;
   booking_id?: number;
+  price_per_person?: number;
+  slots?: number;
+  meeting_point?: string;
 }
 
 export interface GuideExperienceRequestReview {
@@ -42,6 +49,8 @@ export interface GuideExperienceOption {
   title: string;
   city: string;
   price: number;
+  /** Activity type the new-listing form's first page filters on. */
+  category: GuideCategory;
 }
 
 export interface GuideBookingOption {
