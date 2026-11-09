@@ -7,6 +7,7 @@ import guidesApi, { type GuideProfile } from '../services/guidesApi';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { experienceSlugPath } from '../utils/canonicalExperience';
 import { useGoBack } from '../utils/backNavigation';
+import { getLocalGuideProfile } from '../utils/guideProfile';
 import {
   ArrowLeft,
   CalendarDays,
@@ -49,25 +50,35 @@ const GuideProfilePage: React.FC = () => {
   useEffect(() => {
     const guideId = Number(id);
     if (!Number.isFinite(guideId)) {
-      setProfile(null);
-      setError('Guide not found.');
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+        setProfile(null);
+        setError('Guide not found.');
+      }, 0);
       return;
     }
 
     let cancelled = false;
-    setLoading(true);
-    setError(null);
+    setTimeout(() => {
+      setLoading(true);
+      setError(null);
+    }, 0);
     guidesApi
       .getGuideProfile(guideId)
       .then((data) => {
-        if (!cancelled) setProfile(data);
+        if (!cancelled) setTimeout(() => setProfile(data), 0);
       })
       .catch(() => {
-        if (!cancelled) setError('We could not load this guide profile.');
+        // City-catalog guides are not all seeded in the backend. Fall back to
+        // the standardized local profile so a valid id still opens its own page
+        // instead of an error or another guide's data.
+        const localProfile = getLocalGuideProfile(guideId);
+        if (cancelled) return;
+        if (localProfile) setTimeout(() => setProfile(localProfile), 0);
+        else setTimeout(() => setError('We could not load this guide profile.'), 0);
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setTimeout(() => setLoading(false), 0);
       });
 
     return () => {
@@ -297,7 +308,9 @@ const GuideProfilePage: React.FC = () => {
                     <button
                       key={`${photo}-${index}`}
                       type="button"
-                      onClick={() => setLightbox({ src: photo, alt: `${profile.name} photo ${index + 1}` })}
+                      onClick={() =>
+                        setLightbox({ src: photo, alt: `${profile.name} photo ${index + 1}` })
+                      }
                       className="group overflow-hidden rounded-xl"
                     >
                       <img
@@ -320,9 +333,7 @@ const GuideProfilePage: React.FC = () => {
               <div className="flex flex-wrap items-end justify-between gap-2">
                 <div>
                   <h2 className="text-xl font-bold text-slate-900">
-                    {experiences.length > 0
-                      ? `Experiences with ${profile.name}`
-                      : 'Experiences'}
+                    {experiences.length > 0 ? `Experiences with ${profile.name}` : 'Experiences'}
                   </h2>
                   <p className="mt-1 text-sm text-slate-500">
                     {experiences.length > 0
@@ -381,7 +392,8 @@ const GuideProfilePage: React.FC = () => {
                             </span>
                             {typeof experience.availableSlots === 'number' && (
                               <span className="inline-flex items-center gap-1">
-                                <Users className="h-3.5 w-3.5" /> {experience.availableSlots} slots left
+                                <Users className="h-3.5 w-3.5" /> {experience.availableSlots} slots
+                                left
                               </span>
                             )}
                           </div>
@@ -416,9 +428,7 @@ const GuideProfilePage: React.FC = () => {
                     <dt className="inline-flex items-center gap-1.5 text-slate-500">
                       <Star className="h-4 w-4 text-brand-yellow" /> Rating
                     </dt>
-                    <dd className="font-bold text-slate-900">
-                      {profile.rating.toFixed(2)} / 5
-                    </dd>
+                    <dd className="font-bold text-slate-900">{profile.rating.toFixed(2)} / 5</dd>
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <dt className="text-slate-500">Reviews</dt>
@@ -473,8 +483,8 @@ const GuideProfilePage: React.FC = () => {
                   <ShieldCheck className="h-4 w-4 text-green-600" /> Travel with confidence
                 </p>
                 <p className="mt-2">
-                  Every Guides-Nepal guide is reviewed by our regional team, and each booking
-                  shown here is confirmed before you pay.
+                  Every Guides-Nepal guide is reviewed by our regional team, and each booking shown
+                  here is confirmed before you pay.
                 </p>
               </div>
             </div>

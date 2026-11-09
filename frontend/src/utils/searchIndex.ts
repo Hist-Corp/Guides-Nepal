@@ -103,13 +103,8 @@ const createIndexEntries = (): SearchIndexEntry[] => {
       subtitle: `${guide.role} • ${guide.livesIn}`,
       description: guide.bio,
       image: guide.image,
-      link: `/guide/${guide.id}`,
-      tags: [
-        guide.role,
-        guide.livesIn,
-        ...guide.languages,
-        ...guide.cities,
-      ].filter(Boolean),
+      link: `/local/${guide.id}`,
+      tags: [guide.role, guide.livesIn, ...guide.languages, ...guide.cities].filter(Boolean),
       city: guide.livesIn,
       category: guide.role,
       rating: guide.rating,
@@ -137,7 +132,11 @@ const createIndexEntries = (): SearchIndexEntry[] => {
       description: `${cityExperiences.length} experiences available`,
       image: firstExp?.heroImage,
       link: `/city/${city.key}`,
-      tags: [city.name, city.description, ...cityExperiences.map((e) => e.type || '').filter(Boolean)],
+      tags: [
+        city.name,
+        city.description,
+        ...cityExperiences.map((e) => e.type || '').filter(Boolean),
+      ],
       city: city.name,
     });
   }
@@ -200,7 +199,8 @@ export const searchIndexEntries = (query: string, limit = 10): SearchResult[] =>
 
     for (const searchToken of searchTokens) {
       const isMatch = searchableTokens.some(
-        (token) => token === searchToken || token.startsWith(searchToken) || token.includes(searchToken)
+        (token) =>
+          token === searchToken || token.startsWith(searchToken) || token.includes(searchToken)
       );
       if (isMatch) {
         matchedWords++;
@@ -219,10 +219,16 @@ export const searchIndexEntries = (query: string, limit = 10): SearchResult[] =>
       if (entry.type === 'experience' && searchableTokens.includes(searchTokens[0])) {
         score += 20;
       }
-      if (entry.type === 'city' && searchTokens.some((t) => tokenize(entry.title || '').includes(t))) {
+      if (
+        entry.type === 'city' &&
+        searchTokens.some((t) => tokenize(entry.title || '').includes(t))
+      ) {
         score += 30;
       }
-      if (entry.type === 'guide' && searchTokens.some((t) => tokenize(entry.title || '').includes(t))) {
+      if (
+        entry.type === 'guide' &&
+        searchTokens.some((t) => tokenize(entry.title || '').includes(t))
+      ) {
         score += 25;
       }
 

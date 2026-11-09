@@ -1,4 +1,12 @@
-import { allGuides } from './guidesData';
+import {
+  allGuides,
+  bishnuGuide,
+  kumarGuide,
+  panditGuide,
+  ramGuide,
+  rameshGuide,
+  sitaCulturalGuide,
+} from './guidesData';
 import { RichExperienceData } from './types';
 
 // For backward compatibility within this file
@@ -17,11 +25,7 @@ export const bharatpurRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=400&q=80',
       type: 'Wildlife Expert',
     },
-    guides: [
-      { ...commonGuides[0], name: 'Ram', role: 'Wildlife Expert' },
-      commonGuides[3],
-      commonGuides[2],
-    ],
+    guides: [ramGuide, commonGuides[3], commonGuides[2]],
     description:
       'Embark on a thrilling jeep safari deep into the heart of Chitwan National Park. Spot one-horned rhinos, royal bengal tigers, and wild elephants.',
     tourStructure: {
@@ -62,11 +66,7 @@ export const bharatpurRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=400&q=80',
       type: 'Cultural Guide',
     },
-    guides: [
-      { ...commonGuides[1], name: 'Sita', role: 'Cultural Guide' },
-      commonGuides[2],
-      commonGuides[0],
-    ],
+    guides: [sitaCulturalGuide, commonGuides[2], commonGuides[0]],
     description:
       'Immerse yourself in the unique culture of the Tharu people. Visit traditional mud houses, see their stick dance, and taste local delicacies.',
     tourStructure: {
@@ -107,11 +107,7 @@ export const bharatpurRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=400&q=80',
       type: 'River Guide',
     },
-    guides: [
-      { ...commonGuides[3], name: 'Bishnu', role: 'River Guide' },
-      commonGuides[0],
-      commonGuides[1],
-    ],
+    guides: [bishnuGuide, commonGuides[0], commonGuides[1]],
     description:
       "Drift silently down the Rapti River in a traditional dugout canoe. It's the best way to see crocodiles basking on the banks and water birds.",
     tourStructure: {
@@ -152,11 +148,7 @@ export const bharatpurRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?auto=format&fit=crop&w=400&q=80',
       type: 'Animal Expert',
     },
-    guides: [
-      { ...commonGuides[2], name: 'Kumar', role: 'Animal Expert' },
-      commonGuides[3],
-      commonGuides[0],
-    ],
+    guides: [kumarGuide, commonGuides[3], commonGuides[0]],
     description:
       'Visit one of the few elephant breeding centers in the world. See baby elephants playing with their mothers and learn about conservation efforts.',
     tourStructure: {
@@ -197,11 +189,7 @@ export const bharatpurRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=400&q=80',
       type: 'Ornithologist',
     },
-    guides: [
-      { ...commonGuides[0], name: 'Ramesh', role: 'Ornithologist' },
-      commonGuides[1],
-      commonGuides[2],
-    ],
+    guides: [rameshGuide, commonGuides[1], commonGuides[2]],
     description:
       'Visit Bishazari Tal (20,000 Lake), a Ramsar site in the buffer zone. A paradise for bird watchers and nature lovers.',
     tourStructure: {
@@ -242,11 +230,7 @@ export const bharatpurRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=400&q=80',
       type: 'Spiritual Guide',
     },
-    guides: [
-      { ...commonGuides[3], name: 'Pandit', role: 'Spiritual Guide' },
-      commonGuides[0],
-      commonGuides[1],
-    ],
+    guides: [panditGuide, commonGuides[0], commonGuides[1]],
     description:
       'Visit Devghat Dham, the holiest place in Chitwan at the confluence of the Kaligandaki and Trishuli rivers. A place of meditation and elderly care.',
     tourStructure: {

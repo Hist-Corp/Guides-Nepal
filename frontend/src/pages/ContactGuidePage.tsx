@@ -19,7 +19,8 @@ import guidesApi from '../services/guidesApi';
 const ContactGuidePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const goBack = useGoBack();
-  const [guide, setGuide] = useState(commonGuides[0]);
+  const [guide, setGuide] = useState<(typeof commonGuides)[number] | null>(null);
+  const [loadingGuide, setLoadingGuide] = useState(true);
 
   // Form State
   const [adults, setAdults] = useState(2);
@@ -29,29 +30,82 @@ const ContactGuidePage: React.FC = () => {
   const [duration, setDuration] = useState(3);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchGuide = async () => {
-      const guideId = id ? parseInt(id) : 1;
-      // First try to find in static data
-      const staticGuide = commonGuides.find((g) => g.id === guideId);
-      if (staticGuide) {
-        setGuide(staticGuide);
+      const guideId = id ? Number(id) : NaN;
+      setLoadingGuide(true);
+
+      if (!Number.isFinite(guideId)) {
+        if (!cancelled) {
+          setGuide(null);
+          setLoadingGuide(false);
+        }
         return;
       }
-      // If not found, try fetching from backend API
+
+      // The local catalog covers the city guides; backend-only guides are
+      // fetched by id afterwards.
+      const staticGuide = commonGuides.find((g) => g.id === guideId);
+      if (staticGuide) {
+        if (!cancelled) {
+          setGuide(staticGuide);
+          setLoadingGuide(false);
+        }
+        return;
+      }
+
       try {
         const apiGuide = await guidesApi.getGuide(guideId);
-        setGuide(apiGuide);
+        if (!cancelled) setGuide(apiGuide);
       } catch (error) {
         console.error('Error fetching guide:', error);
-        setGuide(null);
+        if (!cancelled) setGuide(null);
+      } finally {
+        if (!cancelled) setLoadingGuide(false);
       }
     };
+
     fetchGuide();
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   // Personalization request submission
   const [sendingRequest, setSendingRequest] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
+
+  if (loadingGuide) {
+    return (
+      <div className="min-h-screen flex flex-col font-sans bg-white">
+        <Header />
+        <main className="flex-grow flex items-center justify-center px-4 py-20">
+          <p className="text-gray-500 font-medium">Loading guide...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!guide) {
+    return (
+      <div className="min-h-screen flex flex-col font-sans bg-white">
+        <Header />
+        <main className="flex-grow flex flex-col items-center justify-center px-4 py-20 text-center">
+          <h1 className="text-2xl font-bold text-gray-900">Guide not found</h1>
+          <p className="mt-3 text-gray-600">This guide is no longer available.</p>
+          <button
+            onClick={goBack}
+            className="mt-8 rounded-full bg-[#213448] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#1a2a3a]"
+          >
+            Go back
+          </button>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   const handleRequest = async () => {
     setSendingRequest(true);

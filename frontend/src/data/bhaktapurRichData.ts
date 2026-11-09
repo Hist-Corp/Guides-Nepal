@@ -1,4 +1,4 @@
-import { allGuides } from './guidesData';
+import { allGuides, krishnaGuide, laxmiGuide, prakashGuide, radhaGuide } from './guidesData';
 import { RichExperienceData } from './types';
 
 // For backward compatibility within this file
@@ -17,11 +17,7 @@ export const bhaktapurRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=400&q=80',
       type: 'Heritage Expert',
     },
-    guides: [
-      { ...commonGuides[0], name: 'Krishna', role: 'Heritage Expert' },
-      commonGuides[1],
-      commonGuides[2],
-    ],
+    guides: [krishnaGuide, commonGuides[1], commonGuides[2]],
     description:
       "Step back in time in the 'City of Devotees'. Walk through medieval streets, admire the 55-Window Palace, and discover the Golden Gate.",
     tourStructure: {
@@ -62,11 +58,7 @@ export const bhaktapurRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=400&q=80',
       type: 'Artisan Guide',
     },
-    guides: [
-      { ...commonGuides[1], name: 'Radha', role: 'Artisan Guide' },
-      commonGuides[2],
-      commonGuides[3],
-    ],
+    guides: [radhaGuide, commonGuides[2], commonGuides[3]],
     description:
       "Get your hands dirty! Learn the ancient art of pottery in Bhaktapur's famous Pottery Square from a master craftsman.",
     tourStructure: {
@@ -107,11 +99,7 @@ export const bhaktapurRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=400&q=80',
       type: 'Foodie Guide',
     },
-    guides: [
-      { ...commonGuides[2], name: 'Prakash', role: 'Foodie Guide' },
-      commonGuides[0],
-      commonGuides[1],
-    ],
+    guides: [prakashGuide, commonGuides[0], commonGuides[1]],
     description:
       "You can't leave Bhaktapur without trying the King of Yogurt. Discover the secrets behind this creamy, delicious dessert.",
     tourStructure: {
@@ -152,11 +140,7 @@ export const bhaktapurRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=400&q=80',
       type: 'Nature Guide',
     },
-    guides: [
-      { ...commonGuides[3], name: 'Laxmi', role: 'Nature Guide' },
-      commonGuides[0],
-      commonGuides[2],
-    ],
+    guides: [laxmiGuide, commonGuides[0], commonGuides[2]],
     description:
       'Hike through pine forests and villages to reach the oldest temple in Nepal, Changu Narayan, a UNESCO World Heritage site.',
     tourStructure: {
@@ -197,11 +181,7 @@ export const bhaktapurRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=400&q=80',
       type: 'Night Guide',
     },
-    guides: [
-      { ...commonGuides[0], name: 'Krishna', role: 'Night Guide' },
-      commonGuides[1],
-      commonGuides[3],
-    ],
+    guides: [{ ...krishnaGuide, role: 'Night Guide' }, commonGuides[1], commonGuides[3]],
     description:
       'Experience the magic of Bhaktapur after dark. The temples are beautifully lit, and the streets are quiet and atmospheric.',
     tourStructure: {
@@ -242,11 +222,7 @@ export const bhaktapurRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=400&q=80',
       type: 'Art Guide',
     },
-    guides: [
-      { ...commonGuides[1], name: 'Radha', role: 'Art Guide' },
-      commonGuides[2],
-      commonGuides[0],
-    ],
+    guides: [{ ...radhaGuide, role: 'Art Guide' }, commonGuides[2], commonGuides[0]],
     description:
       'Learn the intricate art of Thangka painting from a master artist. A spiritual and artistic experience.',
     tourStructure: {

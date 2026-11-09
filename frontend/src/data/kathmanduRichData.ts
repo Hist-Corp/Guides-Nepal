@@ -1,4 +1,14 @@
-import { allGuides } from './guidesData';
+import {
+  agrindraGuide,
+  allGuides,
+  hnoiGuide,
+  nakarinGuide,
+  natchaGuide,
+  nokGuide,
+  piyaweeGuide,
+  requireGuideById,
+  sudaratGuide,
+} from './guidesData';
 import { RichExperienceData } from './types';
 
 // Re-export types for backward compatibility
@@ -67,7 +77,8 @@ export const kathmanduRichData: RichExperienceData[] = [
       type: 'Culinary Guide',
     },
     guides: [
-      { ...commonGuides[1], name: 'Jojo', role: 'Culinary Guide' }, // Customized for this tour
+      // Tour-specific role, but Jojo keeps their real catalogue id (57).
+      { ...requireGuideById(57), role: 'Culinary Guide' },
       commonGuides[0],
       commonGuides[3],
     ],
@@ -111,7 +122,8 @@ export const kathmanduRichData: RichExperienceData[] = [
       type: 'Storyteller',
     },
     guides: [
-      { ...commonGuides[1], name: 'Artty', role: 'Storyteller' },
+      // Artty's real catalogue profile (814), with this tour's role.
+      { ...requireGuideById(814), role: 'Storyteller' },
       commonGuides[3],
       commonGuides[2],
     ],
@@ -155,11 +167,7 @@ export const kathmanduRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=128&q=80',
       type: 'Culture Expert',
     },
-    guides: [
-      { ...commonGuides[2], name: 'Piyawee', role: 'Culture Expert' },
-      commonGuides[1],
-      commonGuides[0],
-    ],
+    guides: [piyaweeGuide, commonGuides[1], commonGuides[0]],
     description:
       "You've probably heard that Kathmandu is well-known for Buddhism and its monks, but do you know the stories and origin behind it? On this private city tour, you are in for a cultural treat!",
     tourStructure: {
@@ -199,11 +207,7 @@ export const kathmanduRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=128&q=80',
       type: 'Nightlife Insider',
     },
-    guides: [
-      { ...commonGuides[3], name: 'Nok', role: 'Nightlife Insider' },
-      commonGuides[0],
-      commonGuides[2],
-    ],
+    guides: [nokGuide, commonGuides[0], commonGuides[2]],
     description:
       'Picture this, a night out in Kathmandu hopping from hot spot to hot spot, discovering local nightlife while tasting typical local drinks perfectly paired with delicious local bites.',
     tourStructure: {
@@ -243,11 +247,7 @@ export const kathmanduRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=128&q=80',
       type: 'Nature Lover',
     },
-    guides: [
-      { ...commonGuides[3], name: 'Hnoi', role: 'Nature Lover' },
-      commonGuides[1],
-      commonGuides[0],
-    ],
+    guides: [hnoiGuide, commonGuides[1], commonGuides[0]],
     description:
       'Imagine this: a scenic road trip from Kathmandu to explore Nagarkot with stops along the way to discover viewpoints, villages, incredible nature, and cultural gems.',
     tourStructure: {
@@ -286,11 +286,7 @@ export const kathmanduRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=128&q=80',
       type: 'History Buff',
     },
-    guides: [
-      { ...commonGuides[1], name: 'Natcha', role: 'History Buff' },
-      commonGuides[2],
-      commonGuides[3],
-    ],
+    guides: [natchaGuide, commonGuides[2], commonGuides[3]],
     description:
       'Embark on a Ancient city of Bhaktapur day trip outside of Kathmandu where many treasures, insights, and stories are waiting. Let a local host show you around.',
     tourStructure: {
@@ -330,11 +326,7 @@ export const kathmanduRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=128&q=80',
       type: 'Food Explorer',
     },
-    guides: [
-      { ...commonGuides[0], name: 'Nakarin', role: 'Food Explorer' },
-      commonGuides[2],
-      commonGuides[1],
-    ],
+    guides: [nakarinGuide, commonGuides[2], commonGuides[1]],
     description:
       "The way to a city's heart it's through its food! And on this private food tour, you'll get to know Kathmandu through its cuisine and the tastings favorite of the locals.",
     tourStructure: {
@@ -373,11 +365,7 @@ export const kathmanduRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=128&q=80',
       type: 'Expert Guide',
     },
-    guides: [
-      { ...commonGuides[1], name: 'Agrindra', role: 'Expert Guide' },
-      commonGuides[3],
-      commonGuides[0],
-    ],
+    guides: [agrindraGuide, commonGuides[3], commonGuides[0]],
     description:
       'Ready for a jam-packed tour, full of history, culture, stories, and sights? Checkmark from your travel bucket list all your must-sees of Kathmandu.',
     tourStructure: {
@@ -416,11 +404,7 @@ export const kathmanduRichData: RichExperienceData[] = [
         'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=128&q=80',
       type: 'Adventure Guide',
     },
-    guides: [
-      { ...commonGuides[3], name: 'Sudarat', role: 'Adventure Guide' },
-      commonGuides[1],
-      commonGuides[2],
-    ],
+    guides: [sudaratGuide, commonGuides[1], commonGuides[2]],
     description:
       'Embark on a Chandragiri Hills day trip outside of Kathmandu. Ride the cable car for panoramic views of the Himalayas.',
     tourStructure: {

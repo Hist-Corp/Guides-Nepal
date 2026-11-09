@@ -18,17 +18,25 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import guidesApi from '../services/guidesApi';
-import { allGuides } from '../data/guidesData';
+import { findGuideById } from '../data/guidesData';
 import { Guide } from '../data/types';
 import { kathmanduRichData } from '../data/kathmanduRichData';
 import { pokharaRichData } from '../data/pokharaRichData';
 import { lalitpurRichData } from '../data/lalitpurRichData';
+import { bhaktapurRichData } from '../data/bhaktapurRichData';
+import { bharatpurRichData } from '../data/bharatpurRichData';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { experienceDetailPath } from '../utils/canonicalExperience';
 import { ImageLightbox } from '../components/common/ImageLightbox';
 
-// Combine all experiences for lookup
-const allExperiences = [...kathmanduRichData, ...pokharaRichData, ...lalitpurRichData];
+// Combine every city catalog for lookup, so each guide's portfolio is complete.
+const allExperiences = [
+  ...kathmanduRichData,
+  ...pokharaRichData,
+  ...lalitpurRichData,
+  ...bhaktapurRichData,
+  ...bharatpurRichData,
+];
 
 const LocalProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -36,6 +44,7 @@ const LocalProfilePage: React.FC = () => {
   const goBack = useGoBack();
   const { formatPrice } = useCurrency();
   const [guide, setGuide] = useState<Guide | null>(null);
+  const [loading, setLoading] = useState(true);
   const [isBioExpanded, setIsBioExpanded] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showHowItWorksModal, setShowHowItWorksModal] = useState(false);
@@ -44,29 +53,87 @@ const LocalProfilePage: React.FC = () => {
   const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchGuide = async () => {
-      const guideId = id ? parseInt(id) : 1;
-      // First try to find in static data so guides not yet in the backend DB
-      // (e.g. Priya, Rohan) still render their own profile correctly.
-      const staticGuide = allGuides.find((g) => g.id === guideId);
-      if (staticGuide) {
-        setGuide(staticGuide);
+      const guideId = id ? Number(id) : NaN;
+
+      setIsBioExpanded(false);
+      setLoading(true);
+
+      if (!Number.isFinite(guideId)) {
+        if (!cancelled) {
+          setGuide(null);
+          setLoading(false);
+        }
         return;
       }
-      // If not found, try fetching from backend API
+
+      // The local catalog is authoritative for its own ids: guides that are not
+      // seeded in the backend still open their own profile and portfolio.
+      const staticGuide = findGuideById(guideId);
+      if (staticGuide) {
+        if (!cancelled) {
+          setGuide(staticGuide);
+          setLoading(false);
+        }
+        return;
+      }
+
+      // Backend-only guides (e.g. newly approved ones) are fetched by id.
       try {
         const guideData = await guidesApi.getGuide(guideId);
-        setGuide(guideData);
+        if (!cancelled) setGuide(guideData);
       } catch (error) {
         console.error('Error fetching guide:', error);
-        setGuide(null);
+        if (!cancelled) setGuide(null);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchGuide();
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
-  if (!guide) return null;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col font-sans bg-white">
+        <Header />
+        <main className="flex-grow bg-gray-50/50">
+          <div className="container mx-auto px-4 py-20 max-w-6xl text-center">
+            <p className="text-gray-500 font-medium">Loading guide profile...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!guide) {
+    return (
+      <div className="min-h-screen flex flex-col font-sans bg-white">
+        <Header />
+        <main className="flex-grow bg-gray-50/50">
+          <div className="container mx-auto px-4 py-20 max-w-2xl text-center">
+            <h1 className="text-2xl font-bold text-gray-900">Guide profile not found</h1>
+            <p className="mt-3 text-gray-600">
+              This guide is no longer available. Browse our experiences to meet another local.
+            </p>
+            <button
+              onClick={goBack}
+              className="mt-8 rounded-full bg-[#213448] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#1a2a3a]"
+            >
+              Go back
+            </button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   const PLACEHOLDER_IMAGE = '/images/placeholder.svg';
   const sanitizeImageUrl = (url: unknown): string => {
@@ -91,8 +158,15 @@ const LocalProfilePage: React.FC = () => {
   const safeGuideImage = sanitizeImageUrl(guide.image);
   const safeHeroImage = sanitizeImageUrl(guide.gallery?.[0] ?? guide.image);
 
-  // Find tours offered by this guide across ALL cities
-  const myTours = allExperiences.filter((tour) => tour.guides?.some((g) => g.id === guide.id));
+  // Find tours offered by this guide across ALL cities. City catalogs reuse
+  // numeric ids, so de-duplicate by slug before rendering the portfolio.
+  const myTours = Array.from(
+    new Map(
+      allExperiences
+        .filter((tour) => tour.guides?.some((g) => g.id === guide.id))
+        .map((tour) => [tour.slug, tour])
+    ).values()
+  );
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white">
@@ -270,7 +344,7 @@ const LocalProfilePage: React.FC = () => {
                       <Check className="w-3.5 h-3.5 text-green-500" /> First Aid Trained
                     </div>
                     <div className="flex items-center gap-1 text-xs font-bold text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200">
-                      <Check className="w-3.5 h-3.5 text-green-500" /> English/French Speaker
+                      <Check className="w-3.5 h-3.5 text-green-500" /> {guide.languages.join(' / ')}
                     </div>
                   </div>
 
@@ -315,9 +389,9 @@ const LocalProfilePage: React.FC = () => {
               <section className="my-12">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">My Philosophy</h2>
                 <blockquote className="border-l-4 border-[#213448] pl-4 italic text-gray-700 bg-gray-50 p-4 rounded-r-lg">
-                  "Travel is not just about seeing new places; it's about feeling them. I believe
-                  in sustainable tourism that respects local communities and preserves our
-                  heritage for future generations."
+                  "Travel is not just about seeing new places; it's about feeling them. I believe in
+                  sustainable tourism that respects local communities and preserves our heritage for
+                  future generations."
                 </blockquote>
               </section>
 
@@ -370,7 +444,7 @@ const LocalProfilePage: React.FC = () => {
                   {myTours.length > 0 ? (
                     myTours.map((tour) => (
                       <div
-                        key={tour.id}
+                        key={tour.slug}
                         onClick={() => {
                           const citySlug = tour.city?.toLowerCase() || 'kathmandu';
                           navigate(experienceDetailPath(citySlug, tour.slug));
