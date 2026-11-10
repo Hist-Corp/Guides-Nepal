@@ -220,45 +220,58 @@ const ExplorePage: React.FC = () => {
         </section>
 
         {/* --- Popular Destinations --- */}
-        <section className="py-12 container mx-auto px-4">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-primary">Popular destinations</h2>
-            <div className="flex gap-2">
-              <button
-                className="p-1.5 rounded-full border border-slate-200 bg-white hover:border-brand-yellow hover:text-primary transition-colors"
-                aria-label="Previous"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                className="p-1.5 rounded-full border border-slate-200 bg-white hover:border-brand-yellow hover:text-primary transition-colors"
-                aria-label="Next"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
+        <section className="py-20 bg-slate-50/40 border-y border-slate-100 container mx-auto px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+              <div className="space-y-2">
+                <h2 className="text-3xl md:text-4xl font-light text-[#213448] leading-tight tracking-tight">
+                  Popular destinations
+                </h2>
+                <p className="text-sm text-slate-500 font-medium uppercase tracking-wider">
+                  Explore Nepal’s iconic cities &amp; regions
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  className="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-colors duration-200"
+                  aria-label="Previous"
+                >
+                  <ChevronLeft className="w-4 h-4 text-slate-600 hover:text-[#213448]" />
+                </button>
+                <button
+                  className="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-colors duration-200"
+                  aria-label="Next"
+                >
+                  <ChevronRight className="w-4 h-4 text-slate-600 hover:text-[#213448]" />
+                </button>
+              </div>
             </div>
-          </div>
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-            {popularDestinations.map((dest, i) => (
-              <Link
-                key={i}
-                to={dest.link}
-                className="flex-shrink-0 w-32 md:w-40 group cursor-pointer"
-              >
-                <div className="rounded-3xl overflow-hidden aspect-square mb-2 relative shadow-lg">
-                  <img
-                    src={dest.image}
-                    alt={dest.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
-                  <span className="absolute bottom-2 left-3 text-white font-bold text-sm drop-shadow-md">
-                    {dest.name}
-                  </span>
-                </div>
-              </Link>
-            ))}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+              {popularDestinations.map((dest, i) => (
+                <Link key={i} to={dest.link} className="group cursor-pointer">
+                  <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm hover:border-slate-300 transition-colors duration-200 group-hover:bg-slate-50">
+                    <div className="h-48 sm:h-52 overflow-hidden bg-slate-100 relative">
+                      <img
+                        src={dest.image}
+                        alt={dest.name}
+                        className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
+                        onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+                      />
+                      <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm border border-slate-100 text-[10px] font-semibold text-[#213448] uppercase tracking-wider">
+                        <span className="w-1.5 h-1.5 rounded-full bg-brand-yellow" />
+                        Explore
+                      </div>
+                    </div>
+                    <div className="p-4 pt-3">
+                      <h3 className="text-base font-light text-[#213448] mb-1 leading-tight tracking-tight">
+                        {dest.name}
+                      </h3>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -347,51 +360,56 @@ const ExplorePage: React.FC = () => {
         </section>
 
         {/* --- Local Experts Carousel --- */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-primary">
-                Explore the city with a local of your choice
-              </h2>
+        <section className="py-20 bg-white border-t border-slate-100 container mx-auto px-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+              <div className="space-y-2">
+                <h2 className="text-3xl md:text-4xl font-light text-[#213448] leading-tight tracking-tight">
+                  Explore the city with a local of your choice
+                </h2>
+                <p className="text-sm text-slate-500 font-medium uppercase tracking-wider">
+                  Local guides ready to show you their Nepal
+                </p>
+              </div>
               <div className="flex gap-2">
                 <button
-                  className="p-2 rounded-full border border-slate-200 bg-white hover:border-brand-yellow hover:text-primary transition-colors"
+                  className="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-colors duration-200"
                   aria-label="Previous"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-4 h-4 text-slate-600 hover:text-[#213448]" />
                 </button>
                 <button
-                  className="p-2 rounded-full border border-slate-200 bg-white hover:border-brand-yellow hover:text-primary transition-colors"
+                  className="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-colors duration-200"
                   aria-label="Next"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-4 h-4 text-slate-600 hover:text-[#213448]" />
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
               {localExperts.map((expert, i) => (
                 <div key={i} className="group cursor-pointer">
-                  <div className="relative rounded-3xl overflow-hidden aspect-[3/4] mb-3 shadow-lg">
-                    <img
-                      src={expert.image}
-                      alt={expert.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-4">
-                      <Button
-                        size="sm"
-                        className="bg-brand-yellow hover:bg-[#ffba0a] text-primary border-none text-xs font-bold"
-                      >
-                        View Profile
-                      </Button>
+                  <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm hover:border-slate-300 transition-colors duration-200">
+                    <div className="h-40 sm:h-44 overflow-hidden bg-slate-100 relative">
+                      <img
+                        src={expert.image}
+                        alt={expert.name}
+                        className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-400"
+                        onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+                      />
                     </div>
-                  </div>
-                  <div className="text-center">
-                    <h3 className="font-bold text-primary text-lg">{expert.name}</h3>
-                    <span className="text-secondary font-medium text-sm uppercase tracking-wide">
-                      {expert.tag}
-                    </span>
+                    <div className="p-4 pt-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="text-base font-light text-[#213448] leading-tight tracking-tight">
+                          {expert.name}
+                        </h3>
+                        <span className="w-2 h-2 rounded-full bg-brand-yellow" />
+                      </div>
+                      <span className="text-[10px] font-semibold text-secondary uppercase tracking-wider">
+                        {expert.tag}
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
