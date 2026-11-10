@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useGoBack } from '../utils/backNavigation';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
@@ -16,22 +16,26 @@ import {
   Award,
   X,
   ArrowLeft,
+  CalendarDays,
+  Users,
 } from 'lucide-react';
 import { kathmanduRichData } from '../data/kathmanduRichData';
 import { pokharaRichData } from '../data/pokharaRichData';
 import { lalitpurRichData } from '../data/lalitpurRichData';
 import { bhaktapurRichData } from '../data/bhaktapurRichData';
 import { bharatpurRichData } from '../data/bharatpurRichData';
+import { findGuideBySlug } from '../utils/guideUrl';
+import { findGuideById } from '../data/guidesData';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { experienceDetailPath } from '../utils/canonicalExperience';
-import {
-  findGuideBySlug,
-  guideContactPath,
-  guideGalleryPath,
-} from '../utils/guideUrl';
+import { experienceDetailPath, experienceSlugPath } from '../utils/canonicalExperience';
 import { ImageLightbox } from '../components/common/ImageLightbox';
+import guidesApi, { type GuideProfile } from '../services/guidesApi';
+import type { Guide } from '../data/types';
 
-// Combine every city catalog for lookup, so each guide's portfolio is complete.
+const PLACEHOLDER_IMAGE = '/images/placeholder.svg';
+
+// City catalogs reuse numeric guide ids, so every tour is collected once and
+// de-duplicated by slug when a guide's portfolio is assembled.
 const allExperiences = [
   ...kathmanduRichData,
   ...pokharaRichData,
@@ -40,24 +44,256 @@ const allExperiences = [
   ...bharatpurRichData,
 ];
 
-const LocalProfilePage: React.FC = () => {
-  const { slug } = useParams<{ slug: string }>();
+const sanitizeImageUrl = (url: unknown): string => {
+  if (typeof url !== 'string') return PLACEHOLDER_IMAGE;
+  if (/[\s"'<>\\]/.test(url)) return PLACEHOLDER_IMAGE;
+  if (url.startsWith('/') && !url.startsWith('//')) return encodeURI(url);
+  try {
+    const parsed = new URL(url, 'https://invalid.local');
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return PLACEHOLDER_IMAGE;
+    if (parsed.hostname === 'invalid.local') return PLACEHOLDER_IMAGE;
+    return parsed.protocol + '//' + parsed.host + parsed.pathname + parsed.search;
+  } catch {
+    return PLACEHOLDER_IMAGE;
+  }
+};
+
+const formatMonthYear = (value?: string | null): string | null => {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+};
+
+/** One experience card in the "Book one of my offers" list. */
+interface OfferCard {
+  key: string;
+  title: string;
+  city?: string | null;
+  description?: string | null;
+  duration?: string | null;
+  category?: string | null;
+  price: number;
+  rating?: number | null;
+  reviews?: number | null;
+  availableSlots?: number | null;
+  heroImage: string;
+  /** Shown when the experience image itself fails to load. */
+  fallbackImage: string;
+  href: string;
+}
+
+/** Everything the profile renders, merged from the API and the local catalog. */
+interface ProfileView {
+  id: number;
+  slug?: string | null;
+  name: string;
+  role: string;
+  image: string;
+  rating: number;
+  reviews: number;
+  bio: string;
+  languages: string[];
+  cities: string[];
+  gallery: string[];
+  verified: boolean;
+  livesIn?: string | null;
+  memberSince?: string | null;
+  region?: string | null;
+  responseTime?: string;
+  experiences: OfferCard[];
+}
+
+const localGuideForProfile = (staticGuide: Guide | undefined, profile: GuideProfile | null) => {
+  // A numeric id can belong to a different person in the local catalog, so only
+  // reuse local content when the names agree.
+  if (!staticGuide) return undefined;
+  if (profile && staticGuide.name.toLowerCase() !== profile.name.toLowerCase()) return undefined;
+  return staticGuide;
+};
+
+const buildView = (
+  profile: GuideProfile | null,
+  staticGuide: Guide | undefined
+): ProfileView => {
+  const local = localGuideForProfile(staticGuide, profile);
+  const galleryFromApi = (profile?.gallery ?? []).filter(
+    (url) => typeof url === 'string' && url.trim() !== ''
+  );
+  const galleryFromLocal = (local?.gallery ?? []).filter(
+    (url) => typeof url === 'string' && url.trim() !== ''
+  );
+
+  const coverFallback = galleryFromApi[0] ?? galleryFromLocal[0] ?? PLACEHOLDER_IMAGE;
+
+  const apiExperiences = (profile?.experiences ?? []).map<OfferCard>((experience) => {
+    const localMatch = allExperiences.find(
+      (tour) => tour.title.toLowerCase() === experience.title.toLowerCase()
+    );
+    return {
+      key: `api-${experience.slug}`,
+      title: experience.title,
+      city: experience.city,
+      duration: experience.duration,
+      category: experience.category,
+      price: Number(experience.price) || 0,
+      rating: experience.rating,
+      reviews: experience.reviews,
+      availableSlots: experience.availableSlots,
+      heroImage: experience.heroImage,
+      fallbackImage: localMatch?.heroImage || coverFallback,
+      href: experienceSlugPath(experience.slug),
+    };
+  });
+
+  const localExperiences: OfferCard[] = local
+    ? Array.from(
+        new Map(
+          allExperiences
+            .filter((tour) => tour.guides?.some((g) => g.id === local.id))
+            .map((tour) => [tour.slug, tour])
+        ).values()
+      ).map((tour) => ({
+        key: `local-${tour.slug}`,
+        title: tour.title,
+        city: tour.city,
+        description: tour.description,
+        duration: tour.duration,
+        category: tour.type,
+        price: Number(tour.price) || 0,
+        rating: tour.rating,
+        reviews: tour.reviews,
+        availableSlots: null,
+        heroImage: tour.heroImage,
+        fallbackImage: coverFallback,
+        href: experienceDetailPath((tour.city || 'kathmandu').toLowerCase(), tour.slug),
+      }))
+    : [];
+
+  // Database experiences are authoritative and come first; local catalog tours
+  // fill in the guide's remaining portfolio.
+  const experiences = [
+    ...apiExperiences,
+    ...localExperiences.filter(
+      (offer) => !apiExperiences.some((apiOffer) => apiOffer.title === offer.title)
+    ),
+  ];
+
+  const cities = profile?.cities?.length ? profile.cities : (local?.cities ?? []);
+  const languages = profile?.languages?.length ? profile.languages : (local?.languages ?? []);
+
+  return {
+    id: profile?.id ?? local?.id ?? 0,
+    slug: profile?.slug ?? null,
+    name: profile?.name ?? local?.name ?? 'Guide',
+    role: profile?.role || local?.role || 'Experience Guide',
+    image: sanitizeImageUrl(profile?.image || local?.image),
+    rating: Number(profile?.rating ?? local?.rating ?? 0),
+    reviews: Number(profile?.reviews ?? local?.reviews ?? 0),
+    bio: (profile?.bio || '').trim() || (local?.bio || '').trim(),
+    languages,
+    cities,
+    // A guide whose only photo is their avatar gains nothing from a one-image
+    // grid, so the catalog gallery is preferred until the API has a real set.
+    gallery: galleryFromApi.length > 1 ? galleryFromApi : galleryFromLocal,
+    verified: Boolean(profile?.verified ?? local?.verified),
+    livesIn: profile?.livesIn || local?.livesIn,
+    memberSince: profile?.memberSince ?? null,
+    region: profile?.region ?? null,
+    responseTime: local?.responseTime,
+    experiences,
+  };
+};
+
+/**
+ * Public profile of one guide, addressed either by slug
+ * (``/guidesprofile/sujal``) or by catalog id (``/guides/2``).
+ *
+ * The page is the single shared template for every guide: it fetches the guide
+ * profile payload and shows their identity, languages, cities, rating, joined
+ * date, photos and every experience they lead.
+ */
+const GuideProfilePage: React.FC = () => {
+  const { slug, id } = useParams<{ slug?: string; id?: string }>();
   const navigate = useNavigate();
   const goBack = useGoBack();
   const { formatPrice } = useCurrency();
-  const guide = findGuideBySlug(slug);
+
+  const [profile, setProfile] = useState<GuideProfile | null>(null);
+  const [loading, setLoading] = useState(true);
   const [isBioExpanded, setIsBioExpanded] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [showHowItWorksModal, setShowHowItWorksModal] = useState(false);
   const [selectedRating, setSelectedRating] = useState(0);
-  // Fullscreen viewer for guide photos (hero + gallery); null when closed.
   const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
+  const [shareLabel, setShareLabel] = useState('Share');
+  const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
+  const [heroSrc, setHeroSrc] = useState<string | null>(null);
+
+  const staticGuide = useMemo(() => {
+    if (slug) return findGuideBySlug(slug);
+    if (id && Number.isInteger(Number(id))) return findGuideById(Number(id));
+    return undefined;
+  }, [slug, id]);
 
   useEffect(() => {
-    setIsBioExpanded(false);
-  }, [slug]);
+    const guideId = id ? Number(id) : NaN;
+    if (!slug && !Number.isFinite(guideId)) {
+      setProfile(null);
+      setLoading(false);
+      return;
+    }
 
-  if (!guide) {
+    let cancelled = false;
+    setLoading(true);
+    setIsBioExpanded(false);
+    setProfile(null);
+    setAvatarSrc(null);
+    setHeroSrc(null);
+
+    const request = slug
+      ? guidesApi.getGuideProfileBySlug(slug)
+      : guidesApi.getGuideProfile(guideId);
+
+    request
+      .then((data) => {
+        if (!cancelled) setProfile(data);
+      })
+      .catch(() => {
+        // A guide that exists only in the local catalog still has a profile.
+        if (!cancelled) setProfile(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [slug, id]);
+
+  const view = useMemo(() => buildView(profile, staticGuide), [profile, staticGuide]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col font-sans bg-white">
+        <Header />
+        <main className="flex-grow bg-gray-50/50">
+          <div className="container mx-auto max-w-6xl px-4 py-16">
+            <div className="animate-pulse space-y-6">
+              <div className="h-96 rounded-2xl bg-gray-200" />
+              <div className="h-8 w-1/3 rounded bg-gray-200" />
+              <div className="h-4 w-2/3 rounded bg-gray-200" />
+              <div className="h-40 rounded-2xl bg-gray-200" />
+            </div>
+            <p className="mt-8 text-center text-sm text-gray-500">Loading guide profile...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!profile && !staticGuide) {
     return (
       <div className="min-h-screen flex flex-col font-sans bg-white">
         <Header />
@@ -67,12 +303,20 @@ const LocalProfilePage: React.FC = () => {
             <p className="mt-3 text-gray-600">
               This guide is no longer available. Browse our experiences to meet another local.
             </p>
-            <button
-              onClick={goBack}
-              className="mt-8 rounded-full bg-[#213448] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#1a2a3a]"
-            >
-              Go back
-            </button>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={goBack}
+                className="rounded-full bg-[#213448] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#1a2a3a]"
+              >
+                Go back
+              </button>
+              <Link
+                to="/listings"
+                className="rounded-full border border-gray-200 px-6 py-2.5 text-sm font-bold text-gray-700 hover:bg-white"
+              >
+                Browse experiences
+              </Link>
+            </div>
           </div>
         </main>
         <Footer />
@@ -80,38 +324,34 @@ const LocalProfilePage: React.FC = () => {
     );
   }
 
-  const PLACEHOLDER_IMAGE = '/images/placeholder.svg';
-  const sanitizeImageUrl = (url: unknown): string => {
-    if (typeof url !== 'string') return PLACEHOLDER_IMAGE;
-    if (/[\s"'<>\\]/.test(url)) return PLACEHOLDER_IMAGE;
-    if (url.startsWith('/') && !url.startsWith('//')) {
-      return encodeURI(url);
-    }
+  const safeGuideImage = avatarSrc ?? sanitizeImageUrl(view.image);
+  const galleryPhotos = view.gallery
+    .map((photo) => sanitizeImageUrl(photo))
+    .filter((photo) => photo !== PLACEHOLDER_IMAGE);
+  const coverPhoto = heroSrc ?? galleryPhotos[0] ?? safeGuideImage;
+  const joined = formatMonthYear(view.memberSince);
+  const profileSlug = view.slug ?? slug ?? String(view.id);
+  const contactPath = `/guidesprofile/${profileSlug}/contact`;
+  const galleryPath = `/guidesprofile/${profileSlug}/gallery`;
+  const livesIn = view.livesIn || view.cities[0];
+  const responseTime = view.responseTime || 'within a few hours';
+  const ratingStars = Math.round(view.rating);
+  const hasLongBio = view.bio.length > 360;
+
+  const handleShare = async () => {
+    const url = window.location.href;
     try {
-      const parsed = new URL(url, 'https://invalid.local');
-      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-        return PLACEHOLDER_IMAGE;
+      if (navigator.share) {
+        await navigator.share({ title: `${view.name} | Guides Nepal`, url });
+        return;
       }
-      if (parsed.hostname === 'invalid.local') {
-        return PLACEHOLDER_IMAGE;
-      }
-      return parsed.protocol + '//' + parsed.host + parsed.pathname + parsed.search;
+      await navigator.clipboard.writeText(url);
+      setShareLabel('Link copied');
+      window.setTimeout(() => setShareLabel('Share'), 1800);
     } catch {
-      return PLACEHOLDER_IMAGE;
+      // Sharing is best-effort; a dismissed sheet is not an error worth showing.
     }
   };
-  const safeGuideImage = sanitizeImageUrl(guide.image);
-  const safeHeroImage = sanitizeImageUrl(guide.gallery?.[0] ?? guide.image);
-
-  // Find tours offered by this guide across ALL cities. City catalogs reuse
-  // numeric ids, so de-duplicate by slug before rendering the portfolio.
-  const myTours = Array.from(
-    new Map(
-      allExperiences
-        .filter((tour) => tour.guides?.some((g) => g.id === guide.id))
-        .map((tour) => [tour.slug, tour])
-    ).values()
-  );
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white">
@@ -137,12 +377,17 @@ const LocalProfilePage: React.FC = () => {
                       <div className="w-28 h-28 rounded-full p-1 border-2 border-[#213448]">
                         <img
                           src={safeGuideImage}
-                          alt={guide.name}
+                          alt={view.name}
                           className="w-full h-full rounded-full object-cover"
-                          onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+                          onError={() => {
+                            const fallback = sanitizeImageUrl(staticGuide?.image);
+                            setAvatarSrc(
+                              safeGuideImage !== fallback ? fallback : PLACEHOLDER_IMAGE
+                            );
+                          }}
                         />
                       </div>
-                      {guide.verified && (
+                      {view.verified && (
                         <div
                           className="absolute bottom-1 right-1 bg-white rounded-full p-1 shadow-md"
                           title="Verified Host"
@@ -152,61 +397,73 @@ const LocalProfilePage: React.FC = () => {
                       )}
                     </div>
 
-                    <h1 className="text-xl font-bold text-gray-900 mb-0.5">{guide.name}</h1>
+                    <h1 className="text-xl font-bold text-gray-900 mb-0.5">{view.name}</h1>
                     <p className="text-[#213448] font-bold text-xs uppercase tracking-wide mb-3">
-                      {guide.role}
+                      {view.role}
                     </p>
 
                     <div className="flex items-center gap-1 mb-4">
                       <div className="flex text-[#ffba0a]">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                          <Star
+                            key={i}
+                            className={`w-3.5 h-3.5 ${
+                              i < ratingStars ? 'fill-current' : 'text-gray-200'
+                            }`}
+                          />
                         ))}
                       </div>
-                      <span className="font-bold text-gray-900 text-sm">{guide.rating}</span>
-                      <span className="text-gray-500 text-xs">({guide.reviews} reviews)</span>
+                      <span className="font-bold text-gray-900 text-sm">
+                        {view.rating.toFixed(2)}
+                      </span>
+                      <span className="text-gray-500 text-xs">({view.reviews} reviews)</span>
                     </div>
 
                     <div className="w-full space-y-3 text-left border-t border-gray-100 pt-4">
-                      <div className="flex items-start gap-2.5 text-xs text-gray-600">
-                        <MapPin className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
-                        <div>
-                          <span className="font-bold text-gray-900 block">Lives in</span>
-                          {guide.livesIn || 'Kathmandu'}
-                        </div>
-                      </div>
-
-                      {/* Added Cities Supported */}
-                      <div className="flex items-start gap-2.5 text-xs text-gray-600">
-                        <MapPin className="w-4 h-4 text-[#213448] shrink-0 mt-0.5" />
-                        <div>
-                          <span className="font-bold text-gray-900 block">Guides in</span>
-                          <div className="flex flex-wrap gap-1 mt-0.5">
-                            {guide.cities.map((city) => (
-                              <span
-                                key={city}
-                                className="bg-[#213448]/10 text-[#213448] text-[10px] px-1.5 py-0.5 rounded font-bold"
-                              >
-                                {city}
-                              </span>
-                            ))}
+                      {livesIn && (
+                        <div className="flex items-start gap-2.5 text-xs text-gray-600">
+                          <MapPin className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold text-gray-900 block">Lives in</span>
+                            {livesIn}
                           </div>
                         </div>
-                      </div>
+                      )}
 
-                      <div className="flex items-start gap-2.5 text-xs text-gray-600">
-                        <MessageCircle className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
-                        <div>
-                          <span className="font-bold text-gray-900 block">Speaks</span>
-                          {guide.languages.join(', ')}
+                      {view.cities.length > 0 && (
+                        <div className="flex items-start gap-2.5 text-xs text-gray-600">
+                          <MapPin className="w-4 h-4 text-[#213448] shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold text-gray-900 block">Guides in</span>
+                            <div className="flex flex-wrap gap-1 mt-0.5">
+                              {view.cities.map((city) => (
+                                <span
+                                  key={city}
+                                  className="bg-[#213448]/10 text-[#213448] text-[10px] px-1.5 py-0.5 rounded font-bold"
+                                >
+                                  {city}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      )}
+
+                      {view.languages.length > 0 && (
+                        <div className="flex items-start gap-2.5 text-xs text-gray-600">
+                          <MessageCircle className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold text-gray-900 block">Speaks</span>
+                            {view.languages.join(', ')}
+                          </div>
+                        </div>
+                      )}
 
                       <div className="flex items-start gap-2.5 text-xs text-gray-600">
                         <Clock className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
                         <div>
                           <span className="font-bold text-gray-900 block">Response time</span>
-                          {guide.responseTime || 'within a few hours'}
+                          {responseTime}
                         </div>
                       </div>
 
@@ -214,11 +471,35 @@ const LocalProfilePage: React.FC = () => {
                         <Package className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
                         <div>
                           <span className="font-bold text-gray-900 block">Experience</span>
-                          {myTours.length > 0 ? `${myTours.length} offers` : 'Custom tours'}
+                          {view.experiences.length > 0
+                            ? `${view.experiences.length} ${
+                                view.experiences.length === 1 ? 'offer' : 'offers'
+                              }`
+                            : 'Custom tours'}
                         </div>
                       </div>
 
-                      {guide.verified && (
+                      {joined && (
+                        <div className="flex items-start gap-2.5 text-xs text-gray-600">
+                          <CalendarDays className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold text-gray-900 block">Guiding since</span>
+                            {joined}
+                          </div>
+                        </div>
+                      )}
+
+                      {view.region && (
+                        <div className="flex items-start gap-2.5 text-xs text-gray-600">
+                          <MapPin className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold text-gray-900 block">Region</span>
+                            {view.region}
+                          </div>
+                        </div>
+                      )}
+
+                      {view.verified && (
                         <div className="flex items-start gap-2.5 text-xs text-gray-600">
                           <Check className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
                           <div>
@@ -231,7 +512,7 @@ const LocalProfilePage: React.FC = () => {
 
                     <button
                       onClick={() => {
-                        navigate(guideContactPath(guide));
+                        navigate(contactPath);
                         window.scrollTo({ top: 0, behavior: 'instant' });
                       }}
                       className="w-full mt-6 bg-[#213448] hover:bg-[#1a2a3a] text-white font-bold py-2.5 rounded-full transition-colors shadow-lg shadow-primary/20 text-sm"
@@ -239,9 +520,12 @@ const LocalProfilePage: React.FC = () => {
                       Contact me
                     </button>
 
-                    <div className="mt-3 flex gap-2">
-                      <button className="flex-1 text-gray-500 text-xs font-medium hover:text-gray-900 flex items-center justify-center gap-1.5 py-1.5 rounded-full hover:bg-gray-50 transition-colors">
-                        <Share className="w-3.5 h-3.5" /> Share
+                    <div className="mt-3 flex gap-2 w-full">
+                      <button
+                        onClick={handleShare}
+                        className="flex-1 text-gray-500 text-xs font-medium hover:text-gray-900 flex items-center justify-center gap-1.5 py-1.5 rounded-full hover:bg-gray-50 transition-colors"
+                      >
+                        <Share className="w-3.5 h-3.5" /> {shareLabel}
                       </button>
                     </div>
                   </div>
@@ -251,25 +535,29 @@ const LocalProfilePage: React.FC = () => {
 
             {/* Right Content - Main Info */}
             <div className="lg:w-2/3 space-y-12">
-              {/* Bio Section with Portfolio Style */}
+              {/* Hero and bio */}
               <section>
                 <div
-                  className="relative rounded-2xl overflow-hidden mb-8 h-[400px] group shadow-sm cursor-zoom-in"
+                  className="relative rounded-2xl overflow-hidden mb-8 h-[400px] group shadow-sm cursor-zoom-in bg-gray-100"
                   onClick={() =>
                     setLightbox({
-                      src: safeHeroImage,
-                      alt: `${guide.name} cover photo`,
+                      src: coverPhoto,
+                      alt: `${view.name} cover photo`,
                     })
                   }
                 >
                   <img
-                    src={safeHeroImage}
-                    alt={guide.name}
+                    src={coverPhoto}
+                    alt={view.name}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+                    onError={() => {
+                      const fallback = sanitizeImageUrl(staticGuide?.gallery?.[0]);
+                      const next = fallback !== PLACEHOLDER_IMAGE ? fallback : PLACEHOLDER_IMAGE;
+                      if (coverPhoto !== next) setHeroSrc(next);
+                    }}
                   />
                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-sm">
-                    <Award className="w-5 h-5 text-gray-700 hover:text-primary cursor-pointer transition-colors" />
+                    <Award className="w-5 h-5 text-gray-700" />
                   </div>
                 </div>
 
@@ -278,104 +566,98 @@ const LocalProfilePage: React.FC = () => {
                 </h2>
 
                 <div className="prose prose-lg text-gray-600 max-w-none">
-                  <p>{guide.bio}</p>
+                  <p className="whitespace-pre-line">
+                    {view.bio
+                      ? view.bio
+                      : `${view.name} hasn't written a bio yet. Browse their offers below to see what they lead around ${
+                          livesIn || 'Nepal'
+                        }.`}
+                  </p>
 
-                  {/* Portfolio Badges */}
                   <div className="flex flex-wrap gap-3 my-6 not-prose">
+                    {view.verified && (
+                      <div className="flex items-center gap-1 text-xs font-bold text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200">
+                        <Check className="w-3.5 h-3.5 text-green-500" /> Verified guide
+                      </div>
+                    )}
+                    {view.languages.length > 0 && (
+                      <div className="flex items-center gap-1 text-xs font-bold text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200">
+                        <MessageCircle className="w-3.5 h-3.5 text-[#213448]" />{' '}
+                        {view.languages.join(' / ')}
+                      </div>
+                    )}
+                    {view.cities.length > 0 && (
+                      <div className="flex items-center gap-1 text-xs font-bold text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200">
+                        <MapPin className="w-3.5 h-3.5 text-[#213448]" /> {view.cities.join(' · ')}
+                      </div>
+                    )}
                     <div className="flex items-center gap-1 text-xs font-bold text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200">
-                      <Check className="w-3.5 h-3.5 text-green-500" /> Government Certified
-                    </div>
-                    <div className="flex items-center gap-1 text-xs font-bold text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200">
-                      <Check className="w-3.5 h-3.5 text-green-500" /> First Aid Trained
-                    </div>
-                    <div className="flex items-center gap-1 text-xs font-bold text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200">
-                      <Check className="w-3.5 h-3.5 text-green-500" /> {guide.languages.join(' / ')}
+                      <Clock className="w-3.5 h-3.5 text-[#213448]" /> Replies {responseTime}
                     </div>
                   </div>
 
-                  <p>
-                    I love meeting new people and showing them the hidden gems of my city. Whether
-                    you are a foodie, a history buff, or just looking for a good time, I can
-                    customize the perfect experience for you.
-                  </p>
-
-                  {isBioExpanded && (
+                  {isBioExpanded && view.bio && (
                     <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                       <p>
-                        Growing up in Nepal has given me a deep appreciation for our rich culture
-                        and traditions. I've spent years exploring every corner of the valley,
-                        finding the best local eateries, ancient temples that aren't on the tourist
-                        maps, and viewpoints with the most breathtaking sunrises.
+                        Every trip is planned around your pace and interests — tell {view.name}{' '}
+                        what you would like to see and the day is adjusted around it.
                       </p>
-                      <p>
-                        My goal is to make you feel like a local, not just a tourist. We'll navigate
-                        the bustling markets together, share stories over cups of masala chai, and
-                        create memories that you'll cherish long after you leave. I'm flexible and
-                        happy to adjust our plans based on your interests and pace.
-                      </p>
-                      <p>
-                        Safety and comfort are my top priorities. I'm trained in first aid and know
-                        the city inside out. Let's embark on an adventure that goes beyond the
-                        guidebooks!
-                      </p>
+                      {joined && (
+                        <p>
+                          {view.name} has been guiding travellers with Guides-Nepal since {joined}
+                          {view.region ? `, covering ${view.region}` : ''}.
+                        </p>
+                      )}
                     </div>
                   )}
 
-                  <button
-                    onClick={() => setIsBioExpanded(!isBioExpanded)}
-                    className="text-[#213448] font-bold text-sm uppercase tracking-wide mt-4 hover:underline"
-                  >
-                    {isBioExpanded ? 'Read less' : 'Read more'}
-                  </button>
+                  {hasLongBio && (
+                    <button
+                      onClick={() => setIsBioExpanded(!isBioExpanded)}
+                      className="text-[#213448] font-bold text-sm uppercase tracking-wide mt-4 hover:underline"
+                    >
+                      {isBioExpanded ? 'Read less' : 'Read more'}
+                    </button>
+                  )}
                 </div>
               </section>
 
-              {/* Philosophy Section */}
-              <section className="my-12">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">My Philosophy</h2>
-                <blockquote className="border-l-4 border-[#213448] pl-4 italic text-gray-700 bg-gray-50 p-4 rounded-r-lg">
-                  "Travel is not just about seeing new places; it's about feeling them. I believe in
-                  sustainable tourism that respects local communities and preserves our heritage for
-                  future generations."
-                </blockquote>
-              </section>
-
               {/* Gallery Section */}
-              {guide.gallery && guide.gallery.length > 0 && (
-                <section>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">My thoughts in pictures</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {guide.gallery.slice(1).map((img, i) => (
-                      <div
-                        key={i}
-                        onClick={() => setLightbox({ src: img, alt: `Gallery ${i + 1}` })}
-                        className="aspect-[4/3] rounded-xl overflow-hidden cursor-zoom-in hover:opacity-90 transition-opacity shadow-sm"
-                      >
-                        <img
-                          src={img}
-                          alt={`Gallery ${i}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ))}
-                    {/* Add one more placeholder if only 1 image in gallery slice */}
-                    {guide.gallery.length < 3 && (
-                      <div className="aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center text-gray-400">
-                        <span>More moments coming soon</span>
-                      </div>
-                    )}
-                  </div>
+              <section>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">My thoughts in pictures</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {galleryPhotos.slice(0, 6).map((img, i) => (
+                    <div
+                      key={`${img}-${i}`}
+                      onClick={() => setLightbox({ src: img, alt: `${view.name} photo ${i + 1}` })}
+                      className="aspect-[4/3] rounded-xl overflow-hidden cursor-zoom-in hover:opacity-90 transition-opacity shadow-sm"
+                    >
+                      <img
+                        src={img}
+                        alt={`${view.name} photo ${i + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => (e.currentTarget.src = PLACEHOLDER_IMAGE)}
+                      />
+                    </div>
+                  ))}
+                  {galleryPhotos.length < 2 && (
+                    <div className="aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
+                      More moments coming soon
+                    </div>
+                  )}
+                </div>
+                {galleryPhotos.length > 2 && (
                   <button
                     onClick={() => {
-                      navigate(guideGalleryPath(guide));
+                      navigate(galleryPath);
                       window.scrollTo({ top: 0, behavior: 'instant' });
                     }}
                     className="text-[#213448] font-bold text-sm uppercase tracking-wide mt-4 hover:underline"
                   >
                     View all photos
                   </button>
-                </section>
-              )}
+                )}
+              </section>
 
               {/* Offers Section */}
               <section>
@@ -386,61 +668,79 @@ const LocalProfilePage: React.FC = () => {
                 </p>
 
                 <div className="space-y-6">
-                  {myTours.length > 0 ? (
-                    myTours.map((tour) => (
-                      <div
-                        key={tour.slug}
-                        onClick={() => {
-                          const citySlug = tour.city?.toLowerCase() || 'kathmandu';
-                          navigate(experienceDetailPath(citySlug, tour.slug));
-                          window.scrollTo({ top: 0, behavior: 'instant' });
-                        }}
-                        className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md border border-gray-100 transition-all cursor-pointer flex flex-col md:flex-row gap-6 group"
+                  {view.experiences.length > 0 ? (
+                    view.experiences.map((offer) => (
+                      <Link
+                        key={offer.key}
+                        to={offer.href}
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
+                        className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md border border-gray-100 transition-all flex flex-col md:flex-row gap-6 group"
                       >
-                        <div className="w-full md:w-48 h-48 md:h-auto rounded-xl overflow-hidden shrink-0 relative">
+                        <div className="w-full md:w-48 h-48 md:h-auto rounded-xl overflow-hidden shrink-0 relative bg-gray-100">
                           <img
-                            src={tour.heroImage}
-                            alt={tour.title}
+                            src={sanitizeImageUrl(offer.heroImage)}
+                            alt={offer.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            onError={(e) => {
+                              const fallback = sanitizeImageUrl(offer.fallbackImage);
+                              const target = e.currentTarget;
+                              if (target.src !== fallback) target.src = fallback;
+                              else target.src = PLACEHOLDER_IMAGE;
+                            }}
                           />
                           <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide text-gray-800">
-                            {tour.city || 'Nepal'}
+                            {offer.city || 'Nepal'}
                           </div>
                         </div>
 
                         <div className="flex flex-col justify-between py-2 flex-grow">
                           <div>
                             <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#213448] transition-colors">
-                              {tour.title}
+                              {offer.title}
                             </h3>
-                            <p className="text-gray-500 line-clamp-2 text-sm mb-4">
-                              {tour.description}
-                            </p>
-                            <div className="flex items-center gap-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-4 h-4" /> {tour.duration || '3 hours'}
-                              </span>
-                              <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                              <span>{tour.type}</span>
+                            {offer.description && (
+                              <p className="text-gray-500 line-clamp-2 text-sm mb-4">
+                                {offer.description}
+                              </p>
+                            )}
+                            <div className="flex flex-wrap items-center gap-4 text-xs font-bold text-gray-600 uppercase tracking-wide">
+                              {offer.duration && (
+                                <span className="flex items-center gap-1">
+                                  <Clock className="w-4 h-4" /> {offer.duration}
+                                </span>
+                              )}
+                              {offer.duration && offer.category && (
+                                <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                              )}
+                              {offer.category && <span>{offer.category}</span>}
+                              {typeof offer.availableSlots === 'number' && (
+                                <span className="flex items-center gap-1 text-gray-500">
+                                  <Users className="w-4 h-4" /> {offer.availableSlots} slots left
+                                </span>
+                              )}
                             </div>
                           </div>
 
                           <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-50">
                             <div className="flex items-center gap-1">
                               <Star className="w-4 h-4 fill-[#ffba0a] text-[#ffba0a]" />
-                              <span className="font-bold text-gray-900">4.9</span>
-                              <span className="text-gray-400 text-sm">(120)</span>
+                              <span className="font-bold text-gray-900">
+                                {(Number(offer.rating) || view.rating).toFixed(1)}
+                              </span>
+                              <span className="text-gray-400 text-sm">
+                                ({offer.reviews ?? view.reviews})
+                              </span>
                             </div>
                             <div className="text-right">
                               <span className="text-xs text-gray-400 uppercase mr-2">From</span>
                               <span className="text-xl font-bold text-gray-900">
-                                {formatPrice(tour.price, 'USD')}
+                                {formatPrice(offer.price, 'USD')}
                               </span>
                               <span className="text-xs text-gray-400"> pp</span>
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     ))
                   ) : (
                     <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-gray-300">
@@ -459,7 +759,8 @@ const LocalProfilePage: React.FC = () => {
                     <img
                       src={safeGuideImage}
                       className="w-full h-full rounded-full object-cover"
-                      alt={guide.name}
+                      alt={view.name}
+                      onError={(e) => (e.currentTarget.src = PLACEHOLDER_IMAGE)}
                     />
                   </div>
                   <h3 className="text-xl font-bold text-[#213448] mb-2">Did you meet me?</h3>
@@ -473,64 +774,34 @@ const LocalProfilePage: React.FC = () => {
                   >
                     Leave a review
                   </button>
-                  <button
-                    onClick={() => setShowHowItWorksModal(true)}
-                    className="block mx-auto mt-4 text-xs font-bold text-[#213448] uppercase tracking-wide hover:underline"
-                  >
-                    How does it work?
-                  </button>
                 </div>
-                {/* Decorative circles */}
                 <div className="absolute -top-12 -left-12 w-32 h-32 bg-[#213448]/10 rounded-full blur-2xl"></div>
                 <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-[#213448]/10 rounded-full blur-2xl"></div>
               </section>
 
-              {/* Reviews List */}
+              {/* Rating summary */}
               <section>
-                <h2 className="text-2xl font-bold text-gray-900 mb-8">Reviews</h2>
-                <div className="space-y-8">
-                  {[
-                    {
-                      name: 'Sarah J.',
-                      date: 'October 2025',
-                      text: 'Absolutely amazing experience! The food was incredible and the stories were even better.',
-                      rating: 5,
-                    },
-                    {
-                      name: 'Mike T.',
-                      date: 'September 2025',
-                      text: 'We felt like we were walking around with a friend. Highly recommend!',
-                      rating: 5,
-                    },
-                    {
-                      name: 'Emma W.',
-                      date: 'August 2025',
-                      text: 'Such a knowledgeable guide. We learned so much about the local culture.',
-                      rating: 5,
-                    },
-                  ].map((review, i) => (
-                    <div key={i} className="flex gap-4 border-b border-gray-100 pb-8 last:border-0">
-                      <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-500 shrink-0">
-                        {review.name[0]}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-bold text-gray-900">{review.name}</span>
-                          <span className="text-gray-400 text-sm">• {review.date}</span>
-                        </div>
-                        <div className="flex text-[#ffba0a] mb-3">
-                          {[...Array(review.rating)].map((_, r) => (
-                            <Star key={r} className="w-3 h-3 fill-current" />
-                          ))}
-                        </div>
-                        <p className="text-gray-600 leading-relaxed">"{review.text}"</p>
-                      </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Reviews</h2>
+                <div className="bg-white border border-gray-100 rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center gap-6">
+                  <div className="text-center sm:text-left">
+                    <p className="text-4xl font-bold text-gray-900">{view.rating.toFixed(2)}</p>
+                    <div className="flex justify-center sm:justify-start text-[#ffba0a] mt-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-4 h-4 ${i < ratingStars ? 'fill-current' : 'text-gray-200'}`}
+                        />
+                      ))}
                     </div>
-                  ))}
+                    <p className="text-gray-500 text-sm mt-1">
+                      {view.reviews} {view.reviews === 1 ? 'review' : 'reviews'}
+                    </p>
+                  </div>
+                  <p className="text-gray-500 text-sm sm:border-l sm:border-gray-100 sm:pl-6">
+                    Written reviews appear here once travellers finish a trip with {view.name}.
+                    Booked guests can add theirs with the button above.
+                  </p>
                 </div>
-                <button className="w-full py-4 border border-gray-200 rounded-xl font-bold text-gray-600 hover:bg-gray-50 transition-colors mt-4">
-                  Show all {guide.reviews} reviews
-                </button>
               </section>
 
               {/* This is Guides Nepal Section */}
@@ -562,16 +833,14 @@ const LocalProfilePage: React.FC = () => {
                   </p>
                   <div className="flex gap-4">
                     <button className="bg-black/30 hover:bg-black/50 p-2 rounded-lg border border-white/20 flex items-center gap-2 pr-4 transition-colors">
-                      <div className="w-6 h-6 bg-white rounded-full"></div>{' '}
-                      {/* Apple Icon Placeholder */}
+                      <div className="w-6 h-6 bg-white rounded-full"></div>
                       <div className="text-left">
                         <div className="text-[10px] uppercase">Download on the</div>
                         <div className="text-sm font-bold leading-none">App Store</div>
                       </div>
                     </button>
                     <button className="bg-black/30 hover:bg-black/50 p-2 rounded-lg border border-white/20 flex items-center gap-2 pr-4 transition-colors">
-                      <div className="w-6 h-6 bg-white rounded-full"></div>{' '}
-                      {/* Play Store Icon Placeholder */}
+                      <div className="w-6 h-6 bg-white rounded-full"></div>
                       <div className="text-left">
                         <div className="text-[10px] uppercase">Get it on</div>
                         <div className="text-sm font-bold leading-none">Google Play</div>
@@ -586,8 +855,6 @@ const LocalProfilePage: React.FC = () => {
                     className="w-full rounded-2xl shadow-2xl border-4 border-white/10 rotate-6 hover:rotate-0 transition-transform duration-500"
                   />
                 </div>
-
-                {/* Background decoration */}
                 <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-[#213448]/20 to-transparent pointer-events-none"></div>
               </section>
             </div>
@@ -619,12 +886,13 @@ const LocalProfilePage: React.FC = () => {
               <div className="flex items-center gap-4 mb-6">
                 <img
                   src={safeGuideImage}
-                  alt={guide.name}
+                  alt={view.name}
                   className="w-16 h-16 rounded-full object-cover"
+                  onError={(e) => (e.currentTarget.src = PLACEHOLDER_IMAGE)}
                 />
                 <div>
                   <p className="text-sm text-gray-500">Reviewing</p>
-                  <h4 className="font-bold text-gray-900 text-lg">{guide.name}</h4>
+                  <h4 className="font-bold text-gray-900 text-lg">{view.name}</h4>
                 </div>
               </div>
 
@@ -688,77 +956,6 @@ const LocalProfilePage: React.FC = () => {
         </div>
       )}
 
-      {/* How it Works Modal */}
-      {showHowItWorksModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-          onClick={() => setShowHowItWorksModal(false)}
-        >
-          <div
-            className="bg-white rounded-2xl w-full max-w-lg shadow-2xl animate-in fade-in zoom-in duration-300"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex justify-between items-center p-6 border-b border-gray-100">
-              <h3 className="text-xl font-bold text-gray-900">How Reviews Work</h3>
-              <button
-                onClick={() => setShowHowItWorksModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-
-            <div className="p-6 space-y-6">
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-full bg-[#213448]/10 flex items-center justify-center shrink-0">
-                  <Check className="w-5 h-5 text-[#213448]" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-1">Verified Experiences</h4>
-                  <p className="text-sm text-gray-600">
-                    Only travelers who have booked and completed a tour with this guide can leave a
-                    review. This ensures all feedback is authentic.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-full bg-[#213448]/10 flex items-center justify-center shrink-0">
-                  <ShieldCheck className="w-5 h-5 text-[#213448]" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-1">Community Guidelines</h4>
-                  <p className="text-sm text-gray-600">
-                    We moderate reviews to ensure they follow our community guidelines. We don't
-                    edit the content, but we remove spam or abusive language.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-full bg-[#213448]/10 flex items-center justify-center shrink-0">
-                  <Star className="w-5 h-5 text-[#213448]" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-1">Fair Rating System</h4>
-                  <p className="text-sm text-gray-600">
-                    Guides are rated on knowledge, friendliness, and service quality. The overall
-                    score is a weighted average of all past reviews.
-                  </p>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setShowHowItWorksModal(false)}
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-900 font-bold py-3 rounded-xl transition-colors mt-4"
-              >
-                Got it
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {lightbox && (
         <ImageLightbox src={lightbox.src} alt={lightbox.alt} onClose={() => setLightbox(null)} />
       )}
@@ -768,4 +965,4 @@ const LocalProfilePage: React.FC = () => {
   );
 };
 
-export default LocalProfilePage;
+export default GuideProfilePage;

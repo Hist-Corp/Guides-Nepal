@@ -36,6 +36,8 @@ class GuideUpdate(BaseModel):
 
 class GuideResponse(GuideBase):
     id: int
+    # Public profile URL slug (``/guidesprofile/:slug``).
+    slug: Optional[str] = None
     # Login account id of the guide, so the frontend can hide a signed-in
     # guide from their own "Who you'll meet" list.
     userId: Optional[int] = None

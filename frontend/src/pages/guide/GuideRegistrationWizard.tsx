@@ -104,9 +104,82 @@ const REGIONS = [
   'Sudurpashchim Province',
 ];
 
+// Input sanitisation: every free-text answer is filtered and capped so a stray
+// paste cannot smuggle control characters, markup or a huge payload into the
+// saved draft and the submitted application.
+const FIELD_MAX_LENGTH: Partial<Record<keyof Draft, number>> = {
+  firstName: 60,
+  lastName: 60,
+  email: 254,
+  password: 128,
+  confirmPassword: 128,
+  phone: 30,
+  region: 80,
+  displayName: 80,
+  bio: 2000,
+  languages: 160,
+  province: 80,
+  preferredGroupSize: 40,
+  yearsExperience: 2,
+  expertise: 300,
+  citiesCovered: 300,
+  guideLicenseNumber: 40,
+  experienceSummary: 2000,
+  ninNumber: 40,
+};
+
+// Character sets each field may contain; anything else is dropped as typed.
+const FIELD_ALLOWED: Partial<Record<keyof Draft, RegExp>> = {
+  firstName: /[\p{L}\p{M} .'\u2019&-]/gu,
+  lastName: /[\p{L}\p{M} .'\u2019&-]/gu,
+  displayName: /[\p{L}\p{M} .'\u2019&()-]/gu,
+  email: /[^\s]/gu,
+  phone: /[0-9+()\-\s]/gu,
+  languages: /[\p{L}\p{M} ,/&.()-]/gu,
+  expertise: /[\p{L}\p{M}\p{N} ,/&.()'-]/gu,
+  citiesCovered: /[\p{L}\p{M}\p{N} ,/&.()'-]/gu,
+  guideLicenseNumber: /[\p{L}\p{N} ._/-]/gu,
+  yearsExperience: /[0-9]/gu,
+  ninNumber: /[0-9+()\-\s]/gu,
+};
+
+const sanitizeFieldValue = (key: keyof Draft, raw: string): string => {
+  const multiline = key === 'bio' || key === 'experienceSummary';
+  let value = raw
+    .replace(/\u00a0/g, ' ')
+    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '');
+  if (!multiline) value = value.replace(/[\r\n\t]+/g, ' ');
+
+  const allowed = FIELD_ALLOWED[key];
+  if (allowed) value = (value.match(allowed) ?? []).join('');
+
+  const max = FIELD_MAX_LENGTH[key];
+  return max ? value.slice(0, max) : value;
+};
+
 const loadDraft = (): Draft => {
   try {
-    return { ...empty, ...JSON.parse(localStorage.getItem('gn-guide-registration-draft') || '{}') };
+    const stored = JSON.parse(localStorage.getItem('gn-guide-registration-draft') || '{}');
+    if (!stored || typeof stored !== 'object') return empty;
+
+    const draft: Draft = { ...empty };
+    (Object.keys(empty) as Array<keyof Draft>).forEach((key) => {
+      if (key === 'liveSelfieImages') return;
+      const target = draft as unknown as Record<string, string | boolean>;
+      if (typeof empty[key] === 'boolean') {
+        target[key] = stored[key] === true;
+      } else {
+        target[key] = sanitizeFieldValue(key, typeof stored[key] === 'string' ? stored[key] : '');
+      }
+    });
+
+    const images = stored.liveSelfieImages;
+    draft.liveSelfieImages = {
+      left: typeof images?.left === 'string' ? images.left : '',
+      front: typeof images?.front === 'string' ? images.front : '',
+      right: typeof images?.right === 'string' ? images.right : '',
+    };
+    return draft;
   } catch {
     return empty;
   }
@@ -206,7 +279,9 @@ export default function GuideRegistrationWizard() {
   const [showSelfieAuth, setShowSelfieAuth] = useState(false);
 
   const update = (key: keyof Draft, value: string | boolean) => {
-    const next = { ...draft, [key]: value };
+    const next: Draft = { ...draft };
+    const target = next as unknown as Record<string, string | boolean>;
+    target[key] = typeof value === 'string' ? sanitizeFieldValue(key, value) : value;
     setDraft(next);
     localStorage.setItem('gn-guide-registration-draft', JSON.stringify(next));
     setFieldErrors((prev) => {
@@ -885,17 +960,31 @@ export default function GuideRegistrationWizard() {
               </div>
             </div>
             <div className="mt-6 space-y-3 text-sm">
-              <label className="flex gap-3">
+              <div className="flex gap-3">
                 <input
+                  id="accept-terms"
                   type="checkbox"
                   checked={draft.terms}
                   onChange={(e) => update('terms', e.target.checked)}
                 />
-                I accept the terms and conditions.
-                {fieldErrors.terms && (
-                  <span className="ml-2 text-xs text-red-600">{fieldErrors.terms}</span>
-                )}
-              </label>
+                <div>
+                  <label htmlFor="accept-terms" className="cursor-pointer">
+                    I accept the{' '}
+                  </label>
+                  <a
+                    href="/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#213448] underline"
+                  >
+                    terms and conditions
+                  </a>
+                  .
+                  {fieldErrors.terms && (
+                    <span className="ml-2 text-xs text-red-600">{fieldErrors.terms}</span>
+                  )}
+                </div>
+              </div>
               <label className="flex gap-3">
                 <input
                   type="checkbox"

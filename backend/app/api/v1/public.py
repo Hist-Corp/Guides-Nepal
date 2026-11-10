@@ -1,6 +1,8 @@
 from typing import List, Optional
 import json
 import os
+import re
+import unicodedata
 import uuid
 from pathlib import Path
 
@@ -550,6 +552,13 @@ def resolve_experience_reference(db: Session, experience_id: Optional[int]) -> O
     return None
 
 
+def _slugify_guide_name(name: Optional[str]) -> str:
+    """URL slug for a guide's public profile (``/guidesprofile/:slug``)."""
+    normalized = unicodedata.normalize("NFKD", str(name or ""))
+    ascii_name = normalized.encode("ascii", "ignore").decode("ascii").lower()
+    return re.sub(r"[^a-z0-9]+", "-", ascii_name).strip("-") or "guide"
+
+
 def _guide_to_host_payload(guide: Guide, user_id: Optional[int] = None) -> dict:
     """Public guide payload.
 
@@ -560,6 +569,7 @@ def _guide_to_host_payload(guide: Guide, user_id: Optional[int] = None) -> dict:
     """
     return {
         "id": guide.id,
+        "slug": _slugify_guide_name(guide.name),
         "userId": user_id,
         "name": guide.name,
         "image": guide.image,
@@ -1007,13 +1017,8 @@ def _guide_profile_experiences(
     return entries
 
 
-@router.get("/guides/{id}/profile")
-def get_guide_profile(id: int, db: Session = Depends(get_db)) -> dict:
+def _guide_profile_payload(db: Session, guide: Guide) -> dict:
     """Everything the traveller-facing guide profile page shows in one payload."""
-    guide = db.get(Guide, id)
-    if guide is None or not guide.is_active:
-        raise HTTPException(status_code=404, detail="Guide not found")
-
     account_id = _guide_account_ids(db, [guide.id]).get(guide.id)
     payload = _guide_to_host_payload(guide, account_id)
     payload["is_active"] = bool(guide.is_active)
@@ -1042,3 +1047,44 @@ def get_guide_profile(id: int, db: Session = Depends(get_db)) -> dict:
         "reviews": int(guide.reviews or 0),
     }
     return payload
+
+
+@router.get("/guides/{id}/profile")
+def get_guide_profile(id: int, db: Session = Depends(get_db)) -> dict:
+    """Profile page payload for a catalog guide id."""
+    guide = db.get(Guide, id)
+    if guide is None or not guide.is_active:
+        raise HTTPException(status_code=404, detail="Guide not found")
+    return _guide_profile_payload(db, guide)
+
+
+@router.get("/guides/by-slug/{slug}")
+def get_guide_profile_by_slug(slug: str, db: Session = Depends(get_db)) -> dict:
+    """Profile page payload for a ``/guidesprofile/:slug`` URL.
+
+    Slugs are derived from the guide's name.  When two guides share a name the
+    second URL gets the id appended, so ``-<id>`` is honoured as well.
+    """
+    target = slug.strip().lower()
+    guides = (
+        db.query(Guide)
+        .filter(Guide.is_active.is_(True))
+        .order_by(Guide.id)
+        .all()
+    )
+
+    for guide in guides:
+        if _slugify_guide_name(guide.name) == target:
+            return _guide_profile_payload(db, guide)
+
+    suffix = re.search(r"-(\d+)$", target)
+    if suffix:
+        guide = next(
+            (g for g in guides if str(g.id) == suffix.group(1)),
+            None,
+        )
+        base = target[: suffix.start()]
+        if guide is not None and _slugify_guide_name(guide.name) == base:
+            return _guide_profile_payload(db, guide)
+
+    raise HTTPException(status_code=404, detail="Guide not found")

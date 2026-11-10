@@ -3,6 +3,8 @@ import { API_BASE_URL } from '../config/api';
 
 export interface Guide {
   id: number;
+  /** Public profile slug, used by ``/guidesprofile/:slug``. */
+  slug?: string | null;
   /** Login account id of the guide, when the backend knows it. */
   userId?: number | null;
   name: string;
@@ -89,6 +91,14 @@ export const guidesApi = {
   // experiences the guide leads.
   getGuideProfile: async (id: number): Promise<GuideProfile> => {
     const response = await axios.get(`${API_BASE_URL}/guides/${id}/profile`);
+    return response.data;
+  },
+
+  // Same payload, addressed by the public profile slug.
+  getGuideProfileBySlug: async (slug: string): Promise<GuideProfile> => {
+    const response = await axios.get(
+      `${API_BASE_URL}/guides/by-slug/${encodeURIComponent(slug)}`
+    );
     return response.data;
   },
 

@@ -69,7 +69,6 @@ import BookingsPage from './pages/user/BookingsPage';
 import GuideBookingsPage from './pages/guide/GuideBookingsPage';
 import RoleProfilePage from './pages/user/RoleProfilePage';
 import PublicGuideListingsPage from './pages/user/PublicGuideListingsPage';
-import GuideProfilePage from './pages/GuideProfilePage';
 import AccountSettingsPage from './pages/user/AccountSettingsPage';
 import FavoritesPage from './pages/user/FavoritesPage';
 import ChatPage from './pages/user/ChatPage';
@@ -185,8 +184,9 @@ function App() {
             />
             <Route path="/profile" element={<RoleProfilePage />} />
             <Route path="/listings" element={<PublicGuideListingsPage />} />
-            {/* Public profile of one guide, linked from "Who you'll meet". */}
-            <Route path="/guides/:id" element={<GuideProfilePage />} />
+            {/* Public profile of one guide by catalog id; the slug URL below
+                is the canonical one used across the site. */}
+            <Route path="/guides/:id" element={<LocalProfilePage />} />
             <Route path="/account" element={<AccountSettingsPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/chat" element={<ChatPage />} />

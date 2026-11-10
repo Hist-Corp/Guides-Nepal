@@ -47,6 +47,8 @@ interface Host {
 /** Guide approved by a Regional Head for this experience. */
 interface AssignedGuide {
   id: number;
+  // Public profile slug, so "View profile" links to the canonical guide URL.
+  slug?: string | null;
   name: string;
   image: string;
   role?: string;
@@ -1385,7 +1387,7 @@ const ExperiencePage: React.FC = () => {
                             )}
                           </button>
                           <Link
-                            to={`/guides/${g.id}`}
+                            to={`/guidesprofile/${g.slug || g.id}`}
                             aria-label={`View ${g.name}'s profile`}
                             className="text-xs font-bold text-primary hover:underline"
                           >

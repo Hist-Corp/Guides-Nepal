@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useGoBack } from '../utils/backNavigation';
 import { Header } from '../components/common/Header';
@@ -14,11 +14,38 @@ import {
 } from 'lucide-react';
 import { sendGuideRequest } from '../services/publicApi';
 import { findGuideBySlug } from '../utils/guideUrl';
+import guidesApi, { type GuideProfile } from '../services/guidesApi';
 
 const ContactGuidePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const goBack = useGoBack();
-  const guide = findGuideBySlug(slug);
+  const localGuide = findGuideBySlug(slug);
+  // Guides that exist only in the database have no local catalog entry, so the
+  // contact page resolves their name from the profile endpoint.
+  const [apiGuide, setApiGuide] = useState<GuideProfile | null>(null);
+  const [resolving, setResolving] = useState(false);
+
+  useEffect(() => {
+    if (localGuide || !slug) return;
+    let cancelled = false;
+    setResolving(true);
+    guidesApi
+      .getGuideProfileBySlug(slug)
+      .then((profile) => {
+        if (!cancelled) setApiGuide(profile);
+      })
+      .catch(() => {
+        if (!cancelled) setApiGuide(null);
+      })
+      .finally(() => {
+        if (!cancelled) setResolving(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [localGuide, slug]);
+
+  const guide = localGuide ?? apiGuide;
 
   // Form State
   const [adults, setAdults] = useState(2);
@@ -30,6 +57,18 @@ const ContactGuidePage: React.FC = () => {
   // Personalization request submission
   const [sendingRequest, setSendingRequest] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
+
+  if (!guide && resolving) {
+    return (
+      <div className="min-h-screen flex flex-col font-sans bg-white">
+        <Header />
+        <main className="flex-grow flex flex-col items-center justify-center px-4 py-20 text-center">
+          <p className="text-gray-500">Loading guide...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!guide) {
     return (
