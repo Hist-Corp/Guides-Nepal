@@ -84,15 +84,28 @@ test.describe('Frontend — Auth flow buttons', () => {
 
   test('currency converter modal opens and converts', async ({ page }) => {
     await page.goto('http://127.0.0.1:5175/');
-    const ccBtn = page.locator('button[aria-label="Currency converter"], button[title*="Currency"], button[title*="currency"]');
+    const ccBtn = page.locator('button[title="Currency"], button[title*="currency"]');
     if (!(await ccBtn.isVisible({ timeout: 3000 }).catch(() => false))) {
       test.skip();
       return;
     }
     await ccBtn.click();
-    const amount = page.locator('input[type="number"]').last();
-    await amount.fill('100');
-    await page.getByRole('button', { name: /^Convert$/i }).click();
-    await expect(page.locator('text=/equals/i')).toBeVisible({ timeout: 5000 });
+    // Wait for the currency picker modal to appear
+    await page.waitForSelector('[data-testid="currency-picker-modal"]', { timeout: 5000 });
+    await expect(page.locator('[data-testid="currency-picker-modal"]')).toBeVisible();
+    // Verify modal contains currency grid
+    await expect(page.locator('[role="radiogroup"]')).toBeVisible();
+    // Check for popular currencies (first in the grid)
+    await expect(page.locator('[role="radiogroup"] button').first()).toBeVisible();
+    // Select a currency (USD)
+    const usdBtn = page.locator('[role="radiogroup"] button').filter({ hasText: 'US Dollar' }).first();
+    if (await usdBtn.isVisible()) {
+      await usdBtn.click();
+      await expect(usdBtn).toHaveAttribute('aria-checked', 'true');
+    }
+    // Click save button
+    await page.getByRole('button', { name: /Save Currency/i }).click();
+    // Wait for modal to close
+    await page.waitForSelector('[data-testid="currency-picker-modal"]', { timeout: 5000, state: 'detached' });
   });
 });

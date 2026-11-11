@@ -69,6 +69,19 @@ After signing in as host, you land on `/host/dashboard`.
 - **Form field focus**: All input fields now use blue focus rings (`focus:ring-[#213448]`) instead of yellow for better visual consistency.
 - **Form layout**: Submit buttons now have improved padding (`px-8 py-3`), larger text (`text-base`), and responsive layout (stacked on mobile, inline on desktop).
 
+**QA & E2E Test Scripts**
+
+- Added four QA npm scripts to root `package.json`:
+  - `npm run qa:smoke` — runs Playwright smoke tests against the frontend project
+  - `npm run qa:e2e` — runs the full Playwright E2E suite
+  - `npm run qa:api` — runs the QA pytest API test suite
+  - `npm run qa:api:debug` — runs the QA pytest API test suite with verbose output
+- Updated E2E test specs:
+  - `tests/e2e/specs/auth.spec.ts` — currency converter button locator now uses `title="Currency"` attribute
+  - `tests/e2e/specs/dashboard.spec.ts` — admin login now reads `DASHBOARD_ADMIN_PASSWORD` env var with `Admin@12345` fallback
+  - `tests/e2e/specs/home-buttons.spec.ts` — hero search test updated with HeroSection-specific styling comments
+  - `tests/e2e/specs/navigation.spec.ts` — category heading link navigation test updated
+
 ### v1.3.0 (2026-10-08)
 
 **Search & Discovery**

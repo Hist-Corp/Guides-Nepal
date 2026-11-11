@@ -4,18 +4,25 @@ test.describe('Frontend — Navigation buttons and routes', () => {
   test('category heading links navigate to their pages', async ({ page }) => {
     await page.goto('/');
     // CategoryGrid heading contains Most Popular / Most Delicious / Real-Good Travel links
-    const links = [
-      { name: /^Most Popular$/i, url: /\/most-popular/ },
-      { name: /^Most Delicious$/i, url: /\/most-delicious/ },
-      { name: /^Real-Good Travel\.$/i, url: /\/real-good-travel/ },
-    ];
-    for (const { name, url } of links) {
-      const link = page.getByRole('link', { name }).first();
-      await expect(link).toBeVisible();
-      await link.click();
-      await expect(page).toHaveURL(url, { timeout: 10000 });
-      await page.goto('/');
-    }
+    // These are Link components inside heading elements
+    const headingLinks = page.locator('h2, h3').locator('a').filter({
+      hasText: /Most Popular|Most Delicious|Real-Good Travel/
+    });
+    const count = await headingLinks.count();
+    expect(count).toBeGreaterThanOrEqual(3);
+    
+    // Test the specific links
+    await headingLinks.filter({ hasText: 'Most Popular' }).first().click();
+    await expect(page).toHaveURL(/\/most-popular/, { timeout: 10000 });
+    await page.goto('/', { timeout: 10000 });
+    
+    await headingLinks.filter({ hasText: 'Most Delicious' }).first().click();
+    await expect(page).toHaveURL(/\/most-delicious/, { timeout: 10000 });
+    await page.goto('/', { timeout: 10000 });
+    
+    await headingLinks.filter({ hasText: 'Real-Good Travel' }).first().click();
+    await expect(page).toHaveURL(/\/real-good-travel/, { timeout: 10000 });
+    await page.goto('/', { timeout: 10000 });
   });
 
   test('footer column links are clickable and load pages', async ({ page }) => {
@@ -36,9 +43,12 @@ test.describe('Frontend — Navigation buttons and routes', () => {
 
   test('featured promo CTA button is clickable', async ({ page }) => {
     await page.goto('/');
-    const cta = page.locator('button', { name: /Read our report/i }).first();
+    // The CTA button is in the PromoBanner section which has data-cms-id="home-promo"
+    const cta = page.locator('[data-cms-id="home-promo"] button').filter({ hasText: /Read our report/i }).first();
     await expect(cta).toBeVisible();
     await cta.click();
+    // Verify we navigate to the impact report page
+    await expect(page).toHaveURL(/impact-report-2024/, { timeout: 10000 });
   });
 
   test('all category cards are navigable', async ({ page }) => {
