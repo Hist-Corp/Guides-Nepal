@@ -13,7 +13,7 @@ export const CookingExperiencesPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans bg-background-cream">
       <Header />
-      <main className="flex-grow">
+      <main id="main-content" className="flex-grow">
         {/* Hero */}
         <section className="bg-[#213448] text-white">
           <div className="container mx-auto px-4 py-14">

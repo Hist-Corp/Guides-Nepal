@@ -129,7 +129,7 @@ const GuideExperienceRequestPage: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 font-sans">
       <Header />
-      <main className="container mx-auto max-w-4xl flex-grow px-4 py-10">
+      <main id="main-content" className="container mx-auto max-w-4xl flex-grow px-4 py-10">
         <button onClick={goBack} className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full text-sm mb-6">
           <ArrowLeft className="h-4 w-4" /> Back
         </button>

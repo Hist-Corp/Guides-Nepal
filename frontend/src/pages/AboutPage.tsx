@@ -14,7 +14,7 @@ const AboutPage: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <PageBackButton />
-      <main className="flex-grow">
+      <main id="main-content" className="flex-grow">
         {/* Hero Section */}
         <section data-cms-id="about-hero" data-cms-label="About Hero" className="bg-primary py-20 text-white">
           <div className="container mx-auto px-4 text-center">

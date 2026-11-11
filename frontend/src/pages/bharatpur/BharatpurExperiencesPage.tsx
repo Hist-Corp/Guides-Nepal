@@ -16,7 +16,7 @@ const BharatpurExperiencesPage: React.FC = () => {
     <div className="min-h-screen flex flex-col font-sans bg-white">
       <Header />
 
-      <main className="container mx-auto px-4 py-16 max-w-7xl flex-grow">
+      <main id="main-content" className="container mx-auto px-4 py-16 max-w-7xl flex-grow">
         <div className="mb-12">
           <button
             onClick={goBack}

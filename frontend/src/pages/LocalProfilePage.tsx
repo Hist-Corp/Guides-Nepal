@@ -277,7 +277,7 @@ const GuideProfilePage: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col font-sans bg-white">
         <Header />
-        <main className="flex-grow bg-gray-50/50">
+        <main id="main-content" className="flex-grow bg-gray-50/50">
           <div className="container mx-auto max-w-6xl px-4 py-16">
             <div className="animate-pulse space-y-6">
               <div className="h-96 rounded-2xl bg-gray-200" />
@@ -297,7 +297,7 @@ const GuideProfilePage: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col font-sans bg-white">
         <Header />
-        <main className="flex-grow bg-gray-50/50">
+        <main id="main-content" className="flex-grow bg-gray-50/50">
           <div className="container mx-auto px-4 py-20 max-w-2xl text-center">
             <h1 className="text-2xl font-bold text-gray-900">Guide profile not found</h1>
             <p className="mt-3 text-gray-600">
@@ -357,7 +357,7 @@ const GuideProfilePage: React.FC = () => {
     <div className="min-h-screen flex flex-col font-sans bg-white">
       <Header />
 
-      <main className="flex-grow bg-gray-50/50">
+      <main id="main-content" className="flex-grow bg-gray-50/50">
         <div className="container mx-auto px-4 py-8 max-w-6xl">
           <button
             onClick={goBack}

@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Navigate, Routes, Route } from 'react-router-dom';
+import SkipLink from './components/common/SkipLink';
 import ScrollToTop from './components/common/ScrollToTop';
 import MailaDaiWidget from './components/common/MailaDaiWidget';
 import CookieConsent from './components/common/CookieConsent';
@@ -121,7 +122,8 @@ function App() {
   return (
     <CurrencyProvider>
       <CartProvider>
-        <Router>
+        <SkipLink />
+      <Router>
           <CmsEditMode />
           {isCmsPreview && <CmsPreviewBridge />}
           <ScrollToTop />

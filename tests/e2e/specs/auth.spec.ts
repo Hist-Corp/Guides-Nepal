@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Frontend — Auth flow buttons', () => {
   test('login modal password toggle changes input type', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('http://127.0.0.1:5175/');
     await page.locator('header').getByRole('button', { name: /^Log in$/i }).first().click();
     const pwInput = page.locator('form input[type="password"]');
     await expect(pwInput).toBeVisible();
@@ -15,7 +15,7 @@ test.describe('Frontend — Auth flow buttons', () => {
   });
 
   test('login modal forgot-password button opens forgot flow', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('http://127.0.0.1:5175/');
     await page.locator('header').getByRole('button', { name: /^Log in$/i }).first().click();
     await page.getByRole('button', { name: /Forgot your password/i }).first().click();
     // ForgotPasswordModal copy
@@ -23,7 +23,7 @@ test.describe('Frontend — Auth flow buttons', () => {
   });
 
   test('login modal "Sign up" button switches to signup', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('http://127.0.0.1:5175/');
     await page.locator('header').getByRole('button', { name: /^Log in$/i }).first().click();
     // The switch-to-signup button inside the login modal (last "Sign up" after opening login)
     await page.getByRole('button', { name: /^Sign up$/i }).last().click();
@@ -32,7 +32,7 @@ test.describe('Frontend — Auth flow buttons', () => {
   });
 
   test('forgot password modal submits email and shows success', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('http://127.0.0.1:5175/');
     await page.locator('header').getByRole('button', { name: /^Log in$/i }).first().click();
     await page.getByRole('button', { name: /Forgot your password/i }).first().click();
     await page.locator('form input[type="email"]').fill('test@example.com');
@@ -42,7 +42,7 @@ test.describe('Frontend — Auth flow buttons', () => {
   });
 
   test('signup modal social login buttons are present', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('http://127.0.0.1:5175/');
     await page.locator('header').getByRole('button', { name: /^Sign up$/i }).first().click();
     // The social buttons are icon-only svg buttons (Apple, Facebook, Google)
     const socialBtns = page.locator('button').filter({ has: page.locator('svg') });
@@ -51,28 +51,28 @@ test.describe('Frontend — Auth flow buttons', () => {
   });
 
   test('signup modal shows email form after selecting traveler', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('http://127.0.0.1:5175/');
     await page.locator('header').getByRole('button', { name: /^Sign up$/i }).first().click();
     // Choose "I'm a Traveler" to reach the email form step
-    await page.getByRole('button', { name: /I.m a Traveler/i }).click();
+    await page.getByRole('button', { name: /I'm a Traveler/i }).click();
     await expect(page.locator('text=Sign up with your email address')).toBeVisible();
     await expect(page.locator('form input[type="email"]')).toBeVisible();
-    await expect(page.locator('form input[type="password"]')).toBeVisible();
+    await expect(page.locator('form input[type="password"]').first()).toBeVisible();
   });
 
   test('signup modal no longer offers a Host option', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('http://127.0.0.1:5175/');
     await page.locator('header').getByRole('button', { name: /^Sign up$/i }).first().click();
     await expect(page.locator('text=Join Guides-Nepal')).toBeVisible();
-    await expect(page.getByRole('button', { name: /I.m a Host/i })).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /I.m a Traveler/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /I.m a Local Guide/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /I'm a Host/i })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /I'm a Traveler/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /I'm a Local Guide/i })).toBeVisible();
   });
 
   test('traveler signup requires accepting Terms & Privacy first', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('http://127.0.0.1:5175/');
     await page.locator('header').getByRole('button', { name: /^Sign up$/i }).first().click();
-    await page.getByRole('button', { name: /I.m a Traveler/i }).click();
+    await page.getByRole('button', { name: /I'm a Traveler/i }).click();
     const form = page.locator('form').last();
     const termsBox = form.locator('input[type="checkbox"]');
     await expect(termsBox).toBeVisible();
@@ -83,7 +83,7 @@ test.describe('Frontend — Auth flow buttons', () => {
   });
 
   test('currency converter modal opens and converts', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('http://127.0.0.1:5175/');
     const ccBtn = page.locator('button[aria-label="Currency converter"], button[title*="Currency"], button[title*="currency"]');
     if (!(await ccBtn.isVisible({ timeout: 3000 }).catch(() => false))) {
       test.skip();

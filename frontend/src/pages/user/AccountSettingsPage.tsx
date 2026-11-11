@@ -211,7 +211,7 @@ const AccountSettingsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans overflow-x-clip">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <main id="main-content" className="flex-grow container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
           <div className="mb-2">
             <button

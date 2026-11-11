@@ -17,7 +17,7 @@ const BookingsPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col font-sans">
       <Header />
 
-      <main className="flex-grow">
+      <main id="main-content" className="flex-grow">
         {/* Hero banner */}
         <div className="bg-gradient-to-r from-primary to-primary/80 text-white py-10">
           <div className="container mx-auto px-4">

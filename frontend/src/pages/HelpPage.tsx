@@ -19,7 +19,7 @@ const HelpPage: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <PageBackButton />
-      <main className="flex-grow">
+      <main id="main-content" className="flex-grow">
         <section className="relative overflow-hidden bg-gradient-to-br from-primary to-primary/80 py-20 text-white">
           <div className="absolute inset-0 opacity-10">
             <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">

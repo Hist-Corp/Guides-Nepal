@@ -13,7 +13,7 @@ const SustainabilityPage: React.FC = () => {
     <div className="min-h-screen flex flex-col text-slate-900 bg-white">
       <Header />
       <PageBackButton />
-      <main className="flex-grow relative">
+      <main id="main-content" className="flex-grow relative">
         {/* ============================================
            HERO SECTION
            ============================================ */}

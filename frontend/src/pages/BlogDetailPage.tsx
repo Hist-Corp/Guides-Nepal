@@ -375,7 +375,7 @@ const BlogDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-grow flex items-center justify-center bg-slate-50">
+        <main id="main-content" className="flex-grow flex items-center justify-center bg-slate-50">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </main>
         <Footer />
@@ -387,7 +387,7 @@ const BlogDetailPage: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-grow">
+        <main id="main-content" className="flex-grow">
           <section className="bg-primary py-20 text-white">
             <div className="container mx-auto px-4 text-center">
               <h1 className="text-4xl md:text-5xl font-bold mb-4">Blog Post Not Found</h1>
@@ -417,7 +417,7 @@ const BlogDetailPage: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <PageBackButton />
-      <main className="flex-grow bg-white">
+      <main id="main-content" className="flex-grow bg-white">
         <section className="bg-gradient-to-b from-[#213448] to-[#2c4a63] py-14 text-white">
           <div className="container mx-auto px-4 max-w-4xl text-center">
             <div className="flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-widest text-amber-300 mb-4">

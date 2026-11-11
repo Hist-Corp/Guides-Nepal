@@ -147,7 +147,7 @@ const GuideProposalFormPage: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 font-sans">
       <Header />
-      <main className="container mx-auto max-w-3xl flex-grow px-4 py-10">
+      <main id="main-content" className="container mx-auto max-w-3xl flex-grow px-4 py-10">
         <Link to="/guide/proposals" className="flex items-center gap-1 text-sm font-bold text-primary hover:underline">
           <ArrowLeft className="h-4 w-4" /> Back to proposals
         </Link>

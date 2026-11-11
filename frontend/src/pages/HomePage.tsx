@@ -17,7 +17,7 @@ export const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans">
       <Header />
-      <main className="flex-grow">
+      <main id="main-content" className="flex-grow">
         <HeroSection />
         <FeaturedExperiences />
         <PromoBanner />

@@ -1102,7 +1102,7 @@ const ExperiencePage: React.FC = () => {
     <div className="min-h-screen flex flex-col font-sans bg-background-cream">
       <Header />
 
-      <main className="flex-grow">
+      <main id="main-content" className="flex-grow">
         {/* Gallery Grid (Mobile: Carousel, Desktop: Grid) */}
         <div className="h-[40vh] md:h-[60vh] relative bg-slate-100">
           <button

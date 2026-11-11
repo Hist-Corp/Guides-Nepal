@@ -17,7 +17,7 @@ export const LalitpurExperiencesPage: React.FC = () => {
     <div className="min-h-screen flex flex-col font-sans bg-gray-50">
       <Header />
 
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
+      <main id="main-content" className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-8">
           <button
             onClick={goBack}

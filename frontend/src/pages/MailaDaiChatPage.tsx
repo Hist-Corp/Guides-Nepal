@@ -167,7 +167,7 @@ const MailaDaiChatPage: React.FC = () => {
       </header>
 
       {/* Chat Area */}
-      <main className="flex-grow flex flex-col max-w-2xl mx-auto w-full p-4 pb-24">
+      <main id="main-content" className="flex-grow flex flex-col max-w-2xl mx-auto w-full p-4 pb-24">
         <div className="space-y-6 flex-grow">
           {messages.map((msg) => (
             <div

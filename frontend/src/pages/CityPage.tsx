@@ -586,7 +586,7 @@ const CityPage: React.FC = () => {
         </div>
       </div>
 
-      <main className="container mx-auto px-4 py-12 space-y-20">
+      <main id="main-content" className="container mx-auto px-4 py-12 space-y-20">
         {/* Value Props Strip */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center border-b border-slate-200 pb-12">
           <div className="flex flex-col items-center gap-3">

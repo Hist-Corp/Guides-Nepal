@@ -144,7 +144,7 @@ const HostEarningsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Header />
-      <main className="flex-grow container mx-auto max-w-6xl px-4 py-8">
+      <main id="main-content" className="flex-grow container mx-auto max-w-6xl px-4 py-8">
         <PageBackButton fallback="/host/dashboard" />
         <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
           <div>

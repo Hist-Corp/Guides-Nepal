@@ -156,7 +156,7 @@ export const SearchPage: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
       <PageBackButton />
-      <main className="flex-grow">
+      <main id="main-content" className="flex-grow">
         <section className="relative bg-primary overflow-hidden pt-12 pb-8 md:pt-14 md:pb-10 min-h-[340px] md:min-h-[380px]">
           <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-primary"></div>
           <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none"></div>

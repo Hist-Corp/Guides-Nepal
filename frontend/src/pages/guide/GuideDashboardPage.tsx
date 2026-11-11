@@ -110,7 +110,7 @@ const GuideDashboardPage: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 font-sans">
       <Header />
-      <main className="container mx-auto max-w-6xl flex-grow px-4 py-10">
+      <main id="main-content" className="container mx-auto max-w-6xl flex-grow px-4 py-10">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Namaste, {user?.firstName ?? 'Guide'}</h1>

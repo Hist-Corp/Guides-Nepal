@@ -26,7 +26,7 @@ export default function OAuthCallback() {
   }, [navigate, login, setTokens, setRememberMe]);
 
   return (
-    <main className="min-h-screen flex items-center justify-center">
+    <main id="main-content" className="min-h-screen flex items-center justify-center">
       <div className="text-gray-600">Finishing sign-in…</div>
     </main>
   );

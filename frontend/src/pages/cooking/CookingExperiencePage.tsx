@@ -485,7 +485,7 @@ const handleBookNow = async (): Promise<boolean> => {
     return (
       <div className="min-h-screen flex flex-col font-sans bg-white">
         <Header />
-        <main className="flex-grow container mx-auto px-4 py-12 text-center">
+        <main id="main-content" className="flex-grow container mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold">Cooking experience not found</h1>
           <button
             onClick={() => navigate('/cooking-classes')}
@@ -578,7 +578,7 @@ const handleBookNow = async (): Promise<boolean> => {
         </div>
       </div>
 
-      <main className="flex-grow">
+      <main id="main-content" className="flex-grow">
         <div className="container mx-auto px-4 py-12 max-w-6xl">
           <div className="lg:grid lg:grid-cols-3 gap-12">
             <div className="lg:col-span-2 space-y-12">

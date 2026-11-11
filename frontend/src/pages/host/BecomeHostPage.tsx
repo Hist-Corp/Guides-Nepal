@@ -66,7 +66,7 @@ const BecomeHostPage: React.FC = () => {
       <Header />
       <PageBackButton />
 
-      <main className="flex-grow">
+      <main id="main-content" className="flex-grow">
         {/* Hero Section */}
         <section className="relative h-[600px] flex flex-col items-center pt-20 overflow-hidden">
           {/* Background Image */}

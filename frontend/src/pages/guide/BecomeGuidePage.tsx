@@ -370,7 +370,7 @@ const BecomeGuidePage: React.FC = () => {
     return (
       <div className="min-h-screen font-sans bg-white flex flex-col">
         <Header />
-        <main className="flex-grow flex items-center justify-center bg-gray-50 px-4 py-20">
+        <main id="main-content" className="flex-grow flex items-center justify-center bg-gray-50 px-4 py-20">
           <div className="bg-white p-10 rounded-3xl shadow-xl text-center max-w-lg w-full">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle2 className="w-10 h-10 text-green-600" />
@@ -396,7 +396,7 @@ const BecomeGuidePage: React.FC = () => {
     <div className="min-h-screen font-sans bg-white text-gray-900">
       <Header />
       
-      <main className="py-12 bg-gray-50">
+      <main id="main-content" className="py-12 bg-gray-50">
         <div className="container mx-auto px-4 max-w-3xl">
           <button 
             onClick={goBack} 

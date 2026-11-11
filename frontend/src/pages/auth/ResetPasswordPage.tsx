@@ -125,7 +125,7 @@ export default function ResetPasswordPage() {
     }
   };
   return (
-    <main className="min-h-screen bg-[#FFF0E6] flex items-center justify-center p-4">
+    <main id="main-content" className="min-h-screen bg-[#FFF0E6] flex items-center justify-center p-4">
       <div className="w-full max-w-[480px] bg-white rounded-3xl shadow-2xl overflow-hidden">
         <div className="bg-[#FFF0E6] p-6 text-center">
           <div className="flex justify-center mb-3">

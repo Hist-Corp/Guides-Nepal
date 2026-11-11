@@ -236,7 +236,7 @@ const ImpactReportPage: React.FC = () => {
     <div className="min-h-screen font-sans text-slate-900 bg-white">
       <Header />
 
-      <main className="relative">
+      <main id="main-content" className="relative">
         {/* Back Button — consistently below header */}
         <div className="absolute top-0 left-0 z-20 mt-6 ml-6 md:ml-8">
           <button

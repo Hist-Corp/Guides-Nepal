@@ -62,7 +62,7 @@ const ContactGuidePage: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col font-sans bg-white">
         <Header />
-        <main className="flex-grow flex flex-col items-center justify-center px-4 py-20 text-center">
+        <main id="main-content" className="flex-grow flex flex-col items-center justify-center px-4 py-20 text-center">
           <p className="text-gray-500">Loading guide...</p>
         </main>
         <Footer />
@@ -74,7 +74,7 @@ const ContactGuidePage: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col font-sans bg-white">
         <Header />
-        <main className="flex-grow flex flex-col items-center justify-center px-4 py-20 text-center">
+        <main id="main-content" className="flex-grow flex flex-col items-center justify-center px-4 py-20 text-center">
           <h1 className="text-2xl font-bold text-gray-900">Guide not found</h1>
           <p className="mt-3 text-gray-600">This guide is no longer available.</p>
           <button
@@ -151,7 +151,7 @@ const ContactGuidePage: React.FC = () => {
     <div className="min-h-screen flex flex-col font-sans bg-white">
       <Header />
 
-      <main className="flex-grow flex flex-col items-center py-12 px-4">
+      <main id="main-content" className="flex-grow flex flex-col items-center py-12 px-4">
         <div className="w-full max-w-2xl space-y-10">
           <button
             onClick={goBack}

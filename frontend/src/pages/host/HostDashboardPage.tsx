@@ -81,7 +81,7 @@ const HostDashboardPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-grow bg-gray-50">
+      <main id="main-content" className="flex-grow bg-gray-50">
         <section className="bg-primary py-14 text-white">
           <div className="container mx-auto px-4">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

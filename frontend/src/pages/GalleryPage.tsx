@@ -42,7 +42,7 @@ const GalleryPage: React.FC = () => {
     <div className="min-h-screen flex flex-col font-sans bg-white">
       <Header />
 
-      <main className="flex-grow bg-gray-50/50">
+      <main id="main-content" className="flex-grow bg-gray-50/50">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           {/* Header */}
           <div className="mb-8">

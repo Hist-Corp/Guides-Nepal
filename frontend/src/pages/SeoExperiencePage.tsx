@@ -181,7 +181,7 @@ const SeoExperiencePage: React.FC = () => {
     <div className="min-h-screen flex flex-col font-sans bg-background-white text-gray-800">
       <Header />
       
-      <main className="flex-grow pt-8 pb-16">
+      <main id="main-content" className="flex-grow pt-8 pb-16">
         <div className="container mx-auto px-4 max-w-7xl">
           <button 
             onClick={goBack} 

@@ -9,7 +9,7 @@ const PrivacyPolicyPage: React.FC = () => {
         <Header />
         <PageBackButton className="max-w-4xl" />
 
-        <main className="container mx-auto px-4 py-12 max-w-4xl">
+        <main id="main-content" className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-12">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
           <p className="text-gray-500 mb-8">Last updated: January 24, 2026</p>

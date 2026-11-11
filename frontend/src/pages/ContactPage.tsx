@@ -39,7 +39,7 @@ const ContactPage: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <PageBackButton />
-      <main className="flex-grow">
+      <main id="main-content" className="flex-grow">
         <section data-cms-id="contact-hero" data-cms-label="Contact Hero" className="bg-primary py-20 text-white">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">

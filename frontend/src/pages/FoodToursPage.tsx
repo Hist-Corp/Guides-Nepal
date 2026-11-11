@@ -249,7 +249,7 @@ export const FoodToursPage: React.FC = () => {
         </h2>
       </div>
 
-      <main className="container mx-auto px-4 py-16 max-w-7xl">
+      <main id="main-content" className="container mx-auto px-4 py-16 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-20 text-center">
           <div className="flex flex-col items-center group">
             <div className="w-20 h-20 rounded-full bg-[#FFF0E6] flex items-center justify-center text-[#213448] mb-6 group-hover:scale-110 transition-transform duration-300">

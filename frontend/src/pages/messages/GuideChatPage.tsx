@@ -69,7 +69,7 @@ const GuideChatPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Header />
 
-      <main className="flex-grow flex flex-col max-w-2xl mx-auto w-full p-4 pb-24">
+      <main id="main-content" className="flex-grow flex flex-col max-w-2xl mx-auto w-full p-4 pb-24">
         {/* Chat header */}
         <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center gap-3">

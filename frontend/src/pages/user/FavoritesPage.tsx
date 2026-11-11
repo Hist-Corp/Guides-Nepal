@@ -11,7 +11,7 @@ const FavoritesPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <main id="main-content" className="flex-grow container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">

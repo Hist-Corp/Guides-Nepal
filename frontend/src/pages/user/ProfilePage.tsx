@@ -118,7 +118,7 @@ const ProfilePage: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 font-sans">
       <Header />
-      <main className="container mx-auto max-w-6xl flex-grow px-4 py-10">
+      <main id="main-content" className="container mx-auto max-w-6xl flex-grow px-4 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left: Profile Card */}
           <div className="lg:col-span-1">

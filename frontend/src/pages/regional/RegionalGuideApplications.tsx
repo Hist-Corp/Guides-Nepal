@@ -106,7 +106,7 @@ const RegionalGuideApplications: React.FC = () => {
   return (
     <div className="min-h-screen font-sans bg-white text-gray-900">
       <Header />
-      <main className="py-12 bg-gray-50">
+      <main id="main-content" className="py-12 bg-gray-50">
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>

@@ -73,7 +73,7 @@ const ChatPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Header />
       
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <main id="main-content" className="flex-grow container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto h-[600px] bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex">
           
           {/* Sidebar: Chat List */}
