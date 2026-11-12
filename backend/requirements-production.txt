@@ -1,0 +1,19 @@
+# Guides Nepal — Backend Runtime Dependencies (Production)
+# Only packages required to run the API in production. Dev tooling (lint, test,
+# type-check, security scan) is intentionally excluded to keep the image lean.
+
+fastapi==0.162.0
+uvicorn[standard]==0.54.0
+pydantic==2.14.1
+pydantic-settings==2.16.1
+email-validator==2.3.0
+sqlalchemy==2.1.6
+alembic==1.20.1
+psycopg2-binary==2.9.13
+python-jose[cryptography]==3.5.0
+bcrypt==5.0.0
+python-multipart==0.0.32
+python-dotenv==1.2.4
+Pillow==13.0.0
+slowapi==0.1.10
+cryptography==50.0.2

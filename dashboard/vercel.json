@@ -1,11 +1,37 @@
 {
-  "buildCommand": "npm run build",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "name": "guides-nepal-dashboard",
+  "version": 2,
+  "buildCommand": "npm install && npm run build",
   "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "framework": "vite",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "regions": ["iad1"],
   "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
     }
-  ]
+  ],
+  "env": {
+    "VITE_API_BASE_URL": "@guides-nepal-backend-url/api/v1",
+    "VITE_PUBLIC_BASE_URL": "/"
+  }
 }
 

@@ -6,24 +6,57 @@ services:
     plan: starter
     autoDeploy: true
     healthCheckPath: /health
-    dockerfilePath: backend/Dockerfile
+    dockerfilePath: backend/Dockerfile.production
+    dockerContext: .
     envVars:
-      # IMPORTANT: Set DATABASE_URL as a secret in the Render dashboard
-      # (Service -> Environment) instead of committing it here, since this
-      # repo is public. Use `sync: false` so Render keeps the dashboard value.
+      # ----------------------------------------------------------------
+      # Required — set these as secrets in the Render dashboard
+      # (Service -> Environment). Never commit real values here.
+      # ----------------------------------------------------------------
       - key: DATABASE_URL
         sync: false
+        # Use Supabase POOLED connection (port 6543) — direct port 5432 often fails from Render due to IPv6.
+        # Format: postgresql://postgres:<PASSWORD>@<PROJECT_REF>.pooler.supabase.com:6543/postgres?sslmode=require
+        # Example: postgresql://postgres:YOUR_DB_PASSWORD@YOUR_PROJECT_REF.pooler.supabase.com:6543/postgres?sslmode=require
       - key: SECRET_KEY
-        generateValue: true
+        sync: false
+        # Generate: openssl rand -hex 32
       - key: ENV
         value: production
-      - key: OPENAI_API_KEY
-        sync: false
       - key: BACKEND_CORS_ORIGINS
-        value: https://guides-nepal-nine.vercel.app,https://guides-nepal-bi2y.vercel.app
+        sync: false
+        # Comma-separated HTTPS origins of deployed frontend + dashboard.
+        # Non-HTTPS origins (except localhost) cause the backend to refuse to boot.
       - key: SUPABASE_URL
         sync: false
+        # https://<PROJECT_REF>.supabase.co
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
+        # Supabase service role key (backend password-reset verification).
       - key: RESET_PASSWORD_REDIRECT_URL
-        value: https://guides-nepal-nine.vercel.app/reset-password
+        sync: false
+        # https://<FRONTEND_URL>/reset-password (allow-list in Supabase Redirect URLs)
+
+      # ----------------------------------------------------------------
+      # Optional — configure only if using the corresponding feature.
+      # ----------------------------------------------------------------
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: AI_PROVIDER
+        value: auto
+      - key: AI_MODEL
+        value: gpt-4o-mini
+      - key: OLLAMA_URL
+        value: http://localhost:11434
+      - key: OLLAMA_MODEL
+        value: llama3.2:latest
+      - key: LOG_LEVEL
+        value: INFO
+      - key: RATE_LIMIT_ENABLED
+        value: "true"
+      - key: RATE_LIMIT_REQUESTS
+        value: "100"
+      - key: RATE_LIMIT_PERIOD
+        value: "60"
+      - key: DEV_ALLOW_SEED
+        value: "false"
