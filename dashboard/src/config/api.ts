@@ -28,4 +28,4 @@ export const getApiUrl = (path: string): string => {
  */
 export const FRONTEND_URL =
   import.meta.env.VITE_FRONTEND_URL ||
-  (import.meta.env.DEV ? 'http://localhost:5175' : 'https://guides-nepal-nine.vercel.app');
+  (import.meta.env.DEV ? 'http://localhost:5175' : 'https://guides-nepal-iota.vercel.app');
