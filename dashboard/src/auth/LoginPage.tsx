@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ChevronDown, Compass, Eye, EyeOff, Moon, Sun } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { login } from '../services/api';
@@ -217,12 +217,18 @@ export default function LoginPage() {
       {/* ---------- Top bar ---------- */}
       <header className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-5 py-5 sm:px-8">
         <div className="flex items-center gap-2.5">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-white/15 font-black text-white ring-1 ring-white/30 backdrop-blur">
-            ग
-          </div>
-          <div className="text-sm font-black uppercase tracking-[0.22em] text-white drop-shadow">
-            Guides<span className="font-light"> Nepal</span>
-          </div>
+          <Link
+            to="/"
+            className="flex items-center gap-2 shrink-0"
+            aria-label="Guides Nepal - Home"
+          >
+            <img
+              src="/images/logo.png"
+              alt="Guides Nepal logo"
+              className="object-contain shrink-0"
+              style={{ maxWidth: '160px', maxHeight: '40px' }}
+            />
+          </Link>
         </div>
         <button
           type="button"

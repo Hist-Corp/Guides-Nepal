@@ -1,5 +1,5 @@
 import { useAuthStore } from "../state/authStore"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { useState } from "react"
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "../hooks/useTheme"
@@ -24,16 +24,18 @@ export default function Topbar() {
   return (
     <header className="gn-topbar sticky top-0 z-20 h-16 border-b border-line flex items-center px-5 justify-between shrink-0">
       <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => navigate(role ? `/dashboard/${role}` : "/dashboard/login")}
-          className="flex cursor-pointer items-center gap-2 font-bold text-lg text-main"
+        <Link
+          to="/"
+          className="flex cursor-pointer items-center gap-2 shrink-0"
+          aria-label="Guides Nepal - Home"
         >
-          <span className="grid h-8 w-8 place-items-center rounded-xl bg-brand-600 text-sm text-white shadow-btn-blue">
-            ग
-          </span>
-          Guides Nepal
-        </button>
+          <img
+            src="/images/logo.png"
+            alt="Guides Nepal logo"
+            className="object-contain shrink-0"
+            style={{ maxWidth: '200px', maxHeight: '50px' }}
+          />
+        </Link>
         <span className="h-5 w-px bg-gray-200" aria-hidden />
         <span className="rounded-full bg-brand-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-brand-700 ring-1 ring-inset ring-brand-200 dark:bg-brand-600/20 dark:text-brand-300 dark:ring-brand-500/40">
           {areaLabel || "Console"}
