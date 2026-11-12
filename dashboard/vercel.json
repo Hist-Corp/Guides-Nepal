@@ -30,7 +30,6 @@
     }
   ],
   "env": {
-    "VITE_API_BASE_URL": "@guides-nepal-backend-url/api/v1",
     "VITE_PUBLIC_BASE_URL": "/"
   }
 }
