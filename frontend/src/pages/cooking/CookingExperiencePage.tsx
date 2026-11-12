@@ -88,30 +88,7 @@ export const cookingExperiencesData: CookingExperience[] = [
       image:
         'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80',
     },
-    guides: [
-      {
-        id: 1,
-        name: 'Chef Sita',
-        role: 'Traditional Newari Cooking Expert',
-        image:
-          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80',
-        rating: 4.9,
-        reviews: 892,
-        bio: "Namaste! I'm Chef Sita, a third-generation Newari cook with over 15 years of experience. I learned traditional cooking techniques from my grandmother and have been sharing the secrets of Nepali cuisine with visitors for the past 8 years. I believe food is the best way to understand a culture!",
-        languages: ['English', 'Nepali', 'Hindi'],
-      },
-      {
-        id: 2,
-        name: 'Chef Maya',
-        role: 'Organic Farm to Table Specialist',
-        image:
-          'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80',
-        rating: 4.8,
-        reviews: 567,
-        bio: "Hello! I'm Chef Maya, passionate about organic farming and sustainable cooking. I grow my own herbs and vegetables and love teaching visitors about the connection between fresh ingredients and delicious food.",
-        languages: ['English', 'Nepali'],
-      },
-    ],
+    guides: [],
     description:
       "Discover the authentic flavors of Nepal in this hands-on cooking class! Start with a guided tour of a local market to select fresh ingredients, then learn to prepare traditional Nepali dishes in a cozy home kitchen. You'll master the art of making dal bhat, momo dumplings, and other beloved Nepali specialties.",
     tourStructure: {
@@ -155,19 +132,7 @@ export const cookingExperiencesData: CookingExperience[] = [
       image:
         'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80',
     },
-    guides: [
-      {
-        id: 3,
-        name: 'Raju',
-        role: 'Momo Master & Street Food Guide',
-        image:
-          'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=128&h=128&q=80',
-        rating: 4.8,
-        reviews: 567,
-        bio: "I'm Raju, Kathmandu-born and raised! I've been making momos since I was 12 years old, learning from my mother who had a small street food stall. Momos are my passion - I know over 20 different filling variations!",
-        languages: ['English', 'Nepali'],
-      },
-    ],
+    guides: [],
     description:
       "Master the art of Nepal's most beloved dish - momo dumplings! In this hands-on workshop, you'll learn to make perfect momo wrappers, create delicious fillings, and master the traditional folding techniques. From classic chicken momos to creative vegetarian variations.",
     tourStructure: {

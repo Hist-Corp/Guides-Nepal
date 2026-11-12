@@ -71,40 +71,7 @@ const cityData: Record<string, CityData> = {
           'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1740&q=80',
       },
     ],
-    guides: [
-      {
-        id: 20,
-        name: 'Somsak',
-        image:
-          'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=128&q=80',
-        rating: 5.0,
-        reviews: 89,
-      },
-      {
-        id: 21,
-        name: 'Noy',
-        image:
-          'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=128&q=80',
-        rating: 4.9,
-        reviews: 120,
-      },
-      {
-        id: 22,
-        name: 'Lek',
-        image:
-          'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=128&q=80',
-        rating: 4.8,
-        reviews: 45,
-      },
-      {
-        id: 23,
-        name: 'Joy',
-        image:
-          'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=128&q=80',
-        rating: 5.0,
-        reviews: 67,
-      },
-    ],
+    guides: [],
   },
   corfu: {
     name: 'Corfu',
@@ -141,40 +108,7 @@ const cityData: Record<string, CityData> = {
           'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1740&q=80',
       },
     ],
-    guides: [
-      {
-        id: 30,
-        name: 'Nikos',
-        image:
-          'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=128&q=80',
-        rating: 5.0,
-        reviews: 90,
-      },
-      {
-        id: 31,
-        name: 'Eleni',
-        image:
-          'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=128&q=80',
-        rating: 4.9,
-        reviews: 75,
-      },
-      {
-        id: 32,
-        name: 'Giorgos',
-        image:
-          'https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=128&q=80',
-        rating: 4.8,
-        reviews: 55,
-      },
-      {
-        id: 33,
-        name: 'Maria',
-        image:
-          'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=128&q=80',
-        rating: 5.0,
-        reviews: 40,
-      },
-    ],
+    guides: [],
   },
   barcelona: {
     name: 'Barcelona',
@@ -211,40 +145,7 @@ const cityData: Record<string, CityData> = {
           'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=1740&q=80',
       },
     ],
-    guides: [
-      {
-        id: 40,
-        name: 'Javier',
-        image:
-          'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=128&q=80',
-        rating: 5.0,
-        reviews: 150,
-      },
-      {
-        id: 41,
-        name: 'Carmen',
-        image:
-          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=128&q=80',
-        rating: 4.9,
-        reviews: 200,
-      },
-      {
-        id: 42,
-        name: 'Pablo',
-        image:
-          'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=128&q=80',
-        rating: 4.8,
-        reviews: 80,
-      },
-      {
-        id: 43,
-        name: 'Lucia',
-        image:
-          'https://images.unsplash.com/photo-1463453091185-61582044d556?auto=format&fit=crop&w=128&q=80',
-        rating: 5.0,
-        reviews: 110,
-      },
-    ],
+    guides: [],
   },
   kathmandu: {
     name: 'Kathmandu',
@@ -284,7 +185,7 @@ const cityData: Record<string, CityData> = {
     guides: [
       {
         id: 1,
-        name: 'Rajesh',
+        name: 'Apicha',
         image:
           'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=128&q=80',
         rating: 5.0,
@@ -292,7 +193,7 @@ const cityData: Record<string, CityData> = {
       },
       {
         id: 2,
-        name: 'Sita',
+        name: 'Sujal',
         image:
           'https://images.unsplash.com/photo-1557862921-37829c790f19?auto=format&fit=crop&w=128&q=80',
         rating: 4.9,
@@ -300,7 +201,7 @@ const cityData: Record<string, CityData> = {
       },
       {
         id: 3,
-        name: 'Nima',
+        name: 'Priya',
         image:
           'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&w=128&q=80',
         rating: 4.9,
@@ -308,7 +209,7 @@ const cityData: Record<string, CityData> = {
       },
       {
         id: 4,
-        name: 'Binod',
+        name: 'Rohan',
         image:
           'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=128&q=80',
         rating: 4.8,
@@ -351,40 +252,7 @@ const cityData: Record<string, CityData> = {
           'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=1740&q=80',
       },
     ],
-    guides: [
-      {
-        id: 5,
-        name: 'Karma',
-        image:
-          'https://images.unsplash.com/photo-1580894732444-8ecded7900cd?auto=format&fit=crop&w=128&q=80',
-        rating: 5.0,
-        reviews: 55,
-      },
-      {
-        id: 6,
-        name: 'Anjali',
-        image:
-          'https://images.unsplash.com/photo-1594751543129-6701ad444259?auto=format&fit=crop&w=128&q=80',
-        rating: 4.9,
-        reviews: 42,
-      },
-      {
-        id: 7,
-        name: 'Deepak',
-        image:
-          'https://images.unsplash.com/photo-1600180758890-6b94519a8ba6?auto=format&fit=crop&w=128&q=80',
-        rating: 4.8,
-        reviews: 88,
-      },
-      {
-        id: 8,
-        name: 'Maya',
-        image:
-          'https://images.unsplash.com/photo-1521119989659-a83eee488004?auto=format&fit=crop&w=128&q=80',
-        rating: 5.0,
-        reviews: 21,
-      },
-    ],
+    guides: [],
   },
   lalitpur: {
     name: 'Lalitpur',
@@ -421,40 +289,7 @@ const cityData: Record<string, CityData> = {
           'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1740&q=80',
       },
     ],
-    guides: [
-      {
-        id: 9,
-        name: 'Suresh',
-        image:
-          'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=128&q=80',
-        rating: 4.9,
-        reviews: 76,
-      },
-      {
-        id: 10,
-        name: 'Rina',
-        image:
-          'https://images.unsplash.com/photo-1542178243-bc20204b769f?auto=format&fit=crop&w=128&q=80',
-        rating: 4.8,
-        reviews: 34,
-      },
-      {
-        id: 11,
-        name: 'Bikash',
-        image:
-          'https://images.unsplash.com/photo-1614289371518-722f2615943d?auto=format&fit=crop&w=128&q=80',
-        rating: 5.0,
-        reviews: 29,
-      },
-      {
-        id: 12,
-        name: 'Sarita',
-        image:
-          'https://images.unsplash.com/photo-1615109398623-88346a601842?auto=format&fit=crop&w=128&q=80',
-        rating: 4.9,
-        reviews: 52,
-      },
-    ],
+    guides: [],
   },
   bhaktapur: {
     name: 'Bhaktapur',
@@ -491,40 +326,7 @@ const cityData: Record<string, CityData> = {
           'https://images.unsplash.com/photo-1465101162946-4377e57745c3?auto=format&fit=crop&w=1740&q=80',
       },
     ],
-    guides: [
-      {
-        id: 13,
-        name: 'Krishna',
-        image:
-          'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=128&q=80',
-        rating: 5.0,
-        reviews: 98,
-      },
-      {
-        id: 14,
-        name: 'Radha',
-        image:
-          'https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=crop&w=128&q=80',
-        rating: 4.9,
-        reviews: 45,
-      },
-      {
-        id: 15,
-        name: 'Prakash',
-        image:
-          'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=crop&w=128&q=80',
-        rating: 4.8,
-        reviews: 62,
-      },
-      {
-        id: 16,
-        name: 'Laxmi',
-        image:
-          'https://images.unsplash.com/photo-1512389142860-9c449e58a543?auto=format&fit=crop&w=128&q=80',
-        rating: 4.9,
-        reviews: 38,
-      },
-    ],
+    guides: [],
   },
 };
 

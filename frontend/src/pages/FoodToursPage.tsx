@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { Button } from '../components/common/Button';
@@ -7,95 +7,23 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useGoBack } from '../utils/backNavigation';
 import { guideProfilePath } from '../utils/guideUrl';
 import { NEPAL_IMAGES } from '../data/images';
-import guidesApi, { Guide } from '../services/guidesApi';
+import { allGuides } from '../data/guidesData';
 
 export const FoodToursPage: React.FC = () => {
   const navigate = useNavigate();
   const goBack = useGoBack();
-  const [guides, setGuides] = useState<Guide[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Use the local Nepal guide catalog so the "Meet Your Local Food Guides"
+  // section always shows real Nepal guides with correct names and routing,
+  // instead of placeholder/demo data returned by the backend /guides API.
+  const foodGuides = allGuides.filter(
+    (g) =>
+      g.cities.includes('Kathmandu') ||
+      g.cities.includes('Pokhara') ||
+      g.cities.includes('Bharatpur') ||
+      g.cities.includes('Lalitpur') ||
+      g.cities.includes('Bhaktapur')
+  );
 
-  useEffect(() => {
-    const fetchGuides = async () => {
-      try {
-        const guidesData = await guidesApi.getGuides();
-        setGuides(guidesData);
-      } catch (error) {
-        console.error('Error fetching guides:', error);
-        // Fallback to mock data if API fails
-        setGuides([
-          {
-            id: 1,
-            name: 'Apicha',
-            image:
-              'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80',
-            role: 'Street Food Specialist',
-            rating: 4.9,
-            reviews: 120,
-            bio: 'Expert in Kathmandu Valley street food.',
-            languages: ['English', 'Nepali'],
-            verified: true,
-            livesIn: 'Kathmandu',
-            cities: ['Kathmandu'],
-            gallery: [],
-            is_active: true,
-          },
-          {
-            id: 2,
-            name: 'Sujal',
-            image:
-              'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80',
-            role: 'Newari Cuisine Expert',
-            rating: 4.8,
-            reviews: 89,
-            bio: 'Specialist in traditional Newari cuisine.',
-            languages: ['English', 'Nepali', 'Newari'],
-            verified: true,
-            livesIn: 'Kathmandu',
-            cities: ['Kathmandu', 'Bhaktapur'],
-            gallery: [],
-            is_active: true,
-          },
-          {
-            id: 3,
-            name: 'Priya',
-            image:
-              'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80',
-            role: 'Himalayan Flavors Guide',
-            rating: 4.95,
-            reviews: 156,
-            bio: 'Expert in Himalayan regional cuisine.',
-            languages: ['English', 'Nepali'],
-            verified: true,
-            livesIn: 'Pokhara',
-            cities: ['Pokhara', 'Kathmandu'],
-            gallery: [],
-            is_active: true,
-          },
-          {
-            id: 4,
-            name: 'Rohan',
-            image:
-              'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=128&h=128&q=80',
-            role: 'Terai Traditions Keeper',
-            rating: 4.92,
-            reviews: 78,
-            bio: 'Specialist in Terai region traditions and cuisine.',
-            languages: ['English', 'Nepali', 'Hindi'],
-            verified: true,
-            livesIn: 'Bharatpur',
-            cities: ['Bharatpur', 'Kathmandu'],
-            gallery: [],
-            is_active: true,
-          },
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchGuides();
-  }, []);
   const cultureCards = [
     {
       slug: 'newari',
@@ -289,17 +217,8 @@ export const FoodToursPage: React.FC = () => {
             </p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1 items-center">
-            {loading ? (
-              // Loading skeleton
-              Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="flex flex-col items-center text-center animate-pulse">
-                  <div className="aspect-[3/4] rounded-sm bg-gray-200 mb-1.5"></div>
-                  <div className="h-2 bg-gray-200 rounded mb-0.5 w-2/3 mx-auto"></div>
-                  <div className="h-1.5 bg-gray-200 rounded w-1/3 mx-auto"></div>
-                </div>
-              ))
-            ) : guides.length > 0 ? (
-              guides.slice(0, 6).map((guide) => (
+            {foodGuides.length > 0 ? (
+              foodGuides.slice(0, 6).map((guide) => (
                 <Link key={guide.name} to={guideProfilePath(guide)} className="flex flex-col items-center text-center group">
                   <div className="aspect-[3/4] rounded-sm overflow-hidden shadow-sm mb-1.5 group-hover:shadow-md transition-shadow duration-300">
                     <img

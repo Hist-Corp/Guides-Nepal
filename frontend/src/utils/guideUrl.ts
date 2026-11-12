@@ -2,7 +2,7 @@ import type { Guide } from '../data/types';
 import { allGuides } from '../data/guidesData';
 
 /** Minimal guide shape needed to build a public profile URL. */
-type GuideLike = { id: number | string; name: string };
+type GuideLike = { id: number | string; name: string; slug?: string | null };
 
 /** Lowercase, ASCII-only, hyphenated form of a guide's display name. */
 export const slugifyGuideName = (name: string): string =>
@@ -38,13 +38,25 @@ for (const guide of allGuides) {
 
 /** Canonical, URL-safe slug for a guide. */
 export const guideSlug = (guide: GuideLike): string => {
-  const catalogId = typeof guide.id === 'number' ? guide.id : Number(guide.id);
-  if (Number.isInteger(catalogId)) {
-    const catalogSlug = slugById.get(catalogId);
-    if (catalogSlug) return catalogSlug;
+  // 1. Use the guide's own slug if provided (e.g. from API responses).
+  if (guide.slug && typeof guide.slug === 'string' && guide.slug.trim() !== '') {
+    return guide.slug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   }
 
-  return slugifyGuideName(guide.name);
+  // 2. Use a slug derived from the guide's own display name.
+  const nameSlug = slugifyGuideName(guide.name);
+  const catalogId = typeof guide.id === 'number' ? guide.id : Number(guide.id);
+
+  // 3. Only fall back to catalog ID lookup when the name-based slug would
+  //    collide with an existing catalog entry (duplicate names like two Apichas).
+  if (Number.isInteger(catalogId)) {
+    const catalogSlug = slugById.get(catalogId);
+    if (catalogSlug && catalogSlug !== nameSlug) {
+      return catalogSlug;
+    }
+  }
+
+  return nameSlug;
 };
 
 /** Resolve a profile URL slug back to the exact guide it represents. */
