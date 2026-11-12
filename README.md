@@ -58,7 +58,7 @@ This repository contains a Vite + React frontend, an optional dashboard app, and
   `frontend/src/services/hostApi.ts`.
 
 **Host Login Credentials**
-- Email: `host@guides-nepal.com` · Password: `Host@123` (set via `HOST_PASSWORD` env var)
+- Email: `host@guides-nepal.com` · Password: `Host@2024` (set via `HOST_PASSWORD` env var)
 
 After signing in as host, you land on `/host/dashboard`.
 
@@ -157,18 +157,19 @@ The system comes with the following pre-configured users for development and tes
 
 | Email | Role | Password | Region/Scope |
 |-------|------|----------|--------------|
-| `admin@guides-nepal.com` | Admin | `Admin@123` | Full system |
-| `content@guides-nepal.com` | Content Manager | `Content@123` | Pages · Blog · Media · SEO |
-| `regional-1@guides-nepal.com` | Regional Head | `Regional@123` | Koshi Province |
-| `regional-2@guides-nepal.com` | Regional Head | `Regional@123` | Madhesh Province |
-| `regional-3@guides-nepal.com` | Regional Head | `Regional@123` | Bagmati Province |
-| `regional-4@guides-nepal.com` | Regional Head | `Regional@123` | Gandaki Province |
-| `regional-5@guides-nepal.com` | Regional Head | `Regional@123 / RegionalManager123!` | Lumbini Province |
-| `regional-6@guides-nepal.com` | Regional Head | `Regional@123` | Karnali Province |
-| `regional-7@guides-nepal.com` | Regional Head | `Regional@123` | Sudurpashchim Province |
-| `support@guides-nepal.com` | Customer Support | `Support@123` | Tickets · FAQ |
-| `host@guides-nepal.com` | Host | `Host@123` | Tours · Bookings · Earnings |
-| `guide@guides-nepal.com` | Guide | `Guide@2024` | Public frontend · **cannot sign in to the dashboard** |
+| `admin@guides-nepal.com` | Admin | `Admin@12345` | Full system |
+| `content@guides-nepal.com` | Content Manager | `Content@2024` | Pages · Blog · Media · SEO |
+| `regional-1@guides-nepal.com` | Regional Head | `RegionalManager123!` | Koshi Province |
+| `regional-2@guides-nepal.com` | Regional Head | `RegionalManager123!` | Madhesh Province |
+| `regional-3@guides-nepal.com` | Regional Head | `RegionalManager123!` | Bagmati Province |
+| `regional-4@guides-nepal.com` | Regional Head | `RegionalManager123!` | Gandaki Province |
+| `regional-5@guides-nepal.com` | Regional Head | `RegionalManager123!` | Lumbini Province |
+| `regional-6@guides-nepal.com` | Regional Head | `RegionalManager123!` | Karnali Province |
+| `regional-7@guides-nepal.com` | Regional Head | `RegionalManager123!` | Sudurpashchim Province |
+| `support@guides-nepal.com` | Customer Support | `Support@2024` | Tickets · FAQ |
+| `host@guides-nepal.com` | Host | `Host@2024` | Tours · Bookings · Earnings |
+| `test@guides-nepal.com` | Guide | `Test@2024` | Public frontend · **cannot sign in to the dashboard** |
+| `guide@guides-nepal.com` | Guide | `Guide@2024` | Catalog guide · **cannot sign in to the dashboard** |
 | `traveler@guides-nepal.com` | Traveler | `Traveler@2024` | Public site only · **cannot sign in to the dashboard** |
 
 The first five appear in the dashboard role dropdown and land on their console. The guide
@@ -718,48 +719,47 @@ npm run dev -- --port 5176 --host
 After running `seed_credentials.py` you can sign in to any console with these
 pre-seeded accounts:
 
-**Admin Login:**
-- Email: `admin@guides-nepal.com`
-- Password: `Admin@123`
+**Dashboard Console Login (seed via `backend/seed_credentials.py`):**
 
-**Content Manager Login:**
-- Email: `content@guides-nepal.com`
-- Password: `Content@123`
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@guides-nepal.com` | `Admin@12345` |
+| Content Manager | `content@guides-nepal.com` | `Content@2024` |
+| Regional Head | `regional@guides-nepal.com` | `Regional@2024` |
+| Customer Support | `support@guides-nepal.com` | `Support@2024` |
+| Host | `host@guides-nepal.com` | `Host@2024` |
+| Guide (no dashboard console) | `test@guides-nepal.com` | `Test@2024` |
 
-**Regional Head Login (7 accounts — one per Nepal province):**
-- Email: `regional-1@guides-nepal.com` — Region: Koshi Province
-- Email: `regional-2@guides-nepal.com` — Region: Madhesh Province
-- Email: `regional-3@guides-nepal.com` — Region: Bagmati Province
-- Email: `regional-4@guides-nepal.com` — Region: Gandaki Province
-- Email: `regional-5@guides-nepal.com` — Region: Lumbini Province
-- Email: `regional-6@guides-nepal.com` — Region: Karnali Province
-- Email: `regional-7@guides-nepal.com` — Region: Sudurpashchim Province
-- Password (all): `Regional@123`
+**Regional Heads — one per province (seed via `backend/seed_regional_managers.py`):**
 
-**Customer Support Login:**
-- Email: `support@guides-nepal.com`
-- Password: `Support@123`
+| Email | Region | Password |
+|-------|--------|----------|
+| `regional-1@guides-nepal.com` | Koshi Province | `RegionalManager123!` |
+| `regional-2@guides-nepal.com` | Madhesh Province | `RegionalManager123!` |
+| `regional-3@guides-nepal.com` | Bagmati Province | `RegionalManager123!` |
+| `regional-4@guides-nepal.com` | Gandaki Province | `RegionalManager123!` |
+| `regional-5@guides-nepal.com` | Lumbini Province | `RegionalManager123!` |
+| `regional-6@guides-nepal.com` | Karnali Province | `RegionalManager123!` |
+| `regional-7@guides-nepal.com` | Sudurpashchim Province | `RegionalManager123!` |
 
-**Host Login:**
-- Email: `host@guides-nepal.com`
-- Password: `Host@123`
+**Public Frontend Login (seed via `backend/seed_traveler_guide.py`):**
 
-**Traveller Login (public frontend only — no dashboard console):**
-- Email: `traveler@guides-nepal.com`
-- Password: `Traveler@2024`
+| Role | Email | Password |
+|------|-------|----------|
+| Traveller | `traveler@guides-nepal.com` | `Traveler@2024` |
+| Traveller | `traveler2@guides-nepal.com` | `Traveler2@2024` |
+| Traveller | `traveler3@guides-nepal.com` | `Traveler3@2024` |
+| Traveller | `traveler4@guides-nepal.com` | `Traveler4@2024` |
+| Guide | `anita@guides-nepal.com` | (see `data/guide_accounts.json`) |
 
-**Guide Login (public frontend only — no dashboard console):**
-- Email: `guide@guides-nepal.com`
-- Password: `Guide@2024`
-
-Create/reset just these two with `cd backend` + `python seed_traveler_guide.py`.
+Create/reset traveler and guide accounts with `cd backend` + `python seed_traveler_guide.py`.
 Sign in at `http://localhost:5175` (Login modal → Traveller/Guide tab) or via
 `POST /api/v1/auth/login` — see [Traveller & Guide Test Credentials](#traveller--guide-test-credentials-public-frontend).
 
 See [Pre-configured Seed Users](#pre-configured-seed-users) for the full table. The
 dashboard login screen has a role dropdown that pre-fills the five console accounts; the
-seeded `guide@guides-nepal.com` account is intentionally absent from that dropdown because
-guides have no dashboard console.
+seeded guide accounts are intentionally absent from that dropdown because guides have no
+dashboard console.
 
 ---
 
