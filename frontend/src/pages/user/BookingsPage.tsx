@@ -3,15 +3,25 @@ import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useBookingStore } from '../../store/bookingStore';
 import { Price } from '../../components/common/Price';
-import { Calendar, MapPin, XCircle, Clock, Users, CheckCircle2, Plane, ArrowRight, MapPinned, Luggage } from 'lucide-react';
+import {
+  Calendar,
+  MapPin,
+  XCircle,
+  Clock,
+  Users,
+  CheckCircle2,
+  ArrowRight,
+  MapPinned,
+  Luggage,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const BookingsPage: React.FC = () => {
   const { bookings, cancelBooking } = useBookingStore();
   const [activeTab, setActiveTab] = useState<'upcoming' | 'archived'>('upcoming');
 
-  const upcomingBookings = bookings.filter(b => b.status === 'upcoming');
-  const archivedBookings = bookings.filter(b => b.status !== 'upcoming');
+  const upcomingBookings = bookings.filter((b) => b.status === 'upcoming');
+  const archivedBookings = bookings.filter((b) => b.status !== 'upcoming');
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex flex-col font-sans">
@@ -27,7 +37,9 @@ const BookingsPage: React.FC = () => {
               </div>
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold">My Travel List</h1>
-                <p className="text-white/80 text-sm mt-1">All your booked experiences, dates, and guides in one place.</p>
+                <p className="text-white/80 text-sm mt-1">
+                  All your booked experiences, dates, and guides in one place.
+                </p>
               </div>
             </div>
           </div>
@@ -65,7 +77,10 @@ const BookingsPage: React.FC = () => {
             upcomingBookings.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {upcomingBookings.map((booking) => (
-                  <div key={booking.id} className="group relative bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
+                  <div
+                    key={booking.id}
+                    className="group relative bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300"
+                  >
                     {/* Top image with overlay */}
                     <div className="relative h-48 overflow-hidden">
                       <img
@@ -76,7 +91,9 @@ const BookingsPage: React.FC = () => {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                       <div className="absolute bottom-3 left-4 right-4">
-                        <h3 className="font-bold text-white text-lg line-clamp-2 drop-shadow-md">{booking.experienceTitle}</h3>
+                        <h3 className="font-bold text-white text-lg line-clamp-2 drop-shadow-md">
+                          {booking.experienceTitle}
+                        </h3>
                       </div>
                       <div className="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1">
                         <CheckCircle2 className="w-3 h-3" /> Upcoming
@@ -89,12 +106,20 @@ const BookingsPage: React.FC = () => {
                           <MapPin className="w-4 h-4 text-primary shrink-0" />
                           <span className="font-medium">{booking.city}</span>
                         </div>
-                        <span className="font-bold text-primary text-lg"><Price amount={booking.price} /></span>
+                        <span className="font-bold text-primary text-lg">
+                          <Price amount={booking.price} />
+                        </span>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <div className="flex items-center gap-1.5">
                           <Calendar className="w-4 h-4 shrink-0" />
-                          <span>{new Date(booking.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                          <span>
+                            {new Date(booking.date).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <Users className="w-4 h-4 shrink-0" />
@@ -106,7 +131,10 @@ const BookingsPage: React.FC = () => {
                           <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">
                             {booking.guideName.charAt(0)}
                           </div>
-                          <span>Guide: <span className="font-medium text-gray-900">{booking.guideName}</span></span>
+                          <span>
+                            Guide:{' '}
+                            <span className="font-medium text-gray-900">{booking.guideName}</span>
+                          </span>
                         </div>
                       )}
                       <button
@@ -126,56 +154,72 @@ const BookingsPage: React.FC = () => {
                 </div>
                 <h2 className="text-xl font-bold text-gray-900 mb-2">No upcoming bookings</h2>
                 <p className="text-gray-500 text-sm mb-6 max-w-md">
-                  You haven't booked any experiences yet. Start exploring Nepal and create your first adventure!
+                  You haven't booked any experiences yet. Start exploring Nepal and create your
+                  first adventure!
                 </p>
-                <Link to="/explore" className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-primary/90 transition-colors">
+                <Link
+                  to="/explore"
+                  className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-primary/90 transition-colors"
+                >
                   Explore things to do
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
             )
-          ) : (
-            archivedBookings.length > 0 ? (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {archivedBookings.map((booking) => (
-                  <div key={booking.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden opacity-60 hover:opacity-80 transition-opacity">
-                    <div className="relative h-36 overflow-hidden">
-                      <img
-                        src={booking.image}
-                        alt={booking.experienceTitle}
-                        className="w-full h-full object-cover grayscale"
-                        onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                      <div className="absolute bottom-3 left-4">
-                        <h3 className="font-bold text-white text-sm line-clamp-1 drop-shadow">{booking.experienceTitle}</h3>
-                      </div>
-                      <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${booking.status === 'cancelled' ? 'bg-red-500 text-white' : 'bg-gray-700 text-white'}`}>
-                        {booking.status === 'cancelled' ? 'Cancelled' : 'Completed'}
-                      </div>
+          ) : archivedBookings.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {archivedBookings.map((booking) => (
+                <div
+                  key={booking.id}
+                  className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden opacity-60 hover:opacity-80 transition-opacity"
+                >
+                  <div className="relative h-36 overflow-hidden">
+                    <img
+                      src={booking.image}
+                      alt={booking.experienceTitle}
+                      className="w-full h-full object-cover grayscale"
+                      onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                    <div className="absolute bottom-3 left-4">
+                      <h3 className="font-bold text-white text-sm line-clamp-1 drop-shadow">
+                        {booking.experienceTitle}
+                      </h3>
                     </div>
-                    <div className="p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <MapPin className="w-3.5 h-3.5 shrink-0" />
-                        <span>{booking.city}</span>
-                        <span className="text-gray-300">·</span>
-                        <Calendar className="w-3.5 h-3.5 shrink-0" />
-                        <span>{new Date(booking.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                      </div>
-                      <span className="font-bold text-gray-400 text-sm"><Price amount={booking.price} /></span>
+                    <div
+                      className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm ${booking.status === 'cancelled' ? 'bg-red-500 text-white' : 'bg-gray-700 text-white'}`}
+                    >
+                      {booking.status === 'cancelled' ? 'Cancelled' : 'Completed'}
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-slate-100">
-                  <Clock className="h-10 w-10 text-slate-400" />
+                  <div className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <MapPin className="w-3.5 h-3.5 shrink-0" />
+                      <span>{booking.city}</span>
+                      <span className="text-gray-300">·</span>
+                      <Calendar className="w-3.5 h-3.5 shrink-0" />
+                      <span>
+                        {new Date(booking.date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </span>
+                    </div>
+                    <span className="font-bold text-gray-400 text-sm">
+                      <Price amount={booking.price} />
+                    </span>
+                  </div>
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">No archived bookings</h2>
-                <p className="text-gray-500 text-sm">Your past adventures will appear here.</p>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-slate-100">
+                <Clock className="h-10 w-10 text-slate-400" />
               </div>
-            )
+              <h2 className="text-xl font-bold text-gray-900 mb-2">No archived bookings</h2>
+              <p className="text-gray-500 text-sm">Your past adventures will appear here.</p>
+            </div>
           )}
         </div>
       </main>

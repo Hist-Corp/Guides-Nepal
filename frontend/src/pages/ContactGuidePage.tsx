@@ -28,6 +28,7 @@ const ContactGuidePage: React.FC = () => {
   useEffect(() => {
     if (localGuide || !slug) return;
     let cancelled = false;
+
     setResolving(true);
     guidesApi
       .getGuideProfileBySlug(slug)
@@ -62,7 +63,10 @@ const ContactGuidePage: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col font-sans bg-white">
         <Header />
-        <main id="main-content" className="flex-grow flex flex-col items-center justify-center px-4 py-20 text-center">
+        <main
+          id="main-content"
+          className="flex-grow flex flex-col items-center justify-center px-4 py-20 text-center"
+        >
           <p className="text-gray-500">Loading guide...</p>
         </main>
         <Footer />
@@ -74,7 +78,10 @@ const ContactGuidePage: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col font-sans bg-white">
         <Header />
-        <main id="main-content" className="flex-grow flex flex-col items-center justify-center px-4 py-20 text-center">
+        <main
+          id="main-content"
+          className="flex-grow flex flex-col items-center justify-center px-4 py-20 text-center"
+        >
           <h1 className="text-2xl font-bold text-gray-900">Guide not found</h1>
           <p className="mt-3 text-gray-600">This guide is no longer available.</p>
           <button

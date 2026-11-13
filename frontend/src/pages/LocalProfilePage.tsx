@@ -112,10 +112,7 @@ const localGuideForProfile = (staticGuide: Guide | undefined, profile: GuideProf
   return staticGuide;
 };
 
-const buildView = (
-  profile: GuideProfile | null,
-  staticGuide: Guide | undefined
-): ProfileView => {
+const buildView = (profile: GuideProfile | null, staticGuide: Guide | undefined): ProfileView => {
   const local = localGuideForProfile(staticGuide, profile);
   const galleryFromApi = (profile?.gallery ?? []).filter(
     (url) => typeof url === 'string' && url.trim() !== ''
@@ -239,15 +236,21 @@ const GuideProfilePage: React.FC = () => {
     const guideId = id ? Number(id) : NaN;
     if (!slug && !Number.isFinite(guideId)) {
       setProfile(null);
+
       setLoading(false);
       return;
     }
 
     let cancelled = false;
+
     setLoading(true);
+
     setIsBioExpanded(false);
+
     setProfile(null);
+
     setAvatarSrc(null);
+
     setHeroSrc(null);
 
     const request = slug
@@ -599,8 +602,8 @@ const GuideProfilePage: React.FC = () => {
                   {isBioExpanded && view.bio && (
                     <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                       <p>
-                        Every trip is planned around your pace and interests — tell {view.name}{' '}
-                        what you would like to see and the day is adjusted around it.
+                        Every trip is planned around your pace and interests — tell {view.name} what
+                        you would like to see and the day is adjusted around it.
                       </p>
                       {joined && (
                         <p>

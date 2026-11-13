@@ -50,20 +50,26 @@ export function ImageEditModal({ open, onClose, onSave, currentSrc }: ImageEditM
   };
 
   return (
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3 className="text-lg font-bold text-gray-900 mb-4">Change Image</h3>
-        
+
         {/* Mode tabs */}
         <div className="flex gap-2 mb-4">
           {[
             { key: 'url', label: '🔗 URL' },
             { key: 'upload', label: '📤 Upload' },
             { key: 'media', label: '🖼️ Media' },
-          ].map(tab => (
+          ].map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setMode(tab.key as any)}
+              onClick={() => setMode(tab.key as 'upload' | 'url' | 'media')}
               className={`px-3 py-1.5 text-sm rounded-lg font-medium transition-colors ${
                 mode === tab.key
                   ? 'bg-blue-500 text-white'
@@ -81,7 +87,7 @@ export function ImageEditModal({ open, onClose, onSave, currentSrc }: ImageEditM
             <input
               type="text"
               value={url}
-              onChange={e => setUrl(e.target.value)}
+              onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com/image.jpg"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 outline-none"
             />
@@ -128,10 +134,12 @@ export function ImageEditModal({ open, onClose, onSave, currentSrc }: ImageEditM
                   key={i}
                   onClick={() => setUrl(src)}
                   className={`rounded-lg overflow-hidden border-2 transition-all ${
-                    url === src ? 'border-blue-500 scale-95' : 'border-transparent hover:border-blue-300'
+                    url === src
+                      ? 'border-blue-500 scale-95'
+                      : 'border-transparent hover:border-blue-300'
                   }`}
                 >
-                  <img src={src} alt={`Media ${i+1}`} className="w-full h-20 object-cover" />
+                  <img src={src} alt={`Media ${i + 1}`} className="w-full h-20 object-cover" />
                 </button>
               ))}
             </div>

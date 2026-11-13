@@ -8,7 +8,13 @@ interface SafeImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
 
 // Image with graceful fallback: if the remote URL fails (offline, 404,
 // hotlink blocked) fall back to the local Nepal placeholder SVG.
-export const SafeImage: React.FC<SafeImageProps> = ({ src, fallbackSrc = NEPAL_IMAGES.placeholder, alt = '', onError, ...rest }) => {
+export const SafeImage: React.FC<SafeImageProps> = ({
+  src,
+  fallbackSrc = NEPAL_IMAGES.placeholder,
+  alt = '',
+  onError,
+  ...rest
+}) => {
   const [current, setCurrent] = useState(src);
   useEffect(() => {
     setCurrent(src);

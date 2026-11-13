@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import { useProfileStore } from '../../store/profileStore';
-import { LayoutDashboard, Calendar, Book, Star, Users, CreditCard } from 'lucide-react';
+import { LayoutDashboard, Calendar, Book, Users, CreditCard } from 'lucide-react';
 
 const RoleProfilePage: React.FC = () => {
   const { isAuthenticated, user } = useAuthStore();
@@ -111,16 +111,24 @@ const RoleProfilePage: React.FC = () => {
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Email</label>
+                  <label className="block text-xs font-bold text-gray-600 uppercase mb-1">
+                    Email
+                  </label>
                   <p className="text-gray-700">{email || 'Not set'}</p>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Phone</label>
+                  <label className="block text-xs font-bold text-gray-600 uppercase mb-1">
+                    Phone
+                  </label>
                   <p className="text-gray-700">{profile.phone || 'Not set'}</p>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Bio</label>
-                  <p className="text-gray-700 whitespace-pre-wrap">{profile.bio || 'No bio added yet.'}</p>
+                  <label className="block text-xs font-bold text-gray-600 uppercase mb-1">
+                    Bio
+                  </label>
+                  <p className="text-gray-700 whitespace-pre-wrap">
+                    {profile.bio || 'No bio added yet.'}
+                  </p>
                 </div>
               </div>
             </div>

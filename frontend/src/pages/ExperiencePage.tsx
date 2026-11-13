@@ -650,7 +650,9 @@ const ExperiencePage: React.FC = () => {
   // so traveler-facing /experience/:id pages show database listings.
   useEffect(() => {
     setApiExperience(undefined);
+
     setListingExperience(undefined);
+
     setResolvedSlug(null);
 
     if (staticExperience || !experienceId) {
@@ -739,12 +741,57 @@ const ExperiencePage: React.FC = () => {
 
   const { isAuthenticated, accessToken } = useAuthStore();
 
+  const { addBooking } = useBookingStore();
+  const [isBooked, setIsBooked] = useState(false);
+  const { profile, addBookmark, removeBookmark } = useProfileStore();
+
+  // Booking form state (date + guests)
+  const [selectedDate, setSelectedDate] = useState('');
+  const [guests, setGuests] = useState(2);
+  const [bookingError, setBookingError] = useState<string | null>(null);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  // Set after saving a bookmark (the card button feedback lives in handleBookmark).
+  const [, setBookmarkSaved] = useState(false);
+  // Booking confirmation popup shown just before confirming.
+  const [confirmPopup, setConfirmPopup] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
+  // Mobile sticky footer: configure-booking sheet state (same flow as the
+  // city experience pages - dates, guests, start time and host in a sheet).
+  const [bookingTime, setBookingTime] = useState('09:00');
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [sheetError, setSheetError] = useState<string | null>(null);
+  const [sheetConfirmed, setSheetConfirmed] = useState(false);
+  const [disabledDates, setDisabledDates] = useState<string[]>([]);
+  const [bookingConfirmed, setBookingConfirmed] = useState(false);
+
+  // Reviews state
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [canReview, setCanReview] = useState<boolean | null>(null);
+  const [reviewFormOpen, setReviewFormOpen] = useState(false);
+
+  const fetchUnavailableDates = async (year: number, month: number) => {
+    if (!accessToken) return;
+    try {
+      const url = getApiUrl(`/bookings/availability/month?year=${year}&month=${month}`);
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+      if (res.ok) {
+        const data = await res.json();
+        setDisabledDates(Array.isArray(data.unavailable) ? data.unavailable : []);
+      }
+    } catch {
+      // Silently fail
+    }
+  };
+
   useEffect(() => {
     if (accessToken) {
       const now = new Date();
       fetchUnavailableDates(now.getFullYear(), now.getMonth() + 1);
     }
-  }, [accessToken]);
+  }, [accessToken, fetchUnavailableDates]);
 
   // Load reviews for this experience and check whether the traveller is
   // eligible to leave one (completed booking + not yet reviewed).
@@ -780,37 +827,6 @@ const ExperiencePage: React.FC = () => {
     };
   }, [experience, isAuthenticated, accessToken]);
 
-  const { addBooking } = useBookingStore();
-  const [isBooked, setIsBooked] = useState(false);
-  const { profile, addBookmark, removeBookmark } = useProfileStore();
-
-  // Booking form state (date + guests)
-  const [selectedDate, setSelectedDate] = useState('');
-  const [guests, setGuests] = useState(2);
-  const [bookingError, setBookingError] = useState<string | null>(null);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
-  // Set after saving a bookmark (the card button feedback lives in handleBookmark).
-  const [, setBookmarkSaved] = useState(false);
-  // Booking confirmation popup shown just before confirming.
-  const [confirmPopup, setConfirmPopup] = useState(false);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-
-  // Mobile sticky footer: configure-booking sheet state (same flow as the
-  // city experience pages - dates, guests, start time and host in a sheet).
-  const [bookingTime, setBookingTime] = useState('09:00');
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [sheetError, setSheetError] = useState<string | null>(null);
-  const [sheetConfirmed, setSheetConfirmed] = useState(false);
-  const [disabledDates, setDisabledDates] = useState<string[]>([]);
-  const [bookingConfirmed, setBookingConfirmed] = useState(false);
-
-  // Reviews state
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [canReview, setCanReview] = useState<boolean | null>(null);
-  const [reviewFormOpen, setReviewFormOpen] = useState(false);
-
   // A signed-in guide must not see themselves in "Who you'll meet".
   const viewerGuideId = useViewerGuideId();
   const visibleGuides = useMemo(
@@ -824,7 +840,7 @@ const ExperiencePage: React.FC = () => {
   const selectedGuide =
     selectedGuideId === null
       ? null
-      : visibleGuides.find((g) => String(g.id) === String(selectedGuideId)) ?? null;
+      : (visibleGuides.find((g) => String(g.id) === String(selectedGuideId)) ?? null);
   const unitPrice = selectedGuide?.price ?? experience?.price ?? 0;
 
   // A new experience resets the choice so its own price shows first.
@@ -891,8 +907,9 @@ const ExperiencePage: React.FC = () => {
 
   const persistBooking = async () => {
     if (!experience) return false;
+    const bookingId = crypto.randomUUID?.() ?? Math.random().toString(36).substr(2, 9);
     const bookingSaved = await addBooking({
-      id: Math.random().toString(36).substr(2, 9),
+      id: bookingId,
       experienceId: experience.id,
       experienceTitle: experience.title,
       city: experience.city,
@@ -909,20 +926,6 @@ const ExperiencePage: React.FC = () => {
       void refreshCapacity();
     }
     return bookingSaved;
-  };
-
-  const fetchUnavailableDates = async (year: number, month: number) => {
-    if (!accessToken) return;
-    try {
-      const url = getApiUrl(`/bookings/availability/month?year=${year}&month=${month}`);
-      const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-      if (res.ok) {
-        const data = await res.json();
-        setDisabledDates(Array.isArray(data.unavailable) ? data.unavailable : []);
-      }
-    } catch {
-      // Silently fail
-    }
   };
 
   const handleBooking = async () => {
@@ -947,15 +950,14 @@ const ExperiencePage: React.FC = () => {
     })();
     if (apiDate) {
       try {
-        const res = await fetch(
-          getApiUrl(`/bookings/availability?date=${apiDate}`),
-          { headers: { Authorization: `Bearer ${accessToken}` } },
-        );
+        const res = await fetch(getApiUrl(`/bookings/availability?date=${apiDate}`), {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
         if (res.ok) {
           const data = await res.json();
           if (!data.available) {
             setBookingError(
-              `The guide is already ${data.status} on this date. Please choose another date.`,
+              `The guide is already ${data.status} on this date. Please choose another date.`
             );
             return;
           }
@@ -1004,15 +1006,14 @@ const ExperiencePage: React.FC = () => {
     })();
     if (apiDate) {
       try {
-        const res = await fetch(
-          getApiUrl(`/bookings/availability?date=${apiDate}`),
-          { headers: { Authorization: `Bearer ${accessToken}` } },
-        );
+        const res = await fetch(getApiUrl(`/bookings/availability?date=${apiDate}`), {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
         if (res.ok) {
           const data = await res.json();
           if (!data.available) {
             setSheetError(
-              `The guide is already ${data.status} on this date. Please choose another date.`,
+              `The guide is already ${data.status} on this date. Please choose another date.`
             );
             return;
           }
@@ -1324,11 +1325,7 @@ const ExperiencePage: React.FC = () => {
                       size="sm"
                       className="rounded-full"
                       onClick={() =>
-                        navigate(
-                          visibleGuides[0]
-                            ? guideContactPath(visibleGuides[0])
-                            : '/contact'
-                        )
+                        navigate(visibleGuides[0] ? guideContactPath(visibleGuides[0]) : '/contact')
                       }
                     >
                       Contact Host
@@ -1368,12 +1365,12 @@ const ExperiencePage: React.FC = () => {
                               src={g.image}
                               alt={g.name}
                               className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md"
-                              onError={(e) => (e.currentTarget.src = "/images/placeholder.svg")}
+                              onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
                             />
                             <div>
                               <div className="font-bold text-gray-900">{g.name}</div>
                               <div className="text-xs text-gray-500">
-                                {g.role || "Experience Guide"}
+                                {g.role || 'Experience Guide'}
                               </div>
                               <div className="text-sm text-gray-600">
                                 {g.rating} ★ ({g.reviews} reviews)
@@ -1660,7 +1657,8 @@ const ExperiencePage: React.FC = () => {
                 <span className="font-bold">Start time:</span> {bookingTime}
               </li>
               <li>
-                <span className="font-bold">Host:</span> {selectedGuide?.name ?? experience.host.name}
+                <span className="font-bold">Host:</span>{' '}
+                {selectedGuide?.name ?? experience.host.name}
               </li>
             </ul>
           }
@@ -1777,9 +1775,7 @@ const ExperiencePage: React.FC = () => {
               </div>
               <div className="flex justify-between border-b pb-2">
                 <span>{selectedGuide ? 'Guide' : 'Host'}</span>
-                <span className="font-medium">
-                  {selectedGuide?.name ?? experience.host.name}
-                </span>
+                <span className="font-medium">{selectedGuide?.name ?? experience.host.name}</span>
               </div>
               <div className="flex justify-between border-b pb-2">
                 <span>Price per person</span>
@@ -1809,16 +1805,19 @@ const ExperiencePage: React.FC = () => {
           </div>
         </div>
       )}
-      <BookingLoginPrompt
-        isOpen={showLoginPrompt}
-        onClose={() => setShowLoginPrompt(false)}
-      />
+      <BookingLoginPrompt isOpen={showLoginPrompt} onClose={() => setShowLoginPrompt(false)} />
 
       {bookingConfirmed && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl animate-in fade-in zoom-in-95">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-              <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg
+                className="h-8 w-8 text-green-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>

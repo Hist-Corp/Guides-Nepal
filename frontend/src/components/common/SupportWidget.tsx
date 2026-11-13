@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { submitSupportTicket } from '../../services/publicApi';
 import { useUIStore } from '../../store/uiStore';
 import './SupportWidget.css';
@@ -27,8 +27,6 @@ export default function SupportWidget({
 }: SupportWidgetProps = {}) {
   const [state, setState] = useState<WidgetState>('closed');
   const [isVisible, setIsVisible] = useState(true);
-  const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('down');
-  const lastScrollYRef = useRef(0);
   const footerTopRef = useRef(0);
 
   // Controlled open state. When an external `open` is provided, the widget
@@ -73,12 +71,12 @@ export default function SupportWidget({
 
   // Close handler: always sync internal state, and forward a callback when the
   // widget is driven by an external source (e.g. the hamburger menu on mobile).
-  const closeWidget = () => {
+  const closeWidget = useCallback(() => {
     if (controlledOnClose) {
       controlledOnClose();
     }
     setState('closed');
-  };
+  }, [controlledOnClose]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -98,7 +96,7 @@ export default function SupportWidget({
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('mousedown', onClick);
     };
-  }, [state]);
+  }, [state, closeWidget]);
 
   // The mobile booking sheet (z-index 90) sits below this widget (z-index
   // 1000), so the bubble would float over the "Configure booking" sheet.
@@ -106,7 +104,9 @@ export default function SupportWidget({
   // it doesn't pop back open once the sheet closes.
   const isBookingSheetOpen = useUIStore((s) => s.isBookingSheetOpen);
   useEffect(() => {
-    if (isBookingSheetOpen) setState('closed');
+    if (isBookingSheetOpen) {
+      setState('closed');
+    }
   }, [isBookingSheetOpen]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

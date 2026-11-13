@@ -98,7 +98,9 @@ export const PlanBookOnTheGo: React.FC = () => {
               {features.map((feature, index) => (
                 <li
                   key={feature.title}
-                  className={'flex items-start gap-4 ' + (inView ? 'animate-fade-in-up' : 'opacity-0')}
+                  className={
+                    'flex items-start gap-4 ' + (inView ? 'animate-fade-in-up' : 'opacity-0')
+                  }
                   style={{ animationDelay: 100 + index * 90 + 'ms' }}
                 >
                   <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white text-primary shadow-[0_1px_1px_0_rgba(0,0,0,0.05),0_2px_2px_0_rgba(0,0,0,0.05)] ring-1 ring-primary/10 transition-all duration-300 hover:scale-105 hover:bg-primary hover:text-white">
@@ -115,7 +117,9 @@ export const PlanBookOnTheGo: React.FC = () => {
 
           {/* Right: phone mockup */}
           <div
-            className={'flex justify-center lg:justify-end ' + (inView ? 'animate-fade-in-up' : 'opacity-0')}
+            className={
+              'flex justify-center lg:justify-end ' + (inView ? 'animate-fade-in-up' : 'opacity-0')
+            }
             style={{ animationDelay: '180ms' }}
           >
             <div className="relative w-[270px] rotate-2 transition-transform duration-500 hover:rotate-0">

@@ -24,20 +24,25 @@ const makeBooking = (overrides: Partial<Booking> = {}): Booking => ({
   ...overrides,
 });
 
-let cartApi: ReturnType<typeof useCart>;
-
 // Shares one CartProvider instance with the rendered <Cart /> so items added
 // here are the same lines the panel shows.
-const CartApiProbe: React.FC = () => {
-  cartApi = useCart();
+const CartApiProbe: React.FC = ({
+  cartApiRef,
+}: {
+  cartApiRef: React.MutableRefObject<ReturnType<typeof useCart> | null>;
+}) => {
+  const api = useCart();
+  React.useLayoutEffect(() => {
+    cartApiRef.current = api;
+  }, [api]);
   return null;
 };
 
-const renderCart = () =>
+const renderCart = (cartApiRef: React.MutableRefObject<ReturnType<typeof useCart> | null>) =>
   render(
     <MemoryRouter>
       <CartProvider>
-        <CartApiProbe />
+        <CartApiProbe cartApiRef={cartApiRef} />
         <Cart isOpen onClose={() => undefined} />
       </CartProvider>
     </MemoryRouter>
@@ -45,14 +50,14 @@ const renderCart = () =>
 
 describe('Cart remove button', () => {
   beforeEach(() => {
-    cartApi = undefined as unknown as ReturnType<typeof useCart>;
     useBookingStore.setState({ bookings: [] });
   });
 
   it('cancels and deletes the booking when the remove button is clicked', () => {
+    const cartApiRef = { current: null as ReturnType<typeof useCart> | null };
     useBookingStore.setState({ bookings: [makeBooking()] });
 
-    renderCart();
+    renderCart(cartApiRef);
     expect(screen.getByText('Everest Base Camp Trek')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /cancel and delete this booking/i }));
@@ -63,18 +68,20 @@ describe('Cart remove button', () => {
   });
 
   it('frees the reserved guide so the experience can be booked again', () => {
+    const cartApiRef = { current: null as ReturnType<typeof useCart> | null };
     useBookingStore.setState({
       bookings: [makeBooking({ guideId: 7, guideName: 'Lhakpa' })],
     });
 
-    renderCart();
+    renderCart(cartApiRef);
     fireEvent.click(screen.getByRole('button', { name: /cancel and delete this booking/i }));
 
     expect(useBookingStore.getState().bookings).toEqual([]);
   });
 
   it('only removes the line for regular cart items', () => {
-    renderCart();
+    const cartApiRef = { current: null as ReturnType<typeof useCart> | null };
+    renderCart(cartApiRef);
 
     const item: Omit<CartItem, 'id' | 'quantity'> = {
       title: 'Nepali Cooking Class',
@@ -83,14 +90,14 @@ describe('Cart remove button', () => {
       category: 'Cooking',
     };
     act(() => {
-      cartApi.addItem(item);
+      cartApiRef.current?.addItem(item);
     });
 
     expect(screen.getByText('Nepali Cooking Class')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /remove from cart/i }));
 
-    expect(cartApi.items).toHaveLength(0);
+    expect(cartApiRef.current?.items).toHaveLength(0);
     // No booking was touched, so the store stays untouched.
     expect(useBookingStore.getState().bookings).toHaveLength(0);
   });

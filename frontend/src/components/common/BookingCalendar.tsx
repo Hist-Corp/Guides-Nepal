@@ -393,11 +393,13 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     if (!single && checkOut && isDisabled(checkOut)) {
       onChange(checkIn, '');
     }
-  }, [checkIn, checkOut, disabledDates, minDate, maxDate, single, onChange]);
+  }, [checkIn, checkOut, disabledDates, minDate, maxDate, single, onChange, isDisabled]);
   useEffect(() => {
     if (!isOpen) {
       // Never leave a rejected or half-typed date sitting in the card fields.
+
       setCiText(formatFromKey(checkIn));
+
       setCoText(formatFromKey(checkOut));
       setTypeErr(null);
     }
@@ -419,6 +421,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
         }
       }
     }
+
     setPendingFocus(null);
   }, [pendingFocus, isOpen]);
 

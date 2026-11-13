@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { PageBackButton } from '../components/common/PageBackButton';
-import { Gift, Heart, PartyPopper, Sparkles } from 'lucide-react';
+import { Gift, Sparkles } from 'lucide-react';
 import { useCurrency } from '../contexts/CurrencyContext';
 
 const giftCardAmounts = [25, 50, 100, 200];
@@ -47,14 +47,18 @@ const GiftCardsPage: React.FC = () => {
                       <span>Valid for all experiences</span>
                     </div>
                   </div>
-                  <p className="text-slate-500 text-sm mt-4 text-center">Preview of your gift card</p>
+                  <p className="text-slate-500 text-sm mt-4 text-center">
+                    Preview of your gift card
+                  </p>
                 </div>
 
                 <div>
                   <h2 className="text-2xl font-bold text-slate-900 mb-6">Purchase Gift Card</h2>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Select Amount</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Select Amount
+                      </label>
                       <div className="grid grid-cols-4 gap-2">
                         {giftCardAmounts.map((amount) => (
                           <button
@@ -72,7 +76,9 @@ const GiftCardsPage: React.FC = () => {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Recipient Name</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Recipient Name
+                      </label>
                       <input
                         type="text"
                         value={recipientName}
@@ -82,7 +88,9 @@ const GiftCardsPage: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Recipient Email</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Recipient Email
+                      </label>
                       <input
                         type="email"
                         value={recipientEmail}
@@ -92,7 +100,9 @@ const GiftCardsPage: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-1">Personal Message</label>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">
+                        Personal Message
+                      </label>
                       <textarea
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}

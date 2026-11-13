@@ -2,13 +2,13 @@ import React from 'react';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
 import { PageBackButton } from '../components/common/PageBackButton';
-import { Users, Heart, Globe, Star, MessageCircle, Calendar } from 'lucide-react';
+import { Users, Globe, Star, MessageCircle, Calendar } from 'lucide-react';
 
 const communityStats = [
   { value: '500+', label: 'Local Guides' },
   { value: '50,000+', label: 'Travelers Served' },
   { value: '5', label: 'Cities Covered' },
-  { value: '4.9', label: 'Average Rating' }
+  { value: '4.9', label: 'Average Rating' },
 ];
 
 const testimonials = [
@@ -16,20 +16,20 @@ const testimonials = [
     name: 'Sarah Johnson',
     location: 'United States',
     text: 'The local guide made my trip to Nepal unforgettable. I learned so much about the culture!',
-    rating: 5
+    rating: 5,
   },
   {
     name: 'Hans Mueller',
     location: 'Germany',
     text: 'Booking through Guides Nepal was easy and the experience was authentic. Highly recommend!',
-    rating: 5
+    rating: 5,
   },
   {
     name: 'Yuki Tanaka',
     location: 'Japan',
     text: 'My guide in Pokhara was amazing. The mountain views and local food were incredible.',
-    rating: 5
-  }
+    rating: 5,
+  },
 ];
 
 const CommunityPage: React.FC = () => {
@@ -42,7 +42,8 @@ const CommunityPage: React.FC = () => {
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Community</h1>
             <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              Join a global community of travelers and local guides connected by a love for authentic experiences.
+              Join a global community of travelers and local guides connected by a love for
+              authentic experiences.
             </p>
           </div>
         </section>
@@ -52,7 +53,9 @@ const CommunityPage: React.FC = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
               {communityStats.map((stat, index) => (
                 <div key={index} className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-primary mb-1">{stat.value}</div>
+                  <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
+                    {stat.value}
+                  </div>
                   <div className="text-slate-600">{stat.label}</div>
                 </div>
               ))}
@@ -62,7 +65,9 @@ const CommunityPage: React.FC = () => {
 
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">What Our Community Says</h2>
+            <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">
+              What Our Community Says
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               {testimonials.map((testimonial, index) => (
                 <div key={index} className="bg-white p-6 rounded-xl shadow-sm">
@@ -113,7 +118,8 @@ const CommunityPage: React.FC = () => {
             <Globe className="w-12 h-12 text-primary mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Our Global Reach</h2>
             <p className="text-slate-600 max-w-xl mx-auto">
-              Travelers from over 50 countries have experienced Nepal through our local guides. Join our growing community and discover the world through local eyes.
+              Travelers from over 50 countries have experienced Nepal through our local guides. Join
+              our growing community and discover the world through local eyes.
             </p>
           </div>
         </section>

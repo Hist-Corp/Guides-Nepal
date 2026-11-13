@@ -7,9 +7,10 @@ interface EditableSection {
   label: string;
 }
 
-export function CmsEditOverlay({ onSectionClick, onImageClick }: {
+export function CmsEditOverlay({
+  onSectionClick,
+}: {
   onSectionClick: (sectionId: string, element: HTMLElement) => void;
-  onImageClick: (src: string, alt: string, sectionId?: string) => void;
 }) {
   const [sections, setSections] = useState<EditableSection[]>([]);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -18,7 +19,7 @@ export function CmsEditOverlay({ onSectionClick, onImageClick }: {
   const scanSections = useCallback(() => {
     const elements = document.querySelectorAll('[data-cms-id]');
     const found: EditableSection[] = [];
-    elements.forEach(el => {
+    elements.forEach((el) => {
       const rect = el.getBoundingClientRect();
       if (rect.width > 0 && rect.height > 0) {
         found.push({
@@ -33,10 +34,11 @@ export function CmsEditOverlay({ onSectionClick, onImageClick }: {
   }, []);
 
   useEffect(() => {
-    scanSections();
     const interval = setInterval(scanSections, 1000);
     window.addEventListener('resize', scanSections);
     window.addEventListener('scroll', scanSections);
+    // Initial scan
+    scanSections();
     return () => {
       clearInterval(interval);
       window.removeEventListener('resize', scanSections);
@@ -50,7 +52,7 @@ export function CmsEditOverlay({ onSectionClick, onImageClick }: {
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[9999]">
-      {sections.map(section => (
+      {sections.map((section) => (
         <div
           key={section.id}
           className="absolute pointer-events-auto"
@@ -73,11 +75,11 @@ export function CmsEditOverlay({ onSectionClick, onImageClick }: {
             onClick={() => handleSectionClick(section)}
           >
             {/* Label */}
-            <div className={`absolute -top-6 left-0 px-2 py-0.5 text-xs font-medium rounded-t-md transition-all ${
-              hoveredId === section.id
-                ? 'bg-blue-500 text-white'
-                : 'bg-blue-400/70 text-white'
-            }`}>
+            <div
+              className={`absolute -top-6 left-0 px-2 py-0.5 text-xs font-medium rounded-t-md transition-all ${
+                hoveredId === section.id ? 'bg-blue-500 text-white' : 'bg-blue-400/70 text-white'
+              }`}
+            >
               ✏️ {section.label}
             </div>
           </div>

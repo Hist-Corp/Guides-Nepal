@@ -60,10 +60,10 @@ export default function MailaDaiWidget() {
   // Hide widget when booking sheet is open
   const isBookingSheetOpen = useUIStore((s) => s.isBookingSheetOpen);
   useEffect(() => {
-    if (isBookingSheetOpen) setState('closed');
+    if (isBookingSheetOpen) {
+      setState('closed');
+    }
   }, [isBookingSheetOpen]);
-
-  const [isVisible, setIsVisible] = useState(true);
 
   // Always visible, like the customer support widget
   useEffect(() => {
@@ -177,7 +177,7 @@ export default function MailaDaiWidget() {
           const marvinMsg: Message = {
             id: (Date.now() + 1).toString(),
             sender: 'marvin',
-            text: 'I\'m here—tell me more and I\'ll help plan or suggest places.',
+            text: "I'm here—tell me more and I'll help plan or suggest places.",
             timestamp: new Date(),
           };
           setMessages((prev) => [...prev, marvinMsg]);
@@ -186,7 +186,7 @@ export default function MailaDaiWidget() {
         const marvinMsg: Message = {
           id: (Date.now() + 1).toString(),
           sender: 'marvin',
-          text: 'I\'m here—tell me more and I\'ll help plan or suggest places.',
+          text: "I'm here—tell me more and I'll help plan or suggest places.",
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, marvinMsg]);
@@ -231,7 +231,11 @@ export default function MailaDaiWidget() {
                 aria-label={state === 'minimized' ? 'Expand chat' : 'Minimize chat'}
                 onClick={toggleMinimize}
               >
-                {state === 'minimized' ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                {state === 'minimized' ? (
+                  <ChevronUp className="w-5 h-5" />
+                ) : (
+                  <ChevronDown className="w-5 h-5" />
+                )}
               </button>
               <button
                 type="button"
@@ -246,10 +250,7 @@ export default function MailaDaiWidget() {
 
           {state === 'open' && (
             <>
-              <div
-                className="maildai-messages"
-                style={{ maxHeight: `calc(${height}px - 160px)` }}
-              >
+              <div className="maildai-messages" style={{ maxHeight: `calc(${height}px - 160px)` }}>
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
@@ -266,9 +267,7 @@ export default function MailaDaiWidget() {
                           <span>You</span>
                         )}
                       </div>
-                      <div className={`maildai-bubble ${msg.sender}`}>
-                        {msg.text}
-                      </div>
+                      <div className={`maildai-bubble ${msg.sender}`}>{msg.text}</div>
                     </div>
                   </div>
                 ))}
@@ -283,7 +282,9 @@ export default function MailaDaiWidget() {
                       </div>
                       <div className="maildai-bubble marvin maildai-typing">
                         <div className="maildai-typing-dots">
-                          <span></span><span></span><span></span>
+                          <span></span>
+                          <span></span>
+                          <span></span>
                         </div>
                       </div>
                     </div>

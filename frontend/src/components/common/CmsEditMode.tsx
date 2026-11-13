@@ -1,6 +1,13 @@
-import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
-import { clearCmsSectionsCache, getPageSections } from '../../services/cms'
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { clearCmsSectionsCache, getPageSections } from '../../services/cms';
+
+interface Section {
+  id: string;
+  content: Record<string, unknown>;
+  style: Record<string, unknown>;
+  type?: string;
+}
 
 /**
  * Live-preview bridge for the content writer dashboard.
@@ -17,149 +24,145 @@ import { clearCmsSectionsCache, getPageSections } from '../../services/cms'
  *     dashboard edits are reflected live.
  */
 
-const ELEMENT_SELECTOR =
-  'h1, h2, h3, h4, h5, h6, p, img, button, a, li, blockquote, figcaption'
+const ELEMENT_SELECTOR = 'h1, h2, h3, h4, h5, h6, p, img, button, a, li, blockquote, figcaption';
 
 function kindOf(el: HTMLElement): string {
-  const tag = el.tagName.toLowerCase()
-  if (tag === 'img') return 'image'
-  if (/^h[1-6]$/.test(tag)) return 'heading'
-  if (tag === 'p') return 'paragraph'
-  if (tag === 'li') return 'listitem'
-  if (tag === 'blockquote' || tag === 'figcaption') return 'quote'
-  if (tag === 'a' && !el.querySelector('img')) return 'link'
-  return 'button'
+  const tag = el.tagName.toLowerCase();
+  if (tag === 'img') return 'image';
+  if (/^h[1-6]$/.test(tag)) return 'heading';
+  if (tag === 'p') return 'paragraph';
+  if (tag === 'li') return 'listitem';
+  if (tag === 'blockquote' || tag === 'figcaption') return 'quote';
+  if (tag === 'a' && !el.querySelector('img')) return 'link';
+  return 'button';
 }
 
 function tagSectionsAndElements(slug: string) {
   // 1. Sections: outermost section/footer/header wrappers only.
   const wrappers = Array.from(
     document.querySelectorAll('section, footer, header')
-  ) as HTMLElement[]
-  let sectionIndex = 0
+  ) as HTMLElement[];
+  let sectionIndex = 0;
   wrappers
     .filter((el) => !el.parentElement?.closest('section, header'))
     .forEach((el) => {
       if (el.getAttribute('data-cms-id')) {
-        sectionIndex += 1
-        return
+        sectionIndex += 1;
+        return;
       }
-      const id = `${slug}-auto-${sectionIndex}`
-      sectionIndex += 1
-      const heading = el.querySelector('h1, h2, h3')
-      const label =
-        (heading?.textContent || '').trim().slice(0, 40) || `Section ${sectionIndex}`
-      el.setAttribute('data-cms-id', id)
-      el.setAttribute('data-cms-label', label)
-    })
+      const id = `${slug}-auto-${sectionIndex}`;
+      sectionIndex += 1;
+      const heading = el.querySelector('h1, h2, h3');
+      const label = (heading?.textContent || '').trim().slice(0, 40) || `Section ${sectionIndex}`;
+      el.setAttribute('data-cms-id', id);
+      el.setAttribute('data-cms-label', label);
+    });
 
   // 2. Granular content elements - everything not already tagged.
-  const elements = Array.from(document.querySelectorAll(ELEMENT_SELECTOR)) as HTMLElement[]
-  let elIndex = 0
+  const elements = Array.from(document.querySelectorAll(ELEMENT_SELECTOR)) as HTMLElement[];
+  let elIndex = 0;
   elements.forEach((el) => {
-    if (el.closest('[data-cms-kind]')) return // inside an already-tagged element
-    const kind = kindOf(el)
-    const id = `${slug}-el-${elIndex}`
-    elIndex += 1
-    const text = (el.textContent || '').trim().replace(/\s+/g, ' ')
-    const label =
-      kind === 'image'
-        ? el.getAttribute('alt') || 'Image'
-        : text.slice(0, 40) || kind
-    el.setAttribute('data-cms-id', id)
-    el.setAttribute('data-cms-label', label)
-    el.setAttribute('data-cms-kind', kind)
-  })
+    if (el.closest('[data-cms-kind]')) return; // inside an already-tagged element
+    const kind = kindOf(el);
+    const id = `${slug}-el-${elIndex}`;
+    elIndex += 1;
+    const text = (el.textContent || '').trim().replace(/\s+/g, ' ');
+    const label = kind === 'image' ? el.getAttribute('alt') || 'Image' : text.slice(0, 40) || kind;
+    el.setAttribute('data-cms-id', id);
+    el.setAttribute('data-cms-label', label);
+    el.setAttribute('data-cms-kind', kind);
+  });
 }
 
 /** Apply CMS content + style overrides onto the real page DOM. */
 async function applyCmsOverrides(slug: string) {
-  if (!slug) return
-  let sections: any[] = []
+  if (!slug) return;
   try {
-    sections = await getPageSections(slug)
+    const sections = await getPageSections(slug);
+    sections.forEach(applySectionOverride);
   } catch {
-    return
+    return;
   }
-  sections.forEach(applySectionOverride)
 }
 
 /** Shared by saved content and unsaved dashboard preview messages. */
-function applySectionOverride(section: any) {
-  const ELEMENT_TYPES = ['heading', 'paragraph', 'listitem', 'quote', 'image', 'button', 'link']
+function applySectionOverride(section: Section) {
+  const ELEMENT_TYPES = ['heading', 'paragraph', 'listitem', 'quote', 'image', 'button', 'link'];
   const setText = (element: HTMLElement | null, value: unknown) => {
-    if (!element || typeof value !== 'string') return
+    if (!element || typeof value !== 'string') return;
     // Leave React's nested accents, links and line breaks intact when unchanged.
-    const normalize = (text: string) => text.replace(/\s+/g, ' ').trim()
-    if (normalize(element.innerText) !== normalize(value)) element.textContent = value
-  }
-    const el = document.querySelector(`[data-cms-id="${CSS.escape(section.id)}"]`) as HTMLElement | null
-    if (!el) return
-    const c = section.content || {}
-    const st = section.style || {}
-    const type = section.type || el.getAttribute('data-cms-kind') || ''
+    const normalize = (text: string) => text.replace(/\s+/g, ' ').trim();
+    if (normalize(element.innerText) !== normalize(value)) element.textContent = value;
+  };
+  const el = document.querySelector(
+    `[data-cms-id="${CSS.escape(section.id)}"]`
+  ) as HTMLElement | null;
+  if (!el) return;
+  const c = section.content || {};
+  const st = section.style || {};
+  const type = section.type || el.getAttribute('data-cms-kind') || '';
 
-    if (ELEMENT_TYPES.includes(type)) {
-      // --- Granular element sections: apply directly to the element ---
-      if (type === 'image') {
-        const img = (el.matches('img') ? el : el.querySelector('img')) as HTMLImageElement | null
-        if (img) {
-          if (c.image) img.src = c.image
-          if (c.alt) img.alt = c.alt
-        }
-      } else if (type === 'button' || type === 'link') {
-        if (c.buttonText) el.textContent = c.buttonText
-        if (c.link) {
-          const anchor = (el.matches('a') ? el : el.querySelector('a')) as HTMLAnchorElement | null
-          if (anchor) anchor.setAttribute('href', c.link)
-        }
-      } else {
-        setText(el, c.heading ?? c.body ?? c.subtitle)
+  if (ELEMENT_TYPES.includes(type)) {
+    // --- Granular element sections: apply directly to the element ---
+    if (type === 'image') {
+      const img = (el.matches('img') ? el : el.querySelector('img')) as HTMLImageElement | null;
+      if (img) {
+        if (c.image) img.src = c.image;
+        if (c.alt) img.alt = c.alt;
       }
-      if (st.fontSize) el.style.fontSize = st.fontSize
-      if (st.fontWeight) el.style.fontWeight = st.fontWeight
-      if (st.textColor) el.style.color = st.textColor
-      if (st.backgroundColor && type !== 'heading') el.style.backgroundColor = st.backgroundColor
-      if (st.alignment) el.style.textAlign = st.alignment
-      return
+    } else if (type === 'button' || type === 'link') {
+      if (c.buttonText) el.textContent = c.buttonText;
+      if (c.link) {
+        const anchor = (el.matches('a') ? el : el.querySelector('a')) as HTMLAnchorElement | null;
+        if (anchor) anchor.setAttribute('href', c.link);
+      }
+    } else {
+      setText(el, c.heading ?? c.body ?? c.subtitle);
     }
+    if (st.fontSize) el.style.fontSize = st.fontSize;
+    if (st.fontWeight) el.style.fontWeight = st.fontWeight;
+    if (st.textColor) el.style.color = st.textColor;
+    if (st.backgroundColor && type !== 'heading') el.style.backgroundColor = st.backgroundColor;
+    if (st.alignment) el.style.textAlign = st.alignment;
+    return;
+  }
 
-    // --- Page-level sections ---
-    if (c.heading) {
-      const heading = (el.matches('h1, h2, h3')
-        ? el
-        : el.querySelector('h1, h2, h3')) as HTMLElement | null
-      setText(heading, c.heading)
-    }
-    if (c.subtitle) {
-      const heading = el.querySelector('h1, h2, h3')
-      const p = (heading?.nextElementSibling as HTMLElement | null) || el.querySelector('p')
-      if (p && p.tagName === 'P') setText(p, c.subtitle)
-    }
-    if (c.body) {
-      const p = el.querySelector('p')
-      if (p) p.textContent = c.body
-    }
+  // --- Page-level sections ---
+  if (c.heading) {
+    const heading = (
+      el.matches('h1, h2, h3') ? el : el.querySelector('h1, h2, h3')
+    ) as HTMLElement | null;
+    setText(heading, c.heading);
+  }
+  if (c.subtitle) {
+    const heading = el.querySelector('h1, h2, h3');
+    const p = (heading?.nextElementSibling as HTMLElement | null) || el.querySelector('p');
+    if (p && p.tagName === 'P') setText(p, c.subtitle);
+  }
+  if (c.body) {
+    const p = el.querySelector('p');
+    if (p) p.textContent = c.body;
+  }
 
-    if (st.backgroundColor) el.style.backgroundColor = st.backgroundColor
-    if (st.textColor) el.style.color = st.textColor
-    if (st.padding) el.style.padding = st.padding
-    if (st.alignment) el.style.textAlign = st.alignment
-    if (st.headingSize) {
-      const heading = el.querySelector('h1, h2, h3') as HTMLElement | null
-      if (heading) heading.style.fontSize = st.headingSize
-    }
+  if (st.backgroundColor) el.style.backgroundColor = st.backgroundColor;
+  if (st.textColor) el.style.color = st.textColor;
+  if (st.padding) el.style.padding = st.padding;
+  if (st.alignment) el.style.textAlign = st.alignment;
+  if (st.headingSize) {
+    const heading = el.querySelector('h1, h2, h3') as HTMLElement | null;
+    if (heading) heading.style.fontSize = st.headingSize;
+  }
 }
 
 const CmsEditMode: React.FC = () => {
-  const location = useLocation()
+  const location = useLocation();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('cms_edit') !== '1') return
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('cms_edit') !== '1') return;
 
-    const slug = params.get('cms_slug') || ''
-    const style = document.createElement('style')
+    const slug = params.get('cms_slug') || '';
+    const style = document.createElement('style');
     style.textContent = `
       [data-cms-id] { position: relative; cursor: pointer !important; }
       [data-cms-id]:not([data-cms-kind])::after {
@@ -185,33 +188,36 @@ const CmsEditMode: React.FC = () => {
         padding: 1px 6px; border-radius: 4px; pointer-events: none;
         text-transform: uppercase; letter-spacing: 0.03em;
       }
-    `
-    document.head.appendChild(style)
+    `;
+    document.head.appendChild(style);
 
     // Wait a tick for the page to render, then tag + apply CMS content.
     const tagTimer = setTimeout(() => {
-      tagSectionsAndElements(slug)
-      applyCmsOverrides(slug)
-    }, 300)
+      tagSectionsAndElements(slug);
+      applyCmsOverrides(slug);
+    }, 300);
 
     // Re-tag continuously: React re-renders can replace DOM nodes (losing
     // the data-cms-* attributes) and async content may load late. The
     // observer keeps every element selectable at all times.
-    const observer = new MutationObserver(() => tagSectionsAndElements(slug))
-    observer.observe(document.body, { childList: true, subtree: true })
+    const observer = new MutationObserver(() => tagSectionsAndElements(slug));
+    observer.observe(document.body, { childList: true, subtree: true });
 
     const onClick = (e: MouseEvent) => {
-      const target = (e.target as HTMLElement).closest('[data-cms-id]') as HTMLElement | null
-      if (!target) return
-      e.preventDefault()
-      e.stopPropagation()
+      const target = (e.target as HTMLElement).closest('[data-cms-id]') as HTMLElement | null;
+      if (!target) return;
+      e.preventDefault();
+      e.stopPropagation();
       // Visual confirmation that the click was registered.
-      document.querySelectorAll('.cms-selected').forEach((n) => n.classList.remove('cms-selected'))
-      target.classList.add('cms-selected')
-      const kind = target.getAttribute('data-cms-kind') || undefined
-      const sectionEl = target.closest('[data-cms-id]:not([data-cms-kind])') as HTMLElement | null
-      const isImage = kind === 'image' || target.tagName.toLowerCase() === 'img' || !!target.querySelector('img')
-      const imgEl = (target.tagName.toLowerCase() === 'img' ? target : target.querySelector('img')) as HTMLImageElement | null
+      document.querySelectorAll('.cms-selected').forEach((n) => n.classList.remove('cms-selected'));
+      target.classList.add('cms-selected');
+      const kind = target.getAttribute('data-cms-kind') || undefined;
+      const sectionEl = target.closest('[data-cms-id]:not([data-cms-kind])') as HTMLElement | null;
+      const isImage =
+        kind === 'image' || target.tagName.toLowerCase() === 'img' || !!target.querySelector('img');
+      const imgEl = (
+        target.tagName.toLowerCase() === 'img' ? target : target.querySelector('img')
+      ) as HTMLImageElement | null;
       window.parent.postMessage(
         {
           type: 'cms-section-click',
@@ -219,62 +225,69 @@ const CmsEditMode: React.FC = () => {
           id: target.getAttribute('data-cms-id'),
           label: target.getAttribute('data-cms-label') || undefined,
           kind,
-          content: kind === 'image'
-            ? { image: imgEl?.src || '', alt: imgEl?.alt || '' }
-            : kind === 'button' || kind === 'link'
-              ? { buttonText: target.innerText, link: target.getAttribute('href') || '' }
-              : kind === 'heading'
-                ? { heading: target.innerText }
-                : { body: target.innerText },
+          content:
+            kind === 'image'
+              ? { image: imgEl?.src || '', alt: imgEl?.alt || '' }
+              : kind === 'button' || kind === 'link'
+                ? { buttonText: target.innerText, link: target.getAttribute('href') || '' }
+                : kind === 'heading'
+                  ? { heading: target.innerText }
+                  : { body: target.innerText },
           sectionId: sectionEl?.getAttribute('data-cms-id') || undefined,
-          currentUrl: isImage ? (imgEl?.src || undefined) : undefined,
-          alt: isImage ? (imgEl?.alt || undefined) : undefined,
+          currentUrl: isImage ? imgEl?.src || undefined : undefined,
+          alt: isImage ? imgEl?.alt || undefined : undefined,
         },
         '*'
-      )
-    }
-    document.addEventListener('click', onClick, true)
+      );
+    };
+    document.addEventListener('click', onClick, true);
 
     const onMessage = (e: MessageEvent) => {
-      if (e.source !== window.parent) return
-      const data = e.data || {}
+      if (e.source !== window.parent) return;
+      const data = e.data || {};
       if (data.type === 'cms-update-section' && typeof data.sectionId === 'string') {
         applySectionOverride({
           id: data.sectionId,
           content: data.content,
           style: data.style,
-        })
+        });
       } else if (data.type === 'cms-refresh') {
-        clearCmsSectionsCache(data.slug)
-        window.location.reload()
+        clearCmsSectionsCache(data.slug);
+        window.location.reload();
       } else if (data.type === 'cms-update-image') {
         // Update image live without reload
-        const el = document.querySelector(`[data-cms-id="${data.sectionId}"]`) as HTMLElement | null
+        const el = document.querySelector(
+          `[data-cms-id="${data.sectionId}"]`
+        ) as HTMLElement | null;
         if (el) {
-          const img = (el.tagName.toLowerCase() === 'img' ? el : el.querySelector('img')) as HTMLImageElement | null
+          const img = (
+            el.tagName.toLowerCase() === 'img' ? el : el.querySelector('img')
+          ) as HTMLImageElement | null;
           if (img) {
-            img.src = data.url
-            img.style.transition = 'opacity 0.3s'
-            img.style.opacity = '0.5'
-            setTimeout(() => { img.style.opacity = '1' }, 300)
+            img.src = data.url;
+            img.style.transition = 'opacity 0.3s';
+            img.style.opacity = '0.5';
+            setTimeout(() => {
+              img.style.opacity = '1';
+            }, 300);
           }
         }
       }
-    }
-    window.addEventListener('message', onMessage)
+    };
+    window.addEventListener('message', onMessage);
 
-    window.parent.postMessage({ type: 'cms-page-loaded', slug, path: location.pathname }, '*')
+    window.parent.postMessage({ type: 'cms-page-loaded', slug, path: location.pathname }, '*');
 
     return () => {
-      clearTimeout(tagTimer)
-      observer.disconnect()
-      document.removeEventListener('click', onClick, true)
-      window.removeEventListener('message', onMessage)
-      style.remove()
-    }
-  }, [location.pathname])
+      clearTimeout(tagTimer);
+      observer.disconnect();
+      document.removeEventListener('click', onClick, true);
+      window.removeEventListener('message', onMessage);
+      style.remove();
+    };
+  }, [location.pathname]);
 
-  return null
-}
+  return null;
+};
 
-export default CmsEditMode
+export default CmsEditMode;

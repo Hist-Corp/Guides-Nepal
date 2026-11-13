@@ -147,7 +147,8 @@ const sanitizeFieldValue = (key: keyof Draft, raw: string): string => {
   const multiline = key === 'bio' || key === 'experienceSummary';
   let value = raw
     .replace(/\u00a0/g, ' ')
-    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '');
+    // Remove control characters (C0 and C1 control codes) using Unicode property
+    .replace(/[\p{Cc}\p{Cf}]/gu, '');
   if (!multiline) value = value.replace(/[\r\n\t]+/g, ' ');
 
   const allowed = FIELD_ALLOWED[key];
@@ -1068,7 +1069,9 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <main id="main-content" className="container mx-auto max-w-5xl px-4 py-10">{children}</main>
+      <main id="main-content" className="container mx-auto max-w-5xl px-4 py-10">
+        {children}
+      </main>
       <Footer />
     </div>
   );

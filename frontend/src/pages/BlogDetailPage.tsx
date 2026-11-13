@@ -13,7 +13,6 @@ import {
   MapPin,
   Share2,
   CheckCircle2,
-  Quote,
   FileText,
   ChevronRight,
 } from 'lucide-react';
@@ -179,7 +178,10 @@ function parseContent(raw: string): Block[] {
       continue;
     }
     if (inTable && line.includes('|') && !line.startsWith('|---')) {
-      const cells = line.split('|').map((c) => c.trim()).filter(Boolean);
+      const cells = line
+        .split('|')
+        .map((c) => c.trim())
+        .filter(Boolean);
       if (cells.length >= 2) {
         tableRows.push({ label: cells[0], value: cells.slice(1).join(' | ') });
       }
@@ -399,12 +401,12 @@ const BlogDetailPage: React.FC = () => {
           <section className="py-16 bg-white">
             <div className="container mx-auto px-4 text-center">
               <Link
-    to="/blog"
-    className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full"
-  >
-    <ArrowLeft className="w-4 h-4" />
-    Back to Blog
-  </Link>
+                to="/blog"
+                className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Blog
+              </Link>
             </div>
           </section>
         </main>
@@ -485,7 +487,10 @@ const BlogDetailPage: React.FC = () => {
                       );
                     if (block.kind === 'key-takeaways')
                       return (
-                        <section key={i} className="my-8 rounded-2xl bg-[#FDF8F5] border border-[#DCE5ED] p-6">
+                        <section
+                          key={i}
+                          className="my-8 rounded-2xl bg-[#FDF8F5] border border-[#DCE5ED] p-6"
+                        >
                           <div className="flex items-center gap-2 mb-4">
                             <FileText className="w-5 h-5 text-primary" />
                             <h3 className="font-bold text-slate-900 text-sm uppercase tracking-widest">
@@ -506,18 +511,28 @@ const BlogDetailPage: React.FC = () => {
                       );
                     if (block.kind === 'fact-table')
                       return (
-                        <div key={i} className="my-8 rounded-xl border border-slate-200/80 shadow-lg shadow-slate-900/5 overflow-hidden bg-white transition-all duration-200 hover:shadow-md">
+                        <div
+                          key={i}
+                          className="my-8 rounded-xl border border-slate-200/80 shadow-lg shadow-slate-900/5 overflow-hidden bg-white transition-all duration-200 hover:shadow-md"
+                        >
                           <div className="overflow-x-auto">
                             <table className="w-full text-left text-sm">
                               <thead className="bg-gradient-to-r from-primary via-[#213448] to-[#1a2a3a] text-white">
                                 <tr>
-                                  <th className="px-4 py-3 font-bold text-sm tracking-wide text-white/90">Label</th>
-                                  <th className="px-4 py-3 font-bold text-sm tracking-wide text-white/90">Value</th>
+                                  <th className="px-4 py-3 font-bold text-sm tracking-wide text-white/90">
+                                    Label
+                                  </th>
+                                  <th className="px-4 py-3 font-bold text-sm tracking-wide text-white/90">
+                                    Value
+                                  </th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-slate-100">
                                 {block.rows.map((row, j) => (
-                                  <tr key={j} className="transition-colors duration-150 group hover:bg-white/50">
+                                  <tr
+                                    key={j}
+                                    className="transition-colors duration-150 group hover:bg-white/50"
+                                  >
                                     <td className="px-4 py-3.5 font-semibold text-slate-800">
                                       {row.label}
                                     </td>
@@ -531,7 +546,10 @@ const BlogDetailPage: React.FC = () => {
                       );
                     if (block.kind === 'author-bio')
                       return (
-                        <section key={i} className="my-10 rounded-2xl border border-slate-200 bg-white overflow-hidden">
+                        <section
+                          key={i}
+                          className="my-10 rounded-2xl border border-slate-200 bg-white overflow-hidden"
+                        >
                           <div className="grid grid-cols-1 md:grid-cols-12 gap-0">
                             <div className="md:col-span-4 bg-[#213448] p-6 flex flex-col justify-center">
                               <div className="flex flex-col items-center text-white">
@@ -549,7 +567,10 @@ const BlogDetailPage: React.FC = () => {
                               </h4>
                               <div className="space-y-3">
                                 {block.bios.map((bio, bi) => (
-                                  <div key={bi} className="text-slate-700 leading-relaxed text-[0.98rem]">
+                                  <div
+                                    key={bi}
+                                    className="text-slate-700 leading-relaxed text-[0.98rem]"
+                                  >
                                     {renderInline(bio.bio)}
                                   </div>
                                 ))}
@@ -560,9 +581,16 @@ const BlogDetailPage: React.FC = () => {
                       );
                     if (block.kind === 'faq')
                       return (
-                        <div key={i} className="mb-6 border-b border-slate-100 pb-4 last:border-0 last:pb-0">
-                          <p className="font-bold text-slate-900 text-[0.98rem] mb-1">{block.question}</p>
-                          <p className="text-slate-600 text-[0.95rem] leading-relaxed">{block.answer}</p>
+                        <div
+                          key={i}
+                          className="mb-6 border-b border-slate-100 pb-4 last:border-0 last:pb-0"
+                        >
+                          <p className="font-bold text-slate-900 text-[0.98rem] mb-1">
+                            {block.question}
+                          </p>
+                          <p className="text-slate-600 text-[0.95rem] leading-relaxed">
+                            {block.answer}
+                          </p>
                         </div>
                       );
                     if (block.kind === 'quote')
@@ -648,21 +676,27 @@ const BlogDetailPage: React.FC = () => {
                                     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                                   }
                                 }}
-                                className={`group flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-all duration-200 relative ${isActive
+                                className={`group flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-all duration-200 relative ${
+                                  isActive
                                     ? 'bg-gradient-to-r from-primary/10 to-[#213448]/5 border border-primary/20 text-white shadow-sm'
                                     : 'text-slate-600 hover:bg-slate-50 hover:border-slate-200/80 hover:text-slate-900 hover:pl-2.5 hover:shadow-sm'
                                 }`}
                               >
-                                <span className={`flex-shrink-0 w-5 h-5 rounded-md flex items-center justify-center text-xs font-bold transition-all duration-200 ${isActive
-                                    ? 'bg-gradient-to-br from-primary to-[#213448] text-white'
-                                    : 'bg-slate-100/80 text-slate-400 group-hover:bg-slate-200 group-hover:text-slate-600'
-                                }`}>
+                                <span
+                                  className={`flex-shrink-0 w-5 h-5 rounded-md flex items-center justify-center text-xs font-bold transition-all duration-200 ${
+                                    isActive
+                                      ? 'bg-gradient-to-br from-primary to-[#213448] text-white'
+                                      : 'bg-slate-100/80 text-slate-400 group-hover:bg-slate-200 group-hover:text-slate-600'
+                                  }`}
+                                >
                                   {idx + 1}
                                 </span>
                                 <span className="flex-1 leading-snug tracking-tight text-sm text-black">
                                   {h.text}
                                 </span>
-                                <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-all duration-200 group-hover:translate-x-1 ${isActive ? 'rotate-90 text-black' : 'text-slate-400 group-hover:text-slate-600'}`} />
+                                <ChevronRight
+                                  className={`w-3.5 h-3.5 shrink-0 transition-all duration-200 group-hover:translate-x-1 ${isActive ? 'rotate-90 text-black' : 'text-slate-400 group-hover:text-slate-600'}`}
+                                />
                               </a>
                             </li>
                           );
@@ -715,12 +749,12 @@ const BlogDetailPage: React.FC = () => {
 
             <div className="mt-12 pt-8 border-t border-slate-200 text-center">
               <Link
-    to="/blog"
-    className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full"
-  >
-    <ArrowLeft className="w-4 h-4" />
-    Back to Blog
-  </Link>
+                to="/blog"
+                className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Blog
+              </Link>
             </div>
           </div>
         </section>

@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 export interface CmsEditMessage {
   type: 'section-click' | 'image-click' | 'section-updated' | 'ready';
   sectionId?: string;
-  sectionData?: any;
+  sectionData?: Record<string, unknown>;
   imageSrc?: string;
   imageAlt?: string;
   pageSlug?: string;
@@ -21,9 +21,11 @@ export function useCmsEdit() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [ready, setReady] = useState(false);
 
+  // Initialize edit mode from URL params - this is a one-time setup
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const editMode = params.get('cms-edit') === '1' || params.get('cmspreview') === '1';
+
     setIsEditMode(editMode);
     if (editMode) {
       // Notify parent that edit mode is ready
@@ -50,29 +52,41 @@ export function useCmsEdit() {
     return () => window.removeEventListener('message', handler);
   }, [isEditMode]);
 
-  const notifySectionClick = useCallback((sectionId: string, sectionData: any) => {
-    window.parent.postMessage({
-      type: 'section-click',
-      sectionId,
-      sectionData,
-    } as CmsEditMessage, '*');
-  }, []);
+  const notifySectionClick = useCallback(
+    (sectionId: string, sectionData: Record<string, unknown>) => {
+      window.parent.postMessage(
+        {
+          type: 'section-click',
+          sectionId,
+          sectionData,
+        } as CmsEditMessage,
+        '*'
+      );
+    },
+    []
+  );
 
   const notifyImageClick = useCallback((imageSrc: string, imageAlt: string, sectionId?: string) => {
-    window.parent.postMessage({
-      type: 'image-click',
-      imageSrc,
-      imageAlt,
-      sectionId,
-    } as CmsEditMessage, '*');
+    window.parent.postMessage(
+      {
+        type: 'image-click',
+        imageSrc,
+        imageAlt,
+        sectionId,
+      } as CmsEditMessage,
+      '*'
+    );
   }, []);
 
-  const sendUpdateToParent = useCallback((sectionId: string, data: any) => {
-    window.parent.postMessage({
-      type: 'section-updated',
-      sectionId,
-      sectionData: data,
-    } as CmsEditMessage, '*');
+  const sendUpdateToParent = useCallback((sectionId: string, data: Record<string, unknown>) => {
+    window.parent.postMessage(
+      {
+        type: 'section-updated',
+        sectionId,
+        sectionData: data,
+      } as CmsEditMessage,
+      '*'
+    );
   }, []);
 
   return {
