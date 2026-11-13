@@ -10,6 +10,7 @@ import ForgotPasswordModal from './ForgotPasswordModal';
 import HelpFaqModal from '../components/HelpFaqModal';
 import nepalHero from '../assets/nepal-hero.jpg';
 import { FRONTEND_URL } from '../config/api';
+import logoImg from '../assets/logo.png';
 
 // Role identity shown in the sign-in dropdown — roles only, never real names.
 const ROLE_EMOJIS: Record<string, string> = {
@@ -199,7 +200,9 @@ export default function LoginPage() {
         if (typeof detail === 'string') {
           message = detail;
         } else if (Array.isArray(detail)) {
-          message = detail.map((d: any) => (typeof d === 'string' ? d : d?.msg || JSON.stringify(d))).join(' ');
+          message = detail
+            .map((d: any) => (typeof d === 'string' ? d : d?.msg || JSON.stringify(d)))
+            .join(' ');
         } else if (detail && typeof detail === 'object') {
           message = detail.msg || JSON.stringify(detail);
         }
@@ -223,7 +226,7 @@ export default function LoginPage() {
             aria-label="Guides Nepal - Home"
           >
             <img
-              src="/images/logo.png"
+              src={logoImg}
               alt="Guides Nepal logo"
               className="object-contain shrink-0"
               style={{ maxWidth: '160px', maxHeight: '40px' }}

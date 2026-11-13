@@ -1,25 +1,29 @@
-import { useAuthStore } from "../state/authStore"
-import { useNavigate, Link } from "react-router-dom"
-import { useState } from "react"
-import { Moon, Sun } from "lucide-react"
-import { useTheme } from "../hooks/useTheme"
-import HelpFaqModal from "./HelpFaqModal"
+import { useAuthStore } from '../state/authStore';
+import { useNavigate, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Moon, Sun } from 'lucide-react';
+import { useTheme } from '../hooks/useTheme';
+import HelpFaqModal from './HelpFaqModal';
+import logoImg from '../assets/logo.png';
 
 export default function Topbar() {
-  const navigate = useNavigate()
-  const { role, user, reset } = useAuthStore()
-  const { theme, toggleTheme } = useTheme()
-  const [helpOpen, setHelpOpen] = useState(false)
+  const navigate = useNavigate();
+  const { role, user, reset } = useAuthStore();
+  const { theme, toggleTheme } = useTheme();
+  const [helpOpen, setHelpOpen] = useState(false);
   function logout() {
-    reset()
-    navigate("/dashboard/login", { replace: true })
+    reset();
+    navigate('/dashboard/login', { replace: true });
   }
   const areaLabel = role
-    ? role.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
-    : ""
+    ? role
+        .split('-')
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ')
+    : '';
   const initials = user
-    ? `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`.toUpperCase() || "U"
-    : "?"
+    ? `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase() || 'U'
+    : '?';
 
   return (
     <header className="gn-topbar sticky top-0 z-20 h-16 border-b border-line flex items-center px-5 justify-between shrink-0">
@@ -30,7 +34,7 @@ export default function Topbar() {
           aria-label="Guides Nepal - Home"
         >
           <img
-            src="/images/logo.png"
+            src={logoImg}
             alt="Guides Nepal logo"
             className="object-contain shrink-0"
             style={{ maxWidth: '200px', maxHeight: '50px' }}
@@ -38,14 +42,17 @@ export default function Topbar() {
         </Link>
         <span className="h-5 w-px bg-gray-200" aria-hidden />
         <span className="rounded-full bg-brand-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-brand-700 ring-1 ring-inset ring-brand-200 dark:bg-brand-600/20 dark:text-brand-300 dark:ring-brand-500/40">
-          {areaLabel || "Console"}
+          {areaLabel || 'Console'}
         </span>
       </div>
 
       <div className="hidden lg:block relative w-80">
         <svg
           className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-soft"
-          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth="2"
         >
           <circle cx="11" cy="11" r="7" strokeLinecap="round" />
           <path d="m20 20-3.5-3.5" strokeLinecap="round" />
@@ -65,11 +72,11 @@ export default function Topbar() {
         </button>
         <button
           onClick={toggleTheme}
-          title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           className="cursor-pointer rounded-lg p-2 text-soft transition hover:bg-surface-3 hover:text-main"
         >
-          {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </button>
         <div className="hidden sm:flex items-center gap-2.5">
           <div className="grid h-9 w-9 place-items-center rounded-full bg-blue-500 text-xs font-bold text-white ring-1 ring-inset ring-blue-600/30 dark:bg-amber-400 dark:text-amber-950 dark:ring-amber-300/50">
@@ -77,9 +84,9 @@ export default function Topbar() {
           </div>
           <div className="leading-tight">
             <div className="text-sm font-medium text-main">
-              {user ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() : "Guest"}
+              {user ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() : 'Guest'}
             </div>
-            <div className="text-[11px] text-soft capitalize">{role ?? "guest"}</div>
+            <div className="text-[11px] text-soft capitalize">{role ?? 'guest'}</div>
           </div>
         </div>
         <span className="h-5 w-px bg-gray-200" aria-hidden />
@@ -92,6 +99,5 @@ export default function Topbar() {
       </div>
       <HelpFaqModal open={helpOpen} onClose={() => setHelpOpen(false)} />
     </header>
-  )
+  );
 }
-
