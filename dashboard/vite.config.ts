@@ -5,8 +5,13 @@ import react from '@vitejs/plugin-react';
 // the backend service name (http://backend:8000) instead of localhost.
 // Local dev keeps working with zero config (defaults to localhost:8000).
 const backendTarget = process.env.VITE_BACKEND_URL ?? 'http://localhost:8000';
+// Base path allows the dashboard to be served at a sub-route (e.g. /dashboard/)
+// when deployed under the frontend Vercel project. Defaults to '/' for the
+// standalone dashboard deployment.
+const base = process.env.VITE_BASE_PATH ?? '/';
 
 export default defineConfig({
+  base,
   resolve: {
     dedupe: ['react', 'react-dom'],
   },
