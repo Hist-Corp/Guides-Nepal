@@ -19,8 +19,8 @@
       "source": "/(.*)",
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Content-Security-Policy", "value": "frame-ancestors 'self' https://guides-nepal-el2f.vercel.app" }
       ]
     },
     {
@@ -31,7 +31,9 @@
     }
   ],
   "env": {
-    "VITE_PUBLIC_BASE_URL": "/"
+    "VITE_PUBLIC_BASE_URL": "/",
+    "VITE_FRONTEND_URL": "https://guides-nepal-iota.vercel.app",
+    "VITE_API_BASE_URL": "https://guides-nepal.onrender.com/api/v1"
   }
 }
 

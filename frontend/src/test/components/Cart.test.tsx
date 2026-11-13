@@ -26,15 +26,15 @@ const makeBooking = (overrides: Partial<Booking> = {}): Booking => ({
 
 // Shares one CartProvider instance with the rendered <Cart /> so items added
 // here are the same lines the panel shows.
-const CartApiProbe: React.FC = ({
-  cartApiRef,
-}: {
+interface CartApiProbeProps {
   cartApiRef: React.MutableRefObject<ReturnType<typeof useCart> | null>;
-}) => {
+}
+
+const CartApiProbe: React.FC<CartApiProbeProps> = ({ cartApiRef }) => {
   const api = useCart();
   React.useLayoutEffect(() => {
     cartApiRef.current = api;
-  }, [api]);
+  }, [api, cartApiRef]);
   return null;
 };
 

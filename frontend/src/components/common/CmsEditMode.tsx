@@ -1,13 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { clearCmsSectionsCache, getPageSections } from '../../services/cms';
-
-interface Section {
-  id: string;
-  content: Record<string, unknown>;
-  style: Record<string, unknown>;
-  type?: string;
-}
+import type { CmsSection } from '../../services/cms';
 
 /**
  * Live-preview bridge for the content writer dashboard.
@@ -86,7 +80,7 @@ async function applyCmsOverrides(slug: string) {
 }
 
 /** Shared by saved content and unsaved dashboard preview messages. */
-function applySectionOverride(section: Section) {
+function applySectionOverride(section: CmsSection) {
   const ELEMENT_TYPES = ['heading', 'paragraph', 'listitem', 'quote', 'image', 'button', 'link'];
   const setText = (element: HTMLElement | null, value: unknown) => {
     if (!element || typeof value !== 'string') return;
@@ -248,9 +242,11 @@ const CmsEditMode: React.FC = () => {
       if (data.type === 'cms-update-section' && typeof data.sectionId === 'string') {
         applySectionOverride({
           id: data.sectionId,
+          title: '',
+          type: '',
           content: data.content,
           style: data.style,
-        });
+        } as CmsSection);
       } else if (data.type === 'cms-refresh') {
         clearCmsSectionsCache(data.slug);
         window.location.reload();
