@@ -265,10 +265,7 @@ export const Header: React.FC = () => {
                 >
                   <Heart className={`w-6 h-6 ${hasFavorites ? 'text-red-500 fill-red-500' : ''}`} />
                 </Link>
-                <div
-                  ref={profileDropdownRef}
-                  className="relative inline-block"
-                >
+                <div ref={profileDropdownRef} className="relative inline-block">
                   <button
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                     title="Profile"
@@ -418,18 +415,18 @@ export const Header: React.FC = () => {
                 )}
               </button>
             )}
-
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              title="Menu"
-              className="w-10 h-10 bg-white hover:bg-gray-50 text-gray-800 rounded-lg flex items-center justify-center transition-colors shadow-sm"
-            >
-              <AlignJustify className="w-5 h-5" />
-            </button>
           </div>
 
           {/* Mobile Actions */}
           <div className="flex items-center gap-2 lg:hidden">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              title="Menu"
+              data-testid="mobile-menu"
+              className="w-10 h-10 bg-white hover:bg-gray-50 text-gray-800 rounded-lg flex items-center justify-center transition-colors shadow-sm"
+            >
+              <AlignJustify className="w-5 h-5" />
+            </button>
             {/* Mobile Search Icon (on home page: animates in after scrolling past hero) */}
             {!isHostApplicationPage && (
               <button
@@ -455,10 +452,7 @@ export const Header: React.FC = () => {
                 >
                   <MessageCircle className="w-5 h-5" />
                 </Link>
-                <div
-                  className="relative"
-                  ref={mobileProfileDropdownRef}
-                >
+                <div className="relative" ref={mobileProfileDropdownRef}>
                   <button
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                     title="Profile"
@@ -505,7 +499,6 @@ export const Header: React.FC = () => {
                           >
                             My listings
                           </Link>
-
                         </>
                       )}
                       <button
@@ -561,7 +554,7 @@ export const Header: React.FC = () => {
               ></div>
 
               {/* Menu Content */}
-              <div className="relative w-full max-w-sm h-full bg-background-cream shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col">
+              <nav className="mobile-menu relative w-full max-w-sm h-full bg-background-cream shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col">
                 <div className="p-6 flex justify-between items-center border-b border-gray-200/50">
                   <span className="font-bold text-lg text-gray-800">Menu</span>
                   <button
@@ -661,7 +654,6 @@ export const Header: React.FC = () => {
                               >
                                 My listings
                               </Link>
-
                             </>
                           )}
                           {user?.role !== 'host' && user?.role !== 'guide' && (
@@ -764,7 +756,7 @@ export const Header: React.FC = () => {
 
                   <div className="h-px bg-gray-200 w-full"></div>
                 </div>
-              </div>
+              </nav>
             </div>,
             document.body
           )}

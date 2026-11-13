@@ -219,6 +219,70 @@ body {
   }
 }
 
+/* ==========================================================================
+   Mobile foundation
+   ==========================================================================
+   Guarantees usable touch targets, safe-area awareness, and consistent
+   tap behaviour across iOS/Android. These utilities are intentionally
+   global so every page/inherited component picks them up automatically.
+   ========================================================================== */
+
+/* 1. Minimum 44×44 px touch target for all interactive elements (WCAG 2.2). */
+button,
+a[role="button"],
+input,
+select,
+textarea,
+a {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Ensure inline links/icons inside buttons still size up to the target. */
+button > *,
+a[role="button"] > * {
+  display: inline-grid;
+  place-items: center;
+}
+
+/* 2. Suppress the default mobile tap highlight so custom focus rings shine. */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 3. Safe-area insets for notched / dynamic-island devices. */
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+}
+
+/* 4. Keep focus rings visible & offset on mobile keyboards. */
+:focus-visible {
+  outline: 2px solid #ffba0a;
+  outline-offset: 2px;
+}
+
+/* 5. Prevent horizontal overflow at the root so mobile viewports never
+   scroll sideways (complements body { overflow-x: clip } in index.css). */
+html {
+  overflow-x: hidden;
+}
+
+/* 6. Reduce motion already handled above; keep mobile transitions crisp. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Custom scrollbar for search modal results */
 .search-results-scroll::-webkit-scrollbar {
   width: 6px;
