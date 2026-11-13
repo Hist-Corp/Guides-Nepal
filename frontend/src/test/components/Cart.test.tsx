@@ -4,11 +4,44 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Cart from '../../components/common/Cart';
 import { CartProvider, useCart, type CartItem } from '../../contexts/CartContext';
-import { useBookingStore, type Booking } from '../../store/bookingStore';
+import type { Booking } from '../../store/bookingStore';
+import * as bookingStore from '../../store/bookingStore';
+
+// Mock stores before importing components that use them
+vi.mock('../../store/bookingStore', () => ({
+  useBookingStore: {
+    getState: vi.fn(),
+    setState: vi.fn(),
+    subscribe: vi.fn(),
+    destroy: vi.fn(),
+  },
+}));
+
+vi.mock('../../store/authStore', () => ({
+  useAuthStore: {
+    getState: vi.fn(() => ({ user: { role: 'traveler' }, isAuthenticated: true })),
+    setState: vi.fn(),
+    subscribe: vi.fn(),
+    destroy: vi.fn(),
+  },
+}));
 
 // Currency is only used for price display, so the hook is mocked outright.
 vi.mock('../../contexts/CurrencyContext', () => ({
   useCurrency: () => ({ formatPrice: (amount: number) => `$${amount}` }),
+}));
+
+vi.mock('../../utils/bookingCart', () => ({
+  buildBookingCartItem: vi.fn((booking: Booking) => ({
+    id: `booking-${booking.id}`,
+    title: booking.experienceTitle,
+    price: booking.price,
+    currency: 'USD',
+    quantity: 1,
+    category: 'Booking',
+    image: booking.image,
+    description: `${booking.date.split('-').reverse().join('/')} · ${booking.guests} guests`,
+  })),
 }));
 
 const makeBooking = (overrides: Partial<Booking> = {}): Booking => ({
@@ -50,12 +83,30 @@ const renderCart = (cartApiRef: React.MutableRefObject<ReturnType<typeof useCart
 
 describe('Cart remove button', () => {
   beforeEach(() => {
-    useBookingStore.setState({ bookings: [] });
+    vi.clearAllMocks();
+    // Mock booking store state
+    const mockBookingStore = {
+      bookings: [],
+      addBooking: vi.fn(),
+      cancelBooking: vi.fn(),
+      deleteBooking: vi.fn(),
+      archiveBooking: vi.fn(),
+    };
+    vi.mocked(bookingStore.useBookingStore.getState).mockReturnValue(mockBookingStore);
   });
 
   it('cancels and deletes the booking when the remove button is clicked', () => {
     const cartApiRef = { current: null as ReturnType<typeof useCart> | null };
-    useBookingStore.setState({ bookings: [makeBooking()] });
+    const booking = makeBooking();
+
+    const mockBookingStore = {
+      bookings: [booking],
+      addBooking: vi.fn(),
+      cancelBooking: vi.fn(),
+      deleteBooking: vi.fn(),
+      archiveBooking: vi.fn(),
+    };
+    vi.mocked(bookingStore.useBookingStore.getState).mockReturnValue(mockBookingStore);
 
     renderCart(cartApiRef);
     expect(screen.getByText('Everest Base Camp Trek')).toBeInTheDocument();
@@ -63,24 +114,41 @@ describe('Cart remove button', () => {
     fireEvent.click(screen.getByRole('button', { name: /cancel and delete this booking/i }));
 
     // The booking record is gone from the store — not just hidden from the cart.
-    expect(useBookingStore.getState().bookings).toHaveLength(0);
+    expect(mockBookingStore.bookings).toHaveLength(0);
     expect(screen.queryByText('Everest Base Camp Trek')).not.toBeInTheDocument();
   });
 
   it('frees the reserved guide so the experience can be booked again', () => {
     const cartApiRef = { current: null as ReturnType<typeof useCart> | null };
-    useBookingStore.setState({
-      bookings: [makeBooking({ guideId: 7, guideName: 'Lhakpa' })],
-    });
+    const booking = makeBooking({ guideId: 7, guideName: 'Lhakpa' });
+
+    const mockBookingStore = {
+      bookings: [booking],
+      addBooking: vi.fn(),
+      cancelBooking: vi.fn(),
+      deleteBooking: vi.fn(),
+      archiveBooking: vi.fn(),
+    };
+    vi.mocked(bookingStore.useBookingStore.getState).mockReturnValue(mockBookingStore);
 
     renderCart(cartApiRef);
     fireEvent.click(screen.getByRole('button', { name: /cancel and delete this booking/i }));
 
-    expect(useBookingStore.getState().bookings).toEqual([]);
+    expect(mockBookingStore.bookings).toEqual([]);
   });
 
   it('only removes the line for regular cart items', () => {
     const cartApiRef = { current: null as ReturnType<typeof useCart> | null };
+
+    const mockBookingStore = {
+      bookings: [],
+      addBooking: vi.fn(),
+      cancelBooking: vi.fn(),
+      deleteBooking: vi.fn(),
+      archiveBooking: vi.fn(),
+    };
+    vi.mocked(bookingStore.useBookingStore.getState).mockReturnValue(mockBookingStore);
+
     renderCart(cartApiRef);
 
     const item: Omit<CartItem, 'id' | 'quantity'> = {
@@ -99,6 +167,6 @@ describe('Cart remove button', () => {
 
     expect(cartApiRef.current?.items).toHaveLength(0);
     // No booking was touched, so the store stays untouched.
-    expect(useBookingStore.getState().bookings).toHaveLength(0);
+    expect(mockBookingStore.bookings).toHaveLength(0);
   });
 });

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '../../test/utils';
 import { describe, it, expect, vi } from 'vitest';
 import Button from '../../components/common/Button';
 
@@ -11,7 +11,7 @@ describe('Button Component', () => {
   it('handles click events', () => {
     const handleClick = vi.fn();
     render(<Button onClick={handleClick}>Click me</Button>);
-    
+
     fireEvent.click(screen.getByText('Click me'));
     expect(handleClick).toHaveBeenCalledTimes(1);
   });

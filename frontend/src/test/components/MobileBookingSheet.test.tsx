@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '../../test/utils';
 import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
 import { useUIStore } from '../../store/uiStore';
 
@@ -37,20 +37,32 @@ const baseProps = {
 
 describe('MobileBookingSheet', () => {
   beforeEach(() => {
-    useUIStore.setState({ isBookingSheetOpen: false });
+    vi.clearAllMocks();
+    vi.mocked(useUIStore.getState).mockReturnValue({
+      isBookingSheetOpen: false,
+      setBookingSheetOpen: vi.fn(),
+      isCartOpen: false,
+      openCart: vi.fn(),
+      closeCart: vi.fn(),
+      isSearchOpen: false,
+      closeSearch: vi.fn(),
+      searchQuery: '',
+      setSearchQuery: vi.fn(),
+      openSearch: vi.fn(),
+    });
   });
 
   it('renders nothing when closed', () => {
     render(<MobileBookingSheet {...baseProps} open={false} guides={[]} />);
     expect(screen.queryByRole('dialog')).toBeNull();
-    expect(useUIStore.getState().isBookingSheetOpen).toBe(false);
+    expect(vi.mocked(useUIStore.getState).mock.results[0].value.isBookingSheetOpen).toBe(false);
   });
 
   it('flags the uiStore while open (so the support widget hides) and clears on unmount', () => {
     const { unmount } = render(<MobileBookingSheet {...baseProps} guides={[]} />);
-    expect(useUIStore.getState().isBookingSheetOpen).toBe(true);
+    expect(vi.mocked(useUIStore.getState).mock.results[0].value.isBookingSheetOpen).toBe(true);
     unmount();
-    expect(useUIStore.getState().isBookingSheetOpen).toBe(false);
+    expect(vi.mocked(useUIStore.getState).mock.results[0].value.isBookingSheetOpen).toBe(false);
   });
 
   it('shows every booking section: dates, start time, guests, guide', () => {
@@ -161,11 +173,11 @@ describe('MobileBookingSheet', () => {
     const { rerender } = render(
       <MobileBookingSheet {...baseProps} singleDate guests={1} guides={[]} />
     );
-    expect(screen.queryByText(/× 1 guests/)).toBeNull();
+    expect(screen.queryByText(/\u00D7 1 guests/)).toBeNull();
     expect(screen.queryByText('Cleaning fee')).toBeNull();
 
     rerender(<MobileBookingSheet {...baseProps} singleDate guests={3} guides={[]} />);
-    expect(screen.getByText(/× 3 guests/)).toBeInTheDocument();
+    expect(screen.getByText(/\u00D7 3 guests/)).toBeInTheDocument();
     expect(screen.getByText('$135')).toBeInTheDocument(); // 45 x 3
   });
 });

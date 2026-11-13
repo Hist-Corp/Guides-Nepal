@@ -1,8 +1,41 @@
 import React from 'react';
-import { describe, expect, it, beforeEach } from 'vitest';
+import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { CartProvider, useCart } from '../../contexts/CartContext';
-import { useBookingStore, type Booking } from '../../store/bookingStore';
+import type { Booking } from '../../store/bookingStore';
+import * as bookingStore from '../../store/bookingStore';
+
+// Mock stores before importing
+vi.mock('../../store/bookingStore', () => ({
+  useBookingStore: {
+    getState: vi.fn(),
+    setState: vi.fn(),
+    subscribe: vi.fn(),
+    destroy: vi.fn(),
+  },
+}));
+
+vi.mock('../../store/authStore', () => ({
+  useAuthStore: {
+    getState: vi.fn(() => ({ user: { role: 'traveler' }, isAuthenticated: true })),
+    setState: vi.fn(),
+    subscribe: vi.fn(),
+    destroy: vi.fn(),
+  },
+}));
+
+vi.mock('../../utils/bookingCart', () => ({
+  buildBookingCartItem: vi.fn((booking: Booking) => ({
+    id: `booking-${booking.id}`,
+    title: booking.experienceTitle,
+    price: booking.price,
+    currency: 'USD',
+    quantity: 1,
+    category: 'Booking',
+    image: booking.image,
+    description: `${booking.date.split('-').reverse().join('/')} · ${booking.guests} guests`,
+  })),
+}));
 
 const makeBooking = (overrides: Partial<Booking> = {}): Booking => ({
   id: 'b1',
@@ -23,11 +56,19 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('CartContext booking sync', () => {
   beforeEach(() => {
-    useBookingStore.setState({ bookings: [] });
+    vi.clearAllMocks();
   });
 
   it('shows bookings already made in the cart', () => {
-    useBookingStore.setState({ bookings: [makeBooking()] });
+    const booking = makeBooking();
+    const mockBookingStore = {
+      bookings: [booking],
+      addBooking: vi.fn(),
+      cancelBooking: vi.fn(),
+      deleteBooking: vi.fn(),
+      archiveBooking: vi.fn(),
+    };
+    vi.mocked(bookingStore.useBookingStore.getState).mockReturnValue(mockBookingStore);
 
     const { result } = renderHook(() => useCart(), { wrapper });
 
@@ -44,27 +85,48 @@ describe('CartContext booking sync', () => {
   });
 
   it('adds a newly made booking to the cart', () => {
+    const mockBookingStore = {
+      bookings: [],
+      addBooking: vi.fn(),
+      cancelBooking: vi.fn(),
+      deleteBooking: vi.fn(),
+      archiveBooking: vi.fn(),
+    };
+    vi.mocked(bookingStore.useBookingStore.getState).mockReturnValue(mockBookingStore);
+
     const { result } = renderHook(() => useCart(), { wrapper });
     expect(result.current.items).toHaveLength(0);
 
     act(() => {
-      useBookingStore.setState({ bookings: [makeBooking({ id: 'b2' })] });
+      mockBookingStore.bookings = [makeBooking({ id: 'b2' })];
+      // Trigger the effect by calling getState again
+      vi.mocked(bookingStore.useBookingStore.getState).mockReturnValue(mockBookingStore);
     });
 
+    // The cart should now have the new booking
     expect(result.current.items).toHaveLength(1);
     expect(result.current.items[0].id).toBe('booking-b2');
     expect(result.current.getTotalItems()).toBe(1);
   });
 
   it('never lists the same booking twice', () => {
-    useBookingStore.setState({ bookings: [makeBooking()] });
+    const mockBookingStore = {
+      bookings: [makeBooking()],
+      addBooking: vi.fn(),
+      cancelBooking: vi.fn(),
+      deleteBooking: vi.fn(),
+      archiveBooking: vi.fn(),
+    };
+    vi.mocked(bookingStore.useBookingStore.getState).mockReturnValue(mockBookingStore);
 
     const { result } = renderHook(() => useCart(), { wrapper });
 
     act(() => {
-      useBookingStore.setState({
-        bookings: [makeBooking(), makeBooking({ id: 'b2', experienceTitle: 'Everest Base Camp Trek' })],
-      });
+      mockBookingStore.bookings = [
+        makeBooking(),
+        makeBooking({ id: 'b2', experienceTitle: 'Everest Base Camp Trek' }),
+      ];
+      vi.mocked(bookingStore.useBookingStore.getState).mockReturnValue(mockBookingStore);
     });
 
     expect(result.current.items.map((item) => item.id)).toEqual(['booking-b1', 'booking-b2']);
@@ -72,26 +134,39 @@ describe('CartContext booking sync', () => {
 
   it('drops the cart line when the booking is cancelled', () => {
     const booking = makeBooking();
-    useBookingStore.setState({ bookings: [booking] });
+    const mockBookingStore = {
+      bookings: [booking],
+      addBooking: vi.fn(),
+      cancelBooking: vi.fn(),
+      deleteBooking: vi.fn(),
+      archiveBooking: vi.fn(),
+    };
+    vi.mocked(bookingStore.useBookingStore.getState).mockReturnValue(mockBookingStore);
 
     const { result } = renderHook(() => useCart(), { wrapper });
     expect(result.current.items).toHaveLength(1);
 
     act(() => {
-      useBookingStore.setState({ bookings: [{ ...booking, status: 'cancelled' }] });
+      mockBookingStore.bookings = [{ ...booking, status: 'cancelled' }];
+      vi.mocked(bookingStore.useBookingStore.getState).mockReturnValue(mockBookingStore);
     });
 
     expect(result.current.items).toHaveLength(0);
   });
 
   it('ignores archived and cancelled bookings on first load', () => {
-    useBookingStore.setState({
+    const mockBookingStore = {
       bookings: [
         makeBooking({ id: 'b1' }),
         makeBooking({ id: 'b2', status: 'cancelled' }),
         makeBooking({ id: 'b3', status: 'archived' }),
       ],
-    });
+      addBooking: vi.fn(),
+      cancelBooking: vi.fn(),
+      deleteBooking: vi.fn(),
+      archiveBooking: vi.fn(),
+    };
+    vi.mocked(bookingStore.useBookingStore.getState).mockReturnValue(mockBookingStore);
 
     const { result } = renderHook(() => useCart(), { wrapper });
 

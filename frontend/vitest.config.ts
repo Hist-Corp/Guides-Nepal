@@ -12,14 +12,9 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
-      exclude: [
-        'node_modules/',
-        'src/test/',
-        '**/*.d.ts',
-        '**/*.config.*',
-        '**/mocks/**',
-      ],
+      exclude: ['node_modules/', 'src/test/', '**/*.d.ts', '**/*.config.*', '**/mocks/**'],
     },
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
   },
   resolve: {
     alias: {

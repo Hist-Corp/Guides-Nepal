@@ -1,3 +1,6 @@
+// Global test setup - mock localStorage and stores before any imports
+import { vi, beforeAll, afterAll } from 'vitest';
+
 // Mock localStorage before any imports that might use it (e.g., zustand persist)
 class MemoryStorage {
   private data = new Map<string, string>();
@@ -82,8 +85,10 @@ window.ResizeObserver = class ResizeObserver {
   }
 };
 
+// Mock scrollTo
+window.scrollTo = vi.fn();
+
 // Suppress console errors during tests (optional)
-import { vi, beforeAll, afterAll } from 'vitest';
 const originalError = console.error;
 beforeAll(() => {
   console.error = (...args) => {
