@@ -69,6 +69,9 @@ export const Header: React.FC = () => {
   // page, matching the original design
   const showSolidBackground = hasPassedTopBlock;
   const isHostApplicationPage = location.pathname === '/host-application';
+  // Experience pages (/city/:cityId/experience/:slug) have their own sticky nav;
+  // collapse the Header mobile menu so only one menu system appears.
+  const isExperiencePage = /^\/city\/[^/]+\/experience/.test(location.pathname);
 
   // Customer support widget driven from the hamburger menu on mobile. On desktop
   // the widget keeps its own floating FAB state (unchanged).

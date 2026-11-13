@@ -268,6 +268,9 @@ a[role="button"] > * {
    scroll sideways (complements body { overflow-x: clip } in index.css). */
 html {
   overflow-x: hidden;
+  /* Ensure fixed-position elements (sticky nav, modals) do not exceed
+     viewport width on touch devices where the address bar may shift. */
+  touch-action: manipulation;
 }
 
 /* 6. Reduce motion already handled above; keep mobile transitions crisp. */
