@@ -1,10 +1,4 @@
-import '@testing-library/jest-dom/vitest';
-import { vi, beforeAll, afterAll } from 'vitest';
-
-// Node 25 can expose a global `localStorage` without a backing file (setItem is
-// undefined, with a --localstorage-file warning) and jsdom mirrors that object.
-// zustand's persist middleware then throws on the first setState of a persisted
-// store, so swap in an in-memory Storage whenever the default can't store.
+// Mock localStorage before any imports that might use it (e.g., zustand persist)
 class MemoryStorage {
   private data = new Map<string, string>();
 
@@ -33,44 +27,22 @@ class MemoryStorage {
   }
 }
 
-const localStorageWorks = (() => {
-  try {
-    const probeKey = '__vitest_storage_probe__';
-    localStorage.setItem(probeKey, '1');
-    localStorage.removeItem(probeKey);
-    return true;
-  } catch {
-    return false;
-  }
-})();
+const memoryStorage = new MemoryStorage();
 
-if (!localStorageWorks) {
-  const memory = new MemoryStorage();
-  try {
-    Object.defineProperty(globalThis, 'localStorage', {
-      configurable: true,
-      writable: true,
-      value: memory,
-    });
-  } catch {
-    // Global not redefinable - patch the existing object in place instead.
-    Object.assign(localStorage, {
-      getItem: memory.getItem.bind(memory),
-      setItem: memory.setItem.bind(memory),
-      removeItem: memory.removeItem.bind(memory),
-      clear: memory.clear.bind(memory),
-      key: memory.key.bind(memory),
-    });
-  }
-  try {
-    Object.defineProperty(window, 'localStorage', {
-      configurable: true,
-      writable: true,
-      value: memory,
-    });
-  } catch {
-    // jsdom's window may not allow redefinition; module scope sees the global.
-  }
+Object.defineProperty(globalThis, 'localStorage', {
+  configurable: true,
+  writable: true,
+  value: memoryStorage,
+});
+
+try {
+  Object.defineProperty(window, 'localStorage', {
+    configurable: true,
+    writable: true,
+    value: memoryStorage,
+  });
+} catch {
+  // jsdom's window may not allow redefinition; module scope sees the global.
 }
 
 // Mock window.matchMedia
@@ -80,8 +52,8 @@ Object.defineProperty(window, 'matchMedia', {
     matches: false,
     media: query,
     onchange: null,
-    addListener: vi.fn(), // deprecated
-    removeListener: vi.fn(), // deprecated
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
@@ -111,6 +83,7 @@ window.ResizeObserver = class ResizeObserver {
 };
 
 // Suppress console errors during tests (optional)
+import { vi, beforeAll, afterAll } from 'vitest';
 const originalError = console.error;
 beforeAll(() => {
   console.error = (...args) => {
@@ -127,3 +100,6 @@ beforeAll(() => {
 afterAll(() => {
   console.error = originalError;
 });
+
+// Import jest-dom matchers after mocks are set up
+import '@testing-library/jest-dom/vitest';
