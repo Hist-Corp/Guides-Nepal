@@ -1,4 +1,4 @@
-import { act, render, screen, fireEvent, within, waitFor } from '@testing-library/react';
+import { act, render, screen, fireEvent, within, waitFor } from '../../test/utils';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ExperiencePage from '../../pages/ExperiencePage';

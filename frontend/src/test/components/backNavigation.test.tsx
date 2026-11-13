@@ -1,11 +1,8 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '../../test/utils';
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
 import BackNavigationTracker from '../../components/routing/BackNavigationTracker';
-import {
-  resetBackNavigationState,
-  resolveBackTarget,
-} from '../../utils/backNavigation';
+import { resetBackNavigationState, resolveBackTarget } from '../../utils/backNavigation';
 import { useGoBack } from '../../utils/backNavigation';
 
 const HOME = '/';
@@ -55,7 +52,7 @@ const renderApp = () =>
         <Route path="/experience/:id" element={<Navigate to={EXPERIENCE} replace />} />
         <Route path="*" element={<Harness />} />
       </Routes>
-    </BrowserRouter>,
+    </BrowserRouter>
   );
 
 const click = (name: string) => fireEvent.click(screen.getByRole('button', { name }));
@@ -65,7 +62,7 @@ describe('resolveBackTarget', () => {
   it('resolves a city experience page to its city landing page', () => {
     expect(resolveBackTarget(EXPERIENCE)).toBe(CITY);
     expect(resolveBackTarget('/city/kathmandu/experience/treasures-of-kathmandu-buddhism')).toBe(
-      '/city/kathmandu',
+      '/city/kathmandu'
     );
   });
 

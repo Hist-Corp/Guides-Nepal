@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render } from '../../test/utils';
 import { describe, expect, it } from 'vitest';
 import { StickyBarPortal } from '../../components/common/StickyBarPortal';
 

@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen } from '../../test/utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Reveal from '../../components/common/Reveal';
 

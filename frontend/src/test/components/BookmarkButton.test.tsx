@@ -1,13 +1,22 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '../../test/utils';
 import { BookmarkButton } from '../../components/common/BookmarkButton';
 import { useProfileStore } from '../../store/profileStore';
 
 // Currency and cart are not involved, so only the router-free plain render.
 describe('BookmarkButton', () => {
   beforeEach(() => {
-    useProfileStore.setState({ profile: { travelPhotos: [], bookmarks: [] } });
+    vi.clearAllMocks();
+    vi.mocked(useProfileStore.getState).mockReturnValue({
+      profile: { travelPhotos: [], bookmarks: [] },
+      updateProfile: vi.fn(),
+      addPhoto: vi.fn(),
+      removePhoto: vi.fn(),
+      addBookmark: vi.fn(),
+      removeBookmark: vi.fn(),
+      clearAll: vi.fn(),
+    });
   });
 
   it('adds the experience to bookmarks on first click', () => {
@@ -26,7 +35,7 @@ describe('BookmarkButton', () => {
 
     fireEvent.click(button);
 
-    expect(useProfileStore.getState().profile.bookmarks).toEqual([
+    expect(vi.mocked(useProfileStore.getState).mock.results[0].value.profile.bookmarks).toEqual([
       expect.objectContaining({
         id: 'exp-nagarkot-day-trip',
         title: 'Nagarkot Day Trip',
@@ -38,7 +47,7 @@ describe('BookmarkButton', () => {
   });
 
   it('removes the bookmark on the next click and reflects the saved state', () => {
-    useProfileStore.setState({
+    vi.mocked(useProfileStore.getState).mockReturnValue({
       profile: {
         travelPhotos: [],
         bookmarks: [
@@ -49,6 +58,12 @@ describe('BookmarkButton', () => {
           },
         ],
       },
+      updateProfile: vi.fn(),
+      addPhoto: vi.fn(),
+      removePhoto: vi.fn(),
+      addBookmark: vi.fn(),
+      removeBookmark: vi.fn(),
+      clearAll: vi.fn(),
     });
 
     render(<BookmarkButton id="exp-nagarkot-day-trip" title="Nagarkot Day Trip" />);
@@ -57,7 +72,9 @@ describe('BookmarkButton', () => {
     expect(button).toHaveAttribute('aria-pressed', 'true');
 
     fireEvent.click(button);
-    expect(useProfileStore.getState().profile.bookmarks).toHaveLength(0);
+    expect(
+      vi.mocked(useProfileStore.getState).mock.results[0].value.profile.bookmarks
+    ).toHaveLength(0);
   });
 
   it('never navigates the card underneath', () => {
@@ -68,7 +85,7 @@ describe('BookmarkButton', () => {
       </div>
     );
 
-    fireEvent.click(screen.getByRole('button'));
+    fireEvent.click(screen.getByRole('button', { name: /bookmark test/i }));
     expect(parentClick).not.toHaveBeenCalled();
   });
 });
