@@ -1,5 +1,4 @@
 import { API_BASE_URL } from '../config/api';
-import { useAuthStore } from '../store/authStore';
 
 export interface GuideAvailability {
   guideId: number;
@@ -61,7 +60,17 @@ const authHeaders = (token: string): HeadersInit => ({
 });
 
 export const bookingApi = {
+  /**
+   * Fetch available guides for an experience on a given date.
+   * Supports optional filtering by guest count, category, and city.
+   * 
+   * @param token - Authentication token (passed from component, not fetched internally)
+   * @param experienceId - The experience ID to get guides for
+   * @param filters - Optional filtering parameters (date, guestCount, category, city)
+   * @returns Promise resolving to array of available guides
+   */
   getAvailableGuides: async (
+    token: string,
     experienceId: number | string,
     filters?: AvailabilityFilter,
   ): Promise<GuideAvailability[]> => {
@@ -72,10 +81,9 @@ export const bookingApi = {
     if (filters?.city) params.set('city', filters.city);
 
     const url = `${API_BASE_URL}/experiences/${experienceId}/guides?${params.toString()}`;
-    const { accessToken } = useAuthStore.getState();
-    if (!accessToken) throw new Error('Not authenticated');
+    if (!token) throw new Error('Authentication token required');
 
-    const res = await fetch(url, { headers: authHeaders(accessToken) });
+    const res = await fetch(url, { headers: authHeaders(token) });
     if (!res.ok) {
       const detail = (await res.json().catch(() => ({}))).detail;
       throw new Error(detail || 'Unable to load available guides.');
@@ -83,9 +91,16 @@ export const bookingApi = {
     return res.json();
   },
 
-  createBooking: async (payload: BookingRequest): Promise<BookingResponse> => {
-    const { accessToken, refreshTokens } = useAuthStore.getState();
-    if (!accessToken) throw new Error('Not authenticated');
+  /**
+   * Create a booking with idempotency key to prevent duplicate submissions
+   * when network retries occur.
+   * 
+   * @param token - Authentication token (passed from component)
+   * @param payload - Booking request payload
+   * @returns Promise resolving to booking response
+   */
+  createBooking: async (token: string, payload: BookingRequest): Promise<BookingResponse> => {
+    if (!token) throw new Error('Authentication token required');
 
     const idempotencyKey = generateIdempotencyKey();
 
@@ -110,14 +125,9 @@ export const bookingApi = {
       });
     };
 
-    const response = await attempt(accessToken);
+    const response = await attempt(token);
 
     if (response.status === 401) {
-      const refreshed = await refreshTokens();
-      if (refreshed) {
-        const nextToken = useAuthStore.getState().accessToken;
-        if (nextToken) return attempt(nextToken);
-      }
       throw new Error('Session expired. Please log in again.');
     }
 
@@ -134,20 +144,29 @@ export const bookingApi = {
     return response.json();
   },
 
+  /**
+   * Check real-time availability for a specific guide, date, and time slot.
+   * 
+   * @param token - Authentication token
+   * @param guideId - The guide's ID
+   * @param date - The date to check availability for
+   * @param timeSlot - Optional time slot to check
+   * @returns Promise resolving to availability status
+   */
   checkAvailability: async (
+    token: string,
     guideId: number,
     date: string,
     timeSlot?: string,
   ): Promise<{ isAvailable: boolean; spotsRemaining: number; message?: string }> => {
-    const { accessToken } = useAuthStore.getState();
-    if (!accessToken) throw new Error('Not authenticated');
+    if (!token) throw new Error('Not authenticated');
 
     const params = new URLSearchParams({ date });
     if (timeSlot) params.set('time_slot', timeSlot);
 
     const res = await fetch(
       `${API_BASE_URL}/guides/${guideId}/availability?${params.toString()}`,
-      { headers: authHeaders(accessToken) },
+      { headers: authHeaders(token) },
     );
     if (!res.ok) {
       const detail = (await res.json().catch(() => ({}))).detail;
@@ -156,16 +175,23 @@ export const bookingApi = {
     return res.json();
   },
 
-  cancelBooking: async (bookingId: string): Promise<void> => {
-    const { accessToken } = useAuthStore.getState();
-    if (!accessToken) throw new Error('Not authenticated');
+  /**
+   * Cancel a booking (releases the guide slot).
+   * 
+   * @param token - Authentication token
+   * @param bookingId - The booking ID to cancel
+   * @returns Promise resolving to void
+   */
+  cancelBooking: async (token: string, bookingId: string): Promise<void> => {
+    if (!token) throw new Error('Not authenticated');
 
     const res = await fetch(`${API_BASE_URL}/bookings/${bookingId}`, {
       method: 'DELETE',
-      headers: authHeaders(accessToken),
+      headers: authHeaders(token),
     });
     if (!res.ok) {
       const detail = (await res.json().catch(() => ({}))).detail;
       throw new Error(detail || 'Unable to cancel booking.');
     }
   },
+};
