@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+:root {
+    font-family: "SF Pro", "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", "Roboto", "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+}
+
+/* Prevent horizontal overflow (scrollbars from wide fixed elements) without breaking sticky header */
+body {
+  overflow-x: clip;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Shutter flash animation - transparent to white to transparent in 150ms */
+@keyframes shutterFlash {
+  0% { background-color: transparent; }
+  50% { background-color: #ffffff; }
+  100% { background-color: transparent; }
+}

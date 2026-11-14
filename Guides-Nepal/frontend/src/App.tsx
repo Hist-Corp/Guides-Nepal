@@ -1,0 +1,293 @@
+import { BrowserRouter as Router, Navigate, Routes, Route } from 'react-router-dom';
+import SkipLink from './components/common/SkipLink';
+import ScrollToTop from './components/common/ScrollToTop';
+import MailaDaiWidget from './components/common/MailaDaiWidget';
+import CookieConsent from './components/common/CookieConsent';
+import Analytics from './components/common/Analytics';
+import PageReveal from './components/common/PageReveal';
+import CmsEditMode from './components/common/CmsEditMode';
+import CmsPreviewBridge from './components/CmsPreviewBridge';
+import { GlobalImageFallback } from './components/common/GlobalImageFallback';
+import { CurrencyProvider } from './contexts/CurrencyContext';
+import { CartProvider } from './contexts/CartContext';
+import { useUIStore } from './store/uiStore';
+import { flushPendingSubmissions } from './services/publicApi';
+
+// Re-deliver any form submissions queued while the backend was offline.
+flushPendingSubmissions();
+import Cart from './components/common/Cart';
+import HomePage from './pages/HomePage';
+import SearchPage from './pages/SearchPage';
+import CanonicalExperienceRoute from './components/routing/CanonicalExperienceRoute';
+import { CityExperienceRoute, ExperienceKindRoute } from './components/routing/ExperienceKindRoute';
+import BackNavigationTracker from './components/routing/BackNavigationTracker';
+import LegacyGuideRedirect from './components/routing/LegacyGuideRedirect';
+import SeoExperiencePage from './pages/SeoExperiencePage';
+import CityPage from './pages/CityPage';
+import KathmanduPage from './pages/kathmandu/KathmanduPage';
+import KathmanduExperiencesPage from './pages/kathmandu/KathmanduExperiencesPage';
+import KathmanduExperiencePage from './pages/kathmandu/KathmanduExperiencePage';
+import PokharaPage from './pages/pokhara/PokharaPage';
+import PokharaExperiencesPage from './pages/pokhara/PokharaExperiencesPage';
+import PokharaExperiencePage from './pages/pokhara/PokharaExperiencePage';
+import LalitpurPage from './pages/lalitpur/LalitpurPage';
+import LalitpurExperiencesPage from './pages/lalitpur/LalitpurExperiencesPage';
+import LalitpurExperiencePage from './pages/lalitpur/LalitpurExperiencePage';
+import BhaktapurPage from './pages/bhaktapur/BhaktapurPage';
+import BhaktapurExperiencesPage from './pages/bhaktapur/BhaktapurExperiencesPage';
+import BhaktapurExperiencePage from './pages/bhaktapur/BhaktapurExperiencePage';
+import BharatpurPage from './pages/bharatpur/BharatpurPage';
+import BharatpurExperiencesPage from './pages/bharatpur/BharatpurExperiencesPage';
+import BharatpurExperiencePage from './pages/bharatpur/BharatpurExperiencePage';
+import LocalProfilePage from './pages/LocalProfilePage';
+import GalleryPage from './pages/GalleryPage';
+import ContactGuidePage from './pages/ContactGuidePage';
+import ImpactReportPage from './pages/ImpactReportPage';
+import NightTourPage from './pages/NightTourPage';
+import BikeTourPage from './pages/BikeTourPage';
+import ExplorePage from './pages/ExplorePage';
+import BecomeHostPage from './pages/host/BecomeHostPage';
+import HostApplicationWizard from './pages/host/HostApplicationWizard';
+import HostDashboardPage from './pages/host/HostDashboardPage';
+import HostExperiencesPage from './pages/host/HostExperiencesPage';
+import HostBookingsPage from './pages/host/HostBookingsPage';
+import HostEarningsPage from './pages/host/HostEarningsPage';
+import HostSettingsPage from './pages/host/HostSettingsPage';
+import GuideRegistrationWizard from './pages/guide/GuideRegistrationWizard';
+import GuideDashboardPage from './pages/guide/GuideDashboardPage';
+import GuideListingsPage from './pages/guide/GuideListingsPage';
+import GuideListingFormPage from './pages/guide/GuideListingFormPage';
+import GuideExperienceRequestPage from './pages/guide/GuideExperienceRequestPage';
+import GuideExperienceRequestDetailsPage from './pages/guide/GuideExperienceRequestDetailsPage';
+import GuideProposalsPage from './pages/guide/GuideProposalsPage';
+import GuideProposalFormPage from './pages/guide/GuideProposalFormPage';
+import GuideProposalDetailPage from './pages/guide/GuideProposalDetailPage';
+import GuideChangeRequestFormPage from './pages/guide/GuideChangeRequestFormPage';
+import GuideChangeRequestDetailPage from './pages/guide/GuideChangeRequestDetailPage';
+import RegionalGuideApplications from './pages/regional/RegionalGuideApplications';
+import RegionalExperienceRequestReview from './pages/regional/RegionalExperienceRequestReview';
+import BookingsPage from './pages/user/BookingsPage';
+import GuideBookingsPage from './pages/guide/GuideBookingsPage';
+import RoleProfilePage from './pages/user/RoleProfilePage';
+import PublicGuideListingsPage from './pages/user/PublicGuideListingsPage';
+import AccountSettingsPage from './pages/user/AccountSettingsPage';
+import FavoritesPage from './pages/user/FavoritesPage';
+import ChatPage from './pages/user/ChatPage';
+import ConsentPage from './pages/ConsentPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import NotFoundPage from './pages/NotFoundPage';
+import MailaDaiChatPage from './pages/MailaDaiChatPage';
+import GuideChatPage from './pages/messages/GuideChatPage';
+import TravellerMessagesPage from './pages/messages/TravellerMessagesPage';
+import OAuthCallback from './pages/auth/OAuthCallback';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+
+import MostPopularPage from './pages/MostPopularPage';
+import MostDeliciousPage from './pages/MostDeliciousPage';
+import RealGoodTravelPage from './pages/RealGoodTravelPage';
+import { FoodToursPage } from './pages/FoodToursPage';
+import CulturalToursPage from './pages/CulturalToursPage';
+import OutdoorActivitiesPage from './pages/OutdoorActivitiesPage';
+import TrekHikingPage from './pages/TrekHikingPage';
+import CookingClassesPage from './pages/CookingClassesPage';
+import CookingExperiencePage from './pages/cooking/CookingExperiencePage';
+import CookingExperiencesPage from './pages/cooking/CookingExperiencesPage';
+import FoodTourCulturePage from './pages/food/FoodTourCulturePage';
+
+// Footer Pages
+import AboutPage from './pages/AboutPage';
+import JobsPage from './pages/JobsPage';
+import BlogPage from './pages/BlogPage';
+import BlogDetailPage from './pages/BlogDetailPage';
+import PressPage from './pages/PressPage';
+import SustainabilityPage from './pages/SustainabilityPage';
+import DestinationsPage from './pages/DestinationsPage';
+import HowItWorksPage from './pages/HowItWorksPage';
+import GiftCardsPage from './pages/GiftCardsPage';
+import HostCenterPage from './pages/HostCenterPage';
+import ContactPage from './pages/ContactPage';
+import FaqPage from './pages/FaqPage';
+import TermsPage from './pages/TermsPage';
+import HelpPage from './pages/HelpPage';
+import HostingPage from './pages/HostingPage';
+import CommunityPage from './pages/CommunityPage';
+
+function App() {
+  const isCartOpen = useUIStore((s) => s.isCartOpen);
+  const closeCart = useUIStore((s) => s.closeCart);
+
+  const isCmsPreview =
+    typeof window !== 'undefined' && window.location.search.includes('cms-preview=1');
+
+  return (
+    <CurrencyProvider>
+      <CartProvider>
+        <SkipLink />
+      <Router>
+          <CmsEditMode />
+          {isCmsPreview && <CmsPreviewBridge />}
+          <ScrollToTop />
+          <BackNavigationTracker />
+          <PageReveal />
+          <GlobalImageFallback />
+          <Cart isOpen={isCartOpen} onClose={closeCart} />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/most-popular" element={<MostPopularPage />} />
+            <Route path="/most-delicious" element={<MostDeliciousPage />} />
+            <Route path="/real-good-travel" element={<RealGoodTravelPage />} />
+            <Route path="/food-tours" element={<FoodToursPage />} />
+            <Route path="/food-tours/culture/:slug" element={<FoodTourCulturePage />} />
+            <Route path="/cultural-tours" element={<CulturalToursPage />} />
+            <Route path="/outdoor-activities" element={<OutdoorActivitiesPage />} />
+            <Route path="/trek-hiking" element={<TrekHikingPage />} />
+            <Route path="/night-tour" element={<NightTourPage />} />
+            <Route path="/bike-tour" element={<BikeTourPage />} />
+            <Route path="/cooking-classes" element={<CookingClassesPage />} />
+            <Route path="/cooking-classes/experiences" element={<CookingExperiencesPage />} />
+            <Route path="/cooking-classes/experience/:slug" element={<CookingExperiencePage />} />
+            <Route path="/explore" element={<ExplorePage />} />
+            <Route path="/become-host" element={<BecomeHostPage />} />
+            <Route path="/host-application" element={<HostApplicationWizard />} />
+            <Route path="/host/dashboard" element={<HostDashboardPage />} />
+            <Route path="/host/experiences" element={<HostExperiencesPage />} />
+            <Route path="/host/bookings" element={<HostBookingsPage />} />
+            <Route path="/host/earnings" element={<HostEarningsPage />} />
+            <Route path="/host/settings" element={<HostSettingsPage />} />
+            <Route path="/guide-registration" element={<GuideRegistrationWizard />} />
+            <Route path="/become-guide" element={<Navigate to="/guide-registration" replace />} />
+            <Route
+              path="/guide-application"
+              element={<Navigate to="/guide-registration" replace />}
+            />
+            <Route path="/bookings" element={<BookingsPage />} />
+            <Route path="/guide/dashboard" element={<GuideDashboardPage />} />
+            <Route path="/guide/listings" element={<GuideListingsPage />} />
+            <Route path="/guide/listings/new" element={<GuideExperienceRequestPage />} />
+            <Route
+              path="/guide/listings/new/details"
+              element={<GuideExperienceRequestDetailsPage />}
+            />
+            <Route path="/guide/listings/:id/edit" element={<GuideListingFormPage />} />
+            <Route
+              path="/guide/listings/:id/propose-change"
+              element={<GuideChangeRequestFormPage />}
+            />
+            <Route path="/guide/proposals" element={<GuideProposalsPage />} />
+            <Route path="/guide/proposals/new" element={<GuideProposalFormPage />} />
+            <Route path="/guide/proposals/:id" element={<GuideProposalDetailPage />} />
+            <Route path="/guide/proposals/:id/edit" element={<GuideProposalFormPage />} />
+            <Route path="/guide/change-requests/:id" element={<GuideChangeRequestDetailPage />} />
+            <Route path="/guide/bookings" element={<GuideBookingsPage />} />
+            <Route path="/regional/guide-applications" element={<RegionalGuideApplications />} />
+            <Route
+              path="/regional/experience-requests"
+              element={<RegionalExperienceRequestReview />}
+            />
+            <Route path="/profile" element={<RoleProfilePage />} />
+            <Route path="/listings" element={<PublicGuideListingsPage />} />
+            {/* Public profile of one guide by catalog id; the slug URL below
+                is the canonical one used across the site. */}
+            <Route path="/guides/:id" element={<LocalProfilePage />} />
+            <Route path="/account" element={<AccountSettingsPage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/chat" element={<ChatPage />} />
+            <Route path="/messages" element={<TravellerMessagesPage />} />
+            <Route path="/messages/guide/:guideId" element={<GuideChatPage />} />
+            <Route path="/maila-dai" element={<MailaDaiChatPage />} />
+            <Route path="/consent" element={<ConsentPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/impact-report-2024" element={<ImpactReportPage />} />
+            <Route path="/experience/seo/:slug" element={<SeoExperiencePage />} />
+            <Route path="/experience/:id" element={<CanonicalExperienceRoute />} />
+
+            {/* Trek & hike detail pages: /trek/<name> and /hike/<name> — the
+                same city experience workflow under kind-canonical URLs. */}
+            <Route path="/trek/:slug" element={<ExperienceKindRoute kind="trek" />} />
+            <Route path="/hike/:slug" element={<ExperienceKindRoute kind="hike" />} />
+            <Route path="/auth/callback" element={<OAuthCallback />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+            {/* Kathmandu Routes */}
+            <Route path="/city/kathmandu" element={<KathmanduPage />} />
+            <Route path="/city/kathmandu/experiences" element={<KathmanduExperiencesPage />} />
+            <Route
+              path="/city/kathmandu/experience/:slug"
+              element={<CityExperienceRoute Page={KathmanduExperiencePage} />}
+            />
+
+            {/* Pokhara Routes */}
+            <Route path="/city/pokhara" element={<PokharaPage />} />
+            <Route path="/city/pokhara/experiences" element={<PokharaExperiencesPage />} />
+            <Route
+              path="/city/pokhara/experience/:slug"
+              element={<CityExperienceRoute Page={PokharaExperiencePage} />}
+            />
+
+            {/* Lalitpur Routes */}
+            <Route path="/city/lalitpur" element={<LalitpurPage />} />
+            <Route path="/city/lalitpur/experiences" element={<LalitpurExperiencesPage />} />
+            <Route
+              path="/city/lalitpur/experience/:slug"
+              element={<CityExperienceRoute Page={LalitpurExperiencePage} />}
+            />
+
+            {/* Bhaktapur Routes */}
+            <Route path="/city/bhaktapur" element={<BhaktapurPage />} />
+            <Route path="/city/bhaktapur/experiences" element={<BhaktapurExperiencesPage />} />
+            <Route
+              path="/city/bhaktapur/experience/:slug"
+              element={<CityExperienceRoute Page={BhaktapurExperiencePage} />}
+            />
+
+            {/* Bharatpur Routes */}
+            <Route path="/city/bharatpur" element={<BharatpurPage />} />
+            <Route path="/city/bharatpur/experiences" element={<BharatpurExperiencesPage />} />
+            <Route
+              path="/city/bharatpur/experience/:slug"
+              element={<CityExperienceRoute Page={BharatpurExperiencePage} />}
+            />
+
+            <Route path="/guidesprofile/:slug" element={<LocalProfilePage />} />
+            <Route path="/guidesprofile/:slug/gallery" element={<GalleryPage />} />
+            <Route path="/guidesprofile/:slug/contact" element={<ContactGuidePage />} />
+
+            {/* Legacy numeric profile URLs permanently redirect to the slug URL. */}
+            <Route path="/local/:id" element={<LegacyGuideRedirect />} />
+            <Route path="/local/:id/gallery" element={<LegacyGuideRedirect section="gallery" />} />
+            <Route path="/local/:id/contact" element={<LegacyGuideRedirect section="contact" />} />
+            <Route path="/city/:cityId" element={<CityPage />} />
+
+            {/* Footer Pages */}
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/jobs" element={<JobsPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogDetailPage />} />
+            <Route path="/press" element={<PressPage />} />
+            <Route path="/sustainability" element={<SustainabilityPage />} />
+            <Route path="/destinations" element={<DestinationsPage />} />
+            <Route path="/how-it-works" element={<HowItWorksPage />} />
+            <Route path="/gift-cards" element={<GiftCardsPage />} />
+            <Route path="/host-center" element={<HostCenterPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/faq" element={<FaqPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/help" element={<HelpPage />} />
+            <Route path="/hosting" element={<HostingPage />} />
+            <Route path="/community" element={<CommunityPage />} />
+            <Route path="/host" element={<BecomeHostPage />} />
+            <Route path="/careers" element={<JobsPage />} />
+
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+          <MailaDaiWidget />
+          <CookieConsent />
+          <Analytics />
+        </Router>
+      </CartProvider>
+    </CurrencyProvider>
+  );
+}
+
+export default App;

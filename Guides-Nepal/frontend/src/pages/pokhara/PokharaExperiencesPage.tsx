@@ -1,0 +1,102 @@
+import React from 'react';
+import { Header } from '../../components/common/Header';
+import { Footer } from '../../components/common/Footer';
+import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useGoBack } from '../../utils/backNavigation';
+import { useCurrency } from '../../contexts/CurrencyContext';
+import { pokharaRichData } from '../../data/pokharaRichData';
+import { experienceDetailPath } from '../../utils/canonicalExperience';
+
+export const PokharaExperiencesPage: React.FC = () => {
+  const navigate = useNavigate();
+  const goBack = useGoBack();
+  const { formatPrice } = useCurrency();
+
+  return (
+    <div className="min-h-screen flex flex-col font-sans bg-gray-50">
+      <Header />
+
+      <main id="main-content" className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="mb-8">
+          <button
+            onClick={goBack}
+            className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Back
+          </button>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Experiences in Pokhara</h1>
+          <p className="text-gray-500">
+            Discover {pokharaRichData.length} unique activities hosted by locals
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {pokharaRichData.map((tour) => (
+            <div
+              key={tour.id}
+              className="flex flex-col bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer"
+              onClick={() => {
+                navigate(experienceDetailPath('pokhara', tour.slug));
+                window.scrollTo({ top: 0, behavior: 'instant' });
+              }}
+            >
+              <div className="relative h-48 aspect-[4/3] overflow-hidden">
+                <img
+                  src={tour.heroImage}
+                  alt={tour.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                {tour.type && (
+                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide text-gray-800">
+                    {tour.type}
+                  </div>
+                )}
+                {/* Heart Icon Placeholder */}
+                <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center hover:bg-white transition-colors">
+                  <div className="w-4 h-4 border-2 border-gray-400 rounded-full"></div>
+                </div>
+              </div>
+
+              <div className="flex-1 p-5 flex flex-col">
+                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">
+                  {tour.city || 'Pokhara'}
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2 leading-snug line-clamp-2 group-hover:text-[#213448] transition-colors">
+                  {tour.title}
+                </h3>
+
+                <div className="flex items-center gap-2 text-xs text-gray-500 mb-4">
+                  <span>{tour.duration}</span>
+                  <span>•</span>
+                  <span>Free cancellation</span>
+                </div>
+
+                <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={tour.host.image}
+                      className="w-8 h-8 rounded-full border-2 border-white object-cover"
+                    />
+                    <span className="text-xs text-gray-500 line-clamp-1">By {tour.host.name}</span>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-[10px] text-gray-400 uppercase">From</div>
+                    <div className="text-lg font-bold text-secondary">
+                      {' '}
+                      {formatPrice(tour.price)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+export default PokharaExperiencesPage;

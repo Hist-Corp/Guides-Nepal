@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" rx="12" fill="url(#bg)"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fed7aa"/>
+      <stop offset="1" stop-color="#f97316"/>
+    </linearGradient>
+  </defs>
+  <path d="M150 200 L250 200 L230 120 L170 120 Z" fill="#c2410c"/>
+  <path d="M130 200 L110 250 L290 250 L270 200 Z" fill="#ea580c"/>
+  <path d="M200 120 L230 150 L170 150 Z" fill="#f97316"/>
+  <rect x="185" y="95" width="30" height="25" fill="#c2410c"/>
+  <path d="M200 80 L215 95 L185 95 Z" fill="#ea580c"/>
+  <text x="200" y="285" font-family="Arial" font-size="14" fill="#9a3412" text-anchor="middle">Bhaktapur · Medieval Durbar Square</text>
+</svg>

@@ -1,0 +1,67 @@
+# Scripts
+
+This directory contains automation scripts for the Guides Nepal project.
+
+## Available Scripts
+
+### setup.js
+
+Automated setup script for the development environment.
+
+```bash
+node scripts/setup.js
+# or: npm run setup
+```
+
+This script will:
+1. Check for required prerequisites (Node.js, npm, Python, pip, Git)
+2. Create environment files from templates
+3. Install frontend dependencies
+4. Install dashboard dependencies
+5. Set up Python virtual environment and install backend dependencies
+6. Optionally set up the database
+7. Install git hooks
+
+### run-eslint.js
+
+Helper used to run ESLint consistently across workspace packages (used by lint tooling).
+
+## Usage
+
+### Initial Setup
+
+```bash
+# Run the automated setup
+npm run setup
+```
+
+### Manual Setup
+
+If you prefer to set up manually:
+
+1. Install dependencies:
+   ```bash
+   cd frontend && npm install
+   cd ../dashboard && npm install
+   cd ../backend && python -m venv .venv
+   # Activate the venv, then install (pick the line for your OS):
+   #   Windows (PowerShell):  .\.venv\Scripts\Activate.ps1; pip install -r requirements.txt
+   #   Windows (cmd):         .venv\Scripts\activate.bat && pip install -r requirements.txt
+   #   macOS / Linux (bash):  source .venv/bin/activate && pip install -r requirements.txt
+   # Or skip manual activation entirely: npm run test:backend (uses scripts/run-py.js,
+   # which finds backend/.venv automatically on every OS).
+   ```
+
+2. Create environment files:
+   ```bash
+   cp backend/.env.example backend/.env
+   cp frontend/.env.example frontend/.env
+   cp dashboard/.env.example dashboard/.env
+   ```
+
+3. Update environment files with your credentials
+
+4. Install git hooks:
+   ```bash
+   npm run prepare
+   ```

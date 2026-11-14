@@ -1,0 +1,110 @@
+name: Deploy Guides Nepal to Production
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Lint frontend
+        run: npm run lint:frontend
+        working-directory: .
+
+      - name: Lint dashboard
+        run: npm run lint:dashboard
+        working-directory: .
+
+      - name: Typecheck frontend
+        run: npm run typecheck:frontend
+        working-directory: .
+
+      - name: Typecheck dashboard
+        run: npm run typecheck:dashboard
+        working-directory: .
+
+  deploy-backend:
+    needs: lint-and-typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Render is triggered automatically via Blueprint autoDeploy on push to main.
+      # This job is a placeholder for any pre-deploy validation you wish to add.
+      - name: Verify Render blueprint exists
+        run: |
+          echo "Render auto-deploys the backend via render.yaml (autoDeploy: true)."
+          echo "Ensure DATABASE_URL, SECRET_KEY, BACKEND_CORS_ORIGINS are set in Render."
+
+  deploy-frontend:
+    needs: lint-and-typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: frontend
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_FRONTEND }}
+          vercel-args: "--prod"
+        working-directory: frontend
+
+  deploy-dashboard:
+    needs: lint-and-typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dashboard dependencies
+        run: npm ci
+        working-directory: dashboard
+
+      - name: Build dashboard
+        run: npm run build
+        working-directory: dashboard
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_DASHBOARD }}
+          vercel-args: "--prod"
+        working-directory: dashboard

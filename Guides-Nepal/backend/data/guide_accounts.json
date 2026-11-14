@@ -1,0 +1,1151 @@
+[
+  {
+    "catalog_guide_id": 1,
+    "name": "Apicha",
+    "email": "guide@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Foodie & Local Expert",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Lalitpur"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Hindi"
+    ],
+    "bio": "I was born and raised in the heart of Kathmandu. Food is my language! I love taking guests to the hidden alleys where my grandmother used to take me for the best treats. I believe that to truly know a city, you must taste it first.",
+    "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.98,
+    "reviews": 124,
+    "verified": true,
+    "catalog_name_is_unique": false,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 2,
+    "name": "Sujal",
+    "email": "sujal@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "History & Culture Buff",
+    "region": "Bagmati Province",
+    "city": "Patan",
+    "cities": [
+      "Kathmandu",
+      "Lalitpur",
+      "Pokhara"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Newari"
+    ],
+    "bio": "History doesn't have to be boring. I tell the stories of Kathmandu's kings and commoners with a twist of humor. Let's explore the living museum that is my city.",
+    "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.95,
+    "reviews": 89,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 3,
+    "name": "Priya",
+    "email": "priya@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Art & Lifestyle Host",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Pokhara"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "French"
+    ],
+    "bio": "As an artist myself, I see Kathmandu through colors and patterns. Join me to discover the vibrant art scene, from ancient Thangkas to modern street art.",
+    "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=128&q=80",
+    "rating": 5,
+    "reviews": 42,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 4,
+    "name": "Rohan",
+    "email": "guide6@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Adventure Enthusiast",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Pokhara",
+      "Lalitpur"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "German"
+    ],
+    "bio": "I love the outdoors and the chaotic energy of Kathmandu. Whether it's hiking the hills or navigating the busiest markets, I'll ensure you have a safe and thrilling time.",
+    "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.92,
+    "reviews": 156,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 39,
+    "name": "Kung",
+    "email": "kung@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Easygoing Local",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Bhaktapur"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Mandarin"
+    ],
+    "bio": "Relaxed and friendly, I love showing visitors the everyday charm of my neighborhood. Let me take you to the spots where locals actually hang out.",
+    "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.85,
+    "reviews": 67,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 57,
+    "name": "Jojo",
+    "email": "jojo@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Nature Lover",
+    "region": "Gandaki Province",
+    "city": "Pokhara",
+    "cities": [
+      "Pokhara",
+      "Chitwan"
+    ],
+    "languages": [
+      "English",
+      "Nepali"
+    ],
+    "bio": "Nature is my passion. From forest trails to mountain meadows, I know the best places to connect with the natural beauty of Nepal.",
+    "image": "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.9,
+    "reviews": 54,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-4@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 156,
+    "name": "Mingma",
+    "email": "guide7@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Rock Climbing Pro",
+    "region": "Gandaki Province",
+    "city": "Pokhara",
+    "cities": [
+      "Pokhara",
+      "Kathmandu"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Hindi"
+    ],
+    "bio": "Certified rock climbing instructor with years of experience scaling the cliffs around Nepal. Safety first, adventure always.",
+    "image": "https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.96,
+    "reviews": 89,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-4@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 178,
+    "name": "Ang",
+    "email": "ang@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Paragliding Pilot",
+    "region": "Gandaki Province",
+    "city": "Pokhara",
+    "cities": [
+      "Pokhara",
+      "Sarangkot"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "French"
+    ],
+    "bio": "Soar above Pokhara with me. I am a certified paragliding pilot who will show you the Himalayas from a bird's eye view.",
+    "image": "https://images.unsplash.com/photo-1535713875002-d1d0cf327fde?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.94,
+    "reviews": 73,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-4@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 195,
+    "name": "Chef Jekky",
+    "email": "chef-jekky@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Chef Jekky and The Team",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Bhaktapur"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Hindi"
+    ],
+    "bio": "Authentic Nepali cuisine expert. Join me for a cooking class where you will learn to make momos, dal bhat, and other local delicacies.",
+    "image": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.91,
+    "reviews": 112,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 198,
+    "name": "Dorje",
+    "email": "dorje@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Jungle Explorer",
+    "region": "Bagmati Province",
+    "city": "Chitwan",
+    "cities": [
+      "Chitwan",
+      "Sauraha"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Tharu"
+    ],
+    "bio": "Jungle safari specialist. I will take you deep into Chitwan National Park to spot rhinos, tigers, and exotic birds.",
+    "image": "https://images.unsplash.com/photo-1524505287194-e9016ce82611?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.88,
+    "reviews": 41,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 199,
+    "name": "Wasana",
+    "email": "wasana@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Food Maniac & Nepali Cooking Class",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Patan"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Hindi"
+    ],
+    "bio": "Food is my life. I teach travelers how to cook authentic Nepali dishes using fresh local ingredients from the market.",
+    "image": "https://images.unsplash.com/photo-1548187741-774e714a33c9?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.93,
+    "reviews": 96,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 203,
+    "name": "Pasang",
+    "email": "pasang@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The River Guide",
+    "region": "Gandaki Province",
+    "city": "Pokhara",
+    "cities": [
+      "Pokhara",
+      "Trishuli"
+    ],
+    "languages": [
+      "English",
+      "Nepali"
+    ],
+    "bio": "White water rafting and river guiding expert. I know every rapid and calm stretch of Nepal's rivers.",
+    "image": "https://images.unsplash.com/photo-1500530854675-371b47c33b6f?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.89,
+    "reviews": 58,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-4@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 210,
+    "name": "Sammy",
+    "email": "sammy@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Good Mood Ambassador",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Nagarkot"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "French",
+      "Spanish"
+    ],
+    "bio": "Always smiling, always welcoming. I make sure every traveler leaves Nepal with great memories and new friends.",
+    "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.97,
+    "reviews": 143,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 267,
+    "name": "Tashi",
+    "email": "tashi@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Eco-Tourism Guide",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Lamjung"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "French"
+    ],
+    "bio": "Sustainable travel advocate. I design eco-friendly tours that support local communities and protect the environment.",
+    "image": "https://images.unsplash.com/photo-1500294073028-a5daa6e44c6c?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.92,
+    "reviews": 78,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 287,
+    "name": "Pema",
+    "email": "pema@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Adventure Expert",
+    "region": "Gandaki Province",
+    "city": "Pokhara",
+    "cities": [
+      "Pokhara",
+      "Jomsom"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Hindi"
+    ],
+    "bio": "Trekking, climbing, and adventure sports specialist. I have led expeditions across the Annapurna and Everest regions.",
+    "image": "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.95,
+    "reviews": 134,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-4@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 321,
+    "name": "Nima",
+    "email": "nima@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Wildlife Expert",
+    "region": "Bagmati Province",
+    "city": "Chitwan",
+    "cities": [
+      "Chitwan",
+      "Bardia"
+    ],
+    "languages": [
+      "English",
+      "Nepali"
+    ],
+    "bio": "Wildlife biologist and nature guide. I help travelers spot rare animals and birds in Nepal's national parks and reserves.",
+    "image": "https://images.unsplash.com/photo-1432352898111-0f88b128e2df?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.9,
+    "reviews": 63,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 342,
+    "name": "Tenzin",
+    "email": "tenzin@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Mountain Guide",
+    "region": "Koshi Province",
+    "city": "Solukhumbu",
+    "cities": [
+      "Lukla",
+      "Namche"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Sherpa"
+    ],
+    "bio": "High-altitude mountain guide with summits across the Himalayas. I specialize in Everest Base Camp and high-pass treks.",
+    "image": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.98,
+    "reviews": 156,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-1@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 420,
+    "name": "Araya",
+    "email": "araya@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Culinary and Culture Admirer",
+    "region": "Bagmati Province",
+    "city": "Patan",
+    "cities": [
+      "Patan",
+      "Kathmandu",
+      "Bhaktapur"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "French"
+    ],
+    "bio": "Food and culture enthusiast. I combine market visits, cooking classes, and heritage walks into unforgettable experiences.",
+    "image": "https://images.unsplash.com/photo-1489424723077-5477077dc8e2?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.89,
+    "reviews": 52,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 445,
+    "name": "Lhakpa",
+    "email": "guide2@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Trekking Specialist",
+    "region": "Gandaki Province",
+    "city": "Pokhara",
+    "cities": [
+      "Pokhara",
+      "Ghorepani"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Hindi"
+    ],
+    "bio": "Trekking route expert. From easy day hikes to challenging multi-day treks, I guide you safely through the mountains.",
+    "image": "https://images.unsplash.com/photo-1526942288877-90568e0c3ca6?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.94,
+    "reviews": 121,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-4@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 54,
+    "name": "Apicha",
+    "email": "apicha-54@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The local culture expert",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Lalitpur"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Hindi"
+    ],
+    "bio": "I was born and raised in the heart of Kathmandu. Food is my language! I love taking guests to the hidden alleys where my grandmother used to take me for the best treats.",
+    "image": "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.98,
+    "reviews": 124,
+    "verified": true,
+    "catalog_name_is_unique": false,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 814,
+    "name": "Artty",
+    "email": "artty@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Lovely Storyteller",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Bhaktapur"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Newari"
+    ],
+    "bio": "Storyteller and cultural heritage guide. I share the legends, myths, and history behind every temple and monument in the valley.",
+    "image": "https://images.unsplash.com/photo-1507656409469-f5c99c40b292?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.87,
+    "reviews": 38,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 933,
+    "name": "Zarut",
+    "email": "zarut@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Culture Magician",
+    "region": "Bagmati Province",
+    "city": "Bhaktapur",
+    "cities": [
+      "Bhaktapur",
+      "Kathmandu",
+      "Patan"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Hindi"
+    ],
+    "bio": "Cultural immersion specialist. I arrange authentic experiences with local families, festivals, and traditional ceremonies.",
+    "image": "https://images.unsplash.com/photo-1543852786-2cf114bb0d2c?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.91,
+    "reviews": 71,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 1001,
+    "name": "Sita",
+    "email": "sita-1001@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Night Market Foodie",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Bhaktapur"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Newari"
+    ],
+    "bio": "Night market specialist who knows all the best street food stalls in Kathmandu and Bhaktapur.",
+    "image": "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.85,
+    "reviews": 163,
+    "verified": true,
+    "catalog_name_is_unique": false,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 1002,
+    "name": "Chef Sita",
+    "email": "chef-sita@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Traditional Newari Cooking Expert",
+    "region": "Bagmati Province",
+    "city": "Patan",
+    "cities": [
+      "Patan",
+      "Kathmandu",
+      "Bhaktapur"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Newari"
+    ],
+    "bio": "Master of Newari cuisine with generations of family recipes. Specializes in yomari, chatamari, and traditional feasts.",
+    "image": "https://images.unsplash.com/photo-1520813788428-75e9d2c538b8?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.92,
+    "reviews": 892,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 1003,
+    "name": "Maya",
+    "email": "maya@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Organic Farm to Table Specialist",
+    "region": "Gandaki Province",
+    "city": "Pokhara",
+    "cities": [
+      "Pokhara",
+      "Nagarkot"
+    ],
+    "languages": [
+      "English",
+      "Nepali"
+    ],
+    "bio": "Organic farming advocate who connects travelers with local farms and fresh, seasonal Nepali produce.",
+    "image": "https://images.unsplash.com/photo-1511729198227-bc431c391c5e?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.88,
+    "reviews": 567,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-4@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 1004,
+    "name": "Raju",
+    "email": "raju@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Momo Master & Street Food Guide",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Thamel"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Hindi"
+    ],
+    "bio": "Momo specialist who knows every dumpling stall in the valley. From steamed to jhol momo, I cover them all.",
+    "image": "https://images.unsplash.com/photo-1530672187241-b8fb0a4c81e9?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.9,
+    "reviews": 334,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 1005,
+    "name": "Bikash",
+    "email": "bikash@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Traditional Thakali Kitchen",
+    "region": "Gandaki Province",
+    "city": "Pokhara",
+    "cities": [
+      "Pokhara",
+      "Jomsom"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Thakali"
+    ],
+    "bio": "Thakali cuisine expert from Mustang. Authentic dal bhat, buckwheat pancakes, and apple brandy pairings.",
+    "image": "https://images.unsplash.com/photo-1514834939393-8c6e8e32690c?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.91,
+    "reviews": 445,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-4@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 1006,
+    "name": "Anita",
+    "email": "anita@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Home Cooking & Family Recipes",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Patan"
+    ],
+    "languages": [
+      "English",
+      "Nepali"
+    ],
+    "bio": "Home cook sharing generations of family recipes. Warm, welcoming kitchen experiences in a traditional Nepali home.",
+    "image": "https://images.unsplash.com/photo-1532012870230-3f1d9843a32c?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.89,
+    "reviews": 189,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 1007,
+    "name": "Tuangtip",
+    "email": "tuangtip@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "The Food Magician",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Thamel",
+      "Asan"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Hindi"
+    ],
+    "bio": "Street food connoisseur who reveals the hidden flavors of Kathmandu's alleys and markets.",
+    "image": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.93,
+    "reviews": 933,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9001,
+    "name": "Krishna",
+    "email": "krishna@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Heritage & Night Guide",
+    "region": "Bagmati Province",
+    "city": "Bhaktapur",
+    "cities": [
+      "Bhaktapur",
+      "Kathmandu"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Newari"
+    ],
+    "bio": "I grew up between Bhaktapur Durbar Square and the pottery squares, and I have spent my life learning the stories behind every temple, courtyard and festival in the city. Walking Bhaktapur after dark, when the crowds have gone and the temples are lit, is my favourite way to share it.",
+    "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.9,
+    "reviews": 98,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9002,
+    "name": "Radha",
+    "email": "radha@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Artisan & Art Guide",
+    "region": "Bagmati Province",
+    "city": "Bhaktapur",
+    "cities": [
+      "Bhaktapur",
+      "Lalitpur"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Newari"
+    ],
+    "bio": "I am a potter and Thangka painter from Bhaktapur. My family has worked in the city's craft workshops for generations, and I love introducing travellers to the makers behind the art — the wheel, the clay, the pigments and the patience.",
+    "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.9,
+    "reviews": 45,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9003,
+    "name": "Prakash",
+    "email": "prakash@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Bhaktapur Foodie Guide",
+    "region": "Bagmati Province",
+    "city": "Bhaktapur",
+    "cities": [
+      "Bhaktapur",
+      "Kathmandu"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Newari"
+    ],
+    "bio": "Juju dhau, the king of yoghurt, is only the beginning. I take guests through Bhaktapur's lanes for Newari snacks, fresh curd, bara and the sweet shops that locals have trusted for decades.",
+    "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.8,
+    "reviews": 62,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9004,
+    "name": "Laxmi",
+    "email": "laxmi@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Nature & Village Guide",
+    "region": "Bagmati Province",
+    "city": "Bhaktapur",
+    "cities": [
+      "Bhaktapur",
+      "Nagarkot"
+    ],
+    "languages": [
+      "English",
+      "Nepali"
+    ],
+    "bio": "I walk the ridge between Bhaktapur and Changu Narayan almost every week. The pine forest, the old village lanes and the views over the valley are my idea of a perfect morning, and I would love to share them with you.",
+    "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.9,
+    "reviews": 37,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9005,
+    "name": "Ram",
+    "email": "ram@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Wildlife Expert",
+    "region": "Bagmati Province",
+    "city": "Bharatpur",
+    "cities": [
+      "Bharatpur",
+      "Chitwan",
+      "Sauraha"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Tharu"
+    ],
+    "bio": "I have guided safaris in Chitwan National Park for more than fifteen years. Rhinos, tigers, elephants and the birds of the grassland — I know where to look, when to be quiet, and how to keep both guests and wildlife safe.",
+    "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.9,
+    "reviews": 76,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9006,
+    "name": "Sita",
+    "email": "sita-9006@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Tharu Cultural Guide",
+    "region": "Bagmati Province",
+    "city": "Bharatpur",
+    "cities": [
+      "Bharatpur",
+      "Chitwan",
+      "Sauraha"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Tharu"
+    ],
+    "bio": "I was born in a Tharu village at the edge of Chitwan. I share our mud houses, stick dance, language and food with travellers who want to understand the people of the Terai, not just its animals.",
+    "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.9,
+    "reviews": 54,
+    "verified": true,
+    "catalog_name_is_unique": false,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9007,
+    "name": "Bishnu",
+    "email": "bishnu@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "River Guide",
+    "region": "Bagmati Province",
+    "city": "Bharatpur",
+    "cities": [
+      "Bharatpur",
+      "Chitwan"
+    ],
+    "languages": [
+      "English",
+      "Nepali"
+    ],
+    "bio": "The Rapti and Narayani rivers are my second home. I paddle traditional dugout canoes, read the currents, and find the quiet stretches where crocodiles bask and kingfishers hunt.",
+    "image": "https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.8,
+    "reviews": 43,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9008,
+    "name": "Kumar",
+    "email": "kumar@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Animal Expert",
+    "region": "Bagmati Province",
+    "city": "Bharatpur",
+    "cities": [
+      "Bharatpur",
+      "Chitwan",
+      "Sauraha"
+    ],
+    "languages": [
+      "English",
+      "Nepali"
+    ],
+    "bio": "I work with the elephant breeding centre and the community forests around Chitwan. My tours focus on animal welfare, conservation and the everyday lives of the mahouts who care for the elephants.",
+    "image": "https://images.unsplash.com/photo-1535713875002-d1d0cf327fde?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.8,
+    "reviews": 58,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9009,
+    "name": "Ramesh",
+    "email": "ramesh@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Ornithologist",
+    "region": "Bagmati Province",
+    "city": "Bharatpur",
+    "cities": [
+      "Bharatpur",
+      "Chitwan"
+    ],
+    "languages": [
+      "English",
+      "Nepali"
+    ],
+    "bio": "I have recorded more than 400 bird species in the Chitwan buffer zone. Bishazari Tal is my favourite place on earth, and I can help you find everything from hornbills to lesser adjutants.",
+    "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.9,
+    "reviews": 41,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9010,
+    "name": "Pandit",
+    "email": "pandit@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Spiritual Guide",
+    "region": "Bagmati Province",
+    "city": "Bharatpur",
+    "cities": [
+      "Bharatpur",
+      "Chitwan"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Hindi"
+    ],
+    "bio": "Devghat Dham, at the meeting of the Kali Gandaki and Trishuli, is a place of pilgrimage and quiet. I explain its rituals and temples with respect, and make sure every guest feels welcome.",
+    "image": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.9,
+    "reviews": 33,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9011,
+    "name": "Piyawee",
+    "email": "piyawee@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Buddhist Culture Expert",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Lalitpur"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Thai"
+    ],
+    "bio": "I studied Buddhist philosophy in Kathmandu and have spent years walking the valley's monasteries and stupas. I explain the symbols, the rituals and the everyday practice of the monks with patience and humour.",
+    "image": "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.9,
+    "reviews": 87,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9012,
+    "name": "Nok",
+    "email": "nok@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Nightlife Insider",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu"
+    ],
+    "languages": [
+      "English",
+      "Nepali"
+    ],
+    "bio": "After sunset, Kathmandu changes. I know the rooftop bars, the live folk-music pubs and the tiny kitchens in Thamel that stay open until the last guest leaves — and the drinks and bites that go with them.",
+    "image": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.9,
+    "reviews": 69,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9013,
+    "name": "Hnoi",
+    "email": "hnoi@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Nature Lover",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Nagarkot",
+      "Bhaktapur"
+    ],
+    "languages": [
+      "English",
+      "Nepali"
+    ],
+    "bio": "I escape the city every chance I get, and Nagarkot is where I go. I know the quiet trails, the village tea stops and the viewpoints that are worth the early start — and I bring the picnic.",
+    "image": "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.8,
+    "reviews": 52,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9014,
+    "name": "Natcha",
+    "email": "natcha@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "History Buff",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Bhaktapur"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Newari"
+    ],
+    "bio": "Bhaktapur is a living museum, and I love reading its layers aloud: the Malla kings, the Newari traders, the temples that survived earthquakes and the courtyards where people still live. History here is never only history.",
+    "image": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.9,
+    "reviews": 64,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9015,
+    "name": "Nakarin",
+    "email": "nakarin@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Food Explorer",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Lalitpur"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Thai"
+    ],
+    "bio": "I judge a city by its breakfast, its market and its momo. In Kathmandu I have found the best of all three, and I take guests on a food walk that follows the locals rather than the guidebooks.",
+    "image": "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.9,
+    "reviews": 73,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9016,
+    "name": "Agrindra",
+    "email": "agrindra@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "City Expert Guide",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Lalitpur",
+      "Bhaktapur"
+    ],
+    "languages": [
+      "English",
+      "Nepali",
+      "Hindi"
+    ],
+    "bio": "I have been guiding in the Kathmandu Valley for over a decade and still find new corners. Durbar Square, Swayambhunath, Patan, the back lanes of Asan — I build a route around what you care about.",
+    "image": "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.8,
+    "reviews": 96,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  },
+  {
+    "catalog_guide_id": 9017,
+    "name": "Sudarat",
+    "email": "sudarat@guides-nepal.com",
+    "password": "Guide@2024",
+    "role": "Adventure Guide",
+    "region": "Bagmati Province",
+    "city": "Kathmandu",
+    "cities": [
+      "Kathmandu",
+      "Chandragiri"
+    ],
+    "languages": [
+      "English",
+      "Nepali"
+    ],
+    "bio": "Cable cars, ridge walks and sunrise hikes are my speciality. Chandragiri and the hills around the valley give you the Himalaya without the expedition, and I make the day as active or as easy as you like.",
+    "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=128&q=80",
+    "rating": 4.9,
+    "reviews": 57,
+    "verified": true,
+    "catalog_name_is_unique": true,
+    "reviewed_by": "regional-3@guides-nepal.com"
+  }
+]

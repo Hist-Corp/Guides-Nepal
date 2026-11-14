@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" rx="12" fill="url(#bg)"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#bfdbfe"/>
+      <stop offset="1" stop-color="#60a5fa"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="200" cy="180" rx="90" ry="20" fill="#2196f3" opacity="0.6"/>
+  <path d="M120 170 C120 140 155 120 200 120 C245 120 280 140 280 170 C280 200 245 220 200 220 C155 220 120 200 120 170 Z" fill="#0ea5e9"/>
+  <path d="M110 180 L200 90 L290 180 Z" fill="#10b981"/>
+  <circle cx="180" cy="155" r="8" fill="#ffffff"/>
+  <circle cx="220" cy="155" r="8" fill="#ffffff"/>
+  <text x="200" y="285" font-family="Arial" font-size="14" fill="#1e40af" text-anchor="middle">Pokhara · Phewa Lake &amp; Annapurna</text>
+</svg>

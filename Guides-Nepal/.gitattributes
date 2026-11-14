@@ -1,0 +1,16 @@
+# Enforce consistent line endings so shell scripts work on every OS.
+# Without this, start-all-mac.sh / run_checks.sh checked out on Windows get CRLF
+# and fail on macOS/Linux with "bad interpreter".
+* text=auto
+*.sh text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.py text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+backend/scripts/run_checks.sh text eol=lf
+start-all-mac.sh text eol=lf
+start-all.sh text eol=lf

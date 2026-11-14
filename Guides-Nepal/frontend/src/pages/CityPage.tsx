@@ -1,0 +1,519 @@
+import React from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { useGoBack } from '../utils/backNavigation';
+import { guideProfilePath } from '../utils/guideUrl';
+import { Header } from '../components/common/Header';
+import { Footer } from '../components/common/Footer';
+import { Button } from '../components/common/Button';
+import { Card } from '../components/common/Card';
+import { Star, Users, Heart, ShieldCheck, Clock, ArrowLeft } from 'lucide-react';
+import { useCurrency } from '../contexts/CurrencyContext';
+
+interface Tour {
+  id: number;
+  title: string;
+  rating: number;
+  reviews: number;
+  price: number;
+  image: string;
+}
+
+interface Guide {
+  id: number;
+  name: string;
+  image: string;
+  rating: number;
+  reviews: number;
+}
+
+interface CityData {
+  name: string;
+  heroImage: string;
+  description: string;
+  topThings: Tour[];
+  guides: Guide[];
+}
+
+// Mock data for cities (in a real app this would come from an API)
+const cityData: Record<string, CityData> = {
+  bangkok: {
+    name: 'Bangkok',
+    heroImage:
+      'https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=1740&q=80',
+    description:
+      'Immerse yourself in the vibrant energy of Bangkok. From ancient temples to bustling street markets, experience the City of Angels.',
+    topThings: [
+      {
+        id: 1001,
+        title: 'A Taste Of Bangkok: Street Food Tour',
+        rating: 4.9,
+        reviews: 312,
+        price: 45,
+        image:
+          'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1740&q=80',
+      },
+      {
+        id: 1002,
+        title: 'Grand Palace & Wat Phra Kaew',
+        rating: 4.8,
+        reviews: 540,
+        price: 55,
+        image:
+          'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1740&q=80',
+      },
+      {
+        id: 1003,
+        title: 'Chao Phraya River Dinner Cruise',
+        rating: 4.7,
+        reviews: 210,
+        price: 65,
+        image:
+          'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1740&q=80',
+      },
+    ],
+    guides: [],
+  },
+  corfu: {
+    name: 'Corfu',
+    heroImage:
+      'https://images.unsplash.com/photo-1458668383970-8ddd3927deed?auto=format&fit=crop&w=1740&q=80',
+    description:
+      'Discover the Emerald Island of Greece. Explore Venetian fortresses, crystal clear beaches, and olive groves.',
+    topThings: [
+      {
+        id: 2001,
+        title: 'Corfu Old Town Walking Tour',
+        rating: 4.9,
+        reviews: 180,
+        price: 40,
+        image:
+          'https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?auto=format&fit=crop&w=1740&q=80',
+      },
+      {
+        id: 2002,
+        title: 'Achilleion Palace Visit',
+        rating: 4.8,
+        reviews: 150,
+        price: 50,
+        image:
+          'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&w=1740&q=80',
+      },
+      {
+        id: 2003,
+        title: 'Paleokastritsa Boat Trip',
+        rating: 5.0,
+        reviews: 230,
+        price: 60,
+        image:
+          'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1740&q=80',
+      },
+    ],
+    guides: [],
+  },
+  barcelona: {
+    name: 'Barcelona',
+    heroImage:
+      'https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=1740&q=80',
+    description:
+      'Experience the architectural marvels of Gaudi, the vibrant Gothic Quarter, and the Mediterranean lifestyle.',
+    topThings: [
+      {
+        id: 3001,
+        title: 'Sagrada Familia Guided Tour',
+        rating: 4.9,
+        reviews: 890,
+        price: 35,
+        image:
+          'https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=1740&q=80',
+      },
+      {
+        id: 3002,
+        title: 'Park Guell & Gaudi Houses',
+        rating: 4.8,
+        reviews: 450,
+        price: 30,
+        image:
+          'https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1740&q=80',
+      },
+      {
+        id: 3003,
+        title: 'Tapas & Wine Experience',
+        rating: 5.0,
+        reviews: 600,
+        price: 75,
+        image:
+          'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=1740&q=80',
+      },
+    ],
+    guides: [],
+  },
+  kathmandu: {
+    name: 'Kathmandu',
+    heroImage:
+      'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1740&q=80',
+    description:
+      'Experience the spiritual heart of Nepal. From ancient temples to vibrant street markets, discover Kathmandu with a local.',
+    topThings: [
+      {
+        id: 101,
+        title: 'Hidden Gems of Kathmandu',
+        rating: 4.9,
+        reviews: 124,
+        price: 25,
+        image:
+          'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1740&q=80',
+      },
+      {
+        id: 102,
+        title: 'Authentic Newari Food Tour',
+        rating: 5.0,
+        reviews: 89,
+        price: 35,
+        image:
+          'https://images.unsplash.com/photo-1554188248-986adbb73be4?auto=format&fit=crop&w=1740&q=80',
+      },
+      {
+        id: 103,
+        title: 'Spiritual Morning at Swayambhunath',
+        rating: 4.8,
+        reviews: 210,
+        price: 20,
+        image:
+          'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1740&q=80',
+      },
+    ],
+    guides: [
+      {
+        id: 1,
+        name: 'Apicha',
+        image:
+          'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=128&q=80',
+        rating: 5.0,
+        reviews: 45,
+      },
+      {
+        id: 2,
+        name: 'Sujal',
+        image:
+          'https://images.unsplash.com/photo-1557862921-37829c790f19?auto=format&fit=crop&w=128&q=80',
+        rating: 4.9,
+        reviews: 32,
+      },
+      {
+        id: 3,
+        name: 'Priya',
+        image:
+          'https://images.unsplash.com/photo-1566492031773-4f4e44671857?auto=format&fit=crop&w=128&q=80',
+        rating: 4.9,
+        reviews: 67,
+      },
+      {
+        id: 4,
+        name: 'Rohan',
+        image:
+          'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=128&q=80',
+        rating: 4.8,
+        reviews: 15,
+      },
+    ],
+  },
+  pokhara: {
+    name: 'Pokhara',
+    heroImage:
+      'https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=1740&q=80',
+    description:
+      'Relax by the lake or embark on a mountain adventure. Pokhara is the gateway to the Annapurna circuit.',
+    topThings: [
+      {
+        id: 201,
+        title: 'Sunrise at Sarangkot',
+        rating: 4.9,
+        reviews: 312,
+        price: 30,
+        image:
+          'https://images.unsplash.com/photo-1545126178-862cdb469409?auto=format&fit=crop&w=1740&q=80',
+      },
+      {
+        id: 202,
+        title: 'Phewa Lake Boat Ride & Hike',
+        rating: 4.8,
+        reviews: 156,
+        price: 40,
+        image:
+          'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1740&q=80',
+      },
+      {
+        id: 203,
+        title: 'Tibetan Culture Tour',
+        rating: 4.9,
+        reviews: 98,
+        price: 35,
+        image:
+          'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=1740&q=80',
+      },
+    ],
+    guides: [],
+  },
+  lalitpur: {
+    name: 'Lalitpur',
+    heroImage:
+      'https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=1740&q=80',
+    description:
+      'Explore the city of fine arts. Lalitpur (Patan) is famous for its intricate architecture and master craftsmen.',
+    topThings: [
+      {
+        id: 301,
+        title: 'Patan Durbar Square Walk',
+        rating: 4.9,
+        reviews: 180,
+        price: 28,
+        image:
+          'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=1740&q=80',
+      },
+      {
+        id: 302,
+        title: 'Traditional Metal Craft Workshop',
+        rating: 5.0,
+        reviews: 65,
+        price: 45,
+        image:
+          'https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&w=1740&q=80',
+      },
+      {
+        id: 303,
+        title: 'Golden Temple & Hidden Courtyards',
+        rating: 4.8,
+        reviews: 112,
+        price: 25,
+        image:
+          'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1740&q=80',
+      },
+    ],
+    guides: [],
+  },
+  bhaktapur: {
+    name: 'Bhaktapur',
+    heroImage:
+      'https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1740&q=80',
+    description:
+      'Step back in time in the medieval city of devotees. Famous for pottery, curd, and timeless architecture.',
+    topThings: [
+      {
+        id: 401,
+        title: 'Bhaktapur Heritage Walk',
+        rating: 4.9,
+        reviews: 245,
+        price: 35,
+        image:
+          'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=1740&q=80',
+      },
+      {
+        id: 402,
+        title: 'Pottery Making Class',
+        rating: 4.8,
+        reviews: 134,
+        price: 30,
+        image:
+          'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1740&q=80',
+      },
+      {
+        id: 403,
+        title: 'Taste Juju Dhau (King Curd)',
+        rating: 5.0,
+        reviews: 320,
+        price: 15,
+        image:
+          'https://images.unsplash.com/photo-1465101162946-4377e57745c3?auto=format&fit=crop&w=1740&q=80',
+      },
+    ],
+    guides: [],
+  },
+};
+
+const CityPage: React.FC = () => {
+  const { cityId } = useParams<{ cityId: string }>();
+  const goBack = useGoBack();
+  const { formatPrice } = useCurrency();
+  const city = cityData[cityId?.toLowerCase() || ''];
+
+  if (!city) {
+    return (
+      <div className="min-h-screen flex flex-col font-sans">
+        <Header />
+        <div className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-primary mb-4">City not found</h1>
+            <Link to="/">
+              <Button>Go Home</Button>
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col font-sans bg-background-cream">
+      <Header />
+
+      {/* City Hero */}
+      <div className="relative h-[50vh] min-h-[400px]">
+        <button
+          onClick={goBack}
+          className="absolute top-8 left-8 z-20 flex items-center gap-2 text-white hover:text-accent font-bold transition-colors bg-black/20 hover:bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Back
+        </button>
+        <img
+          src={city.heroImage}
+          alt={city.name}
+          className="w-full h-full object-cover"
+          onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+        />
+        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+          <div className="text-center text-white px-4 max-w-3xl">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 drop-shadow-lg">
+              Experience the best of <span className="text-brand-yellow">{city.name}</span> with
+              guides-nepal
+            </h1>
+            <p className="text-lg md:text-xl font-medium drop-shadow-md mb-8">{city.description}</p>
+            <a href="#top-tours">
+              <Button className="bg-brand-yellow hover:bg-brand-yellow/90 text-white font-bold text-lg px-8 rounded-full border-none">
+                View all tours
+              </Button>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <main id="main-content" className="container mx-auto px-4 py-12 space-y-20">
+        {/* Value Props Strip */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center border-b border-slate-200 pb-12">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-brand-yellow/10 flex items-center justify-center text-brand-yellow">
+              <Users className="w-6 h-6" />
+            </div>
+            <h3 className="font-bold text-lg">100% Private</h3>
+            <p className="text-slate-600 text-sm">It's just you and your local host</p>
+          </div>
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-brand-yellow/10 flex items-center justify-center text-brand-yellow">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <h3 className="font-bold text-lg">Verified Locals</h3>
+            <p className="text-slate-600 text-sm">We verify every host for quality</p>
+          </div>
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-brand-yellow/10 flex items-center justify-center text-brand-yellow">
+              <Heart className="w-6 h-6" />
+            </div>
+            <h3 className="font-bold text-lg">Authentic Experiences</h3>
+            <p className="text-slate-600 text-sm">Discover the real city, away from crowds</p>
+          </div>
+        </div>
+
+        {/* Top Things to Do */}
+        <section id="top-tours">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-primary">Top things to do in {city.name}</h2>
+            <a href="#top-tours" className="text-primary font-bold hover:underline">
+              See all tours
+            </a>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {city.topThings.map((tour: Tour) => (
+              <Link key={tour.id} to={`/experience/${tour.id}`} className="block h-full">
+                <Card className="border-none shadow-md hover:shadow-xl transition-shadow bg-white h-full">
+                  <div className="relative h-56 overflow-hidden rounded-t-lg">
+                    <img
+                      src={tour.image}
+                      alt={tour.title}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                      onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+                    />
+                    <div className="absolute top-3 left-3 bg-white text-slate-800 text-xs font-bold px-2 py-1 rounded-md shadow-sm flex items-center gap-1">
+                      <Star className="w-3 h-3 fill-brand-yellow text-brand-yellow" />
+                      {tour.rating}
+                    </div>
+                    <div className="absolute bottom-3 right-3 bg-black/60 text-white text-xs font-bold px-2 py-1 rounded-md backdrop-blur-sm">
+                      {tour.reviews} reviews
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="font-bold text-xl mb-2 line-clamp-2">{tour.title}</h3>
+                    <div className="flex items-center gap-2 text-slate-500 text-sm mb-4">
+                      <Clock className="w-4 h-4" />
+                      <span>3 hours</span>
+                      <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                      <span>Private tour</span>
+                    </div>
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
+                      <div className="text-xs text-slate-500">
+                        Starting price <br />
+                        <span className="text-lg font-bold text-primary">
+                          {formatPrice(tour.price, 'USD')}
+                        </span>{' '}
+                        <span className="text-slate-400">pp</span>
+                      </div>
+                      <Button size="sm" className="bg-primary hover:bg-primary-hover text-white">
+                        Book Now
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Local Guides Grid */}
+        <section className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+          <h2 className="text-2xl font-bold text-primary mb-2 text-center">
+            Explore {city.name} with our incredible locals
+          </h2>
+          <p className="text-slate-500 text-center mb-8">Meet the people who know the city best</p>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {city.guides.map((guide: Guide) => (
+              <Link to={guideProfilePath(guide)} className="text-center group block">
+                <div className="relative w-32 h-32 mx-auto mb-4">
+                  <img
+                    src={guide.image}
+                    alt={guide.name}
+                    className="w-full h-full object-cover rounded-full border-4 border-white shadow-lg group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
+                  />
+                  <div className="absolute bottom-1 right-1 bg-brand-yellow text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm">
+                    <Star className="w-2.5 h-2.5 fill-current" />
+                    {guide.rating}
+                  </div>
+                </div>
+                <h4 className="font-bold text-lg text-slate-800 group-hover:text-primary transition-colors">
+                  {guide.name}
+                </h4>
+                <p className="text-xs text-slate-500">{guide.reviews} reviews</p>
+              </Link>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <Link to="/explore">
+              <Button
+                variant="outline"
+                className="rounded-full px-8 text-primary border-primary hover:bg-brand-yellow hover:text-white hover:border-brand-yellow transition-colors"
+              >
+                View all locals
+              </Button>
+            </Link>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default CityPage;
