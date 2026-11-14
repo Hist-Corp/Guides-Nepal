@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "name": "guides-nepal-frontend",
   "version": 2,
-  "buildCommand": "npm install && npm run build && cd dashboard && npm install && VITE_BASE_PATH=/dashboard/ npm run build && mkdir -p ../dist && cp -r frontend/dist/* ../dist/ && mkdir -p ../dist/dashboard && cp -r dist/* ../dist/dashboard/",
+  "buildCommand": "npm install && npm run build && npm install --prefix ./dashboard && VITE_BASE_PATH=/dashboard/ npm run --prefix ./dashboard build && mkdir -p dist && cp -r frontend/dist/* dist/ && mkdir -p dist/dashboard && cp -r dashboard/dist/* dist/dashboard/",
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "devCommand": "npm run dev",
