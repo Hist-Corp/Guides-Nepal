@@ -172,9 +172,9 @@ export const Header: React.FC = () => {
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const mobileProfileDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close profile dropdown when clicking outside
+  // Close profile dropdown when clicking/tapping outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       const target = event.target as Node;
       const inDesktop = profileDropdownRef.current && profileDropdownRef.current.contains(target);
       const inMobile =
@@ -184,7 +184,11 @@ export const Header: React.FC = () => {
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
   }, []);
 
   return (
@@ -228,13 +232,13 @@ export const Header: React.FC = () => {
                   readOnly
                   tabIndex={showHeaderSearch ? 0 : -1}
                   onClick={openSearch}
-                  className="w-full h-12 pl-6 pr-12 rounded-full border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer text-gray-700 placeholder-gray-400 focus:outline-none"
+                  className="w-full h-12 pl-6 pr-14 rounded-full border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-yellow focus:ring-offset-2"
                 />
                 <button
                   onClick={openSearch}
                   tabIndex={showHeaderSearch ? 0 : -1}
                   title="Search"
-                  className="absolute right-1 top-1 bottom-1 w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center text-[#213448] transition-transform group-hover:scale-105"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center text-[#213448] transition-transform group-hover:scale-105"
                 >
                   <Search className="w-4 h-4" />
                 </button>
@@ -242,28 +246,22 @@ export const Header: React.FC = () => {
             </div>
           )}
 
-          {/* Desktop Actions */}
-          <div className="hidden lg:flex items-center gap-4">
+          {/* Desktop Actions (tablet and up) */}
+          <div className="hidden md:flex items-center gap-3">
             {!isAuthenticated ? (
               <>
                 <button
                   onClick={() => setIsLoginOpen(true)}
-                  className="text-base font-medium text-gray-800 hover:text-primary transition-colors"
+                  className="h-10 bg-primary hover:bg-primary-hover text-white text-sm font-bold px-5 rounded-full transition-colors flex items-center"
                 >
                   Log in
-                </button>
-                <button
-                  onClick={() => setIsSignupOpen(true)}
-                  className="bg-primary hover:bg-primary-hover text-white text-sm font-bold px-5 py-2.5 rounded-full transition-colors"
-                >
-                  Sign up
                 </button>
               </>
             ) : (
               <>
                 <Link
                   to="/favorites"
-                  className="text-gray-800 hover:text-primary transition-colors"
+                  className="h-10 flex items-center text-gray-800 hover:text-primary transition-colors"
                   title="Bookmarks"
                 >
                   <Heart className={`w-6 h-6 ${hasFavorites ? 'text-red-500 fill-red-500' : ''}`} />
@@ -272,7 +270,7 @@ export const Header: React.FC = () => {
                   <button
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                     title="Profile"
-                    className="flex items-center gap-2 text-gray-800 transition-all duration-200"
+                    className="h-10 flex items-center gap-2 text-gray-800 transition-all duration-200"
                   >
                     <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-300 transition-all duration-200 hover:scale-110 hover:shadow-md hover:bg-yellow-100 hover:border-yellow-200">
                       {user?.firstName ? (
@@ -284,7 +282,7 @@ export const Header: React.FC = () => {
                   </button>
                   {/* Dropdown Menu */}
                   <div
-                    className={`absolute right-0 top-full pt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 transition-all duration-200 z-50 ${isProfileDropdownOpen ? 'visible opacity-100 pointer-events-auto' : 'invisible opacity-0 pointer-events-none'} animate-in fade-in zoom-in-95`}
+                    className={`absolute right-0 top-full pt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 transition-all duration-200 z-50 ${isProfileDropdownOpen ? 'visible opacity-100 scale-100 pointer-events-auto' : 'invisible opacity-0 scale-95 pointer-events-none'} animate-in fade-in zoom-in-95`}
                   >
                     <div className="px-4 py-2 border-b border-gray-100 mb-2">
                       <p className="font-bold text-gray-900 truncate">
@@ -352,7 +350,7 @@ export const Header: React.FC = () => {
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
                           onClick={() => setIsProfileDropdownOpen(false)}
                         >
-                          My listings
+                          My list
                         </Link>
                       </>
                     )}
@@ -395,7 +393,7 @@ export const Header: React.FC = () => {
               title="Currency"
               aria-label={`Change currency, current: ${currencyInfo.name}`}
               data-testid="currency-picker-button"
-              className="group flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2.5 shadow-sm transition-colors hover:border-primary hover:shadow"
+              className="h-10 group flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 shadow-sm transition-colors hover:border-primary hover:shadow"
             >
               <span className="text-sm font-bold tracking-wide text-primary">
                 {currencyInfo.code}
@@ -408,7 +406,7 @@ export const Header: React.FC = () => {
               <button
                 onClick={openCart}
                 title="Cart"
-                className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="h-10 relative flex items-center px-3 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <ShoppingCart className="h-6 w-6 text-gray-700" />
                 {getTotalItems() > 0 && (
@@ -418,15 +416,24 @@ export const Header: React.FC = () => {
                 )}
               </button>
             )}
-          </div>
 
-          {/* Mobile Actions */}
-          <div className="flex items-center gap-2 lg:hidden">
+            {/* Hamburger Menu (Desktop) - Right side */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               title="Menu"
-              data-testid="mobile-menu"
               className="w-10 h-10 bg-white hover:bg-gray-50 text-gray-800 rounded-lg flex items-center justify-center transition-colors shadow-sm"
+            >
+              <AlignJustify className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Mobile Actions (mobile only) */}
+          <div className="flex items-center gap-2 md:hidden">
+            {/* Mobile-only Hamburger (mobile only, hidden on tablet+) */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              title="Menu"
+              className="hidden md:flex w-10 h-10 bg-white hover:bg-gray-50 text-gray-800 rounded-lg flex items-center justify-center transition-colors shadow-sm"
             >
               <AlignJustify className="w-5 h-5" />
             </button>
@@ -470,7 +477,7 @@ export const Header: React.FC = () => {
                     </div>
                   </button>
                   {isProfileDropdownOpen && (
-                    <div className="absolute right-0 top-full pt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[100] animate-in fade-in zoom-in-95">
+                    <div className="absolute right-0 top-full pt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[100] opacity-100 scale-100 transition-all duration-200 animate-in fade-in zoom-in-95 pointer-events-auto">
                       <div className="px-4 py-2 border-b border-gray-100 mb-2">
                         <p className="font-bold text-gray-900 truncate">
                           {user?.firstName} {user?.lastName}
@@ -496,11 +503,25 @@ export const Header: React.FC = () => {
                       {user?.role === 'guide' && (
                         <>
                           <Link
+                            to="/guide/dashboard"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                            onClick={() => setIsProfileDropdownOpen(false)}
+                          >
+                            Dashboard
+                          </Link>
+                          <Link
                             to="/guide/listings"
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
                             onClick={() => setIsProfileDropdownOpen(false)}
                           >
-                            My listings
+                            My list
+                          </Link>
+                          <Link
+                            to="/guide/bookings"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center gap-2"
+                            onClick={() => setIsProfileDropdownOpen(false)}
+                          >
+                            <MessageCircle className="w-4 h-4" /> Messages
                           </Link>
                         </>
                       )}
@@ -524,15 +545,9 @@ export const Header: React.FC = () => {
               <>
                 <button
                   onClick={() => setIsLoginOpen(true)}
-                  className="shrink-0 text-sm font-bold px-3 py-2 rounded-full transition-colors shadow-sm bg-white hover:bg-slate-50 text-gray-800"
+                  className="shrink-0 bg-primary hover:bg-primary-hover text-white text-sm font-bold px-5 rounded-full transition-colors flex items-center h-10"
                 >
                   Log in
-                </button>
-                <button
-                  onClick={() => setIsSignupOpen(true)}
-                  className="shrink-0 bg-brand-yellow hover:bg-[#ffba0a] text-[#213448] text-sm font-bold px-3.5 py-2 rounded-full transition-colors shadow-sm"
-                >
-                  Sign up
                 </button>
               </>
             )}
@@ -655,7 +670,7 @@ export const Header: React.FC = () => {
                                 className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
                                 onClick={() => setIsMenuOpen(false)}
                               >
-                                My listings
+                                My list
                               </Link>
                             </>
                           )}
@@ -800,7 +815,7 @@ export const Header: React.FC = () => {
                           ? 'Where are you going?'
                           : 'Find your local in...'
                       }
-                      className="w-full h-14 pl-6 pr-14 rounded-full border-2 border-transparent focus:border-brand-yellow bg-white shadow-sm text-[#213448] placeholder:text-gray-400 focus:ring-0 text-lg transition-all"
+                      className="w-full h-14 pl-6 pr-14 rounded-full border border-gray-200 bg-white shadow-sm text-[#213448] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-yellow focus:ring-offset-2 text-lg transition-all"
                       autoFocus
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
@@ -808,7 +823,7 @@ export const Header: React.FC = () => {
                     />
                     <button
                       onClick={handleSearch}
-                      className="absolute right-2 top-2 bottom-2 w-10 h-10 bg-brand-yellow hover:bg-[#ffba0a] rounded-full flex items-center justify-center text-[#213448] transition-transform hover:scale-105 active:scale-95 shadow-sm"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-brand-yellow hover:bg-[#ffba0a] rounded-full flex items-center justify-center text-[#213448] transition-transform hover:scale-105 active:scale-95 shadow-sm"
                     >
                       <Search className="w-5 h-5" />
                     </button>

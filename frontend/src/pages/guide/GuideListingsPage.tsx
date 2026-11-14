@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
-import { BadgeCheck, ExternalLink, Pencil, Plus, RefreshCw, Trash2, Users } from 'lucide-react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { ArrowLeft, BadgeCheck, ExternalLink, Pencil, Plus, RefreshCw, Trash2, Users } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
+import { useGoBack } from '../../utils/backNavigation';
 import { guideDashboardApi, type GuideListing } from '../../services/guideDashboardApi';
 import { useCurrency } from '../../contexts/CurrencyContext';
 
@@ -17,6 +18,8 @@ import { useCurrency } from '../../contexts/CurrencyContext';
  */
 const GuideListingsPage: React.FC = () => {
   const { accessToken, isAuthenticated, user } = useAuthStore();
+  const navigate = useNavigate();
+  const goBack = useGoBack('/guide/dashboard');
   const { formatPrice } = useCurrency();
   const [listings, setListings] = useState<GuideListing[]>([]);
   const [error, setError] = useState('');
@@ -91,6 +94,10 @@ const GuideListingsPage: React.FC = () => {
     <div className="flex min-h-screen flex-col bg-gray-50 font-sans">
       <Header />
       <main id="main-content" className="container mx-auto max-w-6xl flex-grow px-4 py-10">
+        <button onClick={goBack} className="mb-6 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 shadow-sm text-gray-700 font-medium text-sm transition-all duration-200 hover:bg-gray-50 hover:border-gray-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back</span>
+        </button>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Your experiences</h1>
@@ -278,13 +285,6 @@ const GuideListingsPage: React.FC = () => {
             </section>
           </div>
         )}
-
-        <Link
-          to="/guide/dashboard"
-          className="mt-8 inline-block text-sm font-bold text-primary hover:underline"
-        >
-          Back to dashboard
-        </Link>
       </main>
       <Footer />
     </div>

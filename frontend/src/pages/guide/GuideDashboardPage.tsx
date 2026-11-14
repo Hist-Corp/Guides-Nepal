@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Calendar, MapPin, Megaphone, Plus, Users, Compass } from 'lucide-react';
+import { Calendar, LayoutDashboard, BadgeCheck, MapPin, Megaphone, Plus, Users, Compass, Sparkles } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
@@ -100,11 +100,11 @@ const GuideDashboardPage: React.FC = () => {
 
   const stats = data?.stats;
   const cards = [
-    { label: 'Experience listings', value: stats?.listings ?? 0 },
-    { label: 'Assigned experiences', value: stats?.assigned_listings ?? 0 },
-    { label: 'Upcoming bookings', value: stats?.upcoming_bookings ?? 0 },
-    { label: 'Guests booked', value: stats?.total_guests ?? 0 },
-    { label: 'Spots left', value: stats?.available_spots ?? 0 },
+    { label: 'Experience listings', value: stats?.listings ?? 0, icon: LayoutDashboard, color: 'bg-blue-50 text-blue-600 border-blue-100', iconColor: 'bg-blue-100 text-blue-600' },
+    { label: 'Assigned experiences', value: stats?.assigned_listings ?? 0, icon: BadgeCheck, color: 'bg-emerald-50 text-emerald-600 border-emerald-100', iconColor: 'bg-emerald-100 text-emerald-600' },
+    { label: 'Upcoming bookings', value: stats?.upcoming_bookings ?? 0, icon: Calendar, color: 'bg-amber-50 text-amber-600 border-amber-100', iconColor: 'bg-amber-100 text-amber-600' },
+    { label: 'Guests booked', value: stats?.total_guests ?? 0, icon: Users, color: 'bg-purple-50 text-purple-600 border-purple-100', iconColor: 'bg-purple-100 text-purple-600' },
+    { label: 'Spots left', value: stats?.available_spots ?? 0, icon: Sparkles, color: 'bg-rose-50 text-rose-600 border-rose-100', iconColor: 'bg-rose-100 text-rose-600' },
   ];
 
   return (
@@ -118,7 +118,7 @@ const GuideDashboardPage: React.FC = () => {
           </div>
           <div className="flex gap-3">
             <Link to="/guide/proposals" className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-bold text-gray-800 hover:bg-gray-100">Proposals</Link>
-            <Link to="/guide/listings" className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-bold text-gray-800 hover:bg-gray-100">My listings</Link>
+            <Link to="/guide/listings" className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-bold text-gray-800 hover:bg-gray-100">My list</Link>
             <Link to="/guide/listings/new" className="flex items-center gap-2 rounded-full bg-[#213448] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#1a2a3a]">
               <Plus className="h-4 w-4" /> New listing
             </Link>
@@ -129,14 +129,25 @@ const GuideDashboardPage: React.FC = () => {
         ) : error ? (
           <p className="mt-8 rounded-xl border border-red-200 bg-red-50 p-4 text-red-600">{error}</p>
         ) : (
-          <>
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-              {cards.map((c) => (
-                <div key={c.label} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-                  <p className="text-3xl font-bold text-gray-900">{c.value}</p>
-                  <p className="mt-1 text-sm text-gray-500">{c.label}</p>
-                </div>
-              ))}
+          <> 
+            <div className="mt-8 grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+              {cards.map((c) => {
+                const Icon = c.icon;
+                return (
+                  <div
+                    key={c.label}
+                    className={`rounded-2xl border p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 ${c.color}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${c.iconColor}`}>
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <p className="text-2xl font-bold text-gray-900">{c.value}</p>
+                    </div>
+                    <p className="mt-3 text-sm font-medium text-gray-600">{c.label}</p>
+                  </div>
+                );
+              })}
             </div>
 
             <div className="mt-8 grid gap-6 lg:grid-cols-3">
@@ -203,32 +214,47 @@ const GuideDashboardPage: React.FC = () => {
                 <Link to="/guide/listings" className="text-sm font-bold text-primary hover:underline">Manage all</Link>
               </div>
               {(data?.listings ?? []).length === 0 ? (
-                <p className="mt-4 text-gray-500">No listings yet. <Link to="/guide/listings/new" className="font-bold text-primary hover:underline">List your first experience</Link>.</p>
+                <div className="mt-6 text-center py-8">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                    <Compass className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900">No listings yet</h3>
+                  <p className="mt-2 text-gray-500">Start by creating your first experience listing.</p>
+                  <Link
+                    to="/guide/listings/new"
+                    className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#213448] text-white font-bold text-sm hover:bg-[#1a2a3a] transition-colors"
+                  >
+                    <Plus className="h-4 w-4" /> List your first experience
+                  </Link>
+                </div>
               ) : (
-                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2">
                   {(data?.listings ?? []).slice(0, 4).map((l) => (
-                    <div key={l.id} className="rounded-xl border border-gray-100 p-4">
+                    <div key={l.id} className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-shadow">
                       <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="text-xs font-bold uppercase text-gray-500">{l.category} - {l.city}</p>
-                          <h3 className="mt-1 font-bold text-gray-900">{l.title}</h3>
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold uppercase text-gray-500 truncate">{l.category} - {l.city}</p>
+                          <h3 className="mt-1 font-bold text-gray-900 truncate">{l.title}</h3>
                         </div>
                         {l.source === 'assigned' && (
-                          <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700">
+                          <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700">
                             Assigned
                           </span>
                         )}
                       </div>
                       {l.source === 'assigned' ? (
-                        <p className="mt-2 text-sm text-gray-600">
-                          Approved by your Regional Manager. Manage it from My listings.
+                        <p className="mt-3 text-sm text-gray-600">
+                          Approved by your Regional Manager. Manage it from My list.
                         </p>
                       ) : (
                         <>
-                          <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-100">
-                            <div className="h-full rounded-full bg-brand-yellow" style={{ width: `${Math.min(l.occupancy_pct, 100)}%` }} />
+                          <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-100">
+                            <div className="h-full rounded-full bg-brand-yellow transition-all duration-500" style={{ width: `${Math.min(l.occupancy_pct, 100)}%` }} />
                           </div>
-                          <p className="mt-2 text-sm text-gray-600">{l.booked_guests}/{l.max_guests ?? 0} guests - {l.available_spots ?? 0} left</p>
+                          <div className="mt-3 flex items-center justify-between text-sm">
+                            <span className="text-gray-600">{l.booked_guests}/{l.max_guests ?? 0} guests</span>
+                            <span className="font-bold text-amber-600">{l.available_spots ?? 0} spots left</span>
+                          </div>
                         </>
                       )}
                     </div>
