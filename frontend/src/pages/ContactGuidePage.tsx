@@ -1,0 +1,403 @@
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useGoBack } from '../utils/backNavigation';
+import { Header } from '../components/common/Header';
+import { Footer } from '../components/common/Footer';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Minus,
+  Plus,
+  ShieldCheck,
+  MessageCircle,
+  ArrowLeft,
+} from 'lucide-react';
+import { sendGuideRequest } from '../services/publicApi';
+import { findGuideBySlug } from '../utils/guideUrl';
+import guidesApi, { type GuideProfile } from '../services/guidesApi';
+
+const ContactGuidePage: React.FC = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const goBack = useGoBack();
+  const localGuide = findGuideBySlug(slug);
+  // Guides that exist only in the database have no local catalog entry, so the
+  // contact page resolves their name from the profile endpoint.
+  const [apiGuide, setApiGuide] = useState<GuideProfile | null>(null);
+  const [resolving, setResolving] = useState(false);
+
+  useEffect(() => {
+    if (localGuide || !slug) return;
+    let cancelled = false;
+
+    setResolving(true);
+    guidesApi
+      .getGuideProfileBySlug(slug)
+      .then((profile) => {
+        if (!cancelled) setApiGuide(profile);
+      })
+      .catch(() => {
+        if (!cancelled) setApiGuide(null);
+      })
+      .finally(() => {
+        if (!cancelled) setResolving(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [localGuide, slug]);
+
+  const guide = localGuide ?? apiGuide;
+
+  // Form State
+  const [adults, setAdults] = useState(2);
+  const [children, setChildren] = useState(0);
+  const [selectedDate, setSelectedDate] = useState<number | null>(23); // Default selected for demo
+  const [selectedTime, setSelectedTime] = useState({ hour: '09', minute: '00', period: 'AM' });
+  const [duration, setDuration] = useState(3);
+
+  // Personalization request submission
+  const [sendingRequest, setSendingRequest] = useState(false);
+  const [requestSent, setRequestSent] = useState(false);
+
+  if (!guide && resolving) {
+    return (
+      <div className="min-h-screen flex flex-col font-sans bg-white">
+        <Header />
+        <main
+          id="main-content"
+          className="flex-grow flex flex-col items-center justify-center px-4 py-20 text-center"
+        >
+          <p className="text-gray-500">Loading guide...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!guide) {
+    return (
+      <div className="min-h-screen flex flex-col font-sans bg-white">
+        <Header />
+        <main
+          id="main-content"
+          className="flex-grow flex flex-col items-center justify-center px-4 py-20 text-center"
+        >
+          <h1 className="text-2xl font-bold text-gray-900">Guide not found</h1>
+          <p className="mt-3 text-gray-600">This guide is no longer available.</p>
+          <button
+            onClick={goBack}
+            className="mt-8 rounded-full bg-[#213448] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#1a2a3a]"
+          >
+            Go back
+          </button>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const handleRequest = async () => {
+    setSendingRequest(true);
+    try {
+      await sendGuideRequest({
+        name: 'Traveler',
+        email: 'traveler@example.com',
+        subject: `Personalization request for ${guide.name}`,
+        message: `Interested in ${duration}h tour with ${adults} adult(s), ${children} child(ren)${selectedDate ? ` on Jan ${selectedDate}` : ''} at ${selectedTime.hour}:${selectedTime.minute} ${selectedTime.period}.`,
+      });
+      setRequestSent(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } finally {
+      setSendingRequest(false);
+    }
+  };
+
+  const isSafeImageUrl = (url: string): boolean => {
+    if (typeof url !== 'string') return false;
+    if (url.startsWith('/') || url.startsWith('./') || url.startsWith('../')) return true;
+    try {
+      const parsed = new URL(url, window.location.origin);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  };
+  const safeGuideImage = isSafeImageUrl(guide.image) ? encodeURI(guide.image) : '';
+
+  // Calendar generation helper
+  const renderCalendar = () => {
+    const days = [];
+    // Just a demo calendar for Jan 2026 as per image
+    // Empty slots for start of month
+    for (let i = 0; i < 4; i++) days.push(<div key={`empty-${i}`} className="h-10"></div>);
+
+    // Days 1-31
+    for (let i = 1; i <= 31; i++) {
+      const isSelected = i === selectedDate;
+      days.push(
+        <button
+          key={i}
+          onClick={() => setSelectedDate(i)}
+          className={`
+            h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium transition-all mx-auto
+            ${
+              isSelected
+                ? 'bg-brand-yellow text-white font-bold'
+                : 'text-gray-700 hover:bg-gray-100'
+            }
+          `}
+        >
+          {i}
+        </button>
+      );
+    }
+    return days;
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col font-sans bg-white">
+      <Header />
+
+      <main id="main-content" className="flex-grow flex flex-col items-center py-12 px-4">
+        <div className="w-full max-w-2xl space-y-10">
+          <button
+            onClick={goBack}
+            className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Back
+          </button>
+
+          {/* Header Section */}
+          <div className="flex items-start gap-4">
+            <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 border border-gray-200">
+              <img src={safeGuideImage} alt={guide.name} className="w-full h-full object-cover" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-brand-yellow mb-1">
+                S̄wạs̄dī, I am {guide.name}!
+              </h1>
+              <p className="text-gray-500">
+                Thanks for getting in touch.
+                <br />
+                Let's personalize your experience!
+              </p>
+            </div>
+          </div>
+
+          {/* Textarea Section */}
+          <div className="space-y-3">
+            <label className="block text-gray-500 font-medium">
+              What makes a perfect tour for you? Include who's joining and your top preferences!
+            </label>
+            <textarea
+              className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-yellow focus:border-transparent outline-none min-h-[120px] resize-none text-gray-700 placeholder-gray-400"
+              placeholder="E.g., We love food tours with local specialties, street food stops, and unique dining experiences."
+            ></textarea>
+          </div>
+
+          {/* Group Size Section */}
+          <div className="space-y-3">
+            <label className="block text-gray-500 font-medium">What is your group size</label>
+            <div className="border border-gray-200 rounded-xl overflow-hidden divide-y divide-gray-100">
+              {/* Adults */}
+              <div className="flex items-center justify-between p-4 bg-white">
+                <span className="font-bold text-gray-900">Adults</span>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => setAdults(Math.max(1, adults - 1))}
+                    className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-brand-yellow hover:text-brand-yellow transition-colors"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="w-4 text-center font-bold text-gray-900">{adults}</span>
+                  <button
+                    onClick={() => setAdults(adults + 1)}
+                    className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-brand-yellow hover:text-brand-yellow transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              {/* Children */}
+              <div className="flex items-center justify-between p-4 bg-white">
+                <span className="font-bold text-gray-900">Children</span>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => setChildren(Math.max(0, children - 1))}
+                    className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-brand-yellow hover:text-brand-yellow transition-colors"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </button>
+                  <span className="w-4 text-center font-bold text-gray-900">{children}</span>
+                  <button
+                    onClick={() => setChildren(children + 1)}
+                    className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-brand-yellow hover:text-brand-yellow transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Date and Time Section */}
+          <div className="space-y-3">
+            <label className="block text-gray-500 font-medium">
+              Choose your preferred date and time
+            </label>
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              {/* Calendar Header */}
+              <div className="flex items-center justify-between p-4 border-b border-gray-100">
+                <span className="font-bold text-gray-900">January 2026</span>
+                <div className="flex gap-2">
+                  <button className="p-1 hover:bg-gray-100 rounded-full text-brand-yellow">
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button className="p-1 hover:bg-gray-100 rounded-full text-brand-yellow">
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Calendar Grid */}
+              <div className="p-4">
+                <div className="grid grid-cols-7 text-center mb-2">
+                  {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map((d) => (
+                    <div key={d} className="text-xs text-gray-400 font-medium py-2">
+                      {d}
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-7 gap-y-2">{renderCalendar()}</div>
+              </div>
+
+              {/* Time Selection */}
+              <div className="border-t border-gray-100 p-4 flex items-center justify-between">
+                <span className="font-bold text-gray-900 text-sm">Start time</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1 border border-gray-200 rounded px-2 py-1">
+                    <span className="font-bold text-gray-900">{selectedTime.hour}</span>
+                    <span className="text-gray-400">:</span>
+                    <span className="font-bold text-gray-900">{selectedTime.minute}</span>
+                  </div>
+                  <div className="flex bg-gray-100 rounded p-1 gap-1">
+                    <button
+                      onClick={() => setSelectedTime({ ...selectedTime, period: 'AM' })}
+                      className={`px-3 py-1 rounded text-xs font-bold transition-colors ${selectedTime.period === 'AM' ? 'bg-brand-yellow text-white' : 'text-gray-500 hover:bg-gray-200'}`}
+                    >
+                      AM
+                    </button>
+                    <button
+                      onClick={() => setSelectedTime({ ...selectedTime, period: 'PM' })}
+                      className={`px-3 py-1 rounded text-xs font-bold transition-colors ${selectedTime.period === 'PM' ? 'bg-brand-yellow text-white' : 'text-gray-500 hover:bg-gray-200'}`}
+                    >
+                      PM
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Duration */}
+              <div className="border-t border-gray-100 p-4 flex items-center justify-between">
+                <span className="font-bold text-gray-900 text-sm">Duration</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setDuration(Math.max(1, duration - 0.5))}
+                    className="w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:border-brand-yellow hover:text-brand-yellow"
+                  >
+                    <Minus className="w-3 h-3" />
+                  </button>
+                  <div className="border border-gray-200 rounded px-3 py-1 text-sm font-bold text-gray-900 min-w-[80px] text-center">
+                    {duration} hours
+                  </div>
+                  <button
+                    onClick={() => setDuration(duration + 0.5)}
+                    className="w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:border-brand-yellow hover:text-brand-yellow"
+                  >
+                    <Plus className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Success / Security Banner */}
+          <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+                <Check className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-bold text-gray-700 text-sm">Success!</span>
+            </div>
+            <div className="flex items-center gap-1 opacity-50">
+              {/* Cloudflare logo placeholder representation */}
+              <span className="font-bold text-[10px]">CLOUDFLARE</span>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          {requestSent ? (
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+              <div className="font-bold text-green-700 text-sm mb-1">Request sent!</div>
+              <p className="text-sm text-green-600">
+                {guide.name} will get back to you{selectedDate ? ` about Jan ${selectedDate}` : ''}{' '}
+                shortly.
+              </p>
+            </div>
+          ) : (
+            <button
+              onClick={handleRequest}
+              disabled={sendingRequest}
+              className="w-full bg-brand-yellow hover:bg-yellow-600 text-white font-bold py-4 rounded-full text-lg shadow-lg shadow-primary/20 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
+            >
+              {sendingRequest ? 'Sending…' : 'Send your personalization request'}
+            </button>
+          )}
+
+          {/* Safety Notice */}
+          <div className="bg-[#FFF8E6] border border-[#FFE0B2] rounded-xl p-4 flex items-start gap-3">
+            <div className="p-1 bg-brand-yellow rounded-full shrink-0 mt-0.5">
+              <ShieldCheck className="w-4 h-4 text-white" />
+            </div>
+            <div className="text-sm text-gray-600">
+              <span className="font-bold text-gray-900 block mb-1">Safety first</span>
+              For your safety, always communicate and transfer money via the Guides Nepal website or
+              app.{' '}
+              <a href="#" className="text-brand-yellow font-bold hover:underline">
+                Learn more
+              </a>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Floating Chat Button */}
+      <div className="fixed bottom-8 left-8 z-50">
+        <button className="w-14 h-14 bg-brand-yellow rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform text-white">
+          <MessageCircle className="w-7 h-7 fill-current" />
+        </button>
+      </div>
+
+      <Footer />
+    </div>
+  );
+};
+
+// Simple Check Icon Component for internal use
+const Check = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <polyline points="20 6 9 17 4 12"></polyline>
+  </svg>
+);
+
+export default ContactGuidePage;

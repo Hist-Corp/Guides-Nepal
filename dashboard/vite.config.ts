@@ -1,0 +1,36 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+// BACKEND_URL is env-overridable so Docker Compose can point the dev proxy at
+// the backend service name (http://backend:8000) instead of localhost.
+// Local dev keeps working with zero config (defaults to localhost:8000).
+const backendTarget = process.env.VITE_BACKEND_URL ?? 'http://localhost:8000';
+// Base path allows the dashboard to be served at a sub-route (e.g. /dashboard/)
+// when deployed under the frontend Vercel project. Defaults to '/' for the
+// standalone dashboard deployment.
+const base = process.env.VITE_BASE_PATH ?? '/';
+
+export default defineConfig({
+  base,
+  resolve: {
+    dedupe: ['react', 'react-dom'],
+  },
+  plugins: [react()],
+  build: {
+    chunkSizeWarningLimit: 3000,
+  },
+  server: {
+    port: 5176,
+    strictPort: true,
+    host: '0.0.0.0',
+    proxy: {
+      '/api/v1': {
+        target: backendTarget,
+        changeOrigin: true,
+      },
+    },
+  },
+  preview: {
+    port: 5176,
+  },
+});

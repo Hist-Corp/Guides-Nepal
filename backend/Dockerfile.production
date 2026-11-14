@@ -1,0 +1,72 @@
+# Guides Nepal — Backend Production Dockerfile
+# Multi-stage is not required for a pure Python service; we use a single stage
+# with runtime-only dependencies to keep the image small and secure.
+#
+# Build:
+#   docker build -f backend/Dockerfile.production -t guides-nepal-backend:prod .
+#
+# Run:
+#   docker run -p 8000:8000 --env-file backend/.env.production guides-nepal-backend:prod
+
+FROM python:3.11-slim AS builder
+
+WORKDIR /app
+
+# Install system build dependencies (needed for psycopg2-binary, cryptography).
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy only the production requirements and install into a dedicated user site.
+COPY backend/requirements-production.txt .
+RUN pip install --no-cache-dir --user -r requirements-production.txt
+
+# ---------------------------------------------------------------
+# Final image — slim, non-root, runtime only
+# ---------------------------------------------------------------
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Runtime system libraries (libpq for psycopg2). No build tools.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy installed packages from the builder stage.
+COPY --from=builder /root/.local /root/.local
+
+# Make sure scripts in .local are on PATH.
+ENV PATH=/root/.local/bin:$PATH
+
+# Create a non-root user for the application.
+RUN useradd --create-home --shell /bin/bash appuser \
+    && mkdir -p /app/uploads \
+    && chown -R appuser:appuser /app
+
+# Copy application code.
+COPY --chown=appuser:appuser backend/ /app/
+
+# Switch to non-root user.
+USER appuser
+
+# Production environment.
+ENV ENV=production
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PORT=8000
+ENV HOST=0.0.0.0
+
+# Uploads directory (mounted or created at runtime).
+ENV UPLOADS_DIR=./uploads
+
+# Expose the application port.
+EXPOSE 8000
+
+# Health check — Render and other platforms use this to determine readiness.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)" || exit 1
+
+# Start the application with uvicorn. Workers can be tuned via the WEB_CONCURRENCY env var.
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

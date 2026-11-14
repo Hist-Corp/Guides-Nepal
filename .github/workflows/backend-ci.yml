@@ -1,0 +1,96 @@
+name: Backend CI
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
+      - run: pip install -r requirements.txt
+      - run: black --check .
+      - run: ruff check .
+      - run: mypy .
+  test:
+    runs-on: ubuntu-latest
+    needs: quality
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Run tests with coverage
+        run: pytest --cov=app --cov-report=xml --cov-report=html
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          file: backend/coverage.xml
+          flags: backend
+          name: backend-coverage
+  security:
+    runs-on: ubuntu-latest
+    needs: test
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
+      - run: pip install -r requirements.txt
+      - run: safety check -r requirements.txt
+      - run: bandit -r app
+  build:
+    runs-on: ubuntu-latest
+    needs: security
+    steps:
+      - uses: actions/checkout@v5
+      - run: docker run --rm -i hadolint/hadolint < backend/Dockerfile
+      - run: docker compose -f backend/docker-compose.yml config
+      - run: docker build -f backend/Dockerfile backend -t guides-nepal-backend:ci
+  readiness:
+    runs-on: ubuntu-latest
+    needs: build
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
+      - run: pip install -r requirements.txt
+      - run: python scripts/check_readiness.py
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/guides_nepal
+          SECRET_KEY: dummy
+          ENV: ci

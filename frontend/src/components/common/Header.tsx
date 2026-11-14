@@ -1,0 +1,1133 @@
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
+import {
+  AlignJustify,
+  Search,
+  ChevronRight,
+  ChevronLeft,
+  ChevronDown,
+  X,
+  Heart,
+  User,
+  ShoppingCart,
+  Star,
+  MapPin as MapPinIcon,
+  Sparkles,
+  LayoutDashboard,
+  MessageCircle,
+} from 'lucide-react';
+import { LoginModal } from '../auth/LoginModal';
+import { SignupModal } from '../auth/SignupModal';
+import { ForgotPasswordModal } from '../auth/ForgotPasswordModal';
+import SupportWidget from './SupportWidget';
+import { useUIStore } from '../../store/uiStore';
+import { useAuthStore } from '../../store/authStore';
+import { useProfileStore } from '../../store/profileStore';
+import { useCart } from '../../contexts/CartContext';
+import { useBookingStore } from '../../store/bookingStore';
+import { useCurrency } from '../../contexts/CurrencyContext';
+import { CurrencyPickerModal } from './CurrencyPickerModal';
+import { getAllSuggestions } from '../../utils/searchIndex';
+
+export const Header: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const { isSearchOpen, openSearch, closeSearch, searchQuery, setSearchQuery, openCart } =
+    useUIStore();
+  const { isAuthenticated, user, logout } = useAuthStore();
+  const { getTotalItems } = useCart();
+  // Favourites shown on /favorites: the header heart turns red only while the
+  // user actually has saved bookmarks — null/empty keeps the plain outline icon.
+  const bookmarks = useProfileStore((state) => state.profile.bookmarks);
+  const hasFavorites = Array.isArray(bookmarks) && bookmarks.length > 0;
+  const { currencyInfo, formatPrice } = useCurrency();
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isSignupOpen, setIsSignupOpen] = useState(false);
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [isCurrencyPickerOpen, setIsCurrencyPickerOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'experiences' | 'guides'>('experiences');
+  const [isVisible, setIsVisible] = useState(true);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  // Ref (not state) so the scroll effect can attach ONE stable listener and
+  // read the previous position without re-running/re-triggering on every scroll
+  const lastScrollYRef = useRef(0);
+  // True once the page's top hero block has been fully scrolled past. Drives
+  // the peach→white header background on every page and (on the home page)
+  // the header search-bar reveal.
+  const [hasPassedTopBlock, setHasPassedTopBlock] = useState(false);
+
+  // Check if current page is Home Page
+  const isHomePage = location.pathname === '/';
+  // Header search visibility: always on (except host pages); on the home page
+  // it fades/slides in after the hero section has been scrolled past
+  const showHeaderSearch = !isHomePage || hasPassedTopBlock;
+  // Header background: peach while the page's top hero block is still visible,
+  // solid white only once it has been completely scrolled past — on every
+  // page, matching the original design
+  const showSolidBackground = hasPassedTopBlock;
+  const isHostApplicationPage = location.pathname === '/host-application';
+  // Experience pages (/city/:cityId/experience/:slug) have their own sticky nav;
+  // collapse the Header mobile menu so only one menu system appears.
+  const isExperiencePage = /^\/city\/[^/]+\/experience/.test(location.pathname);
+
+  // Customer support widget driven from the hamburger menu on mobile. On desktop
+  // the widget keeps its own floating FAB state (unchanged).
+  const [supportOpen, setSupportOpen] = useState(false);
+
+  const closeSupport = useCallback(() => {
+    setSupportOpen(false);
+  }, []);
+
+  const openSupport = useCallback(() => {
+    setSupportOpen(true);
+  }, []);
+
+  const handleSearch = useCallback(() => {
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      closeSearch();
+      setSearchQuery('');
+    }
+  }, [searchQuery, navigate, closeSearch, setSearchQuery]);
+
+  const suggestions = useMemo(() => getAllSuggestions(searchQuery, 8), [searchQuery]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Handle Navbar Visibility (Hide on scroll down, show on scroll up)
+      if (currentScrollY > lastScrollYRef.current && currentScrollY > 80) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+
+      // Collapse profile dropdown when user starts scrolling
+      setIsProfileDropdownOpen(false);
+
+      // Background colour + (home) search reveal: peach & collapsed while the
+      // page's top hero block is still visible, solid white & expanded once
+      // it has been completely scrolled past — on every page, not just home.
+      // Block selection: the home page's CMS hero; otherwise the first content
+      // block after the header (<main> is a full-page container, so look at
+      // its first child — city/category pages place their hero before
+      // <main>, and are picked up as the header's next sibling directly).
+      const topBlock = (() => {
+        const homeHero = document.querySelector<HTMLElement>('[data-cms-id="home-hero"]');
+        if (homeHero) return homeHero;
+        const pageHero = document.querySelector<HTMLElement>('[data-page-hero="true"]');
+        if (pageHero) return pageHero;
+        const headerEl = document.querySelector('header');
+        let el: Element | null | undefined = headerEl?.nextElementSibling ?? null;
+        if (el && (el.tagName === 'MAIN' || el.tagName === 'FOOTER')) {
+          el = el.firstElementChild;
+        }
+        return el instanceof HTMLElement ? el : null;
+      })();
+      if (topBlock && topBlock.offsetHeight > 0) {
+        // getBoundingClientRect() is viewport-relative (no offsetParent
+        // ambiguity), and the zero-height guard stops the flag latching to
+        // "passed" if the block is still hidden/unstyled when this first runs
+        // on mount — that latch showed a white header + search bar at the top.
+        // "Passed" = the block's bottom has reached the sticky header (80px).
+        setHasPassedTopBlock(topBlock.getBoundingClientRect().bottom <= 80);
+      } else {
+        // No identifiable top block: original fallback (white after 10px)
+        setHasPassedTopBlock(currentScrollY > 10);
+      }
+
+      lastScrollYRef.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Run once on mount so a mid-page refresh shows the correct state
+    handleScroll();
+    // Late-loading assets (hero images) change section heights, so re-measure
+    // when everything has loaded — otherwise only a scroll would correct it
+    window.addEventListener('load', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('load', handleScroll);
+    };
+    // Empty deps: single stable listener for the component's lifetime;
+    // re-adding it per-scroll would race with rapid scroll events
+  }, []);
+
+  // Disable body scroll when menu is open
+  useEffect(() => {
+    if (isMenuOpen || isSearchOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMenuOpen, isSearchOpen]);
+
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileProfileDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close profile dropdown when clicking/tapping outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node;
+      const inDesktop = profileDropdownRef.current && profileDropdownRef.current.contains(target);
+      const inMobile =
+        mobileProfileDropdownRef.current && mobileProfileDropdownRef.current.contains(target);
+      if (!inDesktop && !inMobile) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
+
+  return (
+    <>
+      <header
+        className={`sticky top-0 z-50 w-full border-b border-transparent transition-all duration-300 ${
+          isVisible ? 'translate-y-0' : '-translate-y-full'
+        } ${showSolidBackground ? 'bg-white' : 'bg-peach'}`}
+      >
+        <div className="container mx-auto px-4 h-20 flex items-center justify-between gap-2">
+          {/* Logo */}
+          <Link
+            to="/"
+            className="flex items-center gap-2 shrink-0 -ml-2"
+            aria-label="Guides Nepal - Home"
+          >
+            <img
+              src="/images/logo.png"
+              alt="Guides Nepal logo"
+              className="object-contain shrink-0"
+              style={{ maxWidth: '200px', maxHeight: '50px' }}
+            />
+          </Link>
+
+          {/* Search Bar (All pages; on the home page it animates in once the
+            user scrolls past the hero, which has its own search bar).
+            Kept mounted so it transitions smoothly instead of popping. */}
+          {!isHostApplicationPage && (
+            <div
+              aria-hidden={!showHeaderSearch}
+              className={`hidden md:flex flex-1 overflow-hidden transition-all duration-300 ease-in-out ${
+                showHeaderSearch
+                  ? 'max-w-xl opacity-100 mx-8'
+                  : 'max-w-0 opacity-0 mx-0 pointer-events-none'
+              }`}
+            >
+              <div className="relative w-full group min-w-[22rem]">
+                <input
+                  type="text"
+                  placeholder="Where are you going?"
+                  readOnly
+                  tabIndex={showHeaderSearch ? 0 : -1}
+                  onClick={openSearch}
+                  className="w-full h-12 pl-6 pr-14 rounded-full border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-yellow focus:ring-offset-2"
+                />
+                <button
+                  onClick={openSearch}
+                  tabIndex={showHeaderSearch ? 0 : -1}
+                  title="Search"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center text-[#213448] transition-transform group-hover:scale-105"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Desktop Actions (tablet and up) */}
+          <div className="hidden md:flex items-center gap-3">
+            {!isAuthenticated ? (
+              <>
+                <button
+                  onClick={() => setIsLoginOpen(true)}
+                  className="h-10 bg-primary hover:bg-primary-hover text-white text-sm font-bold px-5 rounded-full transition-colors flex items-center"
+                >
+                  Log in
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/favorites"
+                  className="h-10 flex items-center text-gray-800 hover:text-primary transition-colors"
+                  title="Bookmarks"
+                >
+                  <Heart className={`w-6 h-6 ${hasFavorites ? 'text-red-500 fill-red-500' : ''}`} />
+                </Link>
+                <div ref={profileDropdownRef} className="relative inline-block">
+                  <button
+                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                    title="Profile"
+                    className="h-10 flex items-center gap-2 text-gray-800 transition-all duration-200"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-300 transition-all duration-200 hover:scale-110 hover:shadow-md hover:bg-yellow-100 hover:border-yellow-200">
+                      {user?.firstName ? (
+                        <span className="font-bold text-sm text-gray-700">{user.firstName[0]}</span>
+                      ) : (
+                        <User className="w-5 h-5 text-gray-500" />
+                      )}
+                    </div>
+                  </button>
+                  {/* Dropdown Menu */}
+                  <div
+                    className={`absolute right-0 top-full pt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 transition-all duration-200 z-50 ${isProfileDropdownOpen ? 'visible opacity-100 scale-100 pointer-events-auto' : 'invisible opacity-0 scale-95 pointer-events-none'} animate-in fade-in zoom-in-95`}
+                  >
+                    <div className="px-4 py-2 border-b border-gray-100 mb-2">
+                      <p className="font-bold text-gray-900 truncate">
+                        {user?.firstName} {user?.lastName}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                    </div>
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                      onClick={() => setIsProfileDropdownOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    {user?.role === 'host' && (
+                      <>
+                        <Link
+                          to="/host/dashboard"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center gap-2"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          <LayoutDashboard className="w-4 h-4" /> Host dashboard
+                        </Link>
+                        <Link
+                          to="/host/experiences"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          My experiences
+                        </Link>
+                        <Link
+                          to="/host/bookings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          Bookings
+                        </Link>
+                        <Link
+                          to="/host/earnings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          Earnings
+                        </Link>
+                        <Link
+                          to="/host/settings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          Settings
+                        </Link>
+                      </>
+                    )}
+                    {user?.role === 'guide' && (
+                      <>
+                        <Link
+                          to="/guide/dashboard"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          Dashboard
+                        </Link>
+                        <Link
+                          to="/guide/listings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          My list
+                        </Link>
+                      </>
+                    )}
+                    {user?.role !== 'host' && user?.role !== 'guide' && (
+                      <Link
+                        to="/bookings"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        Travel lists
+                      </Link>
+                    )}
+                    <Link
+                      to={user?.role === 'guide' ? '/guide/bookings' : '/messages'}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center gap-2"
+                      onClick={() => setIsProfileDropdownOpen(false)}
+                    >
+                      <MessageCircle className="w-4 h-4" /> Messages
+                    </Link>
+                    <button
+                      onClick={() => {
+                        logout();
+                        useBookingStore.setState({ bookings: [] });
+                        navigate('/');
+                        setIsProfileDropdownOpen(false);
+                      }}
+                      className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-bold"
+                    >
+                      Log out
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Currency picker - opens "Choose your currency" modal. Text-only
+              code pill (USD / NPR / EUR ...), original white background. */}
+            <button
+              onClick={() => setIsCurrencyPickerOpen(true)}
+              title="Currency"
+              aria-label={`Change currency, current: ${currencyInfo.name}`}
+              data-testid="currency-picker-button"
+              className="h-10 group flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 shadow-sm transition-colors hover:border-primary hover:shadow"
+            >
+              <span className="text-sm font-bold tracking-wide text-primary">
+                {currencyInfo.code}
+              </span>
+              <ChevronDown className="h-4 w-4 text-gray-400 transition-colors group-hover:text-primary" />
+            </button>
+
+            {/* Cart Icon — only for logged-in users */}
+            {isAuthenticated && (
+              <button
+                onClick={openCart}
+                title="Cart"
+                className="h-10 relative flex items-center px-3 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <ShoppingCart className="h-6 w-6 text-gray-700" />
+                {getTotalItems() > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {getTotalItems()}
+                  </span>
+                )}
+              </button>
+            )}
+
+            {/* Hamburger Menu (Desktop) - Right side */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              title="Menu"
+              className="w-10 h-10 bg-white hover:bg-gray-50 text-gray-800 rounded-lg flex items-center justify-center transition-colors shadow-sm"
+            >
+              <AlignJustify className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Mobile Actions (mobile only) */}
+          <div className="flex items-center gap-2 md:hidden">
+            {/* Mobile-only Hamburger (mobile only, hidden on tablet+) */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              title="Menu"
+              className="hidden md:flex w-10 h-10 bg-white hover:bg-gray-50 text-gray-800 rounded-lg flex items-center justify-center transition-colors shadow-sm"
+            >
+              <AlignJustify className="w-5 h-5" />
+            </button>
+            {/* Mobile Search Icon (on home page: animates in after scrolling past hero) */}
+            {!isHostApplicationPage && (
+              <button
+                onClick={openSearch}
+                tabIndex={showHeaderSearch ? 0 : -1}
+                aria-hidden={!showHeaderSearch}
+                title="Search"
+                className={`overflow-hidden flex items-center justify-center bg-brand-yellow text-[#213448] rounded-full shadow-sm transition-all duration-300 ease-in-out ${
+                  showHeaderSearch
+                    ? 'w-10 h-10 opacity-100 scale-100'
+                    : 'w-0 h-0 opacity-0 scale-50 pointer-events-none'
+                }`}
+              >
+                <Search className="w-5 h-5 shrink-0" />
+              </button>
+            )}
+            {isAuthenticated && (
+              <>
+                <Link
+                  to="/maila-dai"
+                  className="w-10 h-10 bg-white hover:bg-slate-50 text-gray-800 rounded-lg flex items-center justify-center transition-colors shadow-sm"
+                  title="Chat with Maila Dai"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                </Link>
+                <div className="relative" ref={mobileProfileDropdownRef}>
+                  <button
+                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                    title="Profile"
+                    className="w-10 h-10 bg-white hover:bg-yellow-50 text-gray-800 rounded-full flex items-center justify-center transition-colors shadow-sm"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-300 transition-all duration-200 hover:scale-110 hover:bg-yellow-100 hover:border-yellow-200">
+                      {user?.firstName ? (
+                        <span className="font-bold text-sm text-gray-700">{user.firstName[0]}</span>
+                      ) : (
+                        <User className="w-5 h-5 text-gray-500" />
+                      )}
+                    </div>
+                  </button>
+                  {isProfileDropdownOpen && (
+                    <div className="absolute right-0 top-full pt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-[100] opacity-100 scale-100 transition-all duration-200 animate-in fade-in zoom-in-95 pointer-events-auto">
+                      <div className="px-4 py-2 border-b border-gray-100 mb-2">
+                        <p className="font-bold text-gray-900 truncate">
+                          {user?.firstName} {user?.lastName}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                      </div>
+                      <Link
+                        to="/profile"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        Profile
+                      </Link>
+                      {user?.role !== 'guide' && (
+                        <Link
+                          to="/bookings"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          Travel lists
+                        </Link>
+                      )}
+                      {user?.role === 'guide' && (
+                        <>
+                          <Link
+                            to="/guide/dashboard"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                            onClick={() => setIsProfileDropdownOpen(false)}
+                          >
+                            Dashboard
+                          </Link>
+                          <Link
+                            to="/guide/listings"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
+                            onClick={() => setIsProfileDropdownOpen(false)}
+                          >
+                            My list
+                          </Link>
+                          <Link
+                            to="/guide/bookings"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center gap-2"
+                            onClick={() => setIsProfileDropdownOpen(false)}
+                          >
+                            <MessageCircle className="w-4 h-4" /> Messages
+                          </Link>
+                        </>
+                      )}
+                      <button
+                        onClick={() => {
+                          logout();
+                          useBookingStore.setState({ bookings: [] });
+                          navigate('/');
+                          setIsProfileDropdownOpen(false);
+                        }}
+                        className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-bold"
+                      >
+                        Log out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+            {!isAuthenticated && (
+              <>
+                <button
+                  onClick={() => setIsLoginOpen(true)}
+                  className="shrink-0 bg-primary hover:bg-primary-hover text-white text-sm font-bold px-5 rounded-full transition-colors flex items-center h-10"
+                >
+                  Log in
+                </button>
+              </>
+            )}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              title="Menu"
+              className="w-10 h-10 bg-white hover:bg-slate-50 text-gray-800 rounded-lg flex items-center justify-center transition-colors shadow-sm"
+            >
+              <AlignJustify className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Hamburger Menu Portal */}
+        {isMenuOpen &&
+          createPortal(
+            <div className="fixed inset-0 z-[100] flex justify-end">
+              {/* Backdrop */}
+              <div
+                className="absolute inset-0 backdrop-blur-md transition-opacity"
+                onClick={() => setIsMenuOpen(false)}
+              ></div>
+
+              {/* Menu Content */}
+              <nav className="mobile-menu relative w-full max-w-sm h-full bg-background-cream shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col">
+                <div className="p-6 flex justify-between items-center border-b border-gray-200/50">
+                  <span className="font-bold text-lg text-gray-800">Menu</span>
+                  <button
+                    onClick={() => setIsMenuOpen(false)}
+                    className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gray-800 hover:bg-slate-50 transition-colors shadow-sm"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto py-6 px-6 space-y-6">
+                  {/* Main Links */}
+                  <div className="space-y-1">
+                    <Link
+                      to="/"
+                      className="block px-4 py-3 rounded-full bg-gray-100 font-bold text-gray-800"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Home
+                    </Link>
+                    <Link
+                      to="/explore"
+                      className="block px-4 py-3 rounded-lg text-gray-800 font-medium hover:bg-black/5 transition-colors"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Explore
+                    </Link>
+
+                    <button
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        openSearch();
+                      }}
+                      className="w-full text-left block px-4 py-3 rounded-lg text-gray-800 font-medium hover:bg-black/5 transition-colors cursor-pointer"
+                    >
+                      Search
+                    </button>
+                  </div>
+
+                  <div className="h-px bg-gray-200 w-full"></div>
+
+                  {/* Profile Section */}
+                  <div className="space-y-3">
+                    <h3 className="text-xs font-medium text-gray-400 px-4 uppercase tracking-wide">
+                      Profile
+                    </h3>
+                    <div className="space-y-1">
+                      {!isAuthenticated ? (
+                        <>
+                          <button
+                            onClick={() => {
+                              setIsLoginOpen(true);
+                              setIsMenuOpen(false);
+                            }}
+                            className="w-full text-left block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                          >
+                            Log in
+                          </button>
+                          <button
+                            onClick={() => {
+                              setIsSignupOpen(true);
+                              setIsMenuOpen(false);
+                            }}
+                            className="w-full text-left block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                          >
+                            Sign up
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <div className="px-4 py-2 mb-2">
+                            <p className="font-bold text-gray-900 truncate">
+                              {user?.firstName} {user?.lastName}
+                            </p>
+                            <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                          </div>
+                          <Link
+                            to="/favorites"
+                            className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            Favorites
+                          </Link>
+                          <Link
+                            to="/profile"
+                            className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            Profile
+                          </Link>
+                          {user?.role === 'guide' && (
+                            <>
+                              <Link
+                                to="/guide/dashboard"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2 flex items-center gap-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                <LayoutDashboard className="h-4 w-4" /> Dashboard
+                              </Link>
+                              <Link
+                                to="/guide/listings"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                My list
+                              </Link>
+                              <Link
+                                to="/guide/bookings"
+                                className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2 flex items-center gap-2"
+                                onClick={() => setIsMenuOpen(false)}
+                              >
+                                <MessageCircle className="h-4 w-4" /> Messages
+                              </Link>
+                            </>
+                          )}
+                          {user?.role !== 'host' && user?.role !== 'guide' && (
+                            <Link
+                              to="/bookings"
+                              className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                              onClick={() => setIsMenuOpen(false)}
+                            >
+                              Travel lists
+                            </Link>
+                          )}
+                          {user?.role !== 'guide' && (
+                            <Link
+                              to="/messages"
+                              className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2 flex items-center gap-2"
+                              onClick={() => setIsMenuOpen(false)}
+                            >
+                              <MessageCircle className="w-4 h-4" /> Messages
+                            </Link>
+                          )}
+                          <button
+                            onClick={() => {
+                              logout();
+                              useBookingStore.setState({ bookings: [] });
+                              setIsMenuOpen(false);
+                              navigate('/');
+                            }}
+                            className="w-full text-left block px-4 py-2 text-red-600 font-bold hover:bg-red-50 rounded-lg transition-colors mx-2"
+                          >
+                            Log out
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-gray-200 w-full"></div>
+
+                  {/* Support Section */}
+                  <div className="space-y-3">
+                    <h3 className="text-xs font-medium text-gray-400 px-4 uppercase tracking-wide">
+                      Support
+                    </h3>
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => {
+                          setSupportOpen(true);
+                          setIsMenuOpen(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                      >
+                        Customer support
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsCurrencyPickerOpen(true);
+                          setIsMenuOpen(false);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                      >
+                        Currency: {currencyInfo.code} - Change
+                      </button>
+                      <Link
+                        to="/gift-cards"
+                        className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Buy a gift voucher
+                      </Link>
+                      {isAuthenticated && (
+                        <Link
+                          to="/become-host"
+                          className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          Become a host
+                        </Link>
+                      )}
+                      <Link
+                        to="/consent"
+                        className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Consent
+                      </Link>
+                      <Link
+                        to="/privacy"
+                        className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Privacy policy
+                      </Link>
+                      <Link
+                        to="/help"
+                        className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Help
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-gray-200 w-full"></div>
+                </div>
+              </nav>
+            </div>,
+            document.body
+          )}
+
+        {/* Search Modal Portal */}
+        {isSearchOpen &&
+          createPortal(
+            <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20">
+              {/* Backdrop (Blurred) */}
+              <div
+                className="absolute inset-0 backdrop-blur-md transition-opacity"
+                onClick={() => closeSearch()}
+              ></div>
+
+              {/* Search Modal Content */}
+              <div className="relative w-[600px] bg-[#FFF0E6] rounded-2xl shadow-2xl flex flex-col animate-in fade-in zoom-in-95 duration-200 min-h-[500px] max-h-[90vh]">
+                {/* Header */}
+                <div className="flex items-center justify-between p-4 relative">
+                  <button
+                    onClick={() => closeSearch()}
+                    className="w-8 h-8 rounded-full bg-white hover:bg-white/80 flex items-center justify-center text-[#213448] transition-colors shadow-sm"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <h2 className="text-[#213448] font-bold text-lg absolute left-1/2 -translate-x-1/2">
+                    {activeTab === 'experiences' ? 'Find an experience' : 'Find a local guide'}
+                  </h2>
+                  <div className="w-8"></div> {/* Spacer for centering */}
+                </div>
+
+                <div className="px-6 pb-6">
+                  {/* Search Input */}
+                  <div className="relative mb-6">
+                    <input
+                      type="text"
+                      placeholder={
+                        activeTab === 'experiences'
+                          ? 'Where are you going?'
+                          : 'Find your local in...'
+                      }
+                      className="w-full h-14 pl-6 pr-14 rounded-full border border-gray-200 bg-white shadow-sm text-[#213448] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-yellow focus:ring-offset-2 text-lg transition-all"
+                      autoFocus
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    />
+                    <button
+                      onClick={handleSearch}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-brand-yellow hover:bg-[#ffba0a] rounded-full flex items-center justify-center text-[#213448] transition-transform hover:scale-105 active:scale-95 shadow-sm"
+                    >
+                      <Search className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* Tabs */}
+                  <div className="flex gap-4 mb-8">
+                    <button
+                      onClick={() => setActiveTab('experiences')}
+                      className={`flex-1 h-10 rounded-full font-bold text-sm flex items-center justify-center gap-2 transition-colors ${
+                        activeTab === 'experiences'
+                          ? 'bg-[#213448] text-white shadow-md'
+                          : 'bg-white text-[#213448] border border-transparent hover:bg-white/50'
+                      }`}
+                    >
+                      <span
+                        className={`w-4 h-4 rounded-full border flex items-center justify-center ${activeTab === 'experiences' ? 'border-brand-yellow text-brand-yellow' : 'border-[#213448] text-[#213448]'}`}
+                      >
+                        <span className="text-[10px]">★</span>
+                      </span>
+                      Experiences
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('guides')}
+                      className={`flex-1 h-10 rounded-full font-bold text-sm flex items-center justify-center gap-2 transition-colors ${
+                        activeTab === 'guides'
+                          ? 'bg-[#213448] text-white shadow-md'
+                          : 'bg-white text-[#213448] border border-transparent hover:bg-white/50'
+                      }`}
+                    >
+                      <span
+                        className={`w-4 h-4 rounded-full border flex items-center justify-center ${activeTab === 'guides' ? 'border-brand-yellow text-brand-yellow' : 'border-[#213448] text-[#213448]'}`}
+                      >
+                        <span className="text-[10px]">●</span>
+                      </span>
+                      Local guides
+                    </button>
+                  </div>
+
+                  {/* Content Area */}
+                  <div className="bg-white rounded-xl -mx-6 -mb-6 p-6 max-h-[420px] overflow-y-auto search-results-scroll">
+                    {activeTab === 'experiences' ? (
+                      <div className="space-y-1">
+                        <h3 className="text-sm font-bold text-[#213448] mb-3 uppercase tracking-wider">
+                          {searchQuery ? 'Search results:' : 'Experiences in:'}
+                        </h3>
+
+                        {suggestions.length > 0 ? (
+                          suggestions
+                            .filter(
+                              (s) =>
+                                s.type === 'experience' ||
+                                s.type === 'city' ||
+                                s.type === 'category'
+                            )
+                            .map((item, i) => (
+                              <div
+                                key={`${item.id}-${i}`}
+                                className="group cursor-pointer"
+                                onClick={() => {
+                                  closeSearch();
+                                  navigate(item.link);
+                                }}
+                              >
+                                <div className="flex items-start gap-4 p-3 rounded-r-xl transition-colors border-l-[4px] border-transparent hover:bg-[#FFF0E6] hover:border-brand-yellow">
+                                  {item.image && (
+                                    <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100 group-hover:scale-105 transition-transform duration-200">
+                                      <img
+                                        src={item.image}
+                                        alt={item.title}
+                                        className="w-full h-full object-cover"
+                                        loading="lazy"
+                                      />
+                                    </div>
+                                  )}
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                      <h4 className="font-bold text-[#213448] text-base truncate">
+                                        {item.title}
+                                      </h4>
+                                      {item.type === 'experience' && item.rating && (
+                                        <span className="flex items-center gap-1 text-xs text-brand-yellow font-semibold whitespace-nowrap">
+                                          <Star className="w-3 h-3 fill-current" />
+                                          {item.rating}
+                                          {item.reviewCount && ` (${item.reviewCount})`}
+                                        </span>
+                                      )}
+                                      {item.type === 'city' && (
+                                        <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
+                                          {item.subtitle}
+                                        </span>
+                                      )}
+                                      {item.type === 'category' && (
+                                        <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
+                                          {item.subtitle}
+                                        </span>
+                                      )}
+                                    </div>
+                                    {item.type === 'experience' && (
+                                      <div className="flex items-center gap-3 text-xs text-gray-500 mb-1">
+                                        {item.city && (
+                                          <span className="flex items-center gap-1 whitespace-nowrap">
+                                            <MapPinIcon className="w-3 h-3" />
+                                            {item.city}
+                                          </span>
+                                        )}
+                                        {item.category && (
+                                          <span className="flex items-center gap-1 whitespace-nowrap">
+                                            <Sparkles className="w-3 h-3" />
+                                            {item.category}
+                                          </span>
+                                        )}
+                                        {item.price && (
+                                          <span className="font-bold text-primary whitespace-nowrap">
+                                            {formatPrice(item.price)}
+                                          </span>
+                                        )}
+                                      </div>
+                                    )}
+                                    {item.type === 'city' && item.description && (
+                                      <p className="text-xs text-gray-500 line-clamp-1">
+                                        {item.description}
+                                      </p>
+                                    )}
+                                    {item.type === 'category' && item.description && (
+                                      <p className="text-xs text-gray-500 line-clamp-1">
+                                        {item.description}
+                                      </p>
+                                    )}
+                                    {item.hostName && (
+                                      <div className="flex items-center gap-2 mt-1">
+                                        {item.hostImage && (
+                                          <img
+                                            src={item.hostImage}
+                                            alt={item.hostName}
+                                            className="w-5 h-5 rounded-full object-cover"
+                                          />
+                                        )}
+                                        <span className="text-xs text-gray-500">
+                                          Hosted by {item.hostName}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <ChevronRight className="w-5 h-5 transition-colors text-gray-300 group-hover:text-brand-yellow flex-shrink-0 mt-1" />
+                                </div>
+                              </div>
+                            ))
+                        ) : (
+                          <div className="text-center py-12 text-gray-400">
+                            No results found for "{searchQuery}"
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-1">
+                        <h3 className="text-sm font-bold text-[#213448] mb-3 uppercase tracking-wider">
+                          {searchQuery ? 'Search results:' : 'Local guides in:'}
+                        </h3>
+
+                        {suggestions.length > 0 ? (
+                          suggestions
+                            .filter((s) => s.type === 'guide')
+                            .map((item, i) => (
+                              <div
+                                key={`${item.id}-${i}`}
+                                className="group cursor-pointer"
+                                onClick={() => {
+                                  closeSearch();
+                                  navigate(item.link);
+                                }}
+                              >
+                                <div className="flex items-start gap-4 p-3 rounded-r-xl transition-colors border-l-[4px] border-transparent hover:bg-[#FFF0E6] hover:border-brand-yellow">
+                                  {item.image && (
+                                    <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 bg-gray-100 group-hover:scale-105 transition-transform duration-200 border-2 border-gray-100">
+                                      <img
+                                        src={item.image}
+                                        alt={item.title}
+                                        className="w-full h-full object-cover"
+                                        loading="lazy"
+                                      />
+                                    </div>
+                                  )}
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                      <h4 className="font-bold text-[#213448] text-base truncate">
+                                        {item.title}
+                                      </h4>
+                                      {item.rating && (
+                                        <span className="flex items-center gap-1 text-xs text-brand-yellow font-semibold whitespace-nowrap">
+                                          <Star className="w-3 h-3 fill-current" />
+                                          {item.rating}
+                                          {item.reviewCount && ` (${item.reviewCount})`}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-gray-500 font-medium">
+                                      {item.subtitle}
+                                    </p>
+                                    {item.description && (
+                                      <p className="text-xs text-gray-500 line-clamp-2 mt-1">
+                                        {item.description}
+                                      </p>
+                                    )}
+                                    {item.city && (
+                                      <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
+                                        <MapPinIcon className="w-3 h-3" />
+                                        <span>Based in {item.city}</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <ChevronRight className="w-5 h-5 transition-colors text-gray-300 group-hover:text-brand-yellow flex-shrink-0 mt-1" />
+                                </div>
+                              </div>
+                            ))
+                        ) : (
+                          <div className="text-center py-12 text-gray-400">
+                            No guides found for "{searchQuery}"
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>,
+            document.body
+          )}
+
+        {/* Login Modal Portal */}
+        {isLoginOpen &&
+          createPortal(
+            <LoginModal
+              isOpen={isLoginOpen}
+              onClose={() => setIsLoginOpen(false)}
+              onSwitchToSignup={() => {
+                setIsLoginOpen(false);
+                setIsSignupOpen(true);
+              }}
+              onSwitchToForgotPassword={() => {
+                setIsLoginOpen(false);
+                setIsForgotPasswordOpen(true);
+              }}
+            />,
+            document.body
+          )}
+
+        {/* Signup Modal Portal */}
+        {isSignupOpen &&
+          createPortal(
+            <SignupModal
+              isOpen={isSignupOpen}
+              onClose={() => setIsSignupOpen(false)}
+              onSwitchToLogin={() => {
+                setIsSignupOpen(false);
+                setIsLoginOpen(true);
+              }}
+            />,
+            document.body
+          )}
+
+        {/* Forgot Password Modal Portal */}
+        {isForgotPasswordOpen &&
+          createPortal(
+            <ForgotPasswordModal
+              isOpen={isForgotPasswordOpen}
+              onClose={() => setIsForgotPasswordOpen(false)}
+              onSwitchToLogin={() => {
+                setIsForgotPasswordOpen(false);
+                setIsLoginOpen(true);
+              }}
+            />,
+            document.body
+          )}
+
+        {/* Currency Picker Modal Portal - "Choose your currency" grid */}
+        {isCurrencyPickerOpen &&
+          createPortal(
+            <CurrencyPickerModal
+              isOpen={isCurrencyPickerOpen}
+              onClose={() => setIsCurrencyPickerOpen(false)}
+            />,
+            document.body
+          )}
+      </header>
+      <SupportWidget open={supportOpen} onOpen={openSupport} onClose={closeSupport} />
+    </>
+  );
+};
+
+export default Header;

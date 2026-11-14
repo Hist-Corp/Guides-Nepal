@@ -1,0 +1,12 @@
+feat: apply pre-existing frontend changes including back navigation fixes
+
+- Remove /local/:id/portfolio from registered routes in backNavigation.ts
+- Apply pre-existing modifications to App.tsx, guidesData.ts, and multiple
+  page components (BikeTour, ContactGuide, CookingClasses, CulturalTours,
+  Explore, Gallery, LocalProfile, NightTour, OutdoorActivities, SeoExperience,
+  TrekHiking, city pages)
+- Delete GuidePortfolioPage.tsx
+- Update backNavigation.test.tsx
+
+Companion to previous commit a5339fe which resolved host dashboard API errors
+and dynamic back button logic.

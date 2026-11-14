@@ -1,0 +1,16 @@
+fix: resolve host dashboard 'unable to load' errors, dynamic back button, and move Back to Dashboard buttons to top
+
+1. Backend API fix: Added missing /host/earnings and /host/payouts routes
+   plus HostEarningsSummary, Payout schemas so the earnings page can load
+   without 'unable to load' errors.
+
+2. Navigation fix: Enhanced goBack/useGoBack to accept an optional fallback
+   route. When there is no navigation history (direct link access), the back
+   button now uses the fallback instead of returning nothing or a broken route.
+   Also fixed resolveBackTarget to skip the /host path which has no page.
+
+3. UI layout: Moved 'Back to Dashboard' buttons from the bottom to the top of
+   GuideProposalsPage and GuideListingsPage for better visibility.
+
+4. Added helper scripts (scripts/fix_backnav.py, start-dev-detached.sh) and
+   run-dev.pid for local dev convenience.

@@ -1,0 +1,204 @@
+@media (max-width: 1023px) {
+  .support-widget { display: none !important; }
+}
+.support-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 40;
+  font-family: inherit;
+}
+
+/* The sticky Book-Now bar only exists on experience/city pages (flagged by
+   StickyBarPortal as body[data-sticky-bar]). On mobile/tablet (<1024px) lift
+   the bubble fully above it (bar height + gap) instead of sitting on top of
+   the price / Book Now button. Pages without a bar keep the normal
+   bottom: 24px position. */
+@media (max-width: 1023px) {
+  .support-widget {
+    right: 16px;
+  }
+  body[data-sticky-bar] .support-widget {
+    bottom: 108px;
+  }
+  .support-panel {
+    margin-bottom: 8px;
+  }
+}
+
+.support-fab {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: #213448; /* Brand dark blue */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.support-fab:hover {
+  background: #1a2a3a;
+  transform: scale(1.06);
+}
+
+.support-panel {
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+  margin-bottom: 12px;
+  animation: support-slide-up 0.18s ease;
+}
+
+@keyframes support-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.support-panel-header {
+  background: #213448; /* Brand dark blue */
+  color: #fff;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.support-panel-header h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.support-close {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.support-form {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.support-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.support-form input,
+.support-form textarea,
+.support-form select {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.support-form input:focus,
+.support-form textarea:focus,
+.support-form select:focus {
+  outline: 2px solid #213448;
+  outline-offset: 1px;
+  border-color: #213448;
+}
+
+.support-submit {
+  background: #213448; /* Brand dark blue */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.support-submit:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.support-error {
+  color: #b91c1c;
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.support-sent {
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.support-sent-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  background: #213448; /* Brand dark blue */
+  color: #fff;
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.support-sent h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.support-sent p {
+  margin: 0 0 14px;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+.support-sent p {
+  margin: 0 0 14px;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+@media (max-width: 768px) {
+  /* Mobile phone (and tablet, which also uses the hamburger menu):
+     hide the floating FAB on ALL pages. The support panel is opened from the
+     hamburger menu instead. Desktop keeps the floating FAB unchanged. */
+  .support-widget {
+    display: none !important;
+  }
+  .support-widget .support-fab {
+    display: none !important;
+  }
+}
+
+/* Scroll tracking - show widget when scrolling up from footer dark blue line */
+.support-widget.visible .support-fab {
+  display: flex !important;
+}
+
+.support-widget.visible .support-panel {
+  display: block !important;
+}
