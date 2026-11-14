@@ -940,6 +940,13 @@ def _guide_profile_experiences(
                 "rating": float(entry.get("rating") or 0.0),
                 "reviews": int(entry.get("reviews") or 0),
                 "availableSlots": entry.get("availableSlots"),
+                # Capacity management fields
+                "maxGuests": entry.get("maxGuests"),
+                "bookedGuests": entry.get("bookedGuests"),
+                "capacityThreshold": entry.get("capacityThreshold"),
+                "rechargeDays": entry.get("rechargeDays"),
+                "availabilityStatus": entry.get("availabilityStatus"),
+                "nextAvailableDate": entry.get("nextAvailableDate"),
             }
         )
 
@@ -997,6 +1004,8 @@ def _guide_profile_experiences(
         )
         for listing in listings:
             max_guests = int(listing.max_guests or 0)
+            booked = int(listing.booked_guests or 0)
+            remaining = max_guests - booked
             add(
                 {
                     "slug": f"guide-{listing.id}",
@@ -1010,7 +1019,16 @@ def _guide_profile_experiences(
                     "duration": listing.duration,
                     "rating": guide.rating,
                     "reviews": guide.reviews,
-                    "availableSlots": max(max_guests - int(listing.booked_guests or 0), 0),
+                    "availableSlots": max(remaining, 0),
+                    # Capacity management fields
+                    "maxGuests": max_guests,
+                    "bookedGuests": booked,
+                    "capacityThreshold": listing.capacity_threshold,
+                    "rechargeDays": listing.recharge_days,
+                    "availabilityStatus": listing.availability_status,
+                    "nextAvailableDate": listing.next_available_date.isoformat()
+                    if listing.next_available_date
+                    else None,
                 }
             )
 

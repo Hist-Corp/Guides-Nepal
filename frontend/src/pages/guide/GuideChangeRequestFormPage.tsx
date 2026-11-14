@@ -6,6 +6,7 @@ import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import { guideDashboardApi, type GuideListing } from '../../services/guideDashboardApi';
 import { experienceWorkflowApi } from '../../services/experienceWorkflowApi';
+import { useGoBack } from '../../utils/backNavigation';
 
 const input =
   'w-full rounded-xl border border-gray-300 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-yellow';
@@ -50,13 +51,13 @@ const GuideChangeRequestFormPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!accessToken || user?.role !== 'guide') return;
+    if (!accessToken) return;
     guideDashboardApi
       .listListings(accessToken)
       .then((rows) => setListing(rows.find((r) => r.id === listingId) ?? null))
       .catch(() => setError('Unable to load listing.'));
      
-  }, [accessToken, user?.role, listingId]);
+  }, [accessToken, listingId]);
 
   const currentValue = (key: string): string => {
     if (!listing) return '';
@@ -116,9 +117,19 @@ const GuideChangeRequestFormPage: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 font-sans">
       <Header />
-      <main id="main-content" className="container mx-auto max-w-3xl flex-grow px-4 py-10">
-        <Link to="/guide/listings" className="flex items-center gap-1 text-sm font-bold text-primary hover:underline">
-          <ArrowLeft className="h-4 w-4" /> Back to your experiences
+      <div className="flex items-center gap-4 px-4 pt-6">
+        <button
+          type="button"
+          onClick={useGoBack('/guide/listings')}
+          className="flex items-center gap-2 rounded-xl bg-white border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:border-[#213448] hover:text-[#213448] hover:shadow-md active:scale-[0.98]"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back</span>
+        </button>
+      </div>
+      <main id="main-content" className="mx-auto w-full max-w-3xl flex-grow px-4 py-8">
+        <Link to="/guide/listings" className="flex items-center gap-1 text-sm font-bold text-primary hover:underline mb-4">
+          <ArrowLeft className="h-4 w-4" /> Back to experiences
         </Link>
         {!listing ? (
           <p className="mt-8 text-gray-500">{error || 'Loading listing...'}</p>

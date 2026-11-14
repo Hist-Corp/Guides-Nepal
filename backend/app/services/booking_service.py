@@ -9,7 +9,7 @@ from app.core.roles import GUIDE
 from fastapi import HTTPException
 from app.schemas.booking import BookingCreate
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class BookingService:
@@ -99,6 +99,14 @@ class BookingService:
                 return {"available": True, "status": "free"}
         else:
             guide_user_id = self.get_booking_guide().id
+
+        # Check listing-level status (open/closed/paused) first
+        listing = self._guide_listing_for_date(date, guide_user_id)
+        if listing is not None:
+            status = listing.availability_status
+            if status != "open":
+                return {"available": False, "status": status}
+
         active = (
             self.db.query(Booking)
             .filter(
@@ -110,8 +118,50 @@ class BookingService:
         )
         if not active:
             return {"available": True, "status": "free"}
+
+        # Check recharge period
+        next_available = self._get_next_available_date(listing, date, guide_user_id)
+        if next_available and date < next_available:
+            return {"available": False, "status": "recharging"}
+
         status = "booked" if active.status == BookingStatus.accepted else "reserved"
         return {"available": False, "status": status}
+
+    def _guide_listing_for_date(self, date: str, guide_user_id: int) -> Optional[GuideListing]:
+        """Return a listing that covers the given date if the guide has one."""
+        from app.api.v1.public import resolve_experience_reference
+
+        # Find bookings for this guide on or near this date
+        rows = (
+            self.db.query(Booking)
+            .filter(
+                Booking.guide_user_id == guide_user_id,
+                Booking.status.in_([BookingStatus.upcoming, BookingStatus.accepted]),
+            )
+            .all()
+        )
+        for booking in rows:
+            booking_date = booking.date.date()
+            if hasattr(booking_date, "strftime"):
+                if booking_date.strftime("%Y-%m-%d") == date[:10]:
+                    # This booking is on the requested date; check if there's a listing
+                    listing = self._guide_listing_for(booking.experience_id)
+                    if listing is not None:
+                        return listing
+        return None
+
+    def _get_next_available_date(self, listing: Optional[GuideListing], date: str, guide_user_id: int) -> Optional[str]:
+        """Get the next available date after recharge period."""
+        if listing is None:
+            return None
+
+        # First check if there's a booking on the same date (availability_for_date
+        # already handles this), then check recharge period
+        if int(listing.recharge_days or 0) > 0:
+            booking_date = datetime.strptime(date, "%Y-%m-%d").date()
+            next_available = booking_date + timedelta(days=int(listing.recharge_days or 0))
+            return next_available.isoformat()
+        return None
 
     def availability_for_month(self, year: int, month: int, guide_id: Optional[int] = None) -> list[str]:
         """Return list of unavailable date strings (YYYY-MM-DD) for the given month."""
@@ -154,6 +204,13 @@ class BookingService:
     def _slots_left(listing: GuideListing) -> int:
         return max(int(listing.max_guests or 0) - int(listing.booked_guests or 0), 0)
 
+    @staticmethod
+    def _is_below_stock_threshold(listing: GuideListing) -> bool:
+        """Return True when remaining seats are at/below the configured threshold."""
+        threshold = int(listing.capacity_threshold or 3)
+        remaining = BookingService._slots_left(listing)
+        return remaining <= threshold
+
     def create_booking(self, user_id: int, booking_in: BookingCreate) -> Booking:
         # Honor the guide/host the traveler selected when it maps to an active
         # guide account; otherwise fall back to the default bookable guide.
@@ -187,7 +244,14 @@ class BookingService:
                     ),
                 )
             listing.booked_guests = int(listing.booked_guests or 0) + int(booking_in.guests or 0)
-
+            # Honor recharge period: after the booking date, block availability
+            # for the configured number of days so the guide has time to recover.
+            if int(listing.recharge_days or 0) > 0:
+                booking_date = booking_in.date.date()
+                next_available = booking_date + timedelta(days=int(listing.recharge_days or 0))
+                # Only set next_available_date if it's in the future
+                if next_available > datetime.now(next_available.tzinfo or datetime.now().astimezone()).date():
+                    listing.next_available_date = next_available
         db_booking = Booking(
             user_id=user_id,
             guide_user_id=guide.id,

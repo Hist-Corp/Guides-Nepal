@@ -150,7 +150,7 @@ async function authenticatedFetch(token: string, input: RequestInfo | URL, init?
 
 export const guideDashboardApi = {
   getDashboard: async (token: string): Promise<GuideDashboardPayload> => {
-    const res = await fetch(`${API_BASE_URL}/guide/dashboard`, { headers: authHeaders(token) });
+    const res = await authenticatedFetch(token, `${API_BASE_URL}/guide/dashboard`);
     if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Unable to load dashboard.');
     return res.json();
   },

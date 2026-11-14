@@ -46,7 +46,15 @@ class GuideResponse(GuideBase):
     # Commercial terms of the guide's approved assignment for this experience,
     # so "Who you'll meet" can show a price per guide.
     price: Optional[float] = None
+    # Capacity management fields
     slots: Optional[int] = None
+    maxGuests: Optional[int] = None
+    bookedGuests: Optional[int] = None
+    availableSlots: Optional[int] = None
+    capacityThreshold: Optional[int] = None
+    rechargeDays: Optional[int] = None
+    availabilityStatus: Optional[str] = None
+    nextAvailableDate: Optional[str] = None
 
     class Config:
         from_attributes = True

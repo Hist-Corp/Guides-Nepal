@@ -509,10 +509,25 @@ export default function LoginPage() {
               >
                 <input
                   type="checkbox"
-                  className="h-4 w-4 cursor-pointer accent-brand-600"
+                  className="peer sr-only"
                   checked={remember}
                   onChange={(e) => setRemember(e.target.checked)}
                 />
+                <span
+                  className="transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-5 h-5 peer-focus:ring-2 peer-focus:ring-brand-600 peer-focus:ring-offset-2 peer-checked:bg-brand-600 peer-checked:border-brand-600"
+                >
+                  {remember ? (
+                    <svg
+                      className="w-3 h-3 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : null}
+                </span>
                 Remember me &amp; keep me signed in
               </label>
 

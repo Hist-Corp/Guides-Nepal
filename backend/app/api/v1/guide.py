@@ -18,6 +18,7 @@ from app.models.booking import Booking, HostExperience
 from app.models.guide_listing import GuideExperienceRequest, GuideListing
 from app.schemas.guide_dashboard import (
     GuideListingCapacityUpdate,
+    GuideListingAvailabilityUpdate,
     GuideListingCreate,
     GuideListingUpdate,
     GuideOnboardingCreate,
@@ -263,6 +264,23 @@ def guide_update_capacity(
     db: Session = Depends(get_db),
 ) -> dict:
     return GuideDashboardService(db).update_capacity(int(guide.id), listing_id, payload)
+
+
+@router.patch("/listings/{listing_id}/availability")
+def guide_update_availability(
+    listing_id: int,
+    payload: GuideListingAvailabilityUpdate,
+    guide: User = Depends(GUIDE_ONLY),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Set manual availability status, recharge period, and pre-scheduling.
+
+    availability_status is one of: "open", "closed", "paused".
+    recharge_days is the forced cooldown in days after a booking.
+    next_available_date is the pre-scheduled date the guide re-opens.
+    capacity_threshold is the low-stock alert threshold.
+    """
+    return GuideDashboardService(db).update_availability(int(guide.id), listing_id, payload)
 
 
 @router.get("/status")

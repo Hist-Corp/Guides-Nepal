@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Calendar, MapPin, Users } from 'lucide-react';
+import { Calendar, MapPin, Users, ArrowLeft } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { getApiUrl } from '../../config/api';
 import { useAuthStore } from '../../store/authStore';
+import { useGoBack } from '../../utils/backNavigation';
 import { useCurrency } from '../../contexts/CurrencyContext';
 
 interface GuideBooking {
@@ -28,7 +29,7 @@ const GuideBookingsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!accessToken || user?.role !== 'guide') return;
+    if (!accessToken) return;
     fetch(getApiUrl('/guide/bookings'), { headers: { Authorization: `Bearer ${accessToken}` } })
       .then(async (response) => {
         if (!response.ok) throw new Error((await response.json()).detail || 'Unable to load bookings.');
@@ -37,7 +38,7 @@ const GuideBookingsPage: React.FC = () => {
       .then(setBookings)
       .catch((requestError) => setError(requestError.message))
       .finally(() => setLoading(false));
-  }, [accessToken, user?.role]);
+  }, [accessToken]);
 
   if (!isAuthenticated) return <Navigate to="/" replace />;
   if (user?.role !== 'guide') return <Navigate to="/bookings" replace />;
@@ -45,7 +46,17 @@ const GuideBookingsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Header />
-      <main id="main-content" className="flex-grow container mx-auto max-w-5xl px-4 py-10">
+      <div className="flex items-center gap-4 px-4 pt-6">
+        <button
+          type="button"
+          onClick={useGoBack('/guide/dashboard')}
+          className="flex items-center gap-2 rounded-xl bg-white border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:border-[#213448] hover:text-[#213448] hover:shadow-md active:scale-[0.98]"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back</span>
+        </button>
+      </div>
+      <main id="main-content" className="mx-auto w-full max-w-5xl flex-grow px-4 py-8">
         <h1 className="text-3xl font-bold text-gray-900">Booking requests</h1>
         <p className="mt-2 text-gray-600">Requests assigned to your guide account.</p>
         {loading ? <p className="mt-8 text-gray-500">Loading bookings…</p> : error ? <p className="mt-8 text-red-600">{error}</p> : bookings.length === 0 ? (

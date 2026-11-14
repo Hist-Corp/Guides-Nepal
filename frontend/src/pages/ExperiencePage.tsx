@@ -58,6 +58,11 @@ interface AssignedGuide {
   // approved with a quote. Falls back to the experience price.
   price?: number | null;
   slots?: number | null;
+  // Capacity management fields
+  maxGuests?: number | null;
+  bookedGuests?: number | null;
+  availableSlots?: number | null;
+  capacityThreshold?: number | null;
 }
 
 interface Experience {
@@ -867,6 +872,10 @@ const ExperiencePage: React.FC = () => {
         image: g.image,
         rating: g.rating,
         reviews: g.reviews,
+        maxGuests: g.maxGuests ?? null,
+        bookedGuests: g.bookedGuests ?? null,
+        availableSlots: typeof g.availableSlots === 'number' ? g.availableSlots : null,
+        capacityThreshold: g.capacityThreshold ?? null,
       }))
     : hostGuide
       ? [hostGuide]
@@ -1345,20 +1354,24 @@ const ExperiencePage: React.FC = () => {
                   <div className="flex flex-wrap gap-4">
                     {visibleGuides.map((g) => {
                       const isSelected = String(selectedGuideId) === String(g.id);
+                      const remainingSlots = typeof g.availableSlots === 'number' ? g.availableSlots : null;
+                      const isLowStock = remainingSlots !== null && remainingSlots <= 3 && remainingSlots > 0;
+                      const isFullyBooked = remainingSlots === 0;
                       return (
                         <div
                           key={g.id}
                           className={`flex w-44 flex-col items-center gap-2 rounded-2xl border p-4 text-center transition-colors ${
                             isSelected
                               ? 'border-primary bg-primary/5 ring-1 ring-primary'
-                              : 'border-slate-200 hover:border-slate-400'
+                              : isFullyBooked ? 'border-red-100 bg-red-50' : 'border-slate-200 hover:border-slate-400'
                           }`}
                         >
                           <button
                             type="button"
+                            disabled={isFullyBooked}
                             aria-pressed={isSelected}
                             aria-label={`Select guide ${g.name}`}
-                            onClick={() => setSelectedGuideId(isSelected ? null : g.id)}
+                            onClick={() => !isFullyBooked && setSelectedGuideId(isSelected ? null : g.id)}
                             className="flex w-full flex-col items-center gap-2"
                           >
                             <img
@@ -1369,18 +1382,27 @@ const ExperiencePage: React.FC = () => {
                             />
                             <div>
                               <div className="font-bold text-gray-900">{g.name}</div>
-                              <div className="text-xs text-gray-500">
-                                {g.role || 'Experience Guide'}
-                              </div>
-                              <div className="text-sm text-gray-600">
-                                {g.rating} ★ ({g.reviews} reviews)
-                              </div>
+                              {remainingSlots !== null && remainingSlots <= 0 && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-bold text-red-700 bg-red-100">
+                                  Fully booked
+                                </span>
+                              )}
+                              {isLowStock && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-bold text-amber-700 bg-amber-100">
+                                  ⚠ {remainingSlots} seats left
+                                </span>
+                              )}
+                              <div className="text-xs text-gray-500">{g.role || 'Experience Guide'}</div>
+                              <div className="text-sm text-gray-600">{g.rating} ★ ({g.reviews} reviews)</div>
                             </div>
                             {typeof g.price === 'number' && (
                               <div className="text-sm font-bold text-secondary">
                                 {formatPrice(g.price, 'USD')}{' '}
                                 <span className="text-xs font-medium text-slate-500">/ person</span>
                               </div>
+                            )}
+                            {remainingSlots !== null && (
+                              <div className="text-[10px] text-gray-400">{remainingSlots} remaining</div>
                             )}
                           </button>
                           <Link
@@ -1390,9 +1412,14 @@ const ExperiencePage: React.FC = () => {
                           >
                             View profile
                           </Link>
-                          {isSelected && (
+                          {isSelected && !isFullyBooked && (
                             <span className="text-xs font-bold uppercase tracking-wider text-primary">
                               Selected
+                            </span>
+                          )}
+                          {isFullyBooked && (
+                            <span className="text-xs font-bold uppercase tracking-wider text-red-600">
+                              Booked out
                             </span>
                           )}
                         </div>

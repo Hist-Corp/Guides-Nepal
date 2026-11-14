@@ -24,6 +24,7 @@ interface AuthStore {
   setTokens: (accessToken: string | null, refreshToken: string | null) => void;
   refreshTokens: () => Promise<boolean>;
   logout: () => void;
+  clearAuth: (navigateFn?: (to: string) => void) => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -78,6 +79,17 @@ export const useAuthStore = create<AuthStore>()(
           refreshToken: null,
           rememberMe: false,
         }),
+  /** Clear all auth state and redirect to login (used on 401 / invalid token). */
+  clearAuth: (navigateFn?: (to: string) => void) => {
+    set({
+      isAuthenticated: false,
+      user: null,
+      accessToken: null,
+      refreshToken: null,
+      rememberMe: false,
+    });
+    if (navigateFn) navigateFn('/');
+  },
     }),
     {
       name: 'auth-storage',

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface BookingCalendarProps {
   checkIn: string;
@@ -517,6 +517,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     const text = isCheckin ? ciText : coText;
     const hasErr = typeErr?.field === field;
     const active = activeField === field;
+    const editable = variant === 'panel';
     // The format hint only appears on the field being edited; untouched card
     // fields keep the "Add date" prompt.
     const isBlank = isCheckin ? !checkIn && !text : !checkOut && !text;
@@ -549,38 +550,66 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
             : 'text-gray-500'
     }`;
 
-    return (
-      <label className={boxCls}>
-        <span className={labelCls}>{isCheckin ? (single ? 'Date' : 'Check-in') : 'Check-out'}</span>
-        <input
-          type="text"
-          inputMode="numeric"
-          autoComplete="off"
-          spellCheck={false}
-          data-field={field}
-          id={`${idPrefix}-${variant}-${field}`}
-          placeholder={placeholder}
-          value={text}
-          aria-invalid={hasErr || undefined}
-          aria-label={
-            isCheckin
-              ? (ariaLabel ?? 'Check-in date, format DD/MM/YYYY')
-              : 'Check-out date, format DD/MM/YYYY'
-          }
-          onChange={(e) => handleType(field, e.target.value)}
-          onFocus={() => openCalendar(field)}
-          onBlur={() => commitTyped(field, text)}
-          onKeyDown={(e) => {
+    const inputHandlers = editable
+      ? {
+          onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+            handleType(field, e.target.value),
+          onFocus: () => openCalendar(field),
+          onBlur: () => commitTyped(field, text),
+          onClick: (e: React.MouseEvent) => e.stopPropagation(),
+          onKeyDown: (e: React.KeyboardEvent) => {
             if (e.key === 'Enter') {
               e.preventDefault();
               commitTyped(field, text, true);
             }
-          }}
-          className={`mt-0.5 w-full min-w-0 border-0 bg-transparent p-0 text-base text-gray-900 outline-none placeholder:text-gray-400 ${
-            hasErr ? 'text-red-600' : ''
-          }`}
-        />
-      </label>
+          },
+        }
+      : {
+          onFocus: () => openCalendar(field),
+          onClick: (e: React.MouseEvent) => e.stopPropagation(),
+        };
+
+    return (
+      <div
+        className={boxCls}
+        onClick={() => openCalendar(field)}
+      >
+        <span className={labelCls}>{isCheckin ? (single ? 'Date' : 'Check-in') : 'Check-out'}</span>
+        <div className="flex items-center w-full gap-1">
+          <input
+            type="text"
+            inputMode={editable ? 'text' : 'none'}
+            autoComplete="off"
+            spellCheck={false}
+            readOnly={!editable}
+            data-field={field}
+            id={`${idPrefix}-${variant}-${field}`}
+            placeholder={placeholder}
+            value={text}
+            aria-invalid={hasErr || undefined}
+            aria-label={
+              isCheckin
+                ? (ariaLabel ?? 'Check-in date, format DD/MM/YYYY')
+                : 'Check-out date, format DD/MM/YYYY'
+            }
+            {...inputHandlers}
+            className={`mt-0.5 w-full min-w-0 border-0 bg-transparent p-0 text-base text-gray-900 outline-none placeholder:text-gray-400 ${
+              hasErr ? 'text-red-600' : ''
+            }`}
+          />
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              openCalendar(field);
+            }}
+            className="p-1 text-gray-400 hover:text-[#213448] transition-colors"
+            aria-label="Open calendar picker"
+          >
+            <CalendarDays className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
     );
   };
 
@@ -621,8 +650,8 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
           onMouseLeave={() => setHoverKey(null)}
           className={`${
             single
-              ? 'w-[340px] md:w-[520px] xl:w-[600px] max-w-[calc(100vw-16px)]'
-              : 'w-[680px] max-w-[calc(100vw-16px)]'
+              ? 'w-full md:w-[600px] xl:w-[760px] max-w-[calc(100vw-16px)]'
+              : 'w-full md:w-[760px] xl:w-[900px] max-w-[calc(100vw-16px)]'
           } absolute left-0 md:left-auto md:right-0 top-full z-50 mt-2 max-h-[85vh] rounded-2xl border border-gray-200 bg-white shadow-2xl overflow-y-auto flex flex-col`}
         >
           {/* Popup header — Airbnb-style "Select dates" with typed

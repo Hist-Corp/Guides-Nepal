@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { X, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { getApiUrl } from '../../config/api';
+import { Checkbox } from '../common/Checkbox';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -248,14 +249,12 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
             {error && <div className="text-red-600 text-sm">{error}</div>}
 
-            <label className="flex items-center gap-2 text-sm text-gray-700">
-              <input
-                type="checkbox"
-                checked={remember}
-                onChange={(e) => setRemember(e.target.checked)}
-              />
-              Remember me
-            </label>
+            <Checkbox
+              label="Remember me"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+              wrapperClassName="mt-4 text-sm text-gray-700"
+            />
 
             {userType === 'traveler' && (
               <div className="flex justify-start">

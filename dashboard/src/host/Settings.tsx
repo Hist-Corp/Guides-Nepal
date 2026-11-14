@@ -214,12 +214,29 @@ export default function HostSettings() {
                         <span className="font-medium">{item.label}</span>
                         <p className="text-sm text-soft">{item.desc}</p>
                       </div>
-                      <input
-                        type="checkbox"
-                        checked={notifications[item.key as keyof NotificationSettings]}
-                        onChange={() => toggleNotif(item.key as keyof NotificationSettings)}
-                        className="h-5 w-5 rounded border-line text-brand-500 focus:ring-brand-500"
-                      />
+                      <span className="relative flex items-center justify-center shrink-0">
+                        <input
+                          type="checkbox"
+                          checked={notifications[item.key as keyof NotificationSettings]}
+                          onChange={() => toggleNotif(item.key as keyof NotificationSettings)}
+                          className="peer sr-only"
+                        />
+                        <span
+                          className="transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-5 h-5 peer-focus:ring-2 peer-focus:ring-brand-600 peer-focus:ring-offset-2 peer-checked:bg-brand-600 peer-checked:border-brand-600"
+                        >
+                          {notifications[item.key as keyof NotificationSettings] ? (
+                            <svg
+                              className="w-3 h-3 text-white"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : null}
+                        </span>
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -233,12 +250,29 @@ export default function HostSettings() {
                   ].map(item => (
                     <label key={item.key} className="flex items-center justify-between py-3 border-b last:border-0 cursor-pointer">
                       <span className="font-medium">{item.label}</span>
-                      <input
-                        type="checkbox"
-                        checked={notifications[item.key as keyof NotificationSettings]}
-                        onChange={() => toggleNotif(item.key as keyof NotificationSettings)}
-                        className="h-5 w-5 rounded border-line text-brand-500 focus:ring-brand-500"
-                      />
+                      <span className="relative flex items-center justify-center shrink-0">
+                        <input
+                          type="checkbox"
+                          checked={notifications[item.key as keyof NotificationSettings]}
+                          onChange={() => toggleNotif(item.key as keyof NotificationSettings)}
+                          className="peer sr-only"
+                        />
+                        <span
+                          className="transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-5 h-5 peer-focus:ring-2 peer-focus:ring-brand-600 peer-focus:ring-offset-2 peer-checked:bg-brand-600 peer-checked:border-brand-600"
+                        >
+                          {notifications[item.key as keyof NotificationSettings] ? (
+                            <svg
+                              className="w-3 h-3 text-white"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : null}
+                        </span>
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -306,12 +340,29 @@ export default function HostSettings() {
                       <span className="font-medium">Automatic payouts</span>
                       <p className="text-sm text-soft">Automatically transfer funds when they reach the minimum amount</p>
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={payout.auto_payout}
-                      onChange={() => togglePayout("auto_payout")}
-                      className="h-5 w-5 rounded border-line text-brand-500 focus:ring-brand-500"
-                    />
+                    <span className="relative flex items-center justify-center shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={payout.auto_payout}
+                        onChange={() => togglePayout("auto_payout")}
+                        className="peer sr-only"
+                      />
+                      <span
+                        className="transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-5 h-5 peer-focus:ring-2 peer-focus:ring-brand-600 peer-focus:ring-offset-2 peer-checked:bg-brand-600 peer-checked:border-brand-600"
+                      >
+                        {payout.auto_payout ? (
+                          <svg
+                            className="w-3 h-3 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        ) : null}
+                      </span>
+                    </span>
                   </label>
 
                   <div className="grid gap-4 md:grid-cols-2">

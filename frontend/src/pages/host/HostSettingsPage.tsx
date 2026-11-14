@@ -316,12 +316,29 @@ const HostSettingsPage: React.FC = () => {
                           <span className="font-medium text-gray-900">{item.label}</span>
                           <p className="text-sm text-gray-500">{item.desc}</p>
                         </div>
-                        <input
-                          type="checkbox"
-                          checked={notifications[item.key as keyof NotificationSettings]}
-                          onChange={() => toggleNotif(item.key as keyof NotificationSettings)}
-                          className="h-5 w-5 rounded border-gray-300 text-[#213448] focus:ring-[#213448]"
-                        />
+                        <span className="relative flex items-center justify-center shrink-0">
+                          <input
+                            type="checkbox"
+                            checked={notifications[item.key as keyof NotificationSettings]}
+                            onChange={() => toggleNotif(item.key as keyof NotificationSettings)}
+                            className="peer sr-only"
+                          />
+                          <span
+                            className="transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-5 h-5 peer-focus:ring-2 peer-focus:ring-[#213448] peer-focus:ring-offset-2 peer-checked:bg-[#213448] peer-checked:border-[#213448]"
+                          >
+                            {notifications[item.key as keyof NotificationSettings] ? (
+                              <svg
+                                className="w-3 h-3 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            ) : null}
+                          </span>
+                        </span>
                       </label>
                     ))}
                   </div>
@@ -338,12 +355,29 @@ const HostSettingsPage: React.FC = () => {
                         className="flex items-center justify-between py-3 border-b last:border-0 cursor-pointer"
                       >
                         <span className="font-medium text-gray-900">{item.label}</span>
-                        <input
-                          type="checkbox"
-                          checked={notifications[item.key as keyof NotificationSettings]}
-                          onChange={() => toggleNotif(item.key as keyof NotificationSettings)}
-                          className="h-5 w-5 rounded border-gray-300 text-[#213448] focus:ring-[#213448]"
-                        />
+                        <span className="relative flex items-center justify-center shrink-0">
+                          <input
+                            type="checkbox"
+                            checked={notifications[item.key as keyof NotificationSettings]}
+                            onChange={() => toggleNotif(item.key as keyof NotificationSettings)}
+                            className="peer sr-only"
+                          />
+                          <span
+                            className="transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-5 h-5 peer-focus:ring-2 peer-focus:ring-[#213448] peer-focus:ring-offset-2 peer-checked:bg-[#213448] peer-checked:border-[#213448]"
+                          >
+                            {notifications[item.key as keyof NotificationSettings] ? (
+                              <svg
+                                className="w-3 h-3 text-white"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            ) : null}
+                          </span>
+                        </span>
                       </label>
                     ))}
                   </div>
@@ -493,12 +527,29 @@ const HostSettingsPage: React.FC = () => {
                           Automatically transfer funds when they reach the minimum amount
                         </p>
                       </div>
-                      <input
-                        type="checkbox"
-                        checked={payout.auto_payout}
-                        onChange={() => togglePayout('auto_payout')}
-                        className="h-5 w-5 rounded border-gray-300 text-[#213448] focus:ring-[#213448]"
-                      />
+                      <span className="relative flex items-center justify-center shrink-0">
+                        <input
+                          type="checkbox"
+                          checked={payout.auto_payout}
+                          onChange={() => togglePayout('auto_payout')}
+                          className="peer sr-only"
+                        />
+                        <span
+                          className="transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-5 h-5 peer-focus:ring-2 peer-focus:ring-[#213448] peer-focus:ring-offset-2 peer-checked:bg-[#213448] peer-checked:border-[#213448]"
+                        >
+                          {payout.auto_payout ? (
+                            <svg
+                              className="w-3 h-3 text-white"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2.5"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : null}
+                        </span>
+                      </span>
                     </label>
 
                     <div className="grid gap-4 md:grid-cols-2">

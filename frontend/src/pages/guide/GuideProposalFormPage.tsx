@@ -5,6 +5,7 @@ import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import { experienceWorkflowApi } from '../../services/experienceWorkflowApi';
+import { useGoBack } from '../../utils/backNavigation';
 
 type Form = {
   title: string;
@@ -56,7 +57,7 @@ const GuideProposalFormPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!accessToken || user?.role !== 'guide' || !editingId) return;
+    if (!accessToken || !editingId) return;
     experienceWorkflowApi
       .getProposal(accessToken, editingId)
       .then((p) =>
@@ -77,7 +78,7 @@ const GuideProposalFormPage: React.FC = () => {
       )
       .catch(() => setError('Unable to load proposal.'));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accessToken, user?.role, editingId]);
+  }, [accessToken, editingId]);
 
   if (!isAuthenticated) return <Navigate to="/" replace />;
   if (user?.role !== 'guide') return <Navigate to="/bookings" replace />;
@@ -147,8 +148,18 @@ const GuideProposalFormPage: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 font-sans">
       <Header />
-      <main id="main-content" className="container mx-auto max-w-3xl flex-grow px-4 py-10">
-        <Link to="/guide/proposals" className="flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+      <div className="flex items-center gap-4 px-4 pt-6">
+        <button
+          type="button"
+          onClick={useGoBack('/guide/proposals')}
+          className="flex items-center gap-2 rounded-xl bg-white border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:border-[#213448] hover:text-[#213448] hover:shadow-md active:scale-[0.98]"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back</span>
+        </button>
+      </div>
+      <main id="main-content" className="mx-auto w-full max-w-3xl flex-grow px-4 py-8">
+        <Link to="/guide/proposals" className="flex items-center gap-1 text-sm font-bold text-primary hover:underline mb-4">
           <ArrowLeft className="h-4 w-4" /> Back to proposals
         </Link>
         <h1 className="mt-4 text-3xl font-bold text-gray-900">

@@ -14,6 +14,10 @@ export interface SheetGuide {
   image: string;
   rating?: number;
   reviews?: number;
+  maxGuests?: number | null;
+  bookedGuests?: number | null;
+  availableSlots?: number | null;
+  capacityThreshold?: number | null;
 }
 
 export interface MobileBookingSheetProps<TGuide extends SheetGuide = SheetGuide> {
@@ -219,13 +223,17 @@ export function MobileBookingSheet<TGuide extends SheetGuide = SheetGuide>({
                     <div className="grid grid-cols-1 gap-2">
                       {guides.map((guide) => {
                         const active = selectedGuide?.id === guide.id;
+                        const remainingSlots = typeof guide.availableSlots === 'number' ? guide.availableSlots : null;
+                        const isLowStock = remainingSlots !== null && remainingSlots <= 3 && remainingSlots > 0;
+                        const isFullyBooked = remainingSlots === 0;
                         return (
                           <button
                             key={guide.id}
                             type="button"
-                            onClick={() => onSelectGuide(guide)}
+                            disabled={isFullyBooked}
+                            onClick={() => !isFullyBooked && onSelectGuide(guide)}
                             aria-pressed={active}
-                            className={`flex items-center gap-3 rounded-xl border p-3 text-left transition-all ${active ? 'border-gray-900 bg-gray-50 ring-1 ring-gray-900' : 'border-gray-200 bg-white hover:border-gray-400'}`}
+                            className={`flex items-center gap-3 rounded-xl border p-3 text-left transition-all ${active ? 'border-gray-900 bg-gray-50 ring-1 ring-gray-900' : isFullyBooked ? 'border-red-100 bg-red-50' : 'border-gray-200 bg-white hover:border-gray-400'}`}
                           >
                             <img
                               src={guide.image}
@@ -241,6 +249,16 @@ export function MobileBookingSheet<TGuide extends SheetGuide = SheetGuide>({
                                   {guide.role}
                                 </span>
                               )}
+                              {remainingSlots !== null && remainingSlots <= 0 && (
+                                <span className="block truncate text-xs font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded">
+                                  Fully booked
+                                </span>
+                              )}
+                              {isLowStock && (
+                                <span className="block truncate text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">
+                                  ⚠ {remainingSlots} seats left
+                                </span>
+                              )}
                               {guide.rating !== undefined && (
                                 <span className="mt-0.5 flex items-center gap-1 text-xs font-medium text-gray-900">
                                   <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
@@ -249,6 +267,9 @@ export function MobileBookingSheet<TGuide extends SheetGuide = SheetGuide>({
                                     <span className="text-gray-400">({guide.reviews})</span>
                                   )}
                                 </span>
+                              )}
+                              {remainingSlots !== null && (
+                                <span className="block text-[10px] text-gray-400">{remainingSlots} remaining</span>
                               )}
                             </span>
                             {active && (

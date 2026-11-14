@@ -11,6 +11,7 @@ from app.models.user import User
 from app.schemas.guide_dashboard import (
     GuideListingCapacityUpdate,
     GuideListingCreate,
+    GuideListingAvailabilityUpdate,
     GuideListingUpdate,
     GuideOnboardingCreate,
     GuideStatusCreate,
@@ -211,6 +212,31 @@ class GuideDashboardService:
             if new_booked < 0 or new_booked > (listing.max_guests or 0):
                 raise HTTPException(status_code=422, detail="booked guests out of capacity bounds")
             listing.booked_guests = new_booked
+        self.db.commit()
+        self.db.refresh(listing)
+        return _listing_to_dict(listing)
+
+    def update_availability(self, guide_id: int, listing_id: int, payload: GuideListingAvailabilityUpdate) -> dict:
+        """Set manual availability status, recharge period, and pre-scheduling.
+
+        availability_status is one of: "open", "closed", "paused".
+        recharge_days is the forced cooldown in days after a booking.
+        next_available_date is the pre-scheduled date the guide re-opens.
+        capacity_threshold is the low-stock alert threshold.
+        """
+        listing = self._get_owned_listing(guide_id, listing_id)
+        data = payload.model_dump(exclude_unset=True)
+        for key, value in data.items():
+            attr_name = key
+            # Map next_available_date string to datetime if provided
+            if key == "next_available_date" and value:
+                from datetime import datetime
+
+                try:
+                    value = datetime.fromisoformat(value)
+                except ValueError:
+                    raise HTTPException(status_code=422, detail="Invalid next_available_date format")
+            setattr(listing, attr_name, value)
         self.db.commit()
         self.db.refresh(listing)
         return _listing_to_dict(listing)

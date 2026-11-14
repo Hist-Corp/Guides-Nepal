@@ -6,6 +6,7 @@ import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import { experienceWorkflowApi, type ExperienceChangeRequest } from '../../services/experienceWorkflowApi';
 import { StatusBadge } from './workflowUi';
+import { useGoBack } from '../../utils/backNavigation';
 
 const fmt = (v: unknown) =>
   v === null || v === undefined || v === '' ? '—' : typeof v === 'boolean' ? (v ? 'active' : 'paused') : String(v);
@@ -30,9 +31,9 @@ const GuideChangeRequestDetailPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (accessToken && user?.role === 'guide') load();
+    if (accessToken) load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accessToken, user?.role, crId]);
+  }, [accessToken, crId]);
 
   if (!isAuthenticated) return <Navigate to="/" replace />;
   if (user?.role !== 'guide') return <Navigate to="/bookings" replace />;
@@ -55,8 +56,18 @@ const GuideChangeRequestDetailPage: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 font-sans">
       <Header />
-      <main id="main-content" className="container mx-auto max-w-4xl flex-grow px-4 py-10">
-        <Link to="/guide/proposals" className="flex items-center gap-1 text-sm font-bold text-primary hover:underline">
+      <div className="flex items-center gap-4 px-4 pt-6">
+        <button
+          type="button"
+          onClick={useGoBack('/guide/proposals')}
+          className="flex items-center gap-2 rounded-xl bg-white border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:border-[#213448] hover:text-[#213448] hover:shadow-md active:scale-[0.98]"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span>Back</span>
+        </button>
+      </div>
+      <main id="main-content" className="mx-auto w-full max-w-4xl flex-grow px-4 py-8">
+        <Link to="/guide/proposals" className="flex items-center gap-1 text-sm font-bold text-primary hover:underline mb-4">
           <ArrowLeft className="h-4 w-4" /> Back to proposals
         </Link>
         {!cr ? (

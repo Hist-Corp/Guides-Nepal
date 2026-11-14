@@ -94,8 +94,10 @@ const GuideExperienceRequestPageInner: React.FC = () => {
   };
 
   useEffect(() => {
-    loadOptions();
-    loadRequests();
+    if (accessToken) {
+      loadOptions();
+      loadRequests();
+    }
   }, [accessToken]);
 
   // The success notice is handed over by step 2; drop it from history so a

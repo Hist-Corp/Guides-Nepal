@@ -57,6 +57,20 @@ class GuideListingCapacityUpdate(BaseModel):
     booked_delta: Optional[int] = Field(default=None, ge=-100, le=100)
 
 
+class GuideListingAvailabilityUpdate(BaseModel):
+    """Set manual availability status, recharge period, and pre-scheduling.
+
+    ``availability_status`` is one of: "open", "closed", "paused".
+    ``recharge_days`` is the forced cooldown in days after a booking.
+    ``next_available_date`` is the pre-scheduled date the guide re-opens.
+    """
+
+    availability_status: Optional[str] = Field(default=None, pattern=r"^(open|closed|paused)$")
+    recharge_days: Optional[int] = Field(default=None, ge=0, le=365)
+    next_available_date: Optional[str] = Field(default=None)  # ISO date string
+    capacity_threshold: Optional[int] = Field(default=None, ge=1, le=100)
+
+
 class GuideStatusCreate(BaseModel):
     update_type: GuideUpdateType = "announcement"
     message: str = Field(min_length=3, max_length=2000)

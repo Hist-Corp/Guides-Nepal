@@ -44,7 +44,7 @@ const GuideListingFormPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!accessToken || user?.role !== 'guide' || !editingId) return;
+    if (!accessToken || !editingId) return;
     guideDashboardApi.listListings(accessToken).then((rows) => {
       const found = rows.find((r) => r.id === editingId);
       if (!found) return;
@@ -55,7 +55,7 @@ const GuideListingFormPage: React.FC = () => {
         max_guests: String(found.max_guests), is_active: found.is_active,
       });
     }).catch(() => undefined);
-  }, [accessToken, user?.role, editingId]);
+  }, [accessToken, editingId]);
 
   if (!isAuthenticated) return <Navigate to="/" replace />;
   if (user?.role !== 'guide') return <Navigate to="/bookings" replace />;

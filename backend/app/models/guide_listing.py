@@ -29,6 +29,11 @@ class GuideListing(Base):
     max_guests = Column(Integer, nullable=False, default=10)
     booked_guests = Column(Integer, nullable=False, default=0)
     is_active = Column(Boolean, nullable=False, default=True)
+    # Capacity management fields
+    capacity_threshold = Column(Integer, nullable=False, default=3)  # low-stock alert below this remaining seats
+    recharge_days = Column(Integer, nullable=False, default=0)  # forced cooldown period in days after last booking
+    availability_status = Column(String, nullable=False, default="open")  # open | closed | paused
+    next_available_date = Column(DateTime(timezone=True), nullable=True)  # pre-scheduled next open date
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -50,6 +55,10 @@ class GuideStatusUpdate(Base):
     event_date = Column(DateTime(timezone=True), nullable=True)
     current_capacity = Column(Integer, nullable=True)
     max_capacity = Column(Integer, nullable=True)
+    # Capacity management
+    recharge_days = Column(Integer, nullable=False, default=0)
+    availability_status = Column(String, nullable=False, default="open")
+    next_available_date = Column(DateTime(timezone=True), nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
