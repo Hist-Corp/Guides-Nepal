@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StickyBarPortal } from '../../components/common/StickyBarPortal';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGoBack } from '../../utils/backNavigation';
@@ -273,21 +273,46 @@ const PokharaExperiencePage: React.FC = () => {
   const ensureConversation = useMessageStore((s) => s.ensureConversation);
   const sendMessage = useMessageStore((s) => s.sendMessage);
 
-  const fetchUnavailableDates = async (year: number, month: number) => {
-    if (!accessToken) return;
-    try {
-      const guideId = selectedGuide?.id;
-      const url = getApiUrl(`/bookings/availability/month?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`);
-      const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-      if (res.ok) {
-        const data = await res.json();
-        setDisabledDates(Array.isArray(data.unavailable) ? data.unavailable : []);
-      }
-    } catch {
-      // Silently fail - dates won't be disabled
-    }
-  };
+  // Deduplicate in-flight availability requests so rapid guide switches don't
+  // hammer the backend with identical calls.
+  const availabilityInflight = useRef<Map<string, Promise<void>>>(new Map());
+  const availabilityCache = useRef<Map<string, string[]>>(new Map());
 
+  const fetchUnavailableDates = useCallback(async (year: number, month: number) => {
+    if (!accessToken) return;
+    const guideId = selectedGuide?.id;
+    const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
+    // Return cached result immediately if available.
+    if (availabilityCache.current.has(cacheKey)) {
+      setDisabledDates(availabilityCache.current.get(cacheKey)!);
+      return;
+    }
+    // If an identical request is already in flight, wait for it instead of
+    // issuing a duplicate call.
+    const existing = availabilityInflight.current.get(cacheKey);
+    if (existing) {
+      await existing;
+      return;
+    }
+    const promise = (async () => {
+      try {
+        const url = getApiUrl(`/bookings/availability/month?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`);
+        const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+        if (res.ok) {
+          const data = await res.json();
+          const unavailable = Array.isArray(data.unavailable) ? data.unavailable : [];
+          availabilityCache.current.set(cacheKey, unavailable);
+          setDisabledDates(unavailable);
+        }
+      } catch {
+        // Silently fail - dates won't be disabled
+      } finally {
+        availabilityInflight.current.delete(cacheKey);
+      }
+    })();
+    availabilityInflight.current.set(cacheKey, promise);
+    await promise;
+  }, [accessToken, selectedGuide?.id]);
 
   // Refetch availability when guide changes
   useEffect(() => {
@@ -295,7 +320,7 @@ const PokharaExperiencePage: React.FC = () => {
       const now = new Date();
       fetchUnavailableDates(now.getFullYear(), now.getMonth() + 1);
     }
-  }, [selectedGuide, accessToken]);
+  }, [selectedGuide, accessToken, fetchUnavailableDates]);
   const { profile, addBookmark, removeBookmark } = useProfileStore();
   const bookmarkId = data ? `exp-${data.slug}` : '';
   const isSaved = bookmarkId ? profile.bookmarks.some((b) => b.id === bookmarkId) : false;
@@ -1073,7 +1098,7 @@ const PokharaExperiencePage: React.FC = () => {
                           </span>
                         </div>
                       </div>
-                    </>
+                  </>
                   ) : (
                     <div className="flex flex-col items-center text-center py-8 animate-in fade-in zoom-in duration-300">
                       <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">

@@ -11,6 +11,8 @@ from app.schemas.booking import BookingCreate
 from typing import List, Optional
 from datetime import datetime, timedelta
 
+from app.api.v1.public import resolve_experience_reference
+
 
 class BookingService:
     def __init__(self, db: Session):
@@ -56,6 +58,39 @@ class BookingService:
         if guide:
             return guide.id
         return None
+
+    def prevent_self_hosted_booking(self, user_id: int, booking_in: BookingCreate) -> None:
+        """Reject a booking when the current user hosts the experience they are
+        trying to book.
+
+        Guides are permitted to book experiences led by *other* guides, but an
+        experience's host may never book their own experience.  This is enforced
+        regardless of which ``guide_id`` the traveler selected on the form.
+        """
+        experience_id = booking_in.experience_id
+
+        resolved = resolve_experience_reference(self.db, experience_id)
+        if not resolved:
+            return  # Unknown experience — let other validators handle it.
+
+        source = resolved.get("source")
+        record_id = resolved.get("record_id")
+
+        if source == "guide_listing" and record_id is not None:
+            listing = self.db.get(GuideListing, record_id)
+            if listing and listing.guide_user_id == user_id:
+                raise HTTPException(
+                    status_code=400,
+                    detail="You cannot book an experience that you are hosting.",
+                )
+        elif source == "host_experience" and record_id is not None:
+            experience = self.db.get(HostExperience, record_id)
+            if experience and experience.host_id == user_id:
+                raise HTTPException(
+                    status_code=400,
+                    detail="You cannot book an experience that you are hosting.",
+                )
+        # ``source == "mock"`` has no persistent host record; skip the check.
 
     def _get_guide_portfolio(self, guide_user_id: int) -> Optional[dict]:
         """Build guide portfolio from guide catalog profile and listings."""

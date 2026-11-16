@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StickyBarPortal } from '../components/common/StickyBarPortal';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Header } from '../components/common/Header';
@@ -19,7 +19,8 @@ import { BookingLoginPrompt } from '../components/common/BookingLoginPrompt';
 import { useAuthStore } from '../store/authStore';
 import { useProfileStore } from '../store/profileStore';
 import guidesApi from '../services/guidesApi';
-import { isOwnGuide, useViewerGuideId } from '../utils/guides';
+import { useViewerGuideId, getAvailableGuides } from '../utils/guides';
+import { mergeGuides, useAssignedGuides } from '../utils/approvedGuides';
 import { guideContactPath } from '../utils/guideUrl';
 import { guideDashboardApi } from '../services/guideDashboardApi';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -67,6 +68,7 @@ interface AssignedGuide {
 
 interface Experience {
   id: number;
+  slug?: string;
   title: string;
   city: string;
   rating: number;
@@ -746,7 +748,7 @@ const ExperiencePage: React.FC = () => {
 
   const { isAuthenticated, accessToken } = useAuthStore();
 
-  const { addBooking } = useBookingStore();
+  const { addBooking, bookings } = useBookingStore();
   const [isBooked, setIsBooked] = useState(false);
   const { profile, addBookmark, removeBookmark } = useProfileStore();
 
@@ -777,19 +779,45 @@ const ExperiencePage: React.FC = () => {
   const [canReview, setCanReview] = useState<boolean | null>(null);
   const [reviewFormOpen, setReviewFormOpen] = useState(false);
 
-  const fetchUnavailableDates = async (year: number, month: number) => {
+  // Deduplicate in-flight availability requests so rapid guide switches don't
+  // hammer the backend with identical calls.
+  const availabilityInflight = useRef<Map<string, Promise<void>>>(new Map());
+  const availabilityCache = useRef<Map<string, string[]>>(new Map());
+
+  const fetchUnavailableDates = useCallback(async (year: number, month: number) => {
     if (!accessToken) return;
-    try {
-      const url = getApiUrl(`/bookings/availability/month?year=${year}&month=${month}`);
-      const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-      if (res.ok) {
-        const data = await res.json();
-        setDisabledDates(Array.isArray(data.unavailable) ? data.unavailable : []);
-      }
-    } catch {
-      // Silently fail
+    const cacheKey = `${year}-${month}-default`;
+    // Return cached result immediately if available.
+    if (availabilityCache.current.has(cacheKey)) {
+      setDisabledDates(availabilityCache.current.get(cacheKey)!);
+      return;
     }
-  };
+    // If an identical request is already in flight, wait for it instead of
+    // issuing a duplicate call.
+    const existing = availabilityInflight.current.get(cacheKey);
+    if (existing) {
+      await existing;
+      return;
+    }
+    const promise = (async () => {
+      try {
+        const url = getApiUrl(`/bookings/availability/month?year=${year}&month=${month}`);
+        const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+        if (res.ok) {
+          const data = await res.json();
+          const unavailable = Array.isArray(data.unavailable) ? data.unavailable : [];
+          availabilityCache.current.set(cacheKey, unavailable);
+          setDisabledDates(unavailable);
+        }
+      } catch {
+        // Silently fail
+      } finally {
+        availabilityInflight.current.delete(cacheKey);
+      }
+    })();
+    availabilityInflight.current.set(cacheKey, promise);
+    await promise;
+  }, [accessToken]);
 
   useEffect(() => {
     if (accessToken) {
@@ -832,11 +860,22 @@ const ExperiencePage: React.FC = () => {
     };
   }, [experience, isAuthenticated, accessToken]);
 
-  // A signed-in guide must not see themselves in "Who you'll meet".
+  // Backend-approved guides for this experience (regional-head assignments).
+  const assignedGuides = useAssignedGuides(
+    experience?.slug,
+    experience?.title
+  );
   const viewerGuideId = useViewerGuideId();
   const visibleGuides = useMemo(
-    () => (experience?.guides ?? []).filter((g) => !isOwnGuide(g, viewerGuideId)),
-    [experience, viewerGuideId]
+    () =>
+      getAvailableGuides(
+        mergeGuides(experience?.guides ?? [], assignedGuides),
+        bookings,
+        experienceId ?? '',
+        experience?.city ?? '',
+        viewerGuideId
+      ),
+    [experience, assignedGuides, bookings, viewerGuideId, experienceId]
   );
 
   // The guide the traveller picked out of "Who you'll meet". Guides quote their
@@ -1004,7 +1043,6 @@ const ExperiencePage: React.FC = () => {
       setSheetError('Please log in to book this experience');
       return;
     }
-
     // Pre-check guide availability before confirming on mobile too.
     const apiDate = (() => {
       const m = selectedDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);

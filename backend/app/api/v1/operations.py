@@ -43,6 +43,19 @@ from app.schemas.guide_dashboard import (
     GuideExperienceRequestReview,
 )
 
+
+class ExperienceGuideAssignmentCreate(BaseModel):
+    """Staff request to assign a catalog guide to an experience.
+
+    The guide appears in the traveller-facing "Who you'll meet" section
+    once the assignment row exists in ``host_experience_guides``.
+    """
+
+    experience_id: int
+    guide_id: int
+    is_primary: bool = True
+
+
 router = APIRouter()
 
 APPLICATION_STAFF = [ADMIN, REGIONAL_HEAD]
@@ -1126,4 +1139,70 @@ def get_support_ticket(
         "resolved_at": ticket.resolved_at.isoformat() if ticket.resolved_at else None,
         "created_at": ticket.created_at.isoformat() if ticket.created_at else None,
         "updated_at": ticket.updated_at.isoformat() if ticket.updated_at else None,
+    }
+
+
+@router.post(
+    "/experience-guide-assignments",
+    status_code=status.HTTP_201_CREATED,
+)
+def create_experience_guide_assignment(
+    payload: ExperienceGuideAssignmentCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role(ADMIN, REGIONAL_HEAD)),
+):
+    """Assign a catalog guide to an experience so they appear in
+    the traveller-facing "Who you'll meet" section.
+
+    Admin or Regional Head only.  Idempotent: re-assigning the same
+    (experience, guide) pair updates the existing row instead of
+    duplicating it.
+    """
+    guide = db.get(Guide, payload.guide_id)
+    if guide is None:
+        raise HTTPException(status_code=404, detail="Guide not found")
+    if not guide.is_active:
+        raise HTTPException(status_code=422, detail="Guide is not active")
+
+    existing = (
+        db.query(HostExperienceGuide)
+        .filter(
+            HostExperienceGuide.experience_id == payload.experience_id,
+            HostExperienceGuide.guide_id == payload.guide_id,
+        )
+        .first()
+    )
+    if existing is not None:
+        existing.is_primary = payload.is_primary
+        existing.host_id = int(current_user.id)
+        db.add(existing)
+        db.commit()
+        db.refresh(existing)
+        return {
+            "id": existing.id,
+            "experience_id": existing.experience_id,
+            "guide_id": existing.guide_id,
+            "guide_name": guide.name,
+            "is_primary": existing.is_primary,
+            "host_id": existing.host_id,
+            "created_at": existing.created_at.isoformat() if existing.created_at else None,
+        }
+
+    row = HostExperienceGuide(
+        host_id=int(current_user.id),
+        experience_id=payload.experience_id,
+        guide_id=payload.guide_id,
+        is_primary=payload.is_primary,
+    )
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return {
+        "id": row.id,
+        "experience_id": row.experience_id,
+        "guide_id": row.guide_id,
+        "guide_name": guide.name,
+        "is_primary": row.is_primary,
+        "host_id": row.host_id,
+        "created_at": row.created_at.isoformat() if row.created_at else None,
     }

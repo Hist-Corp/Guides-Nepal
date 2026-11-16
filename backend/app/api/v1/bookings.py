@@ -6,7 +6,7 @@ from app.schemas.booking import BookingCreate, BookingResponse, GuidePortfolio
 from app.services.booking_service import BookingService
 from app.models.booking import Booking
 from app.core.dependencies import get_current_user, require_role
-from app.core.roles import TRAVELER
+from app.core.roles import GUIDE, TRAVELER
 from app.models.user import User
 from app.models.host_guide import HostGuide
 from app.models.guide import Guide
@@ -15,7 +15,7 @@ from app.models.guide_listing import GuideProfile, GuideListing
 
 router = APIRouter()
 
-TRAVELER_ONLY = require_role(TRAVELER)
+TRAVELER_OR_GUIDE = require_role(TRAVELER, GUIDE)
 
 
 @router.get("/availability")
@@ -45,10 +45,10 @@ def booking_availability_month(
 @router.get("/", response_model=List[BookingResponse])
 def get_bookings(
     db: Session = Depends(get_db),
-    current_user: User = Depends(TRAVELER_ONLY),
+    current_user: User = Depends(TRAVELER_OR_GUIDE),
 ) -> List[BookingResponse]:
-    """Bookings made by the signed-in traveler only. Other travelers and guides
-    cannot see another traveler's bookings."""
+    """Bookings made by the signed-in user. Travelers see their own bookings;
+    guides see bookings made under their guide account."""
     service = BookingService(db)
     bookings = service.get_user_bookings(current_user.id)
     
@@ -84,11 +84,13 @@ def get_bookings(
 def create_booking(
     booking_in: BookingCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(TRAVELER_ONLY),
+    current_user: User = Depends(TRAVELER_OR_GUIDE),
 ) -> BookingResponse:
-    """Create a booking. Only travelers can create bookings; guides receive
-    them via /guide/bookings."""
+    """Create a booking. Travelers and guides can book experiences; a guide
+    cannot book an experience they themselves host."""
     service = BookingService(db)
+    # Reject self-hosted experiences before any mutation.
+    service.prevent_self_hosted_booking(current_user.id, booking_in)
     booking = service.create_booking(current_user.id, booking_in)
     
     # Enrich with guide portfolio
@@ -118,9 +120,9 @@ def create_booking(
 def cancel_booking(
     id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(TRAVELER_ONLY),
+    current_user: User = Depends(TRAVELER_OR_GUIDE),
 ) -> BookingResponse:
-    """Cancel a booking. Only the booking owner (traveler) can cancel it."""
+    """Cancel a booking. Only the booking owner can cancel it."""
     service = BookingService(db)
     booking = service.cancel_booking(current_user.id, id)
     if not booking:
@@ -152,9 +154,9 @@ def cancel_booking(
 def archive_booking(
     id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(TRAVELER_ONLY),
+    current_user: User = Depends(TRAVELER_OR_GUIDE),
 ) -> BookingResponse:
-    """Archive a booking. Only the booking owner (traveler) can archive it."""
+    """Archive a booking. Only the booking owner can archive it."""
     service = BookingService(db)
     booking = service.archive_booking(current_user.id, id)
     if not booking:

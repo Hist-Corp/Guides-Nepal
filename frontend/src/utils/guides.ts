@@ -86,6 +86,13 @@ export function getAvailableGuides<T extends GuideLike>(
   );
 
   return guides
-    .filter((guide) => !reservedGuideIds.has(String(guide.id)) && !isOwnGuide(guide, viewerGuideId) && (typeof (guide as any).availableSlots === 'number' && (guide as any).availableSlots > 0))
+    .filter((guide) => {
+      const slots = (guide as any).availableSlots;
+      return (
+        !reservedGuideIds.has(String(guide.id)) &&
+        !isOwnGuide(guide, viewerGuideId) &&
+        (typeof slots === 'number' ? slots > 0 : true)
+      );
+    })
     .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.reviews ?? 0) - (a.reviews ?? 0));
 }
