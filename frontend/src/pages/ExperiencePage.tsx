@@ -781,50 +781,125 @@ const ExperiencePage: React.FC = () => {
 
   // Deduplicate in-flight availability requests so rapid guide switches don't
   // hammer the backend with identical calls.
+  const [selectedGuideId, setSelectedGuideId] = useState<number | null>(null);
+  const assignedGuides = useAssignedGuides(experience?.slug, experience?.title);
+  const viewerGuideId = useViewerGuideId();
+  const visibleGuides = useMemo(
+    () =>
+      getAvailableGuides(
+        mergeGuides(experience?.guides ?? [], assignedGuides),
+        bookings,
+        experienceId ?? '',
+        experience?.city ?? '',
+        viewerGuideId
+      ),
+    [experience, assignedGuides, bookings, viewerGuideId, experienceId]
+  );
+  const selectedGuide =
+    selectedGuideId === null
+      ? null
+      : (visibleGuides.find((g) => String(g.id) === String(selectedGuideId)) ?? null);
   const availabilityInflight = useRef<Map<string, Promise<void>>>(new Map());
   const availabilityCache = useRef<Map<string, string[]>>(new Map());
+  const availabilityMap = useRef<Map<string, { remaining: number; maxCapacity: number }>>(
+    new Map()
+  );
 
-  const fetchUnavailableDates = useCallback(async (year: number, month: number) => {
-    if (!accessToken) return;
-    const cacheKey = `${year}-${month}-default`;
-    // Return cached result immediately if available.
-    if (availabilityCache.current.has(cacheKey)) {
-      setDisabledDates(availabilityCache.current.get(cacheKey)!);
-      return;
-    }
-    // If an identical request is already in flight, wait for it instead of
-    // issuing a duplicate call.
-    const existing = availabilityInflight.current.get(cacheKey);
-    if (existing) {
-      await existing;
-      return;
-    }
-    const promise = (async () => {
-      try {
-        const url = getApiUrl(`/bookings/availability/month?year=${year}&month=${month}`);
-        const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-        if (res.ok) {
-          const data = await res.json();
-          const unavailable = Array.isArray(data.unavailable) ? data.unavailable : [];
-          availabilityCache.current.set(cacheKey, unavailable);
-          setDisabledDates(unavailable);
-        }
-      } catch {
-        // Silently fail
-      } finally {
-        availabilityInflight.current.delete(cacheKey);
+  const fetchUnavailableDates = useCallback(
+    async (year: number, month: number) => {
+      if (!accessToken) return;
+      const cacheKey = `${year}-${month}-default`;
+      // Return cached result immediately if available.
+      if (availabilityCache.current.has(cacheKey)) {
+        setDisabledDates(availabilityCache.current.get(cacheKey)!);
+        return;
       }
-    })();
-    availabilityInflight.current.set(cacheKey, promise);
-    await promise;
-  }, [accessToken]);
+      // If an identical request is already in flight, wait for it instead of
+      // issuing a duplicate call.
+      const existing = availabilityInflight.current.get(cacheKey);
+      if (existing) {
+        await existing;
+        return;
+      }
+      const promise = (async () => {
+        try {
+          const url = getApiUrl(`/bookings/availability/month?year=${year}&month=${month}`);
+          const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+          if (res.ok) {
+            const data = await res.json();
+            const unavailable = Array.isArray(data.unavailable) ? data.unavailable : [];
+            availabilityCache.current.set(cacheKey, unavailable);
+            setDisabledDates(unavailable);
+          }
+        } catch {
+          // Silently fail
+        } finally {
+          availabilityInflight.current.delete(cacheKey);
+        }
+      })();
+      availabilityInflight.current.set(cacheKey, promise);
+      await promise;
+    },
+    [accessToken]
+  );
+
+  /** Fetch per-date remaining spots for both visible months of the selected guide. */
+  const fetchMonthlyAvailability = useCallback(
+    async (year: number, month: number) => {
+      if (!accessToken) return;
+      const guideId = selectedGuide?.id;
+      const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
+      if (availabilityMap.current.has(cacheKey)) return;
+      const existing = availabilityInflight.current.get(cacheKey);
+      if (existing) {
+        await existing;
+        return;
+      }
+      const promise = (async () => {
+        try {
+          const url = getApiUrl(
+            `/bookings/availability/month-detail?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`
+          );
+          const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+          if (res.ok) {
+            const data = await res.json();
+            const avail = data.availability ?? {};
+            for (const [key, v] of Object.entries(avail)) {
+              const val = v as { remaining?: number; max_capacity?: number };
+              availabilityMap.current.set(key, {
+                remaining: val.remaining ?? 0,
+                maxCapacity: val.max_capacity ?? 0,
+              });
+            }
+          }
+        } catch {
+          // Silently fail - spots won't be shown
+        } finally {
+          availabilityInflight.current.delete(cacheKey);
+        }
+      })();
+      availabilityInflight.current.set(cacheKey, promise);
+      await promise;
+    },
+    [accessToken, selectedGuide?.id]
+  );
+
+  /** Combined month-change handler: refresh unavailable dates AND spot counts. */
+  const handleMonthChange = useCallback(
+    (year: number, month: number) => {
+      fetchUnavailableDates(year, month);
+      fetchMonthlyAvailability(year, month);
+    },
+    [fetchUnavailableDates, fetchMonthlyAvailability]
+  );
 
   useEffect(() => {
     if (accessToken) {
       const now = new Date();
       fetchUnavailableDates(now.getFullYear(), now.getMonth() + 1);
+      fetchMonthlyAvailability(now.getFullYear(), now.getMonth() + 1);
     }
-  }, [accessToken, fetchUnavailableDates]);
+  }, [selectedGuide, accessToken, fetchUnavailableDates, fetchMonthlyAvailability]);
 
   // Load reviews for this experience and check whether the traveller is
   // eligible to leave one (completed booking + not yet reviewed).
@@ -860,31 +935,8 @@ const ExperiencePage: React.FC = () => {
     };
   }, [experience, isAuthenticated, accessToken]);
 
-  // Backend-approved guides for this experience (regional-head assignments).
-  const assignedGuides = useAssignedGuides(
-    experience?.slug,
-    experience?.title
-  );
-  const viewerGuideId = useViewerGuideId();
-  const visibleGuides = useMemo(
-    () =>
-      getAvailableGuides(
-        mergeGuides(experience?.guides ?? [], assignedGuides),
-        bookings,
-        experienceId ?? '',
-        experience?.city ?? '',
-        viewerGuideId
-      ),
-    [experience, assignedGuides, bookings, viewerGuideId, experienceId]
-  );
-
   // The guide the traveller picked out of "Who you'll meet". Guides quote their
   // own per-person price, so the booking card prices the booking for them.
-  const [selectedGuideId, setSelectedGuideId] = useState<number | null>(null);
-  const selectedGuide =
-    selectedGuideId === null
-      ? null
-      : (visibleGuides.find((g) => String(g.id) === String(selectedGuideId)) ?? null);
   const unitPrice = selectedGuide?.price ?? experience?.price ?? 0;
 
   // A new experience resets the choice so its own price shows first.
@@ -1392,8 +1444,10 @@ const ExperiencePage: React.FC = () => {
                   <div className="flex flex-wrap gap-4">
                     {visibleGuides.map((g) => {
                       const isSelected = String(selectedGuideId) === String(g.id);
-                      const remainingSlots = typeof g.availableSlots === 'number' ? g.availableSlots : null;
-                      const isLowStock = remainingSlots !== null && remainingSlots <= 3 && remainingSlots > 0;
+                      const remainingSlots =
+                        typeof g.availableSlots === 'number' ? g.availableSlots : null;
+                      const isLowStock =
+                        remainingSlots !== null && remainingSlots <= 3 && remainingSlots > 0;
                       const isFullyBooked = remainingSlots === 0;
                       return (
                         <div
@@ -1401,7 +1455,9 @@ const ExperiencePage: React.FC = () => {
                           className={`flex w-44 flex-col items-center gap-2 rounded-2xl border p-4 text-center transition-colors ${
                             isSelected
                               ? 'border-primary bg-primary/5 ring-1 ring-primary'
-                              : isFullyBooked ? 'border-red-100 bg-red-50' : 'border-slate-200 hover:border-slate-400'
+                              : isFullyBooked
+                                ? 'border-red-100 bg-red-50'
+                                : 'border-slate-200 hover:border-slate-400'
                           }`}
                         >
                           <button
@@ -1409,7 +1465,9 @@ const ExperiencePage: React.FC = () => {
                             disabled={isFullyBooked}
                             aria-pressed={isSelected}
                             aria-label={`Select guide ${g.name}`}
-                            onClick={() => !isFullyBooked && setSelectedGuideId(isSelected ? null : g.id)}
+                            onClick={() =>
+                              !isFullyBooked && setSelectedGuideId(isSelected ? null : g.id)
+                            }
                             className="flex w-full flex-col items-center gap-2"
                           >
                             <img
@@ -1430,8 +1488,12 @@ const ExperiencePage: React.FC = () => {
                                   ⚠ {remainingSlots} seats left
                                 </span>
                               )}
-                              <div className="text-xs text-gray-500">{g.role || 'Experience Guide'}</div>
-                              <div className="text-sm text-gray-600">{g.rating} ★ ({g.reviews} reviews)</div>
+                              <div className="text-xs text-gray-500">
+                                {g.role || 'Experience Guide'}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {g.rating} ★ ({g.reviews} reviews)
+                              </div>
                             </div>
                             {typeof g.price === 'number' && (
                               <div className="text-sm font-bold text-secondary">
@@ -1440,7 +1502,9 @@ const ExperiencePage: React.FC = () => {
                               </div>
                             )}
                             {remainingSlots !== null && (
-                              <div className="text-[10px] text-gray-400">{remainingSlots} remaining</div>
+                              <div className="text-[10px] text-gray-400">
+                                {remainingSlots} remaining
+                              </div>
                             )}
                           </button>
                           <Link
@@ -1602,7 +1666,8 @@ const ExperiencePage: React.FC = () => {
                       single
                       ariaLabel="Choose experience date"
                       disabledDates={disabledDates}
-                      onMonthChange={fetchUnavailableDates}
+                      availability={Object.fromEntries(availabilityMap.current)}
+                      onMonthChange={handleMonthChange}
                     />
                   </div>
                   <GuestPicker

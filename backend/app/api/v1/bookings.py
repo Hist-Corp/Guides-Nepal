@@ -1,19 +1,14 @@
+from datetime import UTC, datetime
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import List, Optional
+
 from app.core.database import get_db
-from app.schemas.booking import BookingCreate, BookingResponse, GuidePortfolio
-from app.services.booking_service import BookingService
-from app.models.booking import Booking
 from app.core.dependencies import get_current_user, require_role
 from app.core.roles import ADMIN, GUIDE, TRAVELER
 from app.models.user import User
-from app.models.host_guide import HostGuide
-from app.models.guide import Guide
-from app.models.guide_listing import GuideProfile, GuideListing
-from app.models.guide_daily_capacity import GuideDailyCapacity
-from datetime import datetime, timezone
-
+from app.schemas.booking import BookingCreate, BookingResponse
+from app.services.booking_service import BookingService
 
 router = APIRouter()
 
@@ -23,7 +18,7 @@ TRAVELER_OR_GUIDE = require_role(TRAVELER, GUIDE)
 @router.get("/availability")
 def booking_availability(
     date: str = Query(pattern=r"^\d{4}-\d{2}-\d{2}$"),
-    guide_id: Optional[int] = Query(default=None),
+    guide_id: int | None = Query(default=None),
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ) -> dict:
@@ -35,19 +30,21 @@ def booking_availability(
 def booking_availability_month(
     year: int = Query(ge=2020, le=2100),
     month: int = Query(ge=1, le=12),
-    guide_id: Optional[int] = Query(default=None),
+    guide_id: int | None = Query(default=None),
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ) -> dict:
     """Unavailable dates for the currently bookable guide in a given month."""
-    unavailable = BookingService(db).availability_for_month(year, month, guide_id=guide_id)
+    unavailable = BookingService(db).availability_for_month(
+        year, month, guide_id=guide_id
+    )
     return {"unavailable": unavailable}
 
 
 @router.get("/availability/daily")
 def booking_availability_daily(
     date: str = Query(pattern=r"^\d{4}-\d{2}-\d{2}$"),
-    guide_id: Optional[int] = Query(default=None),
+    guide_id: int | None = Query(default=None),
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ) -> dict:
@@ -56,19 +53,56 @@ def booking_availability_daily(
     Uses the per-day ``guide_daily_capacity`` table so the total number of
     bookings per day never exceeds ``max_capacity``.
     """
-    target_date = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+    target_date = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=UTC)
     if guide_id is not None:
         guide_user_id = BookingService(db)._resolve_guide_user_id(guide_id)
         if guide_user_id is None:
-            return {"available": True, "remaining": 0, "max_capacity": 0, "booked_capacity": 0}
+            return {
+                "available": True,
+                "remaining": 0,
+                "max_capacity": 0,
+                "booked_capacity": 0,
+            }
     else:
         guide_user_id = BookingService(db).get_booking_guide().id
     return BookingService(db).get_daily_availability(guide_user_id, target_date)
 
 
+@router.get("/availability/month-detail")
+def booking_availability_month_detail(
+    year: int = Query(ge=2020, le=2100),
+    month: int = Query(ge=1, le=12),
+    guide_id: int | None = Query(default=None),
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+) -> dict:
+    """Availability for every date in a month.
+
+    Returns a map of ``YYYY-MM-DD`` -> {remaining, max_capacity, booked_capacity}
+    so the frontend can render per-date spot counts in the calendar grid.
+    """
+    import calendar
+
+    if guide_id is not None:
+        guide_user_id = BookingService(db)._resolve_guide_user_id(guide_id)
+        if guide_user_id is None:
+            return {"availability": {}}
+    else:
+        guide_user_id = BookingService(db).get_booking_guide().id
+
+    _, days_in_month = calendar.monthrange(year, month)
+    availability: dict[str, dict] = {}
+    for day in range(1, days_in_month + 1):
+        target_date = datetime(year, month, day, tzinfo=UTC)
+        availability[target_date.strftime("%Y-%m-%d")] = BookingService(
+            db
+        ).get_daily_availability(guide_user_id, target_date)
+    return {"availability": availability}
+
+
 @router.post("/capacity/reset")
 def reset_daily_capacity(
-    guide_id: Optional[int] = Query(default=None),
+    guide_id: int | None = Query(default=None),
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role(ADMIN)),
 ) -> dict:
@@ -81,23 +115,23 @@ def reset_daily_capacity(
     return {"reset_count": count, "guide_id": guide_id}
 
 
-@router.get("/", response_model=List[BookingResponse])
+@router.get("/", response_model=list[BookingResponse])
 def get_bookings(
     db: Session = Depends(get_db),
     current_user: User = Depends(TRAVELER_OR_GUIDE),
-) -> List[BookingResponse]:
+) -> list[BookingResponse]:
     """Bookings made by the signed-in user. Travelers see their own bookings;
     guides see bookings made under their guide account."""
     service = BookingService(db)
     bookings = service.get_user_bookings(current_user.id)
-    
+
     # Enrich bookings with guide portfolio
     enriched_bookings = []
     for booking in bookings:
         portfolio_data = None
         if booking.guide_user_id:
             portfolio_data = service._get_guide_portfolio(booking.guide_user_id)
-        
+
         booking_dict = {
             "id": booking.id,
             "user_id": booking.user_id,
@@ -115,7 +149,7 @@ def get_bookings(
             "guide_portfolio": portfolio_data,
         }
         enriched_bookings.append(BookingResponse(**booking_dict))
-    
+
     return enriched_bookings
 
 
@@ -131,12 +165,12 @@ def create_booking(
     # Reject self-hosted experiences before any mutation.
     service.prevent_self_hosted_booking(current_user.id, booking_in)
     booking = service.create_booking(current_user.id, booking_in)
-    
+
     # Enrich with guide portfolio
     portfolio_data = None
     if booking.guide_user_id:
         portfolio_data = service._get_guide_portfolio(booking.guide_user_id)
-    
+
     return BookingResponse(
         id=booking.id,
         user_id=booking.user_id,
@@ -166,11 +200,11 @@ def cancel_booking(
     booking = service.cancel_booking(current_user.id, id)
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
-    
+
     portfolio_data = None
     if booking.guide_user_id:
         portfolio_data = service._get_guide_portfolio(booking.guide_user_id)
-    
+
     return BookingResponse(
         id=booking.id,
         user_id=booking.user_id,
@@ -200,11 +234,11 @@ def archive_booking(
     booking = service.archive_booking(current_user.id, id)
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
-    
+
     portfolio_data = None
     if booking.guide_user_id:
         portfolio_data = service._get_guide_portfolio(booking.guide_user_id)
-    
+
     return BookingResponse(
         id=booking.id,
         user_id=booking.user_id,

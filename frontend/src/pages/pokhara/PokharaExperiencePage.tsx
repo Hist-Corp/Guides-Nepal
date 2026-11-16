@@ -140,7 +140,11 @@ const ReadMoreText = ({
 const sanitizeImageUrl = (url: string | undefined | null): string => {
   if (!url) return '';
   const trimmed = String(url).trim();
-  if (/^\s*javascript:/i.test(trimmed) || /^\s*data:(?!image\/)/i.test(trimmed) || /^\s*vbscript:/i.test(trimmed)) {
+  if (
+    /^\s*javascript:/i.test(trimmed) ||
+    /^\s*data:(?!image\/)/i.test(trimmed) ||
+    /^\s*vbscript:/i.test(trimmed)
+  ) {
     return '';
   }
   if (/^(https?:\/\/|\/|\.\/|\.\.\/|data:image\/)/i.test(trimmed)) {
@@ -277,50 +281,110 @@ const PokharaExperiencePage: React.FC = () => {
   // hammer the backend with identical calls.
   const availabilityInflight = useRef<Map<string, Promise<void>>>(new Map());
   const availabilityCache = useRef<Map<string, string[]>>(new Map());
+  // Per-date remaining spots for the currently selected guide.
+  const availabilityMap = useRef<Map<string, { remaining: number; maxCapacity: number }>>(
+    new Map()
+  );
 
-  const fetchUnavailableDates = useCallback(async (year: number, month: number) => {
-    if (!accessToken) return;
-    const guideId = selectedGuide?.id;
-    const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
-    // Return cached result immediately if available.
-    if (availabilityCache.current.has(cacheKey)) {
-      setDisabledDates(availabilityCache.current.get(cacheKey)!);
-      return;
-    }
-    // If an identical request is already in flight, wait for it instead of
-    // issuing a duplicate call.
-    const existing = availabilityInflight.current.get(cacheKey);
-    if (existing) {
-      await existing;
-      return;
-    }
-    const promise = (async () => {
-      try {
-        const url = getApiUrl(`/bookings/availability/month?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`);
-        const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-        if (res.ok) {
-          const data = await res.json();
-          const unavailable = Array.isArray(data.unavailable) ? data.unavailable : [];
-          availabilityCache.current.set(cacheKey, unavailable);
-          setDisabledDates(unavailable);
-        }
-      } catch {
-        // Silently fail - dates won't be disabled
-      } finally {
-        availabilityInflight.current.delete(cacheKey);
+  const fetchUnavailableDates = useCallback(
+    async (year: number, month: number) => {
+      if (!accessToken) return;
+      const guideId = selectedGuide?.id;
+      const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
+      // Return cached result immediately if available.
+      if (availabilityCache.current.has(cacheKey)) {
+        setDisabledDates(availabilityCache.current.get(cacheKey)!);
+        return;
       }
-    })();
-    availabilityInflight.current.set(cacheKey, promise);
-    await promise;
-  }, [accessToken, selectedGuide?.id]);
+      // If an identical request is already in flight, wait for it instead of
+      // issuing a duplicate call.
+      const existing = availabilityInflight.current.get(cacheKey);
+      if (existing) {
+        await existing;
+        return;
+      }
+      const promise = (async () => {
+        try {
+          const url = getApiUrl(
+            `/bookings/availability/month?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`
+          );
+          const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+          if (res.ok) {
+            const data = await res.json();
+            const unavailable = Array.isArray(data.unavailable) ? data.unavailable : [];
+            availabilityCache.current.set(cacheKey, unavailable);
+            setDisabledDates(unavailable);
+          }
+        } catch {
+          // Silently fail - dates won't be disabled
+        } finally {
+          availabilityInflight.current.delete(cacheKey);
+        }
+      })();
+      availabilityInflight.current.set(cacheKey, promise);
+      await promise;
+    },
+    [accessToken, selectedGuide?.id]
+  );
+
+  /** Fetch per-date remaining spots for both visible months of the selected guide. */
+  const fetchMonthlyAvailability = useCallback(
+    async (year: number, month: number) => {
+      if (!accessToken) return;
+      const guideId = selectedGuide?.id;
+      const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
+      if (availabilityMap.current.has(cacheKey)) return;
+      const existing = availabilityInflight.current.get(cacheKey);
+      if (existing) {
+        await existing;
+        return;
+      }
+      const promise = (async () => {
+        try {
+          const url = getApiUrl(
+            `/bookings/availability/month-detail?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`
+          );
+          const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+          if (res.ok) {
+            const data = await res.json();
+            const avail = data.availability ?? {};
+            for (const [key, v] of Object.entries(avail)) {
+              const val = v as { remaining?: number; max_capacity?: number };
+              availabilityMap.current.set(key, {
+                remaining: val.remaining ?? 0,
+                maxCapacity: val.max_capacity ?? 0,
+              });
+            }
+          }
+        } catch {
+          // Silently fail - spots won't be shown
+        } finally {
+          availabilityInflight.current.delete(cacheKey);
+        }
+      })();
+      availabilityInflight.current.set(cacheKey, promise);
+      await promise;
+    },
+    [accessToken, selectedGuide?.id]
+  );
+
+  /** Combined month-change handler: refresh unavailable dates AND spot counts. */
+  const handleMonthChange = useCallback(
+    (year: number, month: number) => {
+      fetchUnavailableDates(year, month);
+      fetchMonthlyAvailability(year, month);
+    },
+    [fetchUnavailableDates, fetchMonthlyAvailability]
+  );
 
   // Refetch availability when guide changes
   useEffect(() => {
     if (accessToken) {
       const now = new Date();
       fetchUnavailableDates(now.getFullYear(), now.getMonth() + 1);
+      fetchMonthlyAvailability(now.getFullYear(), now.getMonth() + 1);
     }
-  }, [selectedGuide, accessToken, fetchUnavailableDates]);
+  }, [selectedGuide, accessToken, fetchUnavailableDates, fetchMonthlyAvailability]);
   const { profile, addBookmark, removeBookmark } = useProfileStore();
   const bookmarkId = data ? `exp-${data.slug}` : '';
   const isSaved = bookmarkId ? profile.bookmarks.some((b) => b.id === bookmarkId) : false;
@@ -436,8 +500,6 @@ const PokharaExperiencePage: React.FC = () => {
     }
   };
 
-
-
   const handleSheetConfirm = async () => {
     if (!isAuthenticated) {
       setSheetError('Please log in to book an experience');
@@ -550,7 +612,10 @@ const PokharaExperiencePage: React.FC = () => {
         <Header />
         <main id="main-content" className="flex-grow container mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold">Experience not found</h1>
-          <button onClick={goBack} className="flex items-center gap-2 font-bold text-primary hover:text-primary/80 transition-colors mt-4">
+          <button
+            onClick={goBack}
+            className="flex items-center gap-2 font-bold text-primary hover:text-primary/80 transition-colors mt-4"
+          >
             <ArrowLeft className="w-4 h-4" />
             Back
           </button>
@@ -795,24 +860,35 @@ const PokharaExperiencePage: React.FC = () => {
                       <div className="bg-gray-50 p-5 rounded-xl border border-gray-100">
                         <h3 className="text-base font-bold text-gray-900 mb-2">Best time to go</h3>
                         <ul className="text-sm text-gray-600 space-y-2 list-disc pl-5 leading-relaxed">
-                          <li><strong>October–November:</strong> clearest mountain views</li>
-                          <li><strong>March–April:</strong> spring blooms, clear mornings</li>
-                          <li><strong>December–February:</strong> cool, crisp dawns</li>
-                          <li><strong>June–September:</strong> monsoon — lush but cloudy</li>
+                          <li>
+                            <strong>October–November:</strong> clearest mountain views
+                          </li>
+                          <li>
+                            <strong>March–April:</strong> spring blooms, clear mornings
+                          </li>
+                          <li>
+                            <strong>December–February:</strong> cool, crisp dawns
+                          </li>
+                          <li>
+                            <strong>June–September:</strong> monsoon — lush but cloudy
+                          </li>
                         </ul>
                       </div>
                     </div>
                     <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm mt-6">
-                      <h3 className="text-base font-bold text-gray-900 mb-3">Getting there &amp; meeting point</h3>
+                      <h3 className="text-base font-bold text-gray-900 mb-3">
+                        Getting there &amp; meeting point
+                      </h3>
                       <p className="text-sm text-gray-600 leading-relaxed mb-3">
-                        Pokhara&apos;s Lakeside area runs along Phewa Lake, with most experiences starting
-                        from the lakeside promenade or a short drive to Sarangkot ridge (25–30 minutes).
-                        Taxis and ride-hailing apps are readily available in Lakeside.
+                        Pokhara&apos;s Lakeside area runs along Phewa Lake, with most experiences
+                        starting from the lakeside promenade or a short drive to Sarangkot ridge
+                        (25–30 minutes). Taxis and ride-hailing apps are readily available in
+                        Lakeside.
                       </p>
                       <p className="text-sm text-gray-600 leading-relaxed">
-                        Mountain views are clearest at dawn — sunrise trips to Sarangkot depart around
-                        4:30–5:00 AM. Paragliding runs from late morning through early afternoon when
-                        thermals are strongest (roughly October–May season).
+                        Mountain views are clearest at dawn — sunrise trips to Sarangkot depart
+                        around 4:30–5:00 AM. Paragliding runs from late morning through early
+                        afternoon when thermals are strongest (roughly October–May season).
                       </p>
                     </div>
                   </div>
@@ -902,7 +978,8 @@ const PokharaExperiencePage: React.FC = () => {
                           ariaLabel={singleDateTrip ? 'Select date, format DD/MM/YYYY' : undefined}
                           compact={isTrekPort}
                           disabledDates={disabledDates}
-                          onMonthChange={fetchUnavailableDates}
+                          availability={Object.fromEntries(availabilityMap.current)}
+                          onMonthChange={handleMonthChange}
                         />
 
                         <GuestPicker
@@ -1098,7 +1175,7 @@ const PokharaExperiencePage: React.FC = () => {
                           </span>
                         </div>
                       </div>
-                  </>
+                    </>
                   ) : (
                     <div className="flex flex-col items-center text-center py-8 animate-in fade-in zoom-in duration-300">
                       <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
@@ -1325,7 +1402,8 @@ const PokharaExperiencePage: React.FC = () => {
                         idPrefix="form"
                         single={singleDateTrip}
                         disabledDates={disabledDates}
-                        onMonthChange={fetchUnavailableDates}
+                        availability={Object.fromEntries(availabilityMap.current)}
+                        onMonthChange={handleMonthChange}
                       />
                     </div>
                   </div>
@@ -1607,7 +1685,9 @@ const PokharaExperiencePage: React.FC = () => {
                           {item.price != null ? (
                             <>
                               <span className="text-xs text-gray-400">from </span>
-                              <span className="font-bold text-lg text-gray-900"><Price amount={item.price} /></span>
+                              <span className="font-bold text-lg text-gray-900">
+                                <Price amount={item.price} />
+                              </span>
                               <span className="text-xs text-gray-400"> / person</span>
                             </>
                           ) : (
@@ -1889,7 +1969,13 @@ const PokharaExperiencePage: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl animate-in fade-in zoom-in-95">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-              <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg
+                className="h-8 w-8 text-green-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>
@@ -1907,10 +1993,7 @@ const PokharaExperiencePage: React.FC = () => {
         </div>
       )}
 
-      <BookingLoginPrompt
-        isOpen={showLoginPrompt}
-        onClose={() => setShowLoginPrompt(false)}
-      />
+      <BookingLoginPrompt isOpen={showLoginPrompt} onClose={() => setShowLoginPrompt(false)} />
 
       <Footer />
     </div>

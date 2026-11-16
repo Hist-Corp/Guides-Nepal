@@ -234,58 +234,114 @@ const CookingExperiencePage: React.FC = () => {
   // hammer the backend with identical calls.
   const availabilityInflight = useRef<Map<string, Promise<void>>>(new Map());
   const availabilityCache = useRef<Map<string, string[]>>(new Map());
+  const availabilityMap = useRef<Map<string, { remaining: number; maxCapacity: number }>>(
+    new Map()
+  );
 
-  const fetchUnavailableDates = useCallback(async (year: number, month: number) => {
-    if (!accessToken) return;
-    const guideId = selectedGuide?.id;
-    const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
-    if (availabilityCache.current.has(cacheKey)) {
-      setDisabledDates(availabilityCache.current.get(cacheKey)!);
-      return;
-    }
-    const existing = availabilityInflight.current.get(cacheKey);
-    if (existing) {
-      await existing;
-      return;
-    }
-    const promise = (async () => {
-      try {
-        const url = getApiUrl(`/bookings/availability/month?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`);
-        const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-        if (res.ok) {
-          const data = await res.json();
-          const unavailable = Array.isArray(data.unavailable) ? data.unavailable : [];
-          availabilityCache.current.set(cacheKey, unavailable);
-          setDisabledDates(unavailable);
-        }
-      } catch {
-        // Silently fail
-      } finally {
-        availabilityInflight.current.delete(cacheKey);
+  const fetchUnavailableDates = useCallback(
+    async (year: number, month: number) => {
+      if (!accessToken) return;
+      const guideId = selectedGuide?.id;
+      const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
+      if (availabilityCache.current.has(cacheKey)) {
+        setDisabledDates(availabilityCache.current.get(cacheKey)!);
+        return;
       }
-    })();
-    availabilityInflight.current.set(cacheKey, promise);
-    await promise;
-  }, [accessToken, selectedGuide?.id]);
+      const existing = availabilityInflight.current.get(cacheKey);
+      if (existing) {
+        await existing;
+        return;
+      }
+      const promise = (async () => {
+        try {
+          const url = getApiUrl(
+            `/bookings/availability/month?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`
+          );
+          const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+          if (res.ok) {
+            const data = await res.json();
+            const unavailable = Array.isArray(data.unavailable) ? data.unavailable : [];
+            availabilityCache.current.set(cacheKey, unavailable);
+            setDisabledDates(unavailable);
+          }
+        } catch {
+          // Silently fail
+        } finally {
+          availabilityInflight.current.delete(cacheKey);
+        }
+      })();
+      availabilityInflight.current.set(cacheKey, promise);
+      await promise;
+    },
+    [accessToken, selectedGuide?.id]
+  );
+
+  /** Fetch per-date remaining spots for both visible months of the selected guide. */
+  const fetchMonthlyAvailability = useCallback(
+    async (year: number, month: number) => {
+      if (!accessToken) return;
+      const guideId = selectedGuide?.id;
+      const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
+      if (availabilityMap.current.has(cacheKey)) return;
+      const existing = availabilityInflight.current.get(cacheKey);
+      if (existing) {
+        await existing;
+        return;
+      }
+      const promise = (async () => {
+        try {
+          const url = getApiUrl(
+            `/bookings/availability/month-detail?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`
+          );
+          const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+          if (res.ok) {
+            const data = await res.json();
+            const avail = data.availability ?? {};
+            for (const [key, v] of Object.entries(avail)) {
+              const val = v as { remaining?: number; max_capacity?: number };
+              availabilityMap.current.set(key, {
+                remaining: val.remaining ?? 0,
+                maxCapacity: val.max_capacity ?? 0,
+              });
+            }
+          }
+        } catch {
+          // Silently fail - spots won't be shown
+        } finally {
+          availabilityInflight.current.delete(cacheKey);
+        }
+      })();
+      availabilityInflight.current.set(cacheKey, promise);
+      await promise;
+    },
+    [accessToken, selectedGuide?.id]
+  );
+
+  /** Combined month-change handler: refresh unavailable dates AND spot counts. */
+  const handleMonthChange = useCallback(
+    (year: number, month: number) => {
+      fetchUnavailableDates(year, month);
+      fetchMonthlyAvailability(year, month);
+    },
+    [fetchUnavailableDates, fetchMonthlyAvailability]
+  );
 
   useEffect(() => {
     if (accessToken) {
       const now = new Date();
       fetchUnavailableDates(now.getFullYear(), now.getMonth() + 1);
+      fetchMonthlyAvailability(now.getFullYear(), now.getMonth() + 1);
     }
-  }, [selectedGuide, accessToken, fetchUnavailableDates]);
+  }, [selectedGuide, accessToken, fetchUnavailableDates, fetchMonthlyAvailability]);
 
   // A signed-in guide never sees (or books) themselves in "Who you'll meet".
   const viewerGuideId = useViewerGuideId();
   const availableGuides = useMemo(
-    () =>
-      data
-        ? getAvailableGuides(data.guides ?? [], bookings, data.id, '', viewerGuideId)
-        : [],
+    () => (data ? getAvailableGuides(data.guides ?? [], bookings, data.id, '', viewerGuideId) : []),
     [data, bookings, viewerGuideId]
   );
 
-const handleBookNow = async (): Promise<boolean> => {
+  const handleBookNow = async (): Promise<boolean> => {
     if (!isAuthenticated) {
       setShowLoginPrompt(true);
       return false;
@@ -794,7 +850,8 @@ const handleBookNow = async (): Promise<boolean> => {
                           }}
                           idPrefix="card"
                           disabledDates={disabledDates}
-                          onMonthChange={fetchUnavailableDates}
+                          availability={Object.fromEntries(availabilityMap.current)}
+                          onMonthChange={handleMonthChange}
                         />
 
                         <GuestPicker
@@ -813,8 +870,14 @@ const handleBookNow = async (): Promise<boolean> => {
                               <img
                                 src={(() => {
                                   try {
-                                    const parsed = new URL(selectedGuide.image, window.location.origin);
-                                    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                                    const parsed = new URL(
+                                      selectedGuide.image,
+                                      window.location.origin
+                                    );
+                                    if (
+                                      parsed.protocol === 'http:' ||
+                                      parsed.protocol === 'https:'
+                                    ) {
                                       return parsed.href;
                                     }
                                   } catch {
@@ -1091,7 +1154,10 @@ const handleBookNow = async (): Promise<boolean> => {
                                   src={(() => {
                                     try {
                                       const parsed = new URL(guide.image, window.location.origin);
-                                      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                                      if (
+                                        parsed.protocol === 'http:' ||
+                                        parsed.protocol === 'https:'
+                                      ) {
                                         return parsed.href;
                                       }
                                     } catch {
@@ -1163,7 +1229,8 @@ const handleBookNow = async (): Promise<boolean> => {
                         }}
                         idPrefix="form"
                         disabledDates={disabledDates}
-                        onMonthChange={fetchUnavailableDates}
+                        availability={Object.fromEntries(availabilityMap.current)}
+                        onMonthChange={handleMonthChange}
                       />
                     </div>
                   </div>
@@ -1513,16 +1580,19 @@ const handleBookNow = async (): Promise<boolean> => {
         </div>
       )}
 
-      <BookingLoginPrompt
-        isOpen={showLoginPrompt}
-        onClose={() => setShowLoginPrompt(false)}
-      />
+      <BookingLoginPrompt isOpen={showLoginPrompt} onClose={() => setShowLoginPrompt(false)} />
 
       {bookingConfirmed && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl animate-in fade-in zoom-in-95">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-              <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg
+                className="h-8 w-8 text-green-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>

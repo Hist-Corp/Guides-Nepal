@@ -122,46 +122,105 @@ const KathmanduExperiencePage: React.FC = () => {
   // hammer the backend with identical calls.
   const availabilityInflight = useRef<Map<string, Promise<void>>>(new Map());
   const availabilityCache = useRef<Map<string, string[]>>(new Map());
+  const availabilityMap = useRef<Map<string, { remaining: number; maxCapacity: number }>>(
+    new Map()
+  );
 
-  const fetchUnavailableDates = useCallback(async (year: number, month: number) => {
-    if (!accessToken) return;
-    const guideId = selectedGuide?.id;
-    const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
-    if (availabilityCache.current.has(cacheKey)) {
-      setDisabledDates(availabilityCache.current.get(cacheKey)!);
-      return;
-    }
-    const existing = availabilityInflight.current.get(cacheKey);
-    if (existing) {
-      await existing;
-      return;
-    }
-    const promise = (async () => {
-      try {
-        const url = getApiUrl(`/bookings/availability/month?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`);
-        const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-        if (res.ok) {
-          const data = await res.json();
-          const unavailable = Array.isArray(data.unavailable) ? data.unavailable : [];
-          availabilityCache.current.set(cacheKey, unavailable);
-          setDisabledDates(unavailable);
-        }
-      } catch {
-        // Silently fail
-      } finally {
-        availabilityInflight.current.delete(cacheKey);
+  const fetchUnavailableDates = useCallback(
+    async (year: number, month: number) => {
+      if (!accessToken) return;
+      const guideId = selectedGuide?.id;
+      const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
+      if (availabilityCache.current.has(cacheKey)) {
+        setDisabledDates(availabilityCache.current.get(cacheKey)!);
+        return;
       }
-    })();
-    availabilityInflight.current.set(cacheKey, promise);
-    await promise;
-  }, [accessToken, selectedGuide?.id]);
+      const existing = availabilityInflight.current.get(cacheKey);
+      if (existing) {
+        await existing;
+        return;
+      }
+      const promise = (async () => {
+        try {
+          const url = getApiUrl(
+            `/bookings/availability/month?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`
+          );
+          const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+          if (res.ok) {
+            const data = await res.json();
+            const unavailable = Array.isArray(data.unavailable) ? data.unavailable : [];
+            availabilityCache.current.set(cacheKey, unavailable);
+            setDisabledDates(unavailable);
+          }
+        } catch {
+          // Silently fail
+        } finally {
+          availabilityInflight.current.delete(cacheKey);
+        }
+      })();
+      availabilityInflight.current.set(cacheKey, promise);
+      await promise;
+    },
+    [accessToken, selectedGuide?.id]
+  );
+
+  /** Fetch per-date remaining spots for both visible months of the selected guide. */
+  const fetchMonthlyAvailability = useCallback(
+    async (year: number, month: number) => {
+      if (!accessToken) return;
+      const guideId = selectedGuide?.id;
+      const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
+      if (availabilityMap.current.has(cacheKey)) return;
+      const existing = availabilityInflight.current.get(cacheKey);
+      if (existing) {
+        await existing;
+        return;
+      }
+      const promise = (async () => {
+        try {
+          const url = getApiUrl(
+            `/bookings/availability/month-detail?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`
+          );
+          const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+          if (res.ok) {
+            const data = await res.json();
+            const avail = data.availability ?? {};
+            for (const [key, v] of Object.entries(avail)) {
+              const val = v as { remaining?: number; max_capacity?: number };
+              availabilityMap.current.set(key, {
+                remaining: val.remaining ?? 0,
+                maxCapacity: val.max_capacity ?? 0,
+              });
+            }
+          }
+        } catch {
+          // Silently fail - spots won't be shown
+        } finally {
+          availabilityInflight.current.delete(cacheKey);
+        }
+      })();
+      availabilityInflight.current.set(cacheKey, promise);
+      await promise;
+    },
+    [accessToken, selectedGuide?.id]
+  );
+
+  /** Combined month-change handler: refresh unavailable dates AND spot counts. */
+  const handleMonthChange = useCallback(
+    (year: number, month: number) => {
+      fetchUnavailableDates(year, month);
+      fetchMonthlyAvailability(year, month);
+    },
+    [fetchUnavailableDates, fetchMonthlyAvailability]
+  );
 
   useEffect(() => {
     if (accessToken) {
       const now = new Date();
       fetchUnavailableDates(now.getFullYear(), now.getMonth() + 1);
+      fetchMonthlyAvailability(now.getFullYear(), now.getMonth() + 1);
     }
-  }, [selectedGuide, accessToken, fetchUnavailableDates]);
+  }, [selectedGuide, accessToken, fetchUnavailableDates, fetchMonthlyAvailability]);
 
   // Guides approved for this experience by a Regional Head (backend catalog).
   const assignedGuides = useAssignedGuides(data?.slug, data?.title);
@@ -193,7 +252,9 @@ const KathmanduExperiencePage: React.FC = () => {
       // Show info message inside the card instead of alert
       const infoElement = document.getElementById('booking-info-message');
       if (infoElement) {
-        infoElement.textContent = singleDateTrip ? 'Please select a date' : 'Please select a check-in date';
+        infoElement.textContent = singleDateTrip
+          ? 'Please select a date'
+          : 'Please select a check-in date';
         infoElement.classList.remove('hidden');
         infoElement.classList.add('text-red-500');
       }
@@ -378,7 +439,10 @@ const KathmanduExperiencePage: React.FC = () => {
         <Header />
         <main id="main-content" className="flex-grow container mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold">Experience not found</h1>
-          <button onClick={goBack} className="flex items-center gap-2 font-bold text-primary hover:text-primary/80 transition-colors mt-4">
+          <button
+            onClick={goBack}
+            className="flex items-center gap-2 font-bold text-primary hover:text-primary/80 transition-colors mt-4"
+          >
             <ArrowLeft className="w-4 h-4" />
             Back
           </button>
@@ -580,25 +644,35 @@ const KathmanduExperiencePage: React.FC = () => {
                     <div className="bg-gray-50 p-5 rounded-xl border border-gray-100">
                       <h3 className="text-base font-bold text-gray-900 mb-2">Best time to go</h3>
                       <ul className="text-sm text-gray-600 space-y-2 list-disc pl-5 leading-relaxed">
-                        <li><strong>October–November:</strong> clearest skies, festival season</li>
-                        <li><strong>March–April:</strong> spring blooms, pleasant weather</li>
-                        <li><strong>December–February:</strong> cool, dry, fewer crowds</li>
-                        <li><strong>June–September:</strong> monsoon — bring rain gear</li>
+                        <li>
+                          <strong>October–November:</strong> clearest skies, festival season
+                        </li>
+                        <li>
+                          <strong>March–April:</strong> spring blooms, pleasant weather
+                        </li>
+                        <li>
+                          <strong>December–February:</strong> cool, dry, fewer crowds
+                        </li>
+                        <li>
+                          <strong>June–September:</strong> monsoon — bring rain gear
+                        </li>
                       </ul>
                     </div>
                   </div>
                   <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm mt-6">
-                    <h3 className="text-base font-bold text-gray-900 mb-3">Getting there &amp; meeting point</h3>
+                    <h3 className="text-base font-bold text-gray-900 mb-3">
+                      Getting there &amp; meeting point
+                    </h3>
                     <p className="text-sm text-gray-600 leading-relaxed mb-3">
-                      Kathmandu&apos;s main sights are clustered in the old city, all within 30 minutes of
-                      Thamel by taxi. Use Pathao or inDriver for transparent fares. Your guide will confirm
-                      the exact meeting point after booking — most tours start near Durbar Square, Swayambhunath,
-                      or Boudhanath depending on the route.
+                      Kathmandu&apos;s main sights are clustered in the old city, all within 30
+                      minutes of Thamel by taxi. Use Pathao or inDriver for transparent fares. Your
+                      guide will confirm the exact meeting point after booking — most tours start
+                      near Durbar Square, Swayambhunath, or Boudhanath depending on the route.
                     </p>
                     <p className="text-sm text-gray-600 leading-relaxed">
-                      Please arrive 10–15 minutes before the start time. Wear modest clothing that covers
-                      shoulders and knees when visiting temples and stupas, and remove your shoes where
-                      required.
+                      Please arrive 10–15 minutes before the start time. Wear modest clothing that
+                      covers shoulders and knees when visiting temples and stupas, and remove your
+                      shoes where required.
                     </p>
                   </div>
                 </div>
@@ -683,7 +757,8 @@ const KathmanduExperiencePage: React.FC = () => {
                           idPrefix="card"
                           single={singleDateTrip}
                           disabledDates={disabledDates}
-                          onMonthChange={fetchUnavailableDates}
+                          availability={Object.fromEntries(availabilityMap.current)}
+                          onMonthChange={handleMonthChange}
                         />
 
                         <GuestPicker
@@ -694,7 +769,11 @@ const KathmanduExperiencePage: React.FC = () => {
                         />
 
                         {!singleDateTrip && (
-                          <TimePicker value={bookingTime} onChange={setBookingTime} idPrefix="card" />
+                          <TimePicker
+                            value={bookingTime}
+                            onChange={setBookingTime}
+                            idPrefix="card"
+                          />
                         )}
 
                         {/* Selected Guide Preview */}
@@ -1012,7 +1091,8 @@ const KathmanduExperiencePage: React.FC = () => {
                         idPrefix="form"
                         single={singleDateTrip}
                         disabledDates={disabledDates}
-                        onMonthChange={fetchUnavailableDates}
+                        availability={Object.fromEntries(availabilityMap.current)}
+                        onMonthChange={handleMonthChange}
                       />
                     </div>
                   </div>
@@ -1178,7 +1258,9 @@ const KathmanduExperiencePage: React.FC = () => {
             <div className="p-8">
               <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
                 <img
-                  src={/^https?:\/\//i.test(viewingGuide.image) ? encodeURI(viewingGuide.image) : ''}
+                  src={
+                    /^https?:\/\//i.test(viewingGuide.image) ? encodeURI(viewingGuide.image) : ''
+                  }
                   alt={viewingGuide.name}
                   className="w-32 h-32 rounded-full object-cover border-4 border-gray-50 shadow-lg"
                 />
@@ -1348,16 +1430,19 @@ const KathmanduExperiencePage: React.FC = () => {
         </div>
       )}
 
-      <BookingLoginPrompt
-        isOpen={showLoginPrompt}
-        onClose={() => setShowLoginPrompt(false)}
-      />
+      <BookingLoginPrompt isOpen={showLoginPrompt} onClose={() => setShowLoginPrompt(false)} />
 
       {bookingConfirmed && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-2xl animate-in fade-in zoom-in-95">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-              <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg
+                className="h-8 w-8 text-green-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>

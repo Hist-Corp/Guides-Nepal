@@ -14,6 +14,8 @@ interface BookingCalendarProps {
   maxDate?: string;
   /** Dates that should be disabled (yyyy-mm-dd), e.g. guide unavailable */
   disabledDates?: string[];
+  /** Per-date availability: YYYY-MM-DD -> {remaining, maxCapacity} */
+  availability?: Record<string, { remaining: number; maxCapacity: number }>;
   /** Accessible label announced for the trigger buttons */
   ariaLabel?: string;
   /** Compact trigger styling for narrow booking cards (smaller padding/text). */
@@ -139,6 +141,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
   minDate,
   maxDate,
   disabledDates,
+  availability,
   ariaLabel,
   compact = false,
   onMonthChange,
@@ -468,33 +471,51 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
             const selected = key === checkIn || key === checkOut;
             const range = inRange(key);
             const isHover = hoverRange && key === hoverRange.to && !checkOut;
+            const spot = availability?.[key];
+            const remaining = spot ? spot.remaining : null;
+            const spotsLeft = remaining != null ? remaining : disabled ? 0 : null;
             return (
-              <button
-                key={key}
-                type="button"
-                disabled={disabled}
-                aria-pressed={selected}
-                onClick={() => pickDate(key)}
-                onMouseEnter={() => setHoverKey(key)}
-                className={`
-                  ${single ? 'h-9 w-9 md:h-11 md:w-11' : 'h-9 w-9'} mx-auto rounded-full text-sm flex items-center justify-center
-                  transition-colors duration-100
-                  ${disabled ? 'text-gray-300 cursor-not-allowed line-through' : ''}
-                  ${
-                    selected
-                      ? 'bg-gray-900 text-white font-bold hover:bg-gray-700'
-                      : range
-                        ? 'bg-gray-100 text-gray-900'
-                        : !disabled
-                          ? 'text-gray-700 hover:bg-gray-100'
-                          : ''
-                  }
-                  ${range && !selected ? 'rounded-none' : ''}
-                  ${isHover ? 'ring-2 ring-gray-900 ring-inset' : ''}
-                `}
-              >
-                {Number(key.slice(8, 10))}
-              </button>
+              <div key={key} className="flex flex-col items-center">
+                <button
+                  type="button"
+                  disabled={disabled}
+                  aria-pressed={selected}
+                  onClick={() => pickDate(key)}
+                  onMouseEnter={() => setHoverKey(key)}
+                  className={`
+                    ${single ? 'h-9 w-9 md:h-11 md:w-11' : 'h-9 w-9'} mx-auto rounded-full text-sm flex items-center justify-center
+                    transition-colors duration-100
+                    ${disabled ? 'text-gray-300 cursor-not-allowed line-through' : ''}
+                    ${
+                      selected
+                        ? 'bg-gray-900 text-white font-bold hover:bg-gray-700'
+                        : range
+                          ? 'bg-gray-100 text-gray-900'
+                          : !disabled
+                            ? 'text-gray-700 hover:bg-gray-100'
+                            : ''
+                    }
+                    ${range && !selected ? 'rounded-none' : ''}
+                    ${isHover ? 'ring-2 ring-gray-900 ring-inset' : ''}
+                  `}
+                >
+                  {Number(key.slice(8, 10))}
+                </button>
+                {spotsLeft != null && !disabled && (
+                  <span
+                    key={`spots-${key}`}
+                    className={`mt-0.5 text-[9px] ${
+                      spotsLeft === 0
+                        ? 'text-red-500 font-bold'
+                        : spotsLeft <= 2
+                          ? 'text-amber-600 font-bold'
+                          : 'text-gray-400'
+                    }`}
+                  >
+                    {spotsLeft === 0 ? 'Full' : `${spotsLeft} left`}
+                  </span>
+                )}
+              </div>
             );
           })}
         </div>
@@ -552,8 +573,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
 
     const inputHandlers = editable
       ? {
-          onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-            handleType(field, e.target.value),
+          onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleType(field, e.target.value),
           onFocus: () => openCalendar(field),
           onBlur: () => commitTyped(field, text),
           onClick: (e: React.MouseEvent) => e.stopPropagation(),
@@ -570,10 +590,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
         };
 
     return (
-      <div
-        className={boxCls}
-        onClick={() => openCalendar(field)}
-      >
+      <div className={boxCls} onClick={() => openCalendar(field)}>
         <span className={labelCls}>{isCheckin ? (single ? 'Date' : 'Check-in') : 'Check-out'}</span>
         <div className="flex items-center w-full gap-1">
           <input
