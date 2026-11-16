@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from sqlalchemy import inspect, text
 from app.core.config import settings
-from app.core.database import Base, engine
+from app.core.database import Base, engine, SessionLocal
 from app import models  # noqa: F401  (registers all models on Base.metadata)
 from app.core.middleware import (
     SecurityHeadersMiddleware,
@@ -15,8 +15,35 @@ from app.core.middleware import (
 from app.api.v1 import auth, bookings, public, ai, profile, admin, content, operations, host, host_guides, guide, experience_workflow, reviews
 import os
 import logging
+import threading
+import time
+from datetime import datetime, timezone, timedelta
 
 logger = logging.getLogger(__name__)
+
+
+def _daily_reset_loop() -> None:
+    """Background thread: reset booked_capacity to 0 for all guides once per
+    24-hour cycle so booking slots refresh automatically every day."""
+    while True:
+        try:
+            now = datetime.now(timezone.utc)
+            # Compute seconds until next midnight UTC.
+            next_midnight = (now + timedelta(days=1)).replace(
+                hour=0, minute=0, second=0, microsecond=0
+            )
+            sleep_seconds = (next_midnight - now).total_seconds()
+            time.sleep(max(sleep_seconds, 60))
+            db = SessionLocal()
+            try:
+                from app.services.booking_service import BookingService
+                reset_count = BookingService(db).reset_daily_capacity()
+                logger.info(f"Daily capacity reset: {reset_count} guide rows refreshed.")
+            finally:
+                db.close()
+        except Exception as e:
+            logger.warning(f"Daily reset loop error: {e}")
+            time.sleep(300)  # Retry in 5 minutes on failure
 
 # Initialize FastAPI app with security settings
 app = FastAPI(
@@ -126,6 +153,48 @@ def ensure_database_schema() -> None:
                     if name not in guide_app_columns:
                         connection.execute(text(f"ALTER TABLE guide_applications ADD COLUMN {name} {ddl}"))
         logger.info("Database schema verified/created successfully.")
+        # Seed per-day capacity rows for all active guide listings so bookings
+        # for today and future days respect the max_guests capacity.
+        try:
+            from app.models.guide_daily_capacity import GuideDailyCapacity
+            from app.services.booking_service import BookingService
+            from app.models.guide_listing import GuideListing
+            db = SessionLocal()
+            try:
+                listings = db.query(GuideListing).filter(GuideListing.is_active.is_(True)).all()
+                today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+                for listing in listings:
+                    existing = (
+                        db.query(GuideDailyCapacity)
+                        .filter(
+                            GuideDailyCapacity.guide_user_id == listing.guide_user_id,
+                            GuideDailyCapacity.booking_date == today,
+                        )
+                        .first()
+                    )
+                    if existing is None:
+                        row = GuideDailyCapacity(
+                            guide_user_id=listing.guide_user_id,
+                            booking_date=today,
+                            max_capacity=int(listing.max_guests or 10),
+                            booked_capacity=0,
+                            is_active=True,
+                        )
+                        db.add(row)
+                db.commit()
+                logger.info(f"Seeded daily capacity for {len(listings)} active listings.")
+            finally:
+                db.close()
+        except Exception as e:
+            logger.warning(f"Could not seed daily capacity: {e}")
+
+        # Start the background daily-reset thread (midnight UTC refresh).
+        try:
+            t = threading.Thread(target=_daily_reset_loop, daemon=True, name="daily-capacity-reset")
+            t.start()
+            logger.info("Daily capacity reset scheduler started.")
+        except Exception as e:
+            logger.warning(f"Could not start daily reset scheduler: {e}")
     except Exception as e:  # pragma: no cover - depends on DB availability
         logger.error(f"Could not create/verify database schema: {e}")
 

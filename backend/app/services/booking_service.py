@@ -3,13 +3,14 @@ from sqlalchemy.orm import Session
 from app.models.booking import Booking, BookingStatus
 from app.models.host_guide import HostGuide, HostExperienceGuide
 from app.models.guide_listing import GuideListing, GuideProfile
+from app.models.guide_daily_capacity import GuideDailyCapacity
 from app.models.guide import Guide
 from app.models.user import User
 from app.core.roles import GUIDE
 from fastapi import HTTPException
 from app.schemas.booking import BookingCreate
 from typing import List, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from app.api.v1.public import resolve_experience_reference
 
@@ -22,6 +23,114 @@ class BookingService:
         return self.db.query(Booking).filter(Booking.user_id == user_id).all()
 
     def get_booking_guide(self) -> User:
+        guide = (
+            self.db.query(User)
+            .filter(User.email == "guide@guides-nepal.com", User.role == GUIDE, User.is_active.is_(True))
+            .first()
+        )
+        if not guide:
+            raise HTTPException(status_code=503, detail="The booking guide is unavailable")
+        return guide
+
+    # ------------------------------------------------------------------
+    # Daily recurring capacity management
+    # ------------------------------------------------------------------
+
+    def reset_daily_capacity(self, guide_user_id: Optional[int] = None) -> int:
+        """Reset booked_capacity to 0 for all active capacity rows at the start
+        of a new day.  Optionally scoped to a single guide.
+
+        Called once per 24-hour cycle (cron / APScheduler) so booking slots
+        refresh automatically every day.
+        """
+        now = datetime.now(timezone.utc)
+        query = self.db.query(GuideDailyCapacity).filter(GuideDailyCapacity.is_active.is_(True))
+        if guide_user_id is not None:
+            query = query.filter(GuideDailyCapacity.guide_user_id == guide_user_id)
+        rows = query.all()
+        reset_count = 0
+        for row in rows:
+            row.booked_capacity = 0
+            row.reset_at = now
+            reset_count += 1
+        if reset_count:
+            self.db.commit()
+        return reset_count
+
+    def ensure_daily_capacity_row(
+        self, guide_user_id: int, booking_date: datetime, max_capacity: int
+    ) -> GuideDailyCapacity:
+        """Get-or-create the capacity row for (guide, date).  Used when a
+        traveller books in advance for a future day that has no row yet."""
+        # Normalize to start of day in UTC
+        day_start = booking_date.astimezone(timezone.utc).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
+        row = (
+            self.db.query(GuideDailyCapacity)
+            .filter(
+                GuideDailyCapacity.guide_user_id == guide_user_id,
+                GuideDailyCapacity.booking_date == day_start,
+            )
+            .with_for_update()
+            .first()
+        )
+        if row is None:
+            row = GuideDailyCapacity(
+                guide_user_id=guide_user_id,
+                booking_date=day_start,
+                max_capacity=max_capacity,
+                booked_capacity=0,
+                is_active=True,
+                reset_at=None,
+            )
+            self.db.add(row)
+            self.db.flush()
+        return row
+
+    def get_daily_availability(self, guide_user_id: int, booking_date: datetime) -> dict:
+        """Return remaining slots for a guide on a given date."""
+        day_start = booking_date.astimezone(timezone.utc).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
+        row = (
+            self.db.query(GuideDailyCapacity)
+            .filter(
+                GuideDailyCapacity.guide_user_id == guide_user_id,
+                GuideDailyCapacity.booking_date == day_start,
+                GuideDailyCapacity.is_active.is_(True),
+            )
+            .first()
+        )
+        if row is None:
+            # No capacity row yet — fall back to the listing's max_guests as full availability
+            listing = (
+                self.db.query(GuideListing)
+                .filter(GuideListing.guide_user_id == guide_user_id, GuideListing.is_active.is_(True))
+                .first()
+            )
+            max_cap = int(listing.max_guests or 10) if listing else 10
+            return {"available": True, "remaining": max_cap, "max_capacity": max_cap, "booked_capacity": 0}
+        remaining = max(int(row.max_capacity or 0) - int(row.booked_capacity or 0), 0)
+        return {
+            "available": remaining > 0,
+            "remaining": remaining,
+            "max_capacity": int(row.max_capacity or 0),
+            "booked_capacity": int(row.booked_capacity or 0),
+        }
+
+    def _guide_listing_for(self, experience_id: int | None) -> Optional[GuideListing]:
+        """Return the published guide listing behind a public experience id.
+
+        Traveller-facing ids are offset (``200000 + listing id``), so they are
+        resolved through the same helper the request queue uses.
+        """
+        from app.api.v1.public import resolve_experience_reference
+
+        resolved = resolve_experience_reference(self.db, experience_id)
+        if not resolved or resolved.get("source") != "guide_listing":
+            return None
+        return self.db.get(GuideListing, resolved["record_id"])
         guide = (
             self.db.query(User)
             .filter(User.email == "guide@guides-nepal.com", User.role == GUIDE, User.is_active.is_(True))
@@ -260,33 +369,49 @@ class BookingService:
             guide = self.get_booking_guide()
         else:
             guide = self.db.query(User).filter(User.id == guide_id).first()
-        availability = self.availability_for_date(booking_in.date.date().isoformat())
-        if not availability["available"]:
+
+        # --- Daily recurring capacity: lock the capacity row for the date ---
+        booking_date = booking_in.date
+        if hasattr(booking_date, "date"):
+            booking_date = booking_date.date()
+        day_start = datetime(
+            booking_date.year, booking_date.month, booking_date.day,
+            tzinfo=timezone.utc,
+        )
+
+        listing = self._guide_listing_for(booking_in.experience_id)
+        max_cap = int(listing.max_guests or 10) if listing else 10
+
+        row = self.ensure_daily_capacity_row(guide.id, day_start, max_cap)
+
+        guests = int(booking_in.guests or 0)
+        if int(row.booked_capacity or 0) + guests > int(row.max_capacity or 0):
+            remaining = max(int(row.max_capacity or 0) - int(row.booked_capacity or 0), 0)
             raise HTTPException(
                 status_code=409,
-                detail=f"The guide is already {availability['status']} on this date. Please choose another date.",
+                detail=(
+                    f"Only {remaining} slot{'s' if remaining != 1 else ''} left for this date."
+                ),
             )
-        # Published guide listings track live capacity; hold the slots for the
-        # booking so the next traveller sees an updated count.
-        listing = self._guide_listing_for(booking_in.experience_id)
+
+        # Hold the slots atomically in the same transaction as the booking insert.
+        row.booked_capacity = int(row.booked_capacity or 0) + guests
+
+        # Also keep the legacy listing counter in sync for any code paths that
+        # still read GuideListing.booked_guests.
         if listing is not None:
-            remaining = self._slots_left(listing)
-            if int(booking_in.guests or 0) > remaining:
-                raise HTTPException(
-                    status_code=409,
-                    detail=(
-                        f"Only {remaining} slot{'s' if remaining != 1 else ''} left for this experience."
-                    ),
-                )
-            listing.booked_guests = int(listing.booked_guests or 0) + int(booking_in.guests or 0)
+            listing.booked_guests = int(listing.booked_guests or 0) + guests
             # Honor recharge period: after the booking date, block availability
             # for the configured number of days so the guide has time to recover.
             if int(listing.recharge_days or 0) > 0:
-                booking_date = booking_in.date.date()
                 next_available = booking_date + timedelta(days=int(listing.recharge_days or 0))
-                # Only set next_available_date if it's in the future
-                if next_available > datetime.now(next_available.tzinfo or datetime.now().astimezone()).date():
-                    listing.next_available_date = next_available
+                now_date = datetime.now(timezone.utc).date()
+                if next_available > now_date:
+                    listing.next_available_date = datetime(
+                        next_available.year, next_available.month, next_available.day,
+                        tzinfo=timezone.utc,
+                    )
+
         db_booking = Booking(
             user_id=user_id,
             guide_user_id=guide.id,
@@ -310,6 +435,28 @@ class BookingService:
                 if listing is not None:
                     listing.booked_guests = max(
                         int(listing.booked_guests or 0) - int(booking.guests or 0), 0
+                    )
+                # Release daily capacity row slots
+                booking_date = booking.date
+                if hasattr(booking_date, "date"):
+                    booking_date = booking_date.date()
+                day_start = datetime(
+                    booking_date.year, booking_date.month, booking_date.day,
+                    tzinfo=timezone.utc,
+                )
+                row = (
+                    self.db.query(GuideDailyCapacity)
+                    .filter(
+                        GuideDailyCapacity.guide_user_id == booking.guide_user_id,
+                        GuideDailyCapacity.booking_date == day_start,
+                        GuideDailyCapacity.is_active.is_(True),
+                    )
+                    .with_for_update()
+                    .first()
+                )
+                if row is not None:
+                    row.booked_capacity = max(
+                        int(row.booked_capacity or 0) - int(booking.guests or 0), 0
                     )
             booking.status = BookingStatus.cancelled  # type: ignore
             self.db.commit()

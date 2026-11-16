@@ -6,11 +6,13 @@ from app.schemas.booking import BookingCreate, BookingResponse, GuidePortfolio
 from app.services.booking_service import BookingService
 from app.models.booking import Booking
 from app.core.dependencies import get_current_user, require_role
-from app.core.roles import GUIDE, TRAVELER
+from app.core.roles import ADMIN, GUIDE, TRAVELER
 from app.models.user import User
 from app.models.host_guide import HostGuide
 from app.models.guide import Guide
 from app.models.guide_listing import GuideProfile, GuideListing
+from app.models.guide_daily_capacity import GuideDailyCapacity
+from datetime import datetime, timezone
 
 
 router = APIRouter()
@@ -40,6 +42,43 @@ def booking_availability_month(
     """Unavailable dates for the currently bookable guide in a given month."""
     unavailable = BookingService(db).availability_for_month(year, month, guide_id=guide_id)
     return {"unavailable": unavailable}
+
+
+@router.get("/availability/daily")
+def booking_availability_daily(
+    date: str = Query(pattern=r"^\d{4}-\d{2}-\d{2}$"),
+    guide_id: Optional[int] = Query(default=None),
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),
+) -> dict:
+    """Remaining bookable slots for a guide on a specific calendar date.
+
+    Uses the per-day ``guide_daily_capacity`` table so the total number of
+    bookings per day never exceeds ``max_capacity``.
+    """
+    target_date = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+    if guide_id is not None:
+        guide_user_id = BookingService(db)._resolve_guide_user_id(guide_id)
+        if guide_user_id is None:
+            return {"available": True, "remaining": 0, "max_capacity": 0, "booked_capacity": 0}
+    else:
+        guide_user_id = BookingService(db).get_booking_guide().id
+    return BookingService(db).get_daily_availability(guide_user_id, target_date)
+
+
+@router.post("/capacity/reset")
+def reset_daily_capacity(
+    guide_id: Optional[int] = Query(default=None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_role(ADMIN)),
+) -> dict:
+    """Manually trigger the daily capacity reset for all guides (or one guide).
+
+    Admin only.  Normally run automatically once per 24 hours by a scheduler.
+    """
+    service = BookingService(db)
+    count = service.reset_daily_capacity(guide_id)
+    return {"reset_count": count, "guide_id": guide_id}
 
 
 @router.get("/", response_model=List[BookingResponse])
