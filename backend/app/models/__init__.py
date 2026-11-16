@@ -17,3 +17,9 @@ from .host_guide import HostExperienceGuide as HostExperienceGuide
 from .support_ticket import SupportTicket as SupportTicket
 from .experience_workflow import ExperienceProposal as ExperienceProposal
 from .experience_workflow import ExperienceChangeRequest as ExperienceChangeRequest
+from .message import Conversation as Conversation
+from .message import Message as Message
+from .message import MessageStatus as MessageStatus
+from .message import MessageReceipt as MessageReceipt
+from .message import UserSession as UserSession
+from .message import Notification as Notification

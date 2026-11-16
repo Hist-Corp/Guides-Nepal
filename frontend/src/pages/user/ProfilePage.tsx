@@ -1,12 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useGoBack } from '../../utils/backNavigation';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import { useBookingStore } from '../../store/bookingStore';
 import { useProfileStore } from '../../store/profileStore';
-import { Camera, Trash2, Bookmark, MapPin, Calendar, User as UserIcon, ArrowLeft } from 'lucide-react';
+import { listConversations } from '../../services/messageApi';
+import { Camera, Trash2, Bookmark, MapPin, Calendar, User as UserIcon, ArrowLeft, MessageCircle, Clock } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
   const goBack = useGoBack();
@@ -24,6 +25,44 @@ const ProfilePage: React.FC = () => {
   });
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const API_BASE = `${import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '/api/v1' : 'https://guides-nepal.onrender.com/api/v1')}/profile`;
+  const navigate = useNavigate();
+  const [conversations, setConversations] = useState<{
+    id: string;
+    counterpartId: number | string;
+    counterpartName: string;
+    counterpartImage: string;
+    lastMessage: string;
+    lastMessageAt: string;
+    unreadCount: number;
+  }[]>([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
+
+  useEffect(() => {
+    const loadMessages = async () => {
+      if (!accessToken) return;
+      setMessagesLoading(true);
+      try {
+        const rows = await listConversations(accessToken);
+        setConversations(
+          rows.map((r) => ({
+            id: String(r.id),
+            counterpartId: r.guide_id,
+            counterpartName: r.guide_name,
+            counterpartImage: r.guide_image,
+            lastMessage: r.last_message,
+            lastMessageAt: r.last_message_at,
+            unreadCount: r.unread_count,
+          }))
+        );
+      } catch {
+        setConversations([]);
+      } finally {
+        setMessagesLoading(false);
+      }
+    };
+    loadMessages();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accessToken]);
 
   const upcoming = bookings.filter((b) => b.status === 'upcoming');
   const past = bookings.filter((b) => b.status !== 'upcoming');
@@ -337,6 +376,69 @@ const ProfilePage: React.FC = () => {
                       </div>
                     </a>
                   ))}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mt-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-gray-900">Messages</h3>
+                <Link
+                  to="/messages"
+                  className="text-xs font-bold text-primary hover:underline"
+                >
+                  View all
+                </Link>
+              </div>
+              {messagesLoading ? (
+                <p className="text-sm text-gray-500">Loading messages…</p>
+              ) : conversations.length === 0 ? (
+                <p className="text-sm text-gray-500">No messages yet. Start a conversation from a guide's profile or your bookings.</p>
+              ) : (
+                <div className="space-y-3">
+                  {conversations
+                    .slice()
+                    .sort(
+                      (a, b) =>
+                        new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
+                    )
+                    .map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => navigate(`/messages/guide/${c.counterpartId}`)}
+                        className={`w-full text-left flex items-center gap-3 rounded-xl border p-3 transition-all ${
+                          c.unreadCount > 0
+                            ? 'border-primary bg-primary/5'
+                            : 'border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm'
+                        }`}
+                      >
+                        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-gray-200">
+                          <img src={c.counterpartImage} alt={c.counterpartName} className="h-full w-full object-cover" />
+                          {c.unreadCount > 0 && (
+                            <span className="absolute right-0 bottom-0 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="truncate text-sm font-bold text-gray-900">{c.counterpartName}</p>
+                            {c.lastMessageAt && (
+                              <span className="flex shrink-0 items-center gap-1 text-[10px] text-gray-400">
+                                <Clock className="h-3 w-3" />
+                                {new Date(c.lastMessageAt).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                          <p className="truncate text-sm text-gray-500">
+                            {c.lastMessage ? c.lastMessage : 'No messages yet'}
+                          </p>
+                          {c.unreadCount > 0 && (
+                            <span className="text-[10px] font-bold text-primary">{c.unreadCount} new</span>
+                          )}
+                        </div>
+                        <MessageCircle className="h-4 w-4 shrink-0 text-gray-400" />
+                      </button>
+                    ))}
                 </div>
               )}
             </div>

@@ -364,7 +364,7 @@ export const Header: React.FC = () => {
                       </Link>
                     )}
                     <Link
-                      to={user?.role === 'guide' ? '/guide/bookings' : '/messages'}
+                      to="/messages"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center gap-2"
                       onClick={() => setIsProfileDropdownOpen(false)}
                     >
@@ -517,7 +517,7 @@ export const Header: React.FC = () => {
                             My list
                           </Link>
                           <Link
-                            to="/guide/bookings"
+                            to="/messages"
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center gap-2"
                             onClick={() => setIsProfileDropdownOpen(false)}
                           >
@@ -680,7 +680,7 @@ export const Header: React.FC = () => {
                                 My list
                               </Link>
                               <Link
-                                to="/guide/bookings"
+                                to="/messages"
                                 className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2 flex items-center gap-2"
                                 onClick={() => setIsMenuOpen(false)}
                               >

@@ -12,7 +12,7 @@ from app.core.middleware import (
     InputValidationMiddleware,
     HTTPSEnforcementMiddleware,
 )
-from app.api.v1 import auth, bookings, public, ai, profile, admin, content, operations, host, host_guides, guide, experience_workflow, reviews
+from app.api.v1 import auth, bookings, public, ai, profile, admin, content, operations, host, host_guides, guide, experience_workflow, reviews, messages
 import os
 import logging
 import threading
@@ -87,6 +87,9 @@ app.include_router(host.router, prefix=settings.API_V1_STR, tags=["host"])
 app.include_router(host_guides.router, prefix=settings.API_V1_STR, tags=["host-guides"])
 app.include_router(
     guide.router, prefix=settings.API_V1_STR, tags=["guide"]
+)
+app.include_router(
+    messages.router, prefix=settings.API_V1_STR, tags=["messages"]
 )
 app.include_router(
     experience_workflow.router, prefix=settings.API_V1_STR, tags=["experience-workflow"]
