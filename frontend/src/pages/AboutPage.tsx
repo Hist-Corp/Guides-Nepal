@@ -100,7 +100,7 @@ const AboutPage: React.FC = () => {
                 <h3 className="font-bold text-xl mb-3 text-primary">Sustainability</h3>
                 <p className="text-slate-600">
                   We support local communities and promote responsible tourism that benefits both
-                  travelers and hosts.
+                  travelers and agencies.
                 </p>
               </div>
               <div className="bg-white p-8 rounded-xl shadow-sm">

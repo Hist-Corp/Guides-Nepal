@@ -627,7 +627,7 @@ trekRoutes.forEach((trek, index) => {
       image: categoryPortraits[index % categoryPortraits.length],
       rating: tour.rating,
       reviews: tour.reviews,
-      about: `${hostName} was born and raised in Nepal and has been hosting travelers for years. Expect local insight, hidden gems and plenty of stories along the way.`,
+      about: `${hostName} was born and raised in Nepal and has been offering travelers for years. Expect local insight, hidden gems and plenty of stories along the way.`,
     },
   };
 });
@@ -801,14 +801,18 @@ const ExperiencePage: React.FC = () => {
       : (visibleGuides.find((g) => String(g.id) === String(selectedGuideId)) ?? null);
   const availabilityInflight = useRef<Map<string, Promise<void>>>(new Map());
   const availabilityCache = useRef<Map<string, string[]>>(new Map());
-  const availabilityMap = useRef<Map<string, { remaining: number; maxCapacity: number }>>(
-    new Map()
-  );
+  const availabilityLoaded = useRef<Set<string>>(new Set());
+  // Per-date spot counts for the selected guide, kept per guide id so switching
+  // guides never shows another guide's numbers.
+  const [availabilityByGuide, setAvailabilityByGuide] = useState<
+    Record<string, Record<string, { remaining: number; maxCapacity: number }>>
+  >({});
 
   const fetchUnavailableDates = useCallback(
     async (year: number, month: number) => {
       if (!accessToken) return;
-      const cacheKey = `${year}-${month}-default`;
+      const guideId = selectedGuide?.id;
+      const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
       // Return cached result immediately if available.
       if (availabilityCache.current.has(cacheKey)) {
         setDisabledDates(availabilityCache.current.get(cacheKey)!);
@@ -816,14 +820,19 @@ const ExperiencePage: React.FC = () => {
       }
       // If an identical request is already in flight, wait for it instead of
       // issuing a duplicate call.
-      const existing = availabilityInflight.current.get(cacheKey);
+      // Separate in-flight keys: the spot-count request for the same month must
+      // not be mistaken for this one and skipped.
+      const inflightKey = `dates:${cacheKey}`;
+      const existing = availabilityInflight.current.get(inflightKey);
       if (existing) {
         await existing;
         return;
       }
       const promise = (async () => {
         try {
-          const url = getApiUrl(`/bookings/availability/month?year=${year}&month=${month}`);
+          const url = getApiUrl(
+            `/bookings/availability/month?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`
+          );
           const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
           if (res.ok) {
             const data = await res.json();
@@ -834,13 +843,13 @@ const ExperiencePage: React.FC = () => {
         } catch {
           // Silently fail
         } finally {
-          availabilityInflight.current.delete(cacheKey);
+          availabilityInflight.current.delete(inflightKey);
         }
       })();
-      availabilityInflight.current.set(cacheKey, promise);
+      availabilityInflight.current.set(inflightKey, promise);
       await promise;
     },
-    [accessToken]
+    [accessToken, selectedGuide?.id]
   );
 
   /** Fetch per-date remaining spots for both visible months of the selected guide. */
@@ -848,9 +857,11 @@ const ExperiencePage: React.FC = () => {
     async (year: number, month: number) => {
       if (!accessToken) return;
       const guideId = selectedGuide?.id;
-      const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
-      if (availabilityMap.current.has(cacheKey)) return;
-      const existing = availabilityInflight.current.get(cacheKey);
+      const guideKey = guideId ? String(guideId) : 'default';
+      const cacheKey = `${year}-${month}-${guideKey}`;
+      if (availabilityLoaded.current.has(cacheKey)) return;
+      const inflightKey = `counts:${cacheKey}`;
+      const existing = availabilityInflight.current.get(inflightKey);
       if (existing) {
         await existing;
         return;
@@ -864,21 +875,27 @@ const ExperiencePage: React.FC = () => {
           if (res.ok) {
             const data = await res.json();
             const avail = data.availability ?? {};
-            for (const [key, v] of Object.entries(avail)) {
-              const val = v as { remaining?: number; max_capacity?: number };
-              availabilityMap.current.set(key, {
+            const counts: Record<string, { remaining: number; maxCapacity: number }> = {};
+            for (const [day, raw] of Object.entries(avail)) {
+              const val = raw as { remaining?: number; max_capacity?: number };
+              counts[day] = {
                 remaining: val.remaining ?? 0,
                 maxCapacity: val.max_capacity ?? 0,
-              });
+              };
             }
+            availabilityLoaded.current.add(cacheKey);
+            setAvailabilityByGuide((prev) => ({
+              ...prev,
+              [guideKey]: { ...(prev[guideKey] ?? {}), ...counts },
+            }));
           }
         } catch {
           // Silently fail - spots won't be shown
         } finally {
-          availabilityInflight.current.delete(cacheKey);
+          availabilityInflight.current.delete(inflightKey);
         }
       })();
-      availabilityInflight.current.set(cacheKey, promise);
+      availabilityInflight.current.set(inflightKey, promise);
       await promise;
     },
     [accessToken, selectedGuide?.id]
@@ -900,6 +917,15 @@ const ExperiencePage: React.FC = () => {
       fetchMonthlyAvailability(now.getFullYear(), now.getMonth() + 1);
     }
   }, [selectedGuide, accessToken, fetchUnavailableDates, fetchMonthlyAvailability]);
+
+  // A date is only valid on the calendar of the guide it was picked for; when a
+  // different guide is selected, drop a date that guide has not opened.
+  useEffect(() => {
+    if (selectedDate && disabledDates.includes(selectedDate)) {
+      setSelectedDate('');
+      setBookingError(null);
+    }
+  }, [disabledDates, selectedDate]);
 
   // Load reviews for this experience and check whether the traveller is
   // eligible to leave one (completed booking + not yet reviewed).
@@ -1005,6 +1031,41 @@ const ExperiencePage: React.FC = () => {
     }
   }, [slotsLeft, guests]);
 
+  // A successful booking consumes slots, so everything cached for the selected
+  // guide is stale: drop those months and re-read them so the calendar reflects
+  // the new counts.
+  const refreshAvailability = async () => {
+    const guideKey = selectedGuide ? String(selectedGuide.id) : 'default';
+    const suffix = `-${guideKey}`;
+    const months = new Set<string>();
+    for (const key of [...availabilityLoaded.current]) {
+      if (!key.endsWith(suffix)) continue;
+      availabilityLoaded.current.delete(key);
+      availabilityCache.current.delete(key);
+      const [year, month] = key.split('-');
+      months.add(`${year}-${month}`);
+    }
+    setAvailabilityByGuide((prev) => {
+      if (!(guideKey in prev)) return prev;
+      const next = { ...prev };
+      delete next[guideKey];
+      return next;
+    });
+    // Re-read the booked date's month even when it had no counts cached yet.
+    const booked = selectedDate ? new Date(`${selectedDate}T00:00:00`) : new Date();
+    if (!Number.isNaN(booked.getTime())) {
+      months.add(`${booked.getFullYear()}-${booked.getMonth() + 1}`);
+    }
+    for (const entry of months) {
+      const [year, month] = entry.split('-').map(Number);
+      if (!year || !month) continue;
+      await Promise.all([
+        fetchUnavailableDates(year, month),
+        fetchMonthlyAvailability(year, month),
+      ]);
+    }
+  };
+
   const persistBooking = async () => {
     if (!experience) return false;
     const bookingId = crypto.randomUUID?.() ?? Math.random().toString(36).substr(2, 9);
@@ -1024,6 +1085,7 @@ const ExperiencePage: React.FC = () => {
       setIsBooked(true);
       setBookingConfirmed(true);
       void refreshCapacity();
+      void refreshAvailability();
     }
     return bookingSaved;
   };
@@ -1050,7 +1112,8 @@ const ExperiencePage: React.FC = () => {
     })();
     if (apiDate) {
       try {
-        const res = await fetch(getApiUrl(`/bookings/availability?date=${apiDate}`), {
+        const guideParam = selectedGuide ? `&guide_id=${selectedGuide.id}` : '';
+        const res = await fetch(getApiUrl(`/bookings/availability?date=${apiDate}${guideParam}`), {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         if (res.ok) {
@@ -1105,7 +1168,8 @@ const ExperiencePage: React.FC = () => {
     })();
     if (apiDate) {
       try {
-        const res = await fetch(getApiUrl(`/bookings/availability?date=${apiDate}`), {
+        const guideParam = selectedGuide ? `&guide_id=${selectedGuide.id}` : '';
+        const res = await fetch(getApiUrl(`/bookings/availability?date=${apiDate}${guideParam}`), {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         if (res.ok) {
@@ -1666,7 +1730,9 @@ const ExperiencePage: React.FC = () => {
                       single
                       ariaLabel="Choose experience date"
                       disabledDates={disabledDates}
-                      availability={Object.fromEntries(availabilityMap.current)}
+                      availability={
+                        availabilityByGuide[selectedGuide ? String(selectedGuide.id) : 'default'] ?? {}
+                      }
                       onMonthChange={handleMonthChange}
                     />
                   </div>
@@ -1758,6 +1824,10 @@ const ExperiencePage: React.FC = () => {
             setSelectedDate(ci);
             setBookingError(null);
           }}
+          disabledDates={disabledDates}
+          availability={
+            availabilityByGuide[selectedGuide ? String(selectedGuide.id) : 'default'] ?? {}
+          }
           guests={guests}
           onGuestsChange={(g) => {
             setGuests(g);

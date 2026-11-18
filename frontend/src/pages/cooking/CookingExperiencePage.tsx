@@ -1249,7 +1249,7 @@ const CookingExperiencePage: React.FC = () => {
                     <input
                       type="checkbox"
                       id="consent"
-                      className="rounded text-[#ffba0a] focus:ring-[#ffba0a]"
+                      className="w-4 h-4 rounded text-[#ffba0a] focus:ring-[#ffba0a]"
                     />
                     <label htmlFor="consent" className="text-xs text-gray-500">
                       I agree to the terms and conditions and cancellation policy.

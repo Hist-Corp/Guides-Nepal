@@ -8,7 +8,7 @@ const steps = [
   {
     icon: Search,
     title: 'Search Experiences',
-    description: 'Browse hundreds of unique experiences hosted by locals across Nepal\'s most beautiful cities.'
+    description: 'Browse hundreds of unique experiences offered by locals across Nepal\'s most beautiful cities.'
   },
   {
     icon: Calendar,

@@ -35,6 +35,10 @@ export interface MobileBookingSheetProps<TGuide extends SheetGuide = SheetGuide>
   /** Single-day experiences commit one date instead of a check-in/check-out range. */
   singleDate?: boolean;
   onDateChange: (checkIn: string, checkOut: string) => void;
+  /** Dates the selected guide has not opened (or has filled). */
+  disabledDates?: string[];
+  /** Per-date remaining spots for the selected guide. */
+  availability?: Record<string, { remaining: number; maxCapacity: number }>;
   guests: number;
   onGuestsChange: (total: number) => void;
   maxGuests?: number;
@@ -72,6 +76,8 @@ export function MobileBookingSheet<TGuide extends SheetGuide = SheetGuide>({
   checkOut,
   singleDate = false,
   onDateChange,
+  disabledDates,
+  availability,
   guests,
   onGuestsChange,
   maxGuests = 6,
@@ -194,6 +200,8 @@ export function MobileBookingSheet<TGuide extends SheetGuide = SheetGuide>({
                     onChange={onDateChange}
                     idPrefix="sheet"
                     single={singleDate}
+                    disabledDates={disabledDates}
+                    availability={availability}
                   />
                 </section>
                 {!hideTime && (

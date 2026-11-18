@@ -222,7 +222,7 @@ export const CookingClassesPage: React.FC = () => {
                   }
                   className="px-8 py-3.5 bg-brand-yellow hover:bg-[#ffba0a] text-slate-900 font-bold rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                 >
-                  Find your cooking host
+                  Find your cooking agency
                 </button>
               </div>
             </div>
@@ -241,7 +241,7 @@ export const CookingClassesPage: React.FC = () => {
                   <div className="aspect-square rounded-2xl overflow-hidden shadow-lg bg-[#E0F2FE] p-4 flex items-center justify-center text-center">
                     <div>
                       <div className="text-3xl font-bold text-[#213448] mb-1">25+</div>
-                      <div className="text-gray-600 font-medium">Cooking Hosts</div>
+                      <div className="text-gray-600 font-medium">Cooking Agencies</div>
                     </div>
                   </div>
                 </div>
@@ -294,7 +294,7 @@ export const CookingClassesPage: React.FC = () => {
               Feel like a local, not a tourist
             </h3>
             <p className="text-gray-500 max-w-xs">
-              Always private. It's just you and your local host. No strangers, no groups.
+              Always private. It's just you and your local agency. No strangers, no groups.
             </p>
           </div>
           <div className="flex flex-col items-center group">
@@ -303,7 +303,7 @@ export const CookingClassesPage: React.FC = () => {
             </div>
             <h3 className="font-bold text-xl mb-3 text-gray-900">More you, less checklist</h3>
             <p className="text-gray-500 max-w-xs">
-              Let your local host tailor the experience completely to your wishes.
+              Let your local agency tailor the experience completely to your wishes.
             </p>
           </div>
         </div>
@@ -334,7 +334,7 @@ export const CookingClassesPage: React.FC = () => {
                   that brings families together every day.
                 </p>
                 <p className="text-gray-600">
-                  Choose one of our local hosts, who can truly give you an experience worth
+                  Choose one of our local agencies, who can truly give you an experience worth
                   remembering. They'll show you how to perfectly season the lentils, cook the rice
                   to fluffy perfection, and prepare the accompanying vegetables and pickles.
                 </p>
@@ -422,7 +422,7 @@ export const CookingClassesPage: React.FC = () => {
           <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-12">
             <div className="flex flex-col items-center">
               <h3 className="font-bold text-xl text-gray-900 mb-2">A fair income</h3>
-              <p className="text-gray-600">Our hosts set their own price.</p>
+              <p className="text-gray-600">Our agencies set their own price.</p>
             </div>
             <div className="flex flex-col items-center">
               <h3 className="font-bold text-xl text-gray-900 mb-2">Passion for culture</h3>
@@ -606,10 +606,10 @@ export const CookingClassesPage: React.FC = () => {
         <div className="full-width bg-[#FFF0E6] -mx-4 md:-mx-[max(1rem,calc((100vw-80rem)/2))] px-4 md:px-[max(1rem,calc((100vw-80rem)/2))] py-20 mb-24">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Travelers love our cooking hosts
+              Travelers love our cooking agencies
             </h2>
             <p className="text-gray-600">
-              Reviews from guests about our cooking classes and local hosts
+              Reviews from guests about our cooking classes and local agencies
             </p>
           </div>
 
@@ -844,7 +844,7 @@ export const CookingClassesPage: React.FC = () => {
                   that brings families together every day.
                 </p>
                 <p className="text-gray-600 leading-relaxed">
-                  Choose one of our local hosts, who can truly give you an experience worth
+                  Choose one of our local agencies, who can truly give you an experience worth
                   remembering. They'll show you how to perfectly season the lentils, cook the rice
                   to fluffy perfection, and prepare the accompanying vegetables and pickles.
                 </p>
@@ -938,7 +938,7 @@ export const CookingClassesPage: React.FC = () => {
             {[
               {
                 title: 'A fair income',
-                desc: 'Our hosts set their own price.',
+                desc: 'Our agencies set their own price.',
                 icon: <ShieldCheck className="w-8 h-8" />,
               },
               {

@@ -198,7 +198,7 @@ export const CulturalToursPage: React.FC = () => {
                   <div className="aspect-square rounded-2xl overflow-hidden shadow-lg bg-[#E0F2FE] p-4 flex items-center justify-center text-center">
                     <div>
                       <div className="text-3xl font-bold text-[#213448] mb-1">50+</div>
-                      <div className="text-gray-600 font-medium">Local Hosts</div>
+                      <div className="text-gray-600 font-medium">Local Agencies</div>
                     </div>
                   </div>
                 </div>
@@ -251,7 +251,7 @@ export const CulturalToursPage: React.FC = () => {
               Feel like a local, not a tourist
             </h3>
             <p className="text-gray-500 max-w-xs">
-              Always private. It's just you and your local host. No strangers, no groups.
+              Always private. It's just you and your local agency. No strangers, no groups.
             </p>
           </div>
           <div className="flex flex-col items-center group">
@@ -260,7 +260,7 @@ export const CulturalToursPage: React.FC = () => {
             </div>
             <h3 className="font-bold text-xl mb-3 text-gray-900">More you, less checklist</h3>
             <p className="text-gray-500 max-w-xs">
-              Let your local host tailor the experience completely to your wishes.
+              Let your local agency tailor the experience completely to your wishes.
             </p>
           </div>
         </div>
@@ -570,7 +570,7 @@ export const CulturalToursPage: React.FC = () => {
             {[
               {
                 title: 'A fair income',
-                desc: 'Our hosts set their own price.',
+                desc: 'Our agencies set their own price.',
                 icon: <ShieldCheck className="w-8 h-8" />,
               },
               {
@@ -620,7 +620,7 @@ export const CulturalToursPage: React.FC = () => {
               Nepal is a cultural treasure trove that will enrich your understanding of ancient
               traditions! The spiritual atmosphere, the colorful temples, the sacred rituals, and
               the knowledgeable locals. There are so many cultural experiences in Nepal, and with a
-              local host, you can discover them all!
+              local agency, you can discover them all!
             </p>
             <p>
               Start your cultural journey at{' '}
@@ -634,7 +634,7 @@ export const CulturalToursPage: React.FC = () => {
               If you're interested in Buddhism, you're in for a treat! Nepal is the birthplace of
               Buddha. Visit <strong className="text-gray-900">Boudhanath Stupa</strong>, one of the
               largest spherical stupas in Nepal, or take a meditation session with local monks. Your
-              local host can arrange authentic cultural experiences away from tourist crowds.
+              local agency can arrange authentic cultural experiences away from tourist crowds.
             </p>
             <p>
               Want to experience living culture? Participate in a{' '}

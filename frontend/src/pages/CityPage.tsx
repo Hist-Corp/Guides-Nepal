@@ -396,7 +396,7 @@ const CityPage: React.FC = () => {
               <Users className="w-6 h-6" />
             </div>
             <h3 className="font-bold text-lg">100% Private</h3>
-            <p className="text-slate-600 text-sm">It's just you and your local host</p>
+            <p className="text-slate-600 text-sm">It's just you and your local agency</p>
           </div>
           <div className="flex flex-col items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-brand-yellow/10 flex items-center justify-center text-brand-yellow">

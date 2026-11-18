@@ -961,13 +961,14 @@ export default function GuideRegistrationWizard() {
               </div>
             </div>
             <div className="mt-6 space-y-3 text-sm">
-              <div className="flex gap-3">
-                <input
-                  id="accept-terms"
-                  type="checkbox"
-                  checked={draft.terms}
-                  onChange={(e) => update('terms', e.target.checked)}
-                />
+                <div className="flex gap-3">
+                  <input
+                    id="accept-terms"
+                    type="checkbox"
+                    className="w-4 h-4"
+                    checked={draft.terms}
+                    onChange={(e) => update('terms', e.target.checked)}
+                  />
                 <div>
                   <label htmlFor="accept-terms" className="cursor-pointer">
                     I accept the{' '}
@@ -989,6 +990,7 @@ export default function GuideRegistrationWizard() {
               <label className="flex gap-3">
                 <input
                   type="checkbox"
+                  className="w-4 h-4"
                   checked={draft.privacy}
                   onChange={(e) => update('privacy', e.target.checked)}
                 />
@@ -1000,6 +1002,7 @@ export default function GuideRegistrationWizard() {
               <label className="flex gap-3">
                 <input
                   type="checkbox"
+                  className="w-4 h-4"
                   checked={draft.accuracy}
                   onChange={(e) => update('accuracy', e.target.checked)}
                 />

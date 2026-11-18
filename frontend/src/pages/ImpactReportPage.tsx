@@ -617,7 +617,7 @@ const ImpactReportPage: React.FC = () => {
               className="bg-[#213448] text-white hover:bg-slate-700 font-medium px-10 py-4 text-base rounded-full border-none transition-colors"
               onClick={() => navigate('/become-host')}
             >
-              Become a host
+              Become an agency
             </Button>
           </div>
         </section>

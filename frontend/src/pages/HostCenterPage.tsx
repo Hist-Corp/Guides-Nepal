@@ -10,25 +10,25 @@ const resources = [
     icon: Rocket,
     title: 'Getting Started Guide',
     description: 'Learn how to create compelling experiences that travelers love.',
-    path: '/host-application'
+    path: '/agency-application'
   },
   {
     icon: Wallet,
     title: 'Pricing & Payments',
     description: 'Understand how pricing works and when you get paid.',
-    path: '/host-center'
+    path: '/agency-center'
   },
   {
     icon: Users,
     title: 'Building Your Community',
     description: 'Tips for growing your traveler community and getting reviews.',
-    path: '/host-center'
+    path: '/agency-center'
   },
   {
     icon: Award,
     title: 'Creating Great Experiences',
     description: 'Best practices for memorable and highly-rated experiences.',
-    path: '/host-application'
+    path: '/agency-application'
   },
   {
     icon: ShieldCheck,
@@ -52,9 +52,9 @@ const HostCenterPage: React.FC = () => {
       <main id="main-content" className="flex-grow">
         <section className="bg-primary py-20 text-white">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Host Center</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Agency Center</h1>
             <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              Everything you need to know to be a successful host on Guides Nepal.
+              Everything you need to know to be a successful agency on Guides Nepal.
             </p>
           </div>
         </section>
@@ -63,8 +63,8 @@ const HostCenterPage: React.FC = () => {
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary mb-3">Resources</span>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Resources for Hosts</h2>
-              <p className="mt-3 text-slate-500 max-w-xl mx-auto">Everything you need to grow your hosting business and deliver unforgettable experiences.</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Resources for Agencies</h2>
+              <p className="mt-3 text-slate-500 max-w-xl mx-auto">Everything you need to grow your agency business and deliver unforgettable experiences.</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
               {resources.map((resource, index) => (
@@ -93,12 +93,12 @@ const HostCenterPage: React.FC = () => {
 
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Ready to Start Hosting?</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Ready to Start Offering?</h2>
             <p className="text-slate-600 max-w-xl mx-auto mb-6">
               Join our community of local guides and start sharing your passion with travelers from around the world.
             </p>
-            <Link to="/host-application" className="inline-block bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary-hover transition-colors">
-              Become a Host
+            <Link to="/agency-application" className="inline-block bg-primary text-white px-8 py-3 rounded-lg font-bold hover:bg-primary-hover transition-colors">
+              Become an Agency
             </Link>
           </div>
         </section>

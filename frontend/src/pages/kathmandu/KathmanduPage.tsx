@@ -119,7 +119,7 @@ export const KathmanduPage: React.FC = () => {
                   <div className="aspect-square rounded-2xl overflow-hidden shadow-lg bg-[#E0F2FE] p-4 flex items-center justify-center text-center">
                     <div>
                       <div className="text-3xl font-bold text-[#213448] mb-1">50+</div>
-                      <div className="text-gray-600 font-medium">Local Hosts</div>
+                      <div className="text-gray-600 font-medium">Local Agencies</div>
                     </div>
                   </div>
                 </div>
@@ -172,7 +172,7 @@ export const KathmanduPage: React.FC = () => {
               Feel like a local, not a tourist
             </h3>
             <p className="text-gray-500 max-w-xs">
-              Always private. It's just you and your local host. No strangers, no groups.
+              Always private. It's just you and your local agency. No strangers, no groups.
             </p>
           </div>
           <div className="flex flex-col items-center group">
@@ -181,7 +181,7 @@ export const KathmanduPage: React.FC = () => {
             </div>
             <h3 className="font-bold text-xl mb-3 text-gray-900">More you, less checklist</h3>
             <p className="text-gray-500 max-w-xs">
-              Let your local host tailor the experience completely to your wishes.
+              Let your local agency tailor the experience completely to your wishes.
             </p>
           </div>
         </div>
@@ -524,7 +524,7 @@ export const KathmanduPage: React.FC = () => {
                   but only try the main roads.
                 </p>
                 <p className="text-gray-600 leading-relaxed">
-                  Choose one of our local hosts, who can truly give you an experience worth
+                  Choose one of our local agencies, who can truly give you an experience worth
                   remembering. They'll show you around and tell you more about the sites you're
                   visiting. You'll hear tons about the local lifestyle!
                 </p>
@@ -618,7 +618,7 @@ export const KathmanduPage: React.FC = () => {
             {[
               {
                 title: 'A fair income',
-                desc: 'Our hosts set their own price.',
+                desc: 'Our agencies set their own price.',
                 icon: <ShieldCheck className="w-8 h-8" />,
               },
               {
@@ -665,7 +665,7 @@ export const KathmanduPage: React.FC = () => {
             <p>
               Kathmandu is a city that will excite all your senses! The smelling of incense, the
               colorful temples, the busy streets, and the friendly locals. There are so many things
-              to do in Kathmandu, and with a local host, you can experience it all!
+              to do in Kathmandu, and with a local agency, you can experience it all!
             </p>
             <p>
               Start your journey at the <strong className="text-gray-900">Durbar Square</strong>,

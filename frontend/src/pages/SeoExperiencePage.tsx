@@ -278,7 +278,7 @@ const SeoExperiencePage: React.FC = () => {
               >
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                    Hosted by {data.author.name}
+                    By {data.author.name}
                   </h2>
                   <p className="text-gray-500 mb-4">
                     {data.space?.propertyType} · {data.space?.roomType}
@@ -522,7 +522,7 @@ const SeoExperiencePage: React.FC = () => {
                   />
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900">
-                      Hosted by {data.author.name}
+                      By {data.author.name}
                     </h2>
                     <p className="text-gray-500 text-sm">Joined in {data.author.joined}</p>
                   </div>

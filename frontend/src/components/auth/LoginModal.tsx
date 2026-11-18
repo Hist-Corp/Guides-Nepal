@@ -111,7 +111,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         setRememberMe(remember);
         login({
           firstName: data.user.firstName || (userType === 'traveler' ? 'John' : 'Guide'),
-          lastName: data.user.lastName || (userType === 'traveler' ? 'Doe' : 'Host'),
+          lastName: data.user.lastName || (userType === 'traveler' ? 'Doe' : 'Agency'),
           email: data.user.email || email,
           role: data.user.role,
         });
@@ -121,11 +121,11 @@ export const LoginModal: React.FC<LoginModalProps> = ({
         if (data.user?.role === 'guide') {
           navigate('/guide/dashboard');
         }
-        // Approved hosts land on the Host Frontend. Their account only
+        // Approved agencies land on the Agency Frontend. Their account only
         // exists once a regional head/admin approved the application, so a
         // successful login here means they are already active.
         if (data.user?.role === 'host') {
-          navigate('/host/dashboard');
+          navigate('/agency/dashboard');
         }
       } else {
         try {
@@ -205,7 +205,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              Host
+              Agency
             </button>
           </div>
 
@@ -282,10 +282,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               <>
                 No account?{' '}
                 <button
-                  onClick={() => navigate('/host-application')}
+                  onClick={() => navigate('/agency-application')}
                   className="text-[#213448] font-bold hover:text-brand-yellow hover:underline transition-colors"
                 >
-                  Become a Host
+                  Become an Agency
                 </button>
               </>
             ) : (

@@ -37,21 +37,21 @@ const ConsentPage: React.FC = () => {
                 <h3 className="font-bold text-gray-900 mb-3">Manage Cookie Preferences</h3>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <input type="checkbox" id="necessary" checked disabled className="mt-1 w-5 h-5 text-primary rounded focus:ring-primary" />
+                    <input type="checkbox" id="necessary" checked disabled className="mt-1 w-4 h-4 text-primary rounded focus:ring-primary" />
                     <div>
                       <label htmlFor="necessary" className="font-medium text-gray-900 block">Strictly Necessary Cookies</label>
                       <p className="text-sm text-gray-500">Essential for the website to function properly. Cannot be disabled.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <input type="checkbox" id="analytics" defaultChecked className="mt-1 w-5 h-5 text-primary rounded focus:ring-primary" />
+                    <input type="checkbox" id="analytics" defaultChecked className="mt-1 w-4 h-4 text-primary rounded focus:ring-primary" />
                     <div>
                       <label htmlFor="analytics" className="font-medium text-gray-900 block">Analytics Cookies</label>
                       <p className="text-sm text-gray-500">Help us improve our website by collecting and reporting information on how you use it.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <input type="checkbox" id="marketing" className="mt-1 w-5 h-5 text-primary rounded focus:ring-primary" />
+                    <input type="checkbox" id="marketing" className="mt-1 w-4 h-4 text-primary rounded focus:ring-primary" />
                     <div>
                       <label htmlFor="marketing" className="font-medium text-gray-900 block">Marketing Cookies</label>
                       <p className="text-sm text-gray-500">Used to track visitors across websites to display relevant ads.</p>

@@ -103,6 +103,27 @@ export interface GuideStatusItem {
   created_at?: string | null;
 }
 
+export type GuideDayStatus = 'available' | 'unavailable' | 'booked';
+
+export interface GuideAvailabilityDay {
+  date: string;
+  status: GuideDayStatus;
+  bookings: number;
+  /** Null until the day has a capacity row (i.e. before its first booking). */
+  remaining: number | null;
+}
+
+export interface GuideAvailabilityCalendar {
+  start: string;
+  end: string;
+  days: GuideAvailabilityDay[];
+}
+
+export interface GuideAvailabilitySummary {
+  available_days: number;
+  booked_days: number;
+}
+
 export interface GuideOnboarding {
   guide_user_id?: number;
   display_name?: string | null;
@@ -129,6 +150,8 @@ export interface GuideDashboardPayload {
   };
   listings: GuideListing[];
   recent_status: GuideStatusItem[];
+  /** Next-30-days availability snapshot driving the dashboard cards. */
+  availability?: GuideAvailabilitySummary;
 }
 
 function authHeaders(token: string) {
@@ -245,6 +268,30 @@ export const guideDashboardApi = {
       headers: authHeaders(token),
     });
     if (!res.ok) throw new Error('Unable to delete update.');
+  },
+  getAvailability: async (
+    token: string,
+    start: string,
+    end: string,
+  ): Promise<GuideAvailabilityCalendar> => {
+    const res = await authenticatedFetch(
+      token,
+      `${API_BASE_URL}/guide/availability?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`,
+    );
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Unable to load availability.');
+    return res.json();
+  },
+  setAvailability: async (
+    token: string,
+    dates: string[],
+    status: 'available' | 'unavailable',
+  ): Promise<{ status: string; dates: string[]; changed: number }> => {
+    const res = await authenticatedFetch(token, `${API_BASE_URL}/guide/availability`, {
+      method: 'PUT',
+      body: JSON.stringify({ dates, status }),
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Unable to update availability.');
+    return res.json();
   },
   decideBooking: async (token: string, id: number, status: string) => {
     const res = await fetch(`${API_BASE_URL}/guide/bookings/${id}`, {

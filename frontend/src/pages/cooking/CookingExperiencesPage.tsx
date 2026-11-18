@@ -71,7 +71,7 @@ export const CookingExperiencesPage: React.FC = () => {
                       </span>
                     </div>
                     <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Hosted by {exp.host.name}</span>
+                      <span className="text-gray-600">By {exp.host.name}</span>
                       <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                     </div>
                   </div>

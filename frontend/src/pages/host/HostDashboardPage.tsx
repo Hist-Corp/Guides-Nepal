@@ -17,11 +17,11 @@ import { useAuthStore } from '../../store/authStore';
 import { useBookingStore } from '../../store/bookingStore';
 
 /**
- * Host Frontend home after a unified login.
+ * Agency Frontend home after a unified login.
  *
- * Host accounts only exist once a regional head or admin approves the
+ * Agency accounts only exist once a regional head or admin approves the
  * registration, so reaching this page means the applicant is already
- * approved. The same credentials also unlock the Host Dashboard on the
+ * approved. The same credentials also unlock the Agency Dashboard on the
  * dashboard origin.
  */
 const HostDashboardPage: React.FC = () => {
@@ -49,32 +49,32 @@ const HostDashboardPage: React.FC = () => {
   if (!isAuthenticated) return <Navigate to="/" replace />;
   if (user?.role !== 'host') return <Navigate to="/" replace />;
 
-  const name = [user.firstName, user.lastName].filter(Boolean).join(' ') || 'Host';
+  const name = [user.firstName, user.lastName].filter(Boolean).join(' ') || 'Agency';
 
   const cards = [
     {
       icon: Home,
       title: 'My Experiences',
       description: 'Create and manage the experiences you offer to travelers.',
-      to: '/host/experiences',
+      to: '/agency/experiences',
     },
     {
       icon: CalendarDays,
       title: 'Bookings',
       description: 'Review, accept, and track upcoming and past bookings.',
-      to: '/host/bookings',
+      to: '/agency/bookings',
     },
     {
       icon: Wallet,
       title: 'Earnings',
       description: 'See your payout history and pending settlements.',
-      to: '/host/earnings',
+      to: '/agency/earnings',
     },
     {
       icon: Settings,
-      title: 'Host Settings',
+      title: 'Agency Settings',
       description: 'Update your profile, regions, and account preferences.',
-      to: '/host/settings',
+      to: '/agency/settings',
     },
   ];
 
@@ -86,19 +86,19 @@ const HostDashboardPage: React.FC = () => {
           <div className="container mx-auto px-4">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <p className="text-sm uppercase tracking-wide text-white/70">Host account</p>
+                <p className="text-sm uppercase tracking-wide text-white/70">Agency account</p>
                 <h1 className="text-3xl md:text-4xl font-bold mt-1">Welcome, {name}</h1>
                 <p className="mt-2 text-white/80 max-w-2xl">
-                  Manage your experiences, bookings, and payouts. You can also open the full Host
+                  Manage your experiences, bookings, and payouts. You can also open the full Agency
                   Dashboard for advanced tools.
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
                 <Link
-                  to="/host-center"
+                  to="/agency-center"
                   className="inline-flex items-center gap-2 rounded-full bg-white/15 px-5 py-2.5 text-sm font-bold text-white hover:bg-white/25 transition-colors"
                 >
-                  <Info className="w-4 h-4" /> Host Center
+                  <Info className="w-4 h-4" /> Agency Center
                 </Link>
                 <a
                   href="http://localhost:5176/dashboard"
@@ -156,8 +156,8 @@ const HostDashboardPage: React.FC = () => {
               <Info className="w-5 h-5 text-primary" /> Unified sign-in
             </h2>
             <p className="mt-2 text-slate-600 text-sm">
-              This is the Host Frontend. The same email and password you use here also signs you
-              into the Host Dashboard at{' '}
+              This is the Agency Frontend. The same email and password you use here also signs you
+              into the Agency Dashboard at{' '}
               <a
                 href="http://localhost:5176/dashboard"
                 target="_blank"

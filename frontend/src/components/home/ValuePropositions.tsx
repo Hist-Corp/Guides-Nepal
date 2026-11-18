@@ -22,23 +22,23 @@ const usps = [
   {
     icon: SlidersHorizontal,
     title: 'Tailored to your wishes',
-    subtitle: 'From highlights to hidden gems, your host adjusts everything to fit you.',
+    subtitle: 'From highlights to hidden gems, your agency adjusts everything to fit you.',
     description:
       'Want to skip a museum, add a food stop, or focus on street art? Just ask. Every experience is shaped around your pace, preferences and interests.',
   },
   {
     icon: MessagesSquare,
     title: 'Chat before you book',
-    subtitle: 'Message your host directly to customize your experience.',
+    subtitle: 'Message your agency directly to customize your experience.',
     description:
-      'Ask questions, get local tips, or make special requests. Our hosts are real people, ready to make your day unforgettable.',
+      'Ask questions, get local tips, or make special requests. Our agencies are real people, ready to make your day unforgettable.',
   },
   {
     icon: HandHeart,
     title: 'Travel that supports locals',
     subtitle: 'Every booking supports independent locals and their communities.',
     description:
-      'We believe tourism should benefit the people who live there. Your host earns directly and often invests it right back into their neighborhood.',
+      'We believe tourism should benefit the people who live there. Your agency earns directly and often invests it right back into their neighborhood.',
   },
   {
     icon: Wallet,
@@ -52,7 +52,7 @@ const usps = [
     title: 'Trusted by millions',
     subtitle: 'Loved by over 1,000,000 travelers all around the world.',
     description:
-      'Guides Nepal hosts consistently earn 5-star reviews for their kindness, knowledge and the personal stories they share.',
+      'Guides Nepal agencies consistently earn 5-star reviews for their kindness, knowledge and the personal stories they share.',
   },
   {
     icon: ShieldCheck,

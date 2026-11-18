@@ -26,6 +26,9 @@ from app.schemas.guide_dashboard import (
     GuideExperienceRequestCreate,
     GuideExperienceRequestResponse,
 )
+from app.schemas.guide_availability import GuideAvailabilityUpdate
+from app.services.booking_service import BookingService
+from app.services.guide_availability_service import GuideAvailabilityService
 from app.services.guide_dashboard_service import GuideDashboardService
 from app.api.v1.public import (
     GUIDE_LISTING_ID_OFFSET,
@@ -176,6 +179,8 @@ def guide_decide_booking(
     booking.status = BookingStatus(status)  # type: ignore[assignment]
     db.commit()
     db.refresh(booking)
+    # Notify the traveller so their bookings page reflects the decision.
+    BookingService(db).notify_booking_decision(booking, status)
     value = booking.status.value if hasattr(booking.status, "value") else booking.status
     return {"id": booking.id, "status": value}
 
@@ -192,6 +197,7 @@ def guide_dashboard(guide: User = Depends(GUIDE_ONLY), db: Session = Depends(get
     total_guests = sum(int(b.guests or 0) for b in rows)
     total_capacity = sum(int(item["max_guests"] or 0) for item in owned_listings)
     booked_capacity = sum(int(item["booked_guests"] or 0) for item in owned_listings)
+    availability = GuideAvailabilityService(db).summary(int(guide.id))
     return {
         "guide": {
             "id": guide.id,
@@ -211,8 +217,50 @@ def guide_dashboard(guide: User = Depends(GUIDE_ONLY), db: Session = Depends(get
             "available_spots": max(total_capacity - booked_capacity, 0),
         },
         "listings": listings,
+        "availability": availability,
         "recent_status": service.list_status(int(guide.id), limit=5),
     }
+
+
+@router.get("/availability")
+def guide_get_availability(
+    start: str = Query(description="First calendar date (YYYY-MM-DD)"),
+    end: str = Query(description="Last calendar date (YYYY-MM-DD)"),
+    guide: User = Depends(GUIDE_ONLY),
+    db: Session = Depends(get_db),
+) -> dict:
+    """The signed-in guide's availability calendar for a date range.
+
+    Every date is returned, including untouched ones, because the default is
+    ``unavailable``: the dashboard renders the whole month and lets the guide
+    open individual dates.
+    """
+    service = GuideAvailabilityService(db)
+    try:
+        start_date, end_date = service.parse_range(start, end)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+    return {
+        "start": start_date.isoformat(),
+        "end": end_date.isoformat(),
+        "days": service.calendar(int(guide.id), start_date, end_date),
+    }
+
+
+@router.put("/availability")
+def guide_set_availability(
+    payload: GuideAvailabilityUpdate,
+    guide: User = Depends(GUIDE_ONLY),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Open (or close) specific dates on the signed-in guide's calendar.
+
+    Closing a date that still holds an active booking is rejected with 409 so a
+    traveller's trip is never silently dropped; the same guard rejects past
+    dates. The dashboard re-reads ``GET /guide/availability`` afterwards, which
+    is also how traveller-facing availability changes propagate.
+    """
+    return GuideAvailabilityService(db).set_dates(int(guide.id), payload.dates, payload.status)
 
 
 @router.get("/onboarding")

@@ -1,10 +1,58 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Share2 } from 'lucide-react';
 import { useCmsSection } from '../../hooks/useCms';
+
+const SOCIAL_LOGOS: Record<string, string> = {
+  facebook: '/images/facebook.png',
+  x: '/images/x.png',
+  linkedin: '/images/linkedin.png',
+  whatsapp: '/images/whatsapp.png',
+};
 
 export const Footer: React.FC = () => {
   const cmsFooter = useCmsSection('home', 'home-footer');
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const pageText = typeof document !== 'undefined' ? document.title : 'Guides Nepal';
+
+  const socialShares = [
+    {
+      imgSrc: SOCIAL_LOGOS.facebook,
+      color: '#1877F2',
+      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`,
+      label: 'Share on Facebook',
+    },
+    {
+      imgSrc: SOCIAL_LOGOS.x,
+      color: '#000000',
+      url: `https://x.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(pageText)}`,
+      label: 'Share on X',
+    },
+    {
+      imgSrc: SOCIAL_LOGOS.linkedin,
+      color: '#0A66C2',
+      url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(pageUrl)}`,
+      label: 'Share on LinkedIn',
+    },
+    {
+      imgSrc: SOCIAL_LOGOS.whatsapp,
+      color: '#25D366',
+      url: `https://wa.me/?text=${encodeURIComponent(`${pageText} ${pageUrl}`)}`,
+      label: 'Share on WhatsApp',
+    },
+  ];
+
+  const shareOn = (url: string) => {
+    const w = 600;
+    const h = 400;
+    const left = (window.screen.width - w) / 2;
+    const top = (window.screen.height - h) / 2;
+    window.open(
+      url,
+      'share',
+      `width=${w},height=${h},top=${top},left=${left},resizable=yes,scrollbars=yes`
+    );
+  };
+
   return (
     <footer data-cms-id="home-footer" data-cms-label="Footer">
       {/* Top gradient strip */}
@@ -94,20 +142,20 @@ export const Footer: React.FC = () => {
               </ul>
             </div>
 
-            {/* Become a host */}
+            {/* Become an agency */}
             <div>
               <h4 className="font-bold text-slate-900 mb-5 text-sm uppercase tracking-wide">
-                Become a host
+                Become an agency
               </h4>
               <ul className="space-y-3 text-sm text-slate-600">
                 <li>
-                  <Link to="/host-application" className="hover:text-primary transition-colors">
-                    Become a host
+                  <Link to="/agency-application" className="hover:text-primary transition-colors">
+                    Become an agency
                   </Link>
                 </li>
                 <li>
-                  <Link to="/host-center" className="hover:text-primary transition-colors">
-                    Host center
+                  <Link to="/agency-center" className="hover:text-primary transition-colors">
+                    Agency center
                   </Link>
                 </li>
               </ul>
@@ -157,30 +205,22 @@ export const Footer: React.FC = () => {
               </span>
             </div>
             <div className="flex gap-3">
-              <a
-                href="#"
-                className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-primary hover:text-white transition-colors"
-              >
-                <Share2 className="w-4 h-4" />
-              </a>
-              <a
-                href="#"
-                className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-primary hover:text-white transition-colors"
-              >
-                <Share2 className="w-4 h-4" />
-              </a>
-              <a
-                href="#"
-                className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-primary hover:text-white transition-colors"
-              >
-                <Share2 className="w-4 h-4" />
-              </a>
-              <a
-                href="#"
-                className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-primary hover:text-white transition-colors"
-              >
-                <Share2 className="w-4 h-4" />
-              </a>
+              {socialShares.map(({ imgSrc, color, url, label }) => (
+                <a
+                  key={label}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    shareOn(url);
+                  }}
+                  className={`w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-[${color}] hover:bg-[${color}] hover:text-white transition-colors`}
+                  aria-label={label}
+                >
+                  <img src={imgSrc} alt={label} className="w-6 h-6" />
+                </a>
+              ))}
             </div>
           </div>
         </div>

@@ -1088,7 +1088,7 @@ const LalitpurExperiencePage: React.FC = () => {
                     <input
                       type="checkbox"
                       id="consent"
-                      className="rounded text-primary focus:ring-primary"
+                      className="w-4 h-4 rounded text-primary focus:ring-primary"
                     />
                     <label htmlFor="consent" className="text-xs text-gray-500">
                       I agree to the terms and conditions and cancellation policy.

@@ -10,8 +10,8 @@ const OUTDOOR = '/outdoor-activities';
 const CITY = '/city/pokhara';
 const EXPERIENCE = '/city/pokhara/experience/annapurna-base-camp-trek';
 const LEGACY_EXPERIENCE = '/experience/annapurna-circuit-trek';
-const BECOME_HOST = '/become-host';
-const HOST_APPLICATION = '/host-application';
+const BECOME_HOST = '/become-agency';
+const HOST_APPLICATION = '/agency-application';
 
 const Harness: React.FC = () => {
   const navigate = useNavigate();
@@ -29,10 +29,10 @@ const Harness: React.FC = () => {
         go experience
       </button>
       <button type="button" onClick={() => navigate(BECOME_HOST)}>
-        go become-host
+        go become-agency
       </button>
       <button type="button" onClick={() => navigate(HOST_APPLICATION)}>
-        go host-application
+        go agency-application
       </button>
       <button type="button" onClick={() => window.history.back()}>
         browser back
@@ -152,12 +152,12 @@ describe('back buttons', () => {
 
   it('unwinds the host application wizard back through the trail instead of bouncing back to the become-host page', async () => {
     renderApp();
-    click('go become-host');
-    click('go host-application');
+    click('go become-agency');
+    click('go agency-application');
 
     // The wizard's Back button must leave via the trail, not re-push
-    // /become-host, otherwise the trail keeps a duplicate entry and the
-    // become-host Back button returns straight to the wizard.
+    // /become-agency, otherwise the trail keeps a duplicate entry and the
+    // become-agency Back button returns straight to the wizard.
     click('app back');
 
     await waitFor(() => expect(currentPath()).toBe(BECOME_HOST));

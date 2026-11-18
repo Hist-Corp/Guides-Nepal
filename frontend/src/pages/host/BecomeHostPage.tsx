@@ -32,22 +32,22 @@ const BecomeHostPage: React.FC = () => {
     {
       question: 'What is an experience?',
       answer:
-        'An experience is an activity that goes beyond the typical tour or class, designed and led by locals all over the world. Show off your city, craft, cause, or culture by hosting an experience.',
+        'An experience is an activity that goes beyond the typical tour or class, designed and led by locals all over the world. Show off your city, craft, cause, or culture by offering an experience.',
     },
     {
-      question: 'What can I host?',
+      question: 'What can I offer?',
       answer:
-        'You can host a food tour, a workshop, a city walk, a day trip, or any unique activity that shares your passion and local knowledge.',
+        'You can offer a food tour, a workshop, a city walk, a day trip, or any unique activity that shares your passion and local knowledge.',
     },
     {
-      question: 'Do I need to be an experienced host?',
+      question: 'Do I need to be an experienced agency?',
       answer:
         'No! You just need passion for your city and a desire to meet new people. We provide the tools and support to help you succeed.',
     },
     {
       question: 'Do I need insurance?',
       answer:
-        'We recommend checking your local regulations. However, Guides Nepal provides liability insurance for most experiences hosted on our platform.',
+        'We recommend checking your local regulations. However, Guides Nepal provides liability insurance for most experiences offered on our platform.',
     },
     {
       question: 'How do I get paid?',
@@ -55,9 +55,9 @@ const BecomeHostPage: React.FC = () => {
         'We offer secure payouts directly to your bank account or via other payment methods, processed shortly after the experience takes place.',
     },
     {
-      question: 'Is it safe to host travelers?',
+      question: 'Is it safe to offer experiences to travelers?',
       answer:
-        'Safety is our priority. We verify travelers and hosts, and our review system builds trust within the community.',
+        'Safety is our priority. We verify travelers and agencies, and our review system builds trust within the community.',
     },
   ];
 
@@ -73,7 +73,7 @@ const BecomeHostPage: React.FC = () => {
           <div className="absolute inset-0 z-0">
             <img
               src="https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1740&q=80"
-              alt="Become a host"
+              alt="Become an agency"
               className="w-full h-full object-cover object-top"
             />
             {/* Gradient to ensure text readability if needed */}
@@ -124,7 +124,7 @@ const BecomeHostPage: React.FC = () => {
                 {
                   icon: <Calendar className="w-8 h-8 text-brand-yellow" />,
                   title: 'Set your own schedule',
-                  desc: 'Host when it works for you — weekdays, weekends, mornings or nights.',
+                  desc: 'Offer when it works for you — weekdays, weekends, mornings or nights.',
                 },
                 {
                   icon: <Tag className="w-8 h-8 text-brand-yellow" />,
@@ -160,7 +160,7 @@ const BecomeHostPage: React.FC = () => {
                 Global community
               </span>
               <h2 className="text-3xl md:text-4xl font-bold mt-6 mb-4">
-                Thousands of local hosts. One global community.
+                Thousands of local agencies. One global community.
               </h2>
               <p className="text-gray-600 max-w-3xl mx-auto text-lg flex items-center justify-center gap-4">
                 At Guides Nepal, we're a diverse community of locals sharing authentic experiences.
@@ -176,7 +176,7 @@ const BecomeHostPage: React.FC = () => {
                 {
                   name: 'Mina Gloria',
                   quote:
-                    "When I host with Guides Nepal, I feel like I'm traveling the world right from my own city. I've made friends from everywhere!",
+                    "When I offer experiences with Guides Nepal, I feel like I'm traveling the world right from my own city. I've made friends from everywhere!",
                   img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80',
                 },
                 {
@@ -188,23 +188,23 @@ const BecomeHostPage: React.FC = () => {
                 {
                   name: 'Zsofia',
                   quote:
-                    'Hosting with Guides Nepal feels like doing what I love, not just a job. The flexibility is amazing for my lifestyle.',
+                    'Offering experiences with Guides Nepal feels like doing what I love, not just a job. The flexibility is amazing for my lifestyle.',
                   img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80',
                 },
-              ].map((host, i) => (
+              ].map((agency, i) => (
                 <div
                   key={i}
                   className="relative group overflow-hidden rounded-3xl h-96 shadow-lg cursor-pointer"
                 >
                   <img
-                    src={host.img}
-                    alt={host.name}
+                    src={agency.img}
+                    alt={agency.name}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-8 text-white">
-                    <p className="text-lg italic font-medium mb-4 opacity-90">"{host.quote}"</p>
-                    <h3 className="text-2xl font-bold font-serif">{host.name}</h3>
-                    <p className="text-xs uppercase tracking-widest opacity-70 mt-1">Local Host</p>
+                    <p className="text-lg italic font-medium mb-4 opacity-90">"{agency.quote}"</p>
+                    <h3 className="text-2xl font-bold font-serif">{agency.name}</h3>
+                    <p className="text-xs uppercase tracking-widest opacity-70 mt-1">Local Agency</p>
                   </div>
                 </div>
               ))}
@@ -220,7 +220,7 @@ const BecomeHostPage: React.FC = () => {
                 Originals
               </span>
               <h2 className="text-3xl md:text-4xl font-bold mt-6 mb-4">
-                Start hosting fast with Guides Nepal Originals!
+                Start offering fast with Guides Nepal Originals!
               </h2>
               <p className="text-gray-600 max-w-2xl mx-auto text-lg">
                 Ready-made experiences you can personalize and launch quickly. No need to start from
@@ -296,12 +296,12 @@ const BecomeHostPage: React.FC = () => {
                 {
                   icon: <Calendar />,
                   title: 'Set your own schedule',
-                  desc: 'Host at times that suit you.',
+                  desc: 'Offer at times that suit you.',
                 },
                 {
                   icon: <Globe />,
                   title: 'Work from anywhere',
-                  desc: 'Host in your city and manage on the go.',
+                  desc: 'Offer in your city and manage on the go.',
                 },
                 {
                   icon: <Sparkles />,
@@ -359,14 +359,14 @@ const BecomeHostPage: React.FC = () => {
           </div>
           <div className="container mx-auto px-4 relative z-10 text-center text-white">
             <span className="text-brand-yellow font-bold border-b-2 border-brand-yellow pb-1 uppercase tracking-wider text-sm">
-              Become a host
+              Become an agency
             </span>
             <h2 className="text-4xl md:text-6xl font-bold mt-8 mb-10">
               It only takes a minute to apply
             </h2>
             <Button
               className="bg-brand-yellow hover:bg-[#ffba0a] text-[#213448] px-12 py-5 rounded-full text-xl font-bold border-none shadow-2xl hover:scale-105 transition-transform"
-              onClick={() => navigate('/host-application')}
+              onClick={() => navigate('/agency-application')}
             >
               Apply now
             </Button>

@@ -35,7 +35,7 @@ export default function GuideForm({
             className="peer sr-only"
           />
           <span
-            className="transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-5 h-5 peer-focus:ring-2 peer-focus:ring-[#213448] peer-focus:ring-offset-2 peer-checked:bg-[#213448] peer-checked:border-[#213448]"
+            className="transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-4 h-4 peer-focus:ring-2 peer-focus:ring-[#213448] peer-focus:ring-offset-2 peer-checked:bg-[#213448] peer-checked:border-[#213448]"
           >
             {verified ? (
               <svg

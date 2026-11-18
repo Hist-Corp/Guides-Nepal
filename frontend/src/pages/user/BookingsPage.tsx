@@ -31,16 +31,24 @@ const BookingsPage: React.FC = () => {
         {/* Hero banner */}
         <div className="bg-gradient-to-r from-primary to-primary/80 text-white py-10">
           <div className="container mx-auto px-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur ring-2 ring-white/30 shadow-lg transition-transform duration-300 hover:scale-105">
-                <MapPinned className="h-8 w-8" />
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur ring-2 ring-white/30 shadow-lg transition-transform duration-300 hover:scale-105">
+                  <MapPinned className="h-8 w-8" />
+                </div>
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold">My Travel List</h1>
+                  <p className="text-white/80 text-sm mt-1">
+                    All your booked experiences, dates, and guides in one place.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold">My Travel List</h1>
-                <p className="text-white/80 text-sm mt-1">
-                  All your booked experiences, dates, and guides in one place.
-                </p>
-              </div>
+              <Link
+                to="/find-guide"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-primary shadow-md hover:bg-white/90"
+              >
+                <Calendar className="w-4 h-4" /> Book by date
+              </Link>
             </div>
           </div>
         </div>
@@ -138,7 +146,7 @@ const BookingsPage: React.FC = () => {
                         </div>
                       )}
                       <button
-                        onClick={() => cancelBooking(booking.id)}
+                        onClick={() => void cancelBooking(booking.id)}
                         className="w-full mt-2 text-sm text-red-500 hover:text-red-700 font-medium flex items-center justify-center gap-1.5 py-2 rounded-lg hover:bg-red-50 transition-colors"
                       >
                         <XCircle className="w-4 h-4" /> Cancel booking
@@ -157,13 +165,21 @@ const BookingsPage: React.FC = () => {
                   You haven't booked any experiences yet. Start exploring Nepal and create your
                   first adventure!
                 </p>
-                <Link
-                  to="/explore"
-                  className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-primary/90 transition-colors"
-                >
-                  Explore things to do
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <Link
+                    to="/explore"
+                    className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-primary/90 transition-colors"
+                  >
+                    Explore things to do
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <Link
+                    to="/find-guide"
+                    className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-6 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
+                  >
+                    Pick a date first
+                  </Link>
+                </div>
               </div>
             )
           ) : archivedBookings.length > 0 ? (

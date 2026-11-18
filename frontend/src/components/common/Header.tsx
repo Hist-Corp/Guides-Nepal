@@ -68,7 +68,7 @@ export const Header: React.FC = () => {
   // solid white only once it has been completely scrolled past — on every
   // page, matching the original design
   const showSolidBackground = hasPassedTopBlock;
-  const isHostApplicationPage = location.pathname === '/host-application';
+  const isHostApplicationPage = location.pathname === '/agency-application';
   // Experience pages (/city/:cityId/experience/:slug) have their own sticky nav;
   // collapse the Header mobile menu so only one menu system appears.
   const isExperiencePage = /^\/city\/[^/]+\/experience/.test(location.pathname);
@@ -300,35 +300,35 @@ export const Header: React.FC = () => {
                     {user?.role === 'host' && (
                       <>
                         <Link
-                          to="/host/dashboard"
+                          to="/agency/dashboard"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center gap-2"
                           onClick={() => setIsProfileDropdownOpen(false)}
                         >
-                          <LayoutDashboard className="w-4 h-4" /> Host dashboard
+                          <LayoutDashboard className="w-4 h-4" /> Agency dashboard
                         </Link>
                         <Link
-                          to="/host/experiences"
+                          to="/agency/experiences"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
                           onClick={() => setIsProfileDropdownOpen(false)}
                         >
                           My experiences
                         </Link>
                         <Link
-                          to="/host/bookings"
+                          to="/agency/bookings"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
                           onClick={() => setIsProfileDropdownOpen(false)}
                         >
                           Bookings
                         </Link>
                         <Link
-                          to="/host/earnings"
+                          to="/agency/earnings"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
                           onClick={() => setIsProfileDropdownOpen(false)}
                         >
                           Earnings
                         </Link>
                         <Link
-                          to="/host/settings"
+                          to="/agency/settings"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
                           onClick={() => setIsProfileDropdownOpen(false)}
                         >
@@ -757,11 +757,11 @@ export const Header: React.FC = () => {
                       </Link>
                       {isAuthenticated && (
                         <Link
-                          to="/become-host"
+                          to="/become-agency"
                           className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
                           onClick={() => setIsMenuOpen(false)}
                         >
-                          Become a host
+                          Become an agency
                         </Link>
                       )}
                       <Link
@@ -979,7 +979,7 @@ export const Header: React.FC = () => {
                                           />
                                         )}
                                         <span className="text-xs text-gray-500">
-                                          Hosted by {item.hostName}
+                                          By {item.hostName}
                                         </span>
                                       </div>
                                     )}

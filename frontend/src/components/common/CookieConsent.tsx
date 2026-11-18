@@ -33,11 +33,19 @@ export default function CookieConsent() {
         </div>
         <div className="flex flex-wrap items-center gap-3 text-sm">
           <label className="inline-flex items-center gap-2">
-            <input type="checkbox" checked onChange={() => undefined} disabled /> Necessary
+            <input
+              type="checkbox"
+              className="w-2 h-2"
+              checked
+              onChange={() => undefined}
+              disabled
+            />{' '}
+            Necessary
           </label>
           <label className="inline-flex items-center gap-2">
             <input
               type="checkbox"
+              className="w-2 h-2"
               checked={analytics}
               onChange={(e) => setAnalytics(e.target.checked)}
             />{' '}
@@ -46,6 +54,7 @@ export default function CookieConsent() {
           <label className="inline-flex items-center gap-2">
             <input
               type="checkbox"
+              className="w-2 h-2"
               checked={marketing}
               onChange={(e) => setMarketing(e.target.checked)}
             />{' '}

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Calendar, LayoutDashboard, BadgeCheck, MapPin, Megaphone, Plus, Users, Compass, Sparkles } from 'lucide-react';
+import { Calendar, CalendarDays, LayoutDashboard, BadgeCheck, Lock, MapPin, Megaphone, Plus, Users, Compass, Sparkles } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
@@ -105,6 +105,8 @@ const GuideDashboardPage: React.FC = () => {
     { label: 'Upcoming bookings', value: stats?.upcoming_bookings ?? 0, icon: Calendar, color: 'bg-amber-50 text-amber-600 border-amber-100', iconColor: 'bg-amber-100 text-amber-600' },
     { label: 'Guests booked', value: stats?.total_guests ?? 0, icon: Users, color: 'bg-purple-50 text-purple-600 border-purple-100', iconColor: 'bg-purple-100 text-purple-600' },
     { label: 'Spots left', value: stats?.available_spots ?? 0, icon: Sparkles, color: 'bg-rose-50 text-rose-600 border-rose-100', iconColor: 'bg-rose-100 text-rose-600' },
+    { label: 'Open days (30d)', value: data?.availability?.available_days ?? 0, icon: CalendarDays, color: 'bg-teal-50 text-teal-600 border-teal-100', iconColor: 'bg-teal-100 text-teal-600' },
+    { label: 'Booked days (30d)', value: data?.availability?.booked_days ?? 0, icon: Lock, color: 'bg-slate-50 text-slate-600 border-slate-200', iconColor: 'bg-slate-200 text-slate-600' },
   ];
 
   return (
@@ -116,7 +118,10 @@ const GuideDashboardPage: React.FC = () => {
             <h1 className="text-3xl font-bold text-gray-900">Namaste, {user?.firstName ?? 'Guide'}</h1>
             <p className="mt-2 text-gray-600">Post live updates, manage capacity and handle bookings.</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
+            <Link to="/guide/availability" className="flex items-center gap-2 rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-bold text-gray-800 hover:bg-gray-100">
+              <CalendarDays className="h-4 w-4" /> Availability
+            </Link>
             <Link to="/guide/proposals" className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-bold text-gray-800 hover:bg-gray-100">Proposals</Link>
             <Link to="/guide/listings" className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-bold text-gray-800 hover:bg-gray-100">My list</Link>
             <Link to="/guide/listings/new" className="flex items-center gap-2 rounded-full bg-[#213448] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#1a2a3a]">
@@ -130,7 +135,7 @@ const GuideDashboardPage: React.FC = () => {
           <p className="mt-8 rounded-xl border border-red-200 bg-red-50 p-4 text-red-600">{error}</p>
         ) : (
           <> 
-            <div className="mt-8 grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+            <div className="mt-8 grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {cards.map((c) => {
                 const Icon = c.icon;
                 return (

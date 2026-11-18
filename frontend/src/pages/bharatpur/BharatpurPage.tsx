@@ -149,7 +149,7 @@ export const BharatpurPage: React.FC = () => {
               Feel like a local, not a tourist
             </h3>
             <p className="text-gray-500 max-w-xs">
-              Always private. It's just you and your local host. No strangers, no groups.
+              Always private. It's just you and your local agency. No strangers, no groups.
             </p>
           </div>
           <div className="flex flex-col items-center group">
@@ -158,7 +158,7 @@ export const BharatpurPage: React.FC = () => {
             </div>
             <h3 className="font-bold text-xl mb-3 text-gray-900">More you, less checklist</h3>
             <p className="text-gray-500 max-w-xs">
-              Let your local host tailor the experience completely to your wishes.
+              Let your local agency tailor the experience completely to your wishes.
             </p>
           </div>
         </div>
@@ -213,7 +213,7 @@ export const BharatpurPage: React.FC = () => {
                         src={tour.host.image}
                         className="w-10 h-10 rounded-full border-2 border-white object-cover"
                       />
-                      <span className="text-sm font-bold">Hosted by {tour.host.name}</span>
+                      <span className="text-sm font-bold">By {tour.host.name}</span>
                     </div>
                     <div className="text-right">
                       <div className="text-xs opacity-80">From</div>
@@ -522,7 +522,7 @@ export const BharatpurPage: React.FC = () => {
             {[
               {
                 title: 'A fair income',
-                desc: 'Our hosts set their own price.',
+                desc: 'Our agencies set their own price.',
                 icon: <ShieldCheck className="w-8 h-8" />,
               },
               {

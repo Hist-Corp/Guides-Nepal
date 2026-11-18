@@ -434,7 +434,7 @@ export const FoodToursPage: React.FC = () => {
           <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-12">
             <div className="flex flex-col items-center">
               <h3 className="font-bold text-xl text-gray-900 mb-2">A fair income</h3>
-              <p className="text-gray-600">Our hosts set their own price.</p>
+              <p className="text-gray-600">Our agencies set their own price.</p>
             </div>
             <div className="flex flex-col items-center">
               <h3 className="font-bold text-xl text-gray-900 mb-2">Passion for culture</h3>

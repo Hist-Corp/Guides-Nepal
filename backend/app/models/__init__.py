@@ -6,6 +6,7 @@ from .booking import HostExperience as HostExperience
 from .review import Review as Review
 from .bookmark import Bookmark as Bookmark
 from .guide_daily_capacity import GuideDailyCapacity as GuideDailyCapacity
+from .guide_availability import GuideAvailabilityDate as GuideAvailabilityDate
 from .guide import Guide as Guide
 from .guide_listing import GuideListing as GuideListing
 from .guide_listing import GuideProfile as GuideProfile

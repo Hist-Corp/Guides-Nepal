@@ -6,6 +6,7 @@ interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   labelClassName?: string;
   wrapperClassName?: string;
   disabled?: boolean;
+  color?: string;
 }
 
 export const Checkbox: React.FC<CheckboxProps> = ({
@@ -15,6 +16,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   wrapperClassName,
   disabled,
   id,
+  color = '#213448',
   checked,
   defaultChecked,
   onChange,
@@ -23,6 +25,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
 }) => {
   const generatedId = useId();
   const checkboxId = id || `gn-checkbox-${generatedId}`;
+  const checkedColor = color.replace('#', '');
 
   return (
     <label
@@ -41,7 +44,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
           {...rest}
         />
         <span
-          className={`transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-5 h-5 peer-focus:ring-2 peer-focus:ring-[#213448] peer-focus:ring-offset-2 peer-checked:bg-[#213448] peer-checked:border-[#213448] peer-disabled:bg-gray-100 peer-disabled:border-gray-200 peer-disabled:cursor-not-allowed ${className ?? ''}`}
+          className={`transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-4 h-4 peer-focus:ring-2 peer-focus:ring-[#${checkedColor}] peer-focus:ring-offset-2 peer-checked:bg-[#${checkedColor}] peer-checked:border-[#${checkedColor}] peer-disabled:bg-gray-100 peer-disabled:border-gray-200 peer-disabled:cursor-not-allowed ${className ?? ''}`}
         >
           {checked ? (
             <svg

@@ -1,5 +1,3 @@
-from datetime import UTC, datetime
-
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
@@ -34,11 +32,12 @@ def booking_availability_month(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ) -> dict:
-    """Unavailable dates for the currently bookable guide in a given month."""
-    unavailable = BookingService(db).availability_for_month(
-        year, month, guide_id=guide_id
-    )
-    return {"unavailable": unavailable}
+    """Dates the traveller cannot pick in the month.
+
+    Availability is opt-in, so this lists every date the guide has not opened
+    (plus any opened date that is now full); traveller calendars disable them.
+    """
+    return {"unavailable": BookingService(db).unavailable_dates(year, month, guide_id=guide_id)}
 
 
 @router.get("/availability/daily")
@@ -50,22 +49,10 @@ def booking_availability_daily(
 ) -> dict:
     """Remaining bookable slots for a guide on a specific calendar date.
 
-    Uses the per-day ``guide_daily_capacity`` table so the total number of
-    bookings per day never exceeds ``max_capacity``.
+    Read from the day's ``guide_daily_capacity`` row — the same row a booking
+    is checked against — so the number matches what a booking will accept.
     """
-    target_date = datetime.strptime(date, "%Y-%m-%d").replace(tzinfo=UTC)
-    if guide_id is not None:
-        guide_user_id = BookingService(db)._resolve_guide_user_id(guide_id)
-        if guide_user_id is None:
-            return {
-                "available": True,
-                "remaining": 0,
-                "max_capacity": 0,
-                "booked_capacity": 0,
-            }
-    else:
-        guide_user_id = BookingService(db).get_booking_guide().id
-    return BookingService(db).get_daily_availability(guide_user_id, target_date)
+    return BookingService(db).daily_availability(date, guide_id=guide_id)
 
 
 @router.get("/availability/month-detail")
@@ -76,28 +63,29 @@ def booking_availability_month_detail(
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ) -> dict:
-    """Availability for every date in a month.
+    """Per-date spot counts for a month, keyed by ``YYYY-MM-DD``.
 
-    Returns a map of ``YYYY-MM-DD`` -> {remaining, max_capacity, booked_capacity}
-    so the frontend can render per-date spot counts in the calendar grid.
+    Values come from the same ``guide_daily_capacity`` rows bookings are checked
+    against, read in one query for the month. Dates without a row are omitted
+    rather than estimated, so the calendar never shows a count a booking would
+    not honour.
     """
-    import calendar
+    return {"availability": BookingService(db).month_detail(year, month, guide_id=guide_id)}
 
-    if guide_id is not None:
-        guide_user_id = BookingService(db)._resolve_guide_user_id(guide_id)
-        if guide_user_id is None:
-            return {"availability": {}}
-    else:
-        guide_user_id = BookingService(db).get_booking_guide().id
 
-    _, days_in_month = calendar.monthrange(year, month)
-    availability: dict[str, dict] = {}
-    for day in range(1, days_in_month + 1):
-        target_date = datetime(year, month, day, tzinfo=UTC)
-        availability[target_date.strftime("%Y-%m-%d")] = BookingService(
-            db
-        ).get_daily_availability(guide_user_id, target_date)
-    return {"availability": availability}
+@router.get("/available-guides")
+def booking_available_guides(
+    date: str = Query(pattern=r"^\d{4}-\d{2}-\d{2}$"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(TRAVELER_OR_GUIDE),
+) -> list[dict]:
+    """Step 2 of the date-first booking flow.
+
+    Given a date, list the guides who opened it, still have room, and have a
+    bookable experience listed — each with the capacity the booking path will
+    enforce.
+    """
+    return BookingService(db).available_guides(date, exclude_user_id=current_user.id)
 
 
 @router.post("/capacity/reset")
@@ -108,7 +96,9 @@ def reset_daily_capacity(
 ) -> dict:
     """Manually trigger the daily capacity reset for all guides (or one guide).
 
-    Admin only.  Normally run automatically once per 24 hours by a scheduler.
+    Admin only. Normally run automatically once per 24 hours by a scheduler.
+    Only today's and older rows are cleared; future rows keep their advance
+    bookings.
     """
     service = BookingService(db)
     count = service.reset_daily_capacity(guide_id)

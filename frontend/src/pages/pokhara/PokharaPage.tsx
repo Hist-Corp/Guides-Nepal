@@ -92,7 +92,7 @@ export const PokharaPage: React.FC = () => {
                   <div className="aspect-square rounded-2xl overflow-hidden shadow-lg bg-[#E0F2FE] p-4 flex items-center justify-center text-center">
                     <div>
                       <div className="text-3xl font-bold text-[#213448] mb-1">20+</div>
-                      <div className="text-gray-600 font-medium">Local Hosts</div>
+                      <div className="text-gray-600 font-medium">Local Agencies</div>
                     </div>
                   </div>
                 </div>
@@ -145,7 +145,7 @@ export const PokharaPage: React.FC = () => {
               Feel like a local, not a tourist
             </h3>
             <p className="text-gray-500 max-w-xs">
-              Always private. It's just you and your local host. No strangers, no groups.
+              Always private. It's just you and your local agency. No strangers, no groups.
             </p>
           </div>
           <div className="flex flex-col items-center group">
@@ -154,7 +154,7 @@ export const PokharaPage: React.FC = () => {
             </div>
             <h3 className="font-bold text-xl mb-3 text-gray-900">More you, less checklist</h3>
             <p className="text-gray-500 max-w-xs">
-              Let your local host tailor the experience completely to your wishes.
+              Let your local agency tailor the experience completely to your wishes.
             </p>
           </div>
         </div>
@@ -213,7 +213,7 @@ export const PokharaPage: React.FC = () => {
                         className="h-8 w-8 shrink-0 rounded-full border-2 border-white object-cover"
                       />
                       <span className="min-w-0 truncate text-[13px]">
-                        <span className="hidden lg:inline">Hosted by </span>
+                        <span className="hidden lg:inline">By </span>
                         <span className="font-semibold">{tour.host.name}</span>
                       </span>
                     </div>
@@ -249,7 +249,7 @@ export const PokharaPage: React.FC = () => {
               {
                 name: 'James',
                 review:
-                  'Paragliding was intense but safe! Thanks to our local host for arranging everything seamlessly.',
+                  'Paragliding was intense but safe! Thanks to our local agency for arranging everything seamlessly.',
                 host: 'Bijay',
                 date: 'Pokhara, January 20, 2026',
               },
@@ -524,7 +524,7 @@ export const PokharaPage: React.FC = () => {
             {[
               {
                 title: 'A fair income',
-                desc: 'Our hosts set their own price.',
+                desc: 'Our agencies set their own price.',
                 icon: <ShieldCheck className="w-8 h-8" />,
               },
               {

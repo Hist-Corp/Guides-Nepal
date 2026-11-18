@@ -67,7 +67,9 @@ import GuideChangeRequestDetailPage from './pages/guide/GuideChangeRequestDetail
 import RegionalGuideApplications from './pages/regional/RegionalGuideApplications';
 import RegionalExperienceRequestReview from './pages/regional/RegionalExperienceRequestReview';
 import BookingsPage from './pages/user/BookingsPage';
+import FindGuidePage from './pages/user/FindGuidePage';
 import GuideBookingsPage from './pages/guide/GuideBookingsPage';
+import GuideAvailabilityPage from './pages/guide/GuideAvailabilityPage';
 import RoleProfilePage from './pages/user/RoleProfilePage';
 import PublicGuideListingsPage from './pages/user/PublicGuideListingsPage';
 import AccountSettingsPage from './pages/user/AccountSettingsPage';
@@ -147,13 +149,13 @@ function App() {
             <Route path="/cooking-classes/experiences" element={<CookingExperiencesPage />} />
             <Route path="/cooking-classes/experience/:slug" element={<CookingExperiencePage />} />
             <Route path="/explore" element={<ExplorePage />} />
-            <Route path="/become-host" element={<BecomeHostPage />} />
-            <Route path="/host-application" element={<HostApplicationWizard />} />
-            <Route path="/host/dashboard" element={<HostDashboardPage />} />
-            <Route path="/host/experiences" element={<HostExperiencesPage />} />
-            <Route path="/host/bookings" element={<HostBookingsPage />} />
-            <Route path="/host/earnings" element={<HostEarningsPage />} />
-            <Route path="/host/settings" element={<HostSettingsPage />} />
+            <Route path="/become-agency" element={<BecomeHostPage />} />
+            <Route path="/agency-application" element={<HostApplicationWizard />} />
+            <Route path="/agency/dashboard" element={<HostDashboardPage />} />
+            <Route path="/agency/experiences" element={<HostExperiencesPage />} />
+            <Route path="/agency/bookings" element={<HostBookingsPage />} />
+            <Route path="/agency/earnings" element={<HostEarningsPage />} />
+            <Route path="/agency/settings" element={<HostSettingsPage />} />
             <Route path="/guide-registration" element={<GuideRegistrationWizard />} />
             <Route path="/become-guide" element={<Navigate to="/guide-registration" replace />} />
             <Route
@@ -161,6 +163,7 @@ function App() {
               element={<Navigate to="/guide-registration" replace />}
             />
             <Route path="/bookings" element={<BookingsPage />} />
+            <Route path="/find-guide" element={<FindGuidePage />} />
             <Route path="/guide/dashboard" element={<GuideDashboardPage />} />
             <Route path="/guide/listings" element={<GuideListingsPage />} />
             <Route path="/guide/listings/new" element={<GuideExperienceRequestPage />} />
@@ -179,6 +182,7 @@ function App() {
             <Route path="/guide/proposals/:id/edit" element={<GuideProposalFormPage />} />
             <Route path="/guide/change-requests/:id" element={<GuideChangeRequestDetailPage />} />
             <Route path="/guide/bookings" element={<GuideBookingsPage />} />
+            <Route path="/guide/availability" element={<GuideAvailabilityPage />} />
             <Route path="/regional/guide-applications" element={<RegionalGuideApplications />} />
             <Route
               path="/regional/experience-requests"
@@ -269,15 +273,26 @@ function App() {
             <Route path="/destinations" element={<DestinationsPage />} />
             <Route path="/how-it-works" element={<HowItWorksPage />} />
             <Route path="/gift-cards" element={<GiftCardsPage />} />
-            <Route path="/host-center" element={<HostCenterPage />} />
+            <Route path="/agency-center" element={<HostCenterPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/faq" element={<FaqPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/help" element={<HelpPage />} />
             <Route path="/hosting" element={<HostingPage />} />
             <Route path="/community" element={<CommunityPage />} />
-            <Route path="/host" element={<BecomeHostPage />} />
+            <Route path="/agency" element={<BecomeHostPage />} />
             <Route path="/careers" element={<JobsPage />} />
+
+            {/* Redirects for renamed Host → Agency routes */}
+            <Route path="/host" element={<Navigate to="/agency" replace />} />
+            <Route path="/become-host" element={<Navigate to="/become-agency" replace />} />
+            <Route path="/host-application" element={<Navigate to="/agency-application" replace />} />
+            <Route path="/host/dashboard" element={<Navigate to="/agency/dashboard" replace />} />
+            <Route path="/host/experiences" element={<Navigate to="/agency/experiences" replace />} />
+            <Route path="/host/bookings" element={<Navigate to="/agency/bookings" replace />} />
+            <Route path="/host/earnings" element={<Navigate to="/agency/earnings" replace />} />
+            <Route path="/host/settings" element={<Navigate to="/agency/settings" replace />} />
+            <Route path="/host-center" element={<Navigate to="/agency-center" replace />} />
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

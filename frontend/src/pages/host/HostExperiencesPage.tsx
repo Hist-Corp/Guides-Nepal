@@ -180,7 +180,7 @@ const HostExperiencesPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Header />
       <main id="main-content" className="flex-grow container mx-auto max-w-6xl px-4 py-8">
-        <PageBackButton fallback="/host/dashboard" />
+        <PageBackButton fallback="/agency/dashboard" />
         <div className="flex flex-wrap items-start justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">My Experiences</h1>
@@ -215,7 +215,7 @@ const HostExperiencesPage: React.FC = () => {
               <CalendarDays className="w-12 h-12 text-gray-300 mb-3" />
               <h3 className="text-lg font-bold text-gray-900 mb-1">No experiences yet</h3>
               <p className="text-gray-500 text-sm mb-6">
-                Create your first experience to start hosting travelers.
+                Create your first experience to start offering travelers.
               </p>
               <button
                 onClick={() => {

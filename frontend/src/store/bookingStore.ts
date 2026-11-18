@@ -20,8 +20,12 @@ export interface Booking {
 
 interface BookingStore {
   bookings: Booking[];
-  addBooking: (booking: Booking) => Promise<boolean>;
-  cancelBooking: (id: string) => void;
+  /** Persists the booking and returns it as stored, with the server's id;
+   * null when the guide/date was rejected or the user is signed out. */
+  addBooking: (booking: Booking) => Promise<Booking | null>;
+  /** Cancels the booking on the server (releasing the date's capacity) and
+   * marks it cancelled locally; false when the server refused. */
+  cancelBooking: (id: string) => Promise<boolean>;
   /** Fully removes the booking record — the cancel step keeps its own status
    * transition, so cancelling and deleting a booking are separate intents. */
   deleteBooking: (id: string) => void;
@@ -34,7 +38,7 @@ export const useBookingStore = create<BookingStore>()(
       bookings: [],
       addBooking: async (booking) => {
         const { accessToken, refreshTokens } = useAuthStore.getState();
-        if (!accessToken) return false;
+        if (!accessToken) return null;
 
         const attempt = async (token: string) => {
           const response = await fetch(getApiUrl('/bookings/'), {
@@ -75,22 +79,61 @@ export const useBookingStore = create<BookingStore>()(
           if (!response.ok) {
             const error = await response.json().catch(() => ({}));
             alert(error.detail || 'This guide is unavailable. Please choose another guide or another date.');
-            return false;
+            return null;
           }
-          set((state) => ({ bookings: [...state.bookings, booking] }));
-          return true;
+          // The server assigns the booking id; keep it so the confirmation can
+          // show the real reference instead of the local placeholder.
+          const saved: { id?: number | string } | null = await response.json().catch(() => null);
+          const savedBooking: Booking =
+            saved?.id !== undefined && saved?.id !== null
+              ? { ...booking, id: String(saved.id) }
+              : booking;
+          set((state) => ({ bookings: [...state.bookings, savedBooking] }));
+          return savedBooking;
         } catch (error) {
           console.error('Failed to save booking:', error);
           alert('Unable to save your booking. Please choose another guide or another date.');
+          return null;
+        }
+      },
+      cancelBooking: async (id) => {
+        const { accessToken, refreshTokens } = useAuthStore.getState();
+        if (!accessToken) return false;
+
+        const attempt = async (token: string): Promise<Response> => {
+          const response = await fetch(getApiUrl(`/bookings/${id}/cancel`), {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (response.status === 401) {
+            const refreshed = await refreshTokens();
+            if (refreshed) {
+              const nextToken = useAuthStore.getState().accessToken;
+              if (nextToken) return attempt(nextToken);
+            }
+          }
+          return response;
+        };
+
+        try {
+          const response = await attempt(accessToken);
+          if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            alert(error.detail || 'Unable to cancel this booking. Please try again.');
+            return false;
+          }
+          set((state) => ({
+            bookings: state.bookings.map((b) =>
+              b.id === id ? { ...b, status: 'cancelled' } : b
+            ),
+          }));
+          return true;
+        } catch (error) {
+          console.error('Failed to cancel booking:', error);
+          alert('Unable to cancel this booking. Please try again.');
           return false;
         }
       },
-      cancelBooking: (id) => 
-        set((state) => ({
-          bookings: state.bookings.map((b) => 
-            b.id === id ? { ...b, status: 'cancelled' } : b
-          )
-        })),
       deleteBooking: (id) =>
         set((state) => ({
           bookings: state.bookings.filter((b) => b.id !== id)

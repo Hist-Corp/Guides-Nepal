@@ -20,13 +20,14 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  // Booking lines mirror real bookings: removing one cancels the booking
-  // (status → cancelled, releasing the reserved guide) and deletes the booking
-  // record, so "Remove from cart" is a true cancellation, not just a UI hide.
+  // Booking lines mirror real bookings: removing one cancels it on the server
+  // (releasing the reserved guide and the date's capacity) and deletes the
+  // booking record, so "Remove from cart" is a true cancellation, not just a UI
+  // hide.
   const handleRemove = (itemId: string) => {
     if (itemId.startsWith(BOOKING_CART_PREFIX)) {
       const bookingId = itemId.slice(BOOKING_CART_PREFIX.length);
-      cancelBooking(bookingId);
+      void cancelBooking(bookingId);
       deleteBooking(bookingId);
     }
     removeItem(itemId);

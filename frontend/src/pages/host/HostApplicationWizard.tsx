@@ -72,7 +72,7 @@ const empty: Draft = {
   privacy: false,
   accuracy: false,
 };
-const steps = ['Personal details', 'Host profile', 'Experience', 'Documents', 'Review'];
+  const steps = ['Personal details', 'Agency profile', 'Experience', 'Documents', 'Review'];
 const loadDraft = (): Draft => {
   try {
     return { ...empty, ...JSON.parse(localStorage.getItem('gn-host-application-draft') || '{}') };
@@ -236,7 +236,7 @@ export default function HostApplicationWizard() {
         Back
       </button>
       <div className="rounded-3xl bg-white p-5 shadow-sm md:p-10">
-        <h1 className="text-3xl font-bold text-[#213448]">Host application</h1>
+        <h1 className="text-3xl font-bold text-[#213448]">Agency application</h1>
         <p className="mt-2 text-gray-600">
           Complete each section. Your progress is saved on this device.
         </p>
@@ -322,13 +322,13 @@ export default function HostApplicationWizard() {
         {step === 1 && (
           <div className="grid gap-5 md:grid-cols-2">
             <label className="font-medium text-sm text-gray-700">
-              Host type *
+              Agency type *
               <select
                 className="mt-2 w-full rounded-xl border border-gray-300 p-3"
                 value={draft.hostType}
                 onChange={(e) => update('hostType', e.target.value)}
               >
-                <option value="individual">Individual host</option>
+                <option value="individual">Individual agency</option>
                 <option value="business">Business</option>
                 <option value="agency">Agency / collective</option>
               </select>
@@ -369,7 +369,7 @@ export default function HostApplicationWizard() {
         {step === 2 && (
           <div className="space-y-5">
             <Textarea
-              label="Tell us about your hosting experience *"
+              label="Tell us about your agency experience *"
               value={draft.experience}
               onChange={(v) => update('experience', v)}
               placeholder="Minimum 50 characters"
@@ -430,7 +430,7 @@ export default function HostApplicationWizard() {
           <div className="space-y-4">
             <div className="rounded-xl bg-blue-50 p-4 text-sm text-blue-800">
               <Lock className="mb-2 h-5 w-5" />
-              Documents are used only for identity and host verification. PDF, JPG, or PNG; maximum
+              Documents are used only for identity and agency verification. PDF, JPG, or PNG; maximum
               10 MB each.
             </div>
             <Upload
@@ -463,7 +463,7 @@ export default function HostApplicationWizard() {
               {[
                 ['Applicant', `${draft.firstName} ${draft.lastName}`],
                 ['Contact', `${draft.email} · ${draft.phone}`],
-                ['Host type', draft.hostType],
+                ['Agency type', draft.hostType],
                 ['Primary city', draft.primaryCity],
                 ['Proposed experience', draft.proposedTitle],
                 ['Price', draft.price],
@@ -478,10 +478,11 @@ export default function HostApplicationWizard() {
               <label className="flex gap-3">
                 <input
                   type="checkbox"
+                  className="w-4 h-4"
                   checked={draft.terms}
                   onChange={(e) => update('terms', e.target.checked)}
                 />
-                I accept the host terms and conditions.
+                I accept the agency terms and conditions.
               </label>
               <label className="flex gap-3">
                 <span className="relative flex items-center justify-center shrink-0 mt-0.5">
@@ -492,7 +493,7 @@ export default function HostApplicationWizard() {
                     className="peer sr-only"
                   />
                   <span
-                    className="transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-5 h-5 peer-focus:ring-2 peer-focus:ring-[#213448] peer-focus:ring-offset-2 peer-checked:bg-[#213448] peer-checked:border-[#213448]"
+                    className="transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-4 h-4 peer-focus:ring-2 peer-focus:ring-[#213448] peer-focus:ring-offset-2 peer-checked:bg-[#213448] peer-checked:border-[#213448]"
                   >
                     {draft.privacy ? (
                       <svg
@@ -518,7 +519,7 @@ export default function HostApplicationWizard() {
                     className="peer sr-only"
                   />
                   <span
-                    className="transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-5 h-5 peer-focus:ring-2 peer-focus:ring-[#213448] peer-focus:ring-offset-2 peer-checked:bg-[#213448] peer-checked:border-[#213448]"
+                    className="transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-4 h-4 peer-focus:ring-2 peer-focus:ring-[#213448] peer-focus:ring-offset-2 peer-checked:bg-[#213448] peer-checked:border-[#213448]"
                   >
                     {draft.accuracy ? (
                       <svg

@@ -735,7 +735,7 @@ const BlogDetailPage: React.FC = () => {
                 <div className="bg-[#213448] text-white p-6 rounded-2xl">
                   <h3 className="font-bold mb-1">Explore with a local guide</h3>
                   <p className="text-sm text-white/70 mb-4">
-                    Book a verified host for the places in this story.
+                    Book a verified agency for the places in this story.
                   </p>
                   <Link
                     to="/guides"

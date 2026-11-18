@@ -177,7 +177,7 @@ export const NightTourPage: React.FC = () => {
 
               <p className="text-xl text-gray-600 max-w-lg leading-relaxed">
                 Experience lantern-lit heritage squares, night food walks, and moonlit lake
-                rides with a friendly local host who shares the hidden gems after sunset.
+                rides with a friendly local agency who shares the hidden gems after sunset.
               </p>
 
               <div className="flex flex-wrap gap-4 pt-2">
@@ -259,7 +259,7 @@ export const NightTourPage: React.FC = () => {
             </div>
             <h3 className="font-bold text-xl mb-3 text-gray-900">Feel like a local, not a tourist</h3>
             <p className="text-gray-500 max-w-xs">
-              Always private. It's just you and your local host. No strangers, no groups.
+              Always private. It's just you and your local agency. No strangers, no groups.
             </p>
           </div>
           <div className="flex flex-col items-center group">
@@ -268,7 +268,7 @@ export const NightTourPage: React.FC = () => {
             </div>
             <h3 className="font-bold text-xl mb-3 text-gray-900">More you, less checklist</h3>
             <p className="text-gray-500 max-w-xs">
-              Let your local host tailor the night experience completely to your wishes.
+              Let your local agency tailor the night experience completely to your wishes.
             </p>
           </div>
         </div>
@@ -575,7 +575,7 @@ export const NightTourPage: React.FC = () => {
             {[
               {
                 title: 'Local night experts',
-                desc: 'Our hosts know the evenings best.',
+                desc: 'Our agencies know the evenings best.',
                 icon: <Moon className="w-8 h-8" />,
               },
               {

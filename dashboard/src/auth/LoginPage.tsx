@@ -514,7 +514,7 @@ export default function LoginPage() {
                   onChange={(e) => setRemember(e.target.checked)}
                 />
                 <span
-                  className="transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-5 h-5 peer-focus:ring-2 peer-focus:ring-brand-600 peer-focus:ring-offset-2 peer-checked:bg-brand-600 peer-checked:border-brand-600"
+                  className="transition-all duration-200 ease-in-out rounded-sm border border-gray-300 bg-gray-50 w-4 h-4 peer-focus:ring-2 peer-focus:ring-brand-600 peer-focus:ring-offset-2 peer-checked:bg-brand-600 peer-checked:border-brand-600"
                 >
                   {remember ? (
                     <svg

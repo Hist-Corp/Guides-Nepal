@@ -30,7 +30,7 @@ const bikeLocals = [
   { id: 267, name: 'Tashi', title: 'The Bhaktapur Activity Explorer', reviews: 163, languages: 'English・Nepali' },
   { id: 156, name: 'Mingma', title: 'The Hillside Ride Leader', reviews: 156, languages: 'English・Nepali' },
   { id: 203, name: 'Pasang', title: 'The Riverside Cycling Guide', reviews: 142, languages: 'English・Nepali' },
-  { id: 178, name: 'Ang', title: 'The Lakeside Activity Host', reviews: 139, languages: 'English・Nepali' },
+  { id: 178, name: 'Ang', title: 'The Lakeside Activity Agency', reviews: 139, languages: 'English・Nepali' },
   { id: 321, name: 'Nima', title: 'The Cultural Cycling Guide', reviews: 127, languages: 'English・Nepali' },
   {
     id: 342,
@@ -221,7 +221,7 @@ export const ActivityTourPage: React.FC = () => {
             </div>
             <h3 className="font-bold text-xl mb-3 text-gray-900">Feel like a local, not a tourist</h3>
             <p className="text-gray-500 max-w-xs">
-              Always private. It's just you and your local host on the road.
+              Always private. It's just you and your local agency on the road.
             </p>
           </div>
           <div className="flex flex-col items-center group">
@@ -230,7 +230,7 @@ export const ActivityTourPage: React.FC = () => {
             </div>
             <h3 className="font-bold text-xl mb-3 text-gray-900">More you, less checklist</h3>
             <p className="text-gray-500 max-w-xs">
-              Let your local host tailor the bike route completely to your wishes.
+              Let your local agency tailor the bike route completely to your wishes.
             </p>
           </div>
         </div>
@@ -523,14 +523,14 @@ export const ActivityTourPage: React.FC = () => {
         <div className="mb-24 pt-16 border-t border-gray-100">
           <div className="text-center mb-12">
             <h2 className="text-2xl font-bold text-[#213448]">
-              Why do Guides Nepal bike hosts love what they do?
+              Why do Guides Nepal bike agencies love what they do?
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
             {[
               {
                 title: 'Local bike experts',
-                desc: 'Our hosts know the best cycling roads.',
+                desc: 'Our agencies know the best cycling roads.',
                 icon: <Activity className="w-8 h-8" />,
               },
               {
