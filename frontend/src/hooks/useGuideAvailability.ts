@@ -25,99 +25,86 @@ export function useGuideAvailability({ accessToken, guideId }: UseGuideAvailabil
   const guideKey = guideId === null || guideId === undefined ? 'default' : String(guideId);
   const [disabledByGuide, setDisabledByGuide] = useState<Record<string, string[]>>({});
   const [countsByGuide, setCountsByGuide] = useState<Record<string, AvailabilityCounts>>({});
-  // Deduplicate in-flight requests: `dates:` and `counts:` keep the two calls
-  // for the same month from being mistaken for each other.
+  // In-flight requests, so identical calls share one round trip. The `dates:` /
+  // `counts:` prefixes keep the two calls for the same month apart.
   const inflight = useRef<Map<string, Promise<void>>>(new Map());
   const dateLists = useRef<Map<string, string[]>>(new Map());
   const loadedMonths = useRef<Set<string>>(new Set());
+
+  /** Run `task` once per key; a concurrent caller awaits the pending request. */
+  const loadOnce = useCallback(async (key: string, task: () => Promise<void>) => {
+    const pending = inflight.current.get(key);
+    if (pending) return pending;
+    const promise = task().finally(() => inflight.current.delete(key));
+    inflight.current.set(key, promise);
+    return promise;
+  }, []);
 
   const fetchUnavailableDates = useCallback(
     async (year: number, month: number) => {
       if (!accessToken) return;
       const cacheKey = `${year}-${month}-${guideKey}`;
-      const guideParam = guideKey === 'default' ? '' : `&guide_id=${guideKey}`;
       const cached = dateLists.current.get(cacheKey);
       if (cached) {
         setDisabledByGuide((prev) => ({ ...prev, [guideKey]: cached }));
         return;
       }
-      const inflightKey = `dates:${cacheKey}`;
-      const existing = inflight.current.get(inflightKey);
-      if (existing) {
-        await existing;
-        return;
-      }
-      const promise = (async () => {
+      const guideParam = guideKey === 'default' ? '' : `&guide_id=${guideKey}`;
+      await loadOnce(`dates:${cacheKey}`, async () => {
         try {
           const url = getApiUrl(
             `/bookings/availability/month?year=${year}&month=${month}${guideParam}`
           );
           const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-          if (res.ok) {
-            const data = await res.json();
-            const unavailable: string[] = Array.isArray(data.unavailable) ? data.unavailable : [];
-            dateLists.current.set(cacheKey, unavailable);
-            setDisabledByGuide((prev) => ({ ...prev, [guideKey]: unavailable }));
-          }
+          if (!res.ok) return;
+          const data = await res.json();
+          const unavailable: string[] = Array.isArray(data.unavailable) ? data.unavailable : [];
+          dateLists.current.set(cacheKey, unavailable);
+          setDisabledByGuide((prev) => ({ ...prev, [guideKey]: unavailable }));
         } catch {
           // Silently fail - dates won't be disabled
-        } finally {
-          inflight.current.delete(inflightKey);
         }
-      })();
-      inflight.current.set(inflightKey, promise);
-      await promise;
+      });
     },
-    [accessToken, guideKey]
+    [accessToken, guideKey, loadOnce]
   );
 
   const fetchMonthCounts = useCallback(
     async (year: number, month: number) => {
       if (!accessToken) return;
       const cacheKey = `${year}-${month}-${guideKey}`;
-      const guideParam = guideKey === 'default' ? '' : `&guide_id=${guideKey}`;
       if (loadedMonths.current.has(cacheKey)) return;
-      const inflightKey = `counts:${cacheKey}`;
-      const existing = inflight.current.get(inflightKey);
-      if (existing) {
-        await existing;
-        return;
-      }
-      const promise = (async () => {
+      const guideParam = guideKey === 'default' ? '' : `&guide_id=${guideKey}`;
+      await loadOnce(`counts:${cacheKey}`, async () => {
         try {
           const url = getApiUrl(
             `/bookings/availability/month-detail?year=${year}&month=${month}${guideParam}`
           );
           const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-          if (res.ok) {
-            const data = await res.json();
-            const days = (data.availability ?? {}) as Record<
-              string,
-              { remaining?: number; max_capacity?: number }
-            >;
-            const counts: AvailabilityCounts = {};
-            for (const [date, value] of Object.entries(days)) {
-              counts[date] = {
-                remaining: value.remaining ?? 0,
-                maxCapacity: value.max_capacity ?? 0,
-              };
-            }
-            loadedMonths.current.add(cacheKey);
-            setCountsByGuide((prev) => ({
-              ...prev,
-              [guideKey]: { ...(prev[guideKey] ?? {}), ...counts },
-            }));
+          if (!res.ok) return;
+          const data = await res.json();
+          const days = (data.availability ?? {}) as Record<
+            string,
+            { remaining?: number; max_capacity?: number }
+          >;
+          const counts: AvailabilityCounts = {};
+          for (const [date, value] of Object.entries(days)) {
+            counts[date] = {
+              remaining: value.remaining ?? 0,
+              maxCapacity: value.max_capacity ?? 0,
+            };
           }
+          loadedMonths.current.add(cacheKey);
+          setCountsByGuide((prev) => ({
+            ...prev,
+            [guideKey]: { ...(prev[guideKey] ?? {}), ...counts },
+          }));
         } catch {
           // Silently fail - spots won't be shown
-        } finally {
-          inflight.current.delete(inflightKey);
         }
-      })();
-      inflight.current.set(inflightKey, promise);
-      await promise;
+      });
     },
-    [accessToken, guideKey]
+    [accessToken, guideKey, loadOnce]
   );
 
   const loadMonth = useCallback(

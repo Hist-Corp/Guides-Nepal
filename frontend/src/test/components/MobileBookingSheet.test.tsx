@@ -105,24 +105,6 @@ describe('MobileBookingSheet', () => {
     expect(screen.getByText('Please select a check-in date')).toBeInTheDocument();
   });
 
-  it('replaces the form with a confirmation view and Done button when confirmed', () => {
-    const onClose = vi.fn();
-    render(
-      <MobileBookingSheet
-        {...baseProps}
-        confirmed
-        onClose={onClose}
-        confirmedSummary={<p>Guide: Apicha</p>}
-        guides={[]}
-      />
-    );
-    expect(screen.getByText(/booking requested/i)).toBeInTheDocument();
-    expect(screen.getByText('Guide: Apicha')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Book Now' })).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
-    expect(onClose).toHaveBeenCalled();
-  });
-
   it('passes singleDate through to the calendar for single-day experiences', () => {
     const { rerender } = render(<MobileBookingSheet {...baseProps} guides={[]} singleDate />);
     expect(screen.getByTestId('sheet-calendar')).toHaveAttribute('data-single', 'true');

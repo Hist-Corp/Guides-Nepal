@@ -37,7 +37,11 @@ def booking_availability_month(
     Availability is opt-in, so this lists every date the guide has not opened
     (plus any opened date that is now full); traveller calendars disable them.
     """
-    return {"unavailable": BookingService(db).unavailable_dates(year, month, guide_id=guide_id)}
+    return {
+        "unavailable": BookingService(db).unavailable_dates(
+            year, month, guide_id=guide_id
+        )
+    }
 
 
 @router.get("/availability/daily")
@@ -70,7 +74,9 @@ def booking_availability_month_detail(
     rather than estimated, so the calendar never shows a count a booking would
     not honour.
     """
-    return {"availability": BookingService(db).month_detail(year, month, guide_id=guide_id)}
+    return {
+        "availability": BookingService(db).month_detail(year, month, guide_id=guide_id)
+    }
 
 
 @router.get("/available-guides")
@@ -110,8 +116,10 @@ def get_bookings(
     db: Session = Depends(get_db),
     current_user: User = Depends(TRAVELER_OR_GUIDE),
 ) -> list[BookingResponse]:
-    """Bookings made by the signed-in user. Travelers see their own bookings;
-    guides see bookings made under their guide account."""
+    """Bookings authored by the signed-in user. Travelers see the bookings they
+    made; guides see their own booking requests (the ones assigned to their
+    guide account).  The guide console's ``GET /guide/bookings`` is the
+    authoritative place for a guide to act on incoming requests."""
     service = BookingService(db)
     bookings = service.get_user_bookings(current_user.id)
 

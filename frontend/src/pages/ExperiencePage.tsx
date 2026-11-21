@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useGuideAvailability } from '../hooks/useGuideAvailability';
 import { StickyBarPortal } from '../components/common/StickyBarPortal';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Header } from '../components/common/Header';
@@ -770,7 +771,6 @@ const ExperiencePage: React.FC = () => {
   const [bookingTime, setBookingTime] = useState('09:00');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [sheetError, setSheetError] = useState<string | null>(null);
-  const [disabledDates, setDisabledDates] = useState<string[]>([]);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   // The date that was booked. Refreshing availability clears the calendar
   // selection when the booking fills that date, but the confirmation still has
@@ -782,144 +782,45 @@ const ExperiencePage: React.FC = () => {
   const [canReview, setCanReview] = useState<boolean | null>(null);
   const [reviewFormOpen, setReviewFormOpen] = useState(false);
 
-  // Deduplicate in-flight availability requests so rapid guide switches don't
-  // hammer the backend with identical calls.
   const [selectedGuideId, setSelectedGuideId] = useState<number | null>(null);
+  // Guide whose booking just succeeded; they keep their spot counts even
+  // though a reserved guide drops out of "Who you'll meet".
+  const [bookedGuideId, setBookedGuideId] = useState<number | null>(null);
   const assignedGuides = useAssignedGuides(experience?.slug, experience?.title);
   const viewerGuideId = useViewerGuideId();
+  const guidePool = useMemo(
+    () => mergeGuides(experience?.guides ?? [], assignedGuides),
+    [experience, assignedGuides]
+  );
   const visibleGuides = useMemo(
     () =>
       getAvailableGuides(
-        mergeGuides(experience?.guides ?? [], assignedGuides),
+        guidePool,
         bookings,
         experienceId ?? '',
         experience?.city ?? '',
         viewerGuideId
       ),
-    [experience, assignedGuides, bookings, viewerGuideId, experienceId]
+    [guidePool, bookings, experienceId, experience, viewerGuideId]
   );
+  // The booked guide stays selectable (and keeps their calendar) even after the
+  // booking marks them reserved and drops them out of "Who you'll meet".
+  const bookedGuide =
+    bookedGuideId === null ? null : (guidePool.find((g) => g.id === bookedGuideId) ?? null);
+  const guidesForBooking =
+    bookedGuide && !visibleGuides.includes(bookedGuide)
+      ? [...visibleGuides, bookedGuide]
+      : visibleGuides;
   const selectedGuide =
     selectedGuideId === null
       ? null
-      : (visibleGuides.find((g) => String(g.id) === String(selectedGuideId)) ?? null);
-  const availabilityInflight = useRef<Map<string, Promise<void>>>(new Map());
-  const availabilityCache = useRef<Map<string, string[]>>(new Map());
-  const availabilityLoaded = useRef<Set<string>>(new Set());
-  // Per-date spot counts for the selected guide, kept per guide id so switching
-  // guides never shows another guide's numbers.
-  const [availabilityByGuide, setAvailabilityByGuide] = useState<
-    Record<string, Record<string, { remaining: number; maxCapacity: number }>>
-  >({});
-
-  const fetchUnavailableDates = useCallback(
-    async (year: number, month: number) => {
-      if (!accessToken) return;
-      const guideId = selectedGuide?.id;
-      const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
-      // Return cached result immediately if available.
-      if (availabilityCache.current.has(cacheKey)) {
-        setDisabledDates(availabilityCache.current.get(cacheKey)!);
-        return;
-      }
-      // If an identical request is already in flight, wait for it instead of
-      // issuing a duplicate call.
-      // Separate in-flight keys: the spot-count request for the same month must
-      // not be mistaken for this one and skipped.
-      const inflightKey = `dates:${cacheKey}`;
-      const existing = availabilityInflight.current.get(inflightKey);
-      if (existing) {
-        await existing;
-        return;
-      }
-      const promise = (async () => {
-        try {
-          const url = getApiUrl(
-            `/bookings/availability/month?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`
-          );
-          const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-          if (res.ok) {
-            const data = await res.json();
-            const unavailable = Array.isArray(data.unavailable) ? data.unavailable : [];
-            availabilityCache.current.set(cacheKey, unavailable);
-            setDisabledDates(unavailable);
-          }
-        } catch {
-          // Silently fail
-        } finally {
-          availabilityInflight.current.delete(inflightKey);
-        }
-      })();
-      availabilityInflight.current.set(inflightKey, promise);
-      await promise;
-    },
-    [accessToken, selectedGuide?.id]
-  );
-
-  /** Fetch per-date remaining spots for both visible months of the selected guide. */
-  const fetchMonthlyAvailability = useCallback(
-    async (year: number, month: number) => {
-      if (!accessToken) return;
-      const guideId = selectedGuide?.id;
-      const guideKey = guideId ? String(guideId) : 'default';
-      const cacheKey = `${year}-${month}-${guideKey}`;
-      if (availabilityLoaded.current.has(cacheKey)) return;
-      const inflightKey = `counts:${cacheKey}`;
-      const existing = availabilityInflight.current.get(inflightKey);
-      if (existing) {
-        await existing;
-        return;
-      }
-      const promise = (async () => {
-        try {
-          const url = getApiUrl(
-            `/bookings/availability/month-detail?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`
-          );
-          const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-          if (res.ok) {
-            const data = await res.json();
-            const avail = data.availability ?? {};
-            const counts: Record<string, { remaining: number; maxCapacity: number }> = {};
-            for (const [day, raw] of Object.entries(avail)) {
-              const val = raw as { remaining?: number; max_capacity?: number };
-              counts[day] = {
-                remaining: val.remaining ?? 0,
-                maxCapacity: val.max_capacity ?? 0,
-              };
-            }
-            availabilityLoaded.current.add(cacheKey);
-            setAvailabilityByGuide((prev) => ({
-              ...prev,
-              [guideKey]: { ...(prev[guideKey] ?? {}), ...counts },
-            }));
-          }
-        } catch {
-          // Silently fail - spots won't be shown
-        } finally {
-          availabilityInflight.current.delete(inflightKey);
-        }
-      })();
-      availabilityInflight.current.set(inflightKey, promise);
-      await promise;
-    },
-    [accessToken, selectedGuide?.id]
-  );
-
-  /** Combined month-change handler: refresh unavailable dates AND spot counts. */
-  const handleMonthChange = useCallback(
-    (year: number, month: number) => {
-      fetchUnavailableDates(year, month);
-      fetchMonthlyAvailability(year, month);
-    },
-    [fetchUnavailableDates, fetchMonthlyAvailability]
-  );
-
-  useEffect(() => {
-    if (accessToken) {
-      const now = new Date();
-      fetchUnavailableDates(now.getFullYear(), now.getMonth() + 1);
-      fetchMonthlyAvailability(now.getFullYear(), now.getMonth() + 1);
-    }
-  }, [selectedGuide, accessToken, fetchUnavailableDates, fetchMonthlyAvailability]);
+      : (guidesForBooking.find((g) => g.id === selectedGuideId) ?? null);
+  const {
+    disabledDates,
+    availability,
+    handleMonthChange,
+    refresh: refreshAvailability,
+  } = useGuideAvailability({ accessToken, guideId: selectedGuide?.id });
 
   // A date is only valid on the calendar of the guide it was picked for; when a
   // different guide is selected, drop a date that guide has not opened.
@@ -971,35 +872,24 @@ const ExperiencePage: React.FC = () => {
   // A new experience resets the choice so its own price shows first.
   useEffect(() => {
     setSelectedGuideId(null);
+    setBookedGuideId(null);
   }, [experienceId]);
 
-  // The mobile sheet offers the same guides, so both booking paths agree.
+  // The mobile sheet offers the same guides, so both booking paths agree. An
+  // experience with no bookable guides falls back to its host card.
   const hostGuide: SheetGuide | null = experience
     ? {
-        id: selectedGuide ? selectedGuide.id : `host-${experience.id}`,
-        name: selectedGuide?.name ?? experience.host.name,
-        role: selectedGuide?.role ?? 'Your host',
-        image: selectedGuide?.image ?? experience.host.image,
-        rating: selectedGuide?.rating ?? experience.host.rating,
-        reviews: selectedGuide?.reviews ?? experience.host.reviews,
+        id: `host-${experience.id}`,
+        name: experience.host.name,
+        role: 'Your host',
+        image: experience.host.image,
+        rating: experience.host.rating,
+        reviews: experience.host.reviews,
       }
     : null;
-  const sheetGuides: SheetGuide[] = visibleGuides.length
-    ? visibleGuides.map((g) => ({
-        id: g.id,
-        name: g.name,
-        role: g.role ?? 'Experience Guide',
-        image: g.image,
-        rating: g.rating,
-        reviews: g.reviews,
-        maxGuests: g.maxGuests ?? null,
-        bookedGuests: g.bookedGuests ?? null,
-        availableSlots: typeof g.availableSlots === 'number' ? g.availableSlots : null,
-        capacityThreshold: g.capacityThreshold ?? null,
-      }))
-    : hostGuide
-      ? [hostGuide]
-      : [];
+  const sheetGuides: SheetGuide[] = (
+    guidesForBooking.length ? guidesForBooking : hostGuide ? [hostGuide] : []
+  ).map((guide) => ({ ...guide, role: guide.role || 'Experience Guide' }));
 
   // Live remaining capacity of a published guide listing. Catalog experiences
   // do not track slots, so they keep the previous 20-guest ceiling.
@@ -1034,36 +924,11 @@ const ExperiencePage: React.FC = () => {
     }
   }, [slotsLeft, guests]);
 
-  // A booking only consumes the booked date, so drop that month for the
-  // selected guide and re-read it; every other month is still accurate.
-  const refreshAvailability = async () => {
-    const booked = new Date(`${selectedDate}T00:00:00`);
-    if (Number.isNaN(booked.getTime())) return;
-    const year = booked.getFullYear();
-    const month = booked.getMonth() + 1;
-    const guideKey = selectedGuide ? String(selectedGuide.id) : 'default';
-    const cacheKey = `${year}-${month}-${guideKey}`;
-    // A request that started before the booking would write pre-booking counts
-    // into the cache, so let it settle before dropping the entries below.
-    await Promise.all([
-      availabilityInflight.current.get(`dates:${cacheKey}`),
-      availabilityInflight.current.get(`counts:${cacheKey}`),
-    ]);
-    availabilityCache.current.delete(cacheKey);
-    availabilityLoaded.current.delete(cacheKey);
-    // Spot counts are keyed by YYYY-MM-DD, so drop just this month's days.
-    const monthPrefix = `${year}-${String(month).padStart(2, '0')}-`;
-    setAvailabilityByGuide((prev) => {
-      const guide = prev[guideKey];
-      if (!guide) return prev;
-      const kept = Object.entries(guide).filter(([day]) => !day.startsWith(monthPrefix));
-      return { ...prev, [guideKey]: Object.fromEntries(kept) };
-    });
-    await Promise.all([fetchUnavailableDates(year, month), fetchMonthlyAvailability(year, month)]);
-  };
-
   const persistBooking = async () => {
     if (!experience) return false;
+    // Claim the guide before the request so they stay selected (and keep
+    // showing their spot counts) once the booking marks them reserved.
+    setBookedGuideId(selectedGuide?.id ?? null);
     const bookingId = crypto.randomUUID?.() ?? Math.random().toString(36).substr(2, 9);
     const bookingSaved = await addBooking({
       id: bookingId,
@@ -1082,7 +947,9 @@ const ExperiencePage: React.FC = () => {
       setConfirmedDate(selectedDate);
       setBookingConfirmed(true);
       void refreshCapacity();
-      void refreshAvailability();
+      void refreshAvailability(selectedDate);
+    } else {
+      setBookedGuideId(null);
     }
     return bookingSaved;
   };
@@ -1499,7 +1366,7 @@ const ExperiencePage: React.FC = () => {
                   </div>
                   <div className="flex flex-wrap gap-4">
                     {visibleGuides.map((g) => {
-                      const isSelected = String(selectedGuideId) === String(g.id);
+                      const isSelected = selectedGuideId === g.id;
                       const remainingSlots =
                         typeof g.availableSlots === 'number' ? g.availableSlots : null;
                       const isLowStock =
@@ -1722,10 +1589,7 @@ const ExperiencePage: React.FC = () => {
                       single
                       ariaLabel="Choose experience date"
                       disabledDates={disabledDates}
-                      availability={
-                        availabilityByGuide[selectedGuide ? String(selectedGuide.id) : 'default'] ??
-                        {}
-                      }
+                      availability={availability}
                       onMonthChange={handleMonthChange}
                     />
                   </div>
@@ -1818,9 +1682,7 @@ const ExperiencePage: React.FC = () => {
             setBookingError(null);
           }}
           disabledDates={disabledDates}
-          availability={
-            availabilityByGuide[selectedGuide ? String(selectedGuide.id) : 'default'] ?? {}
-          }
+          availability={availability}
           guests={guests}
           onGuestsChange={(g) => {
             setGuests(g);
@@ -1830,11 +1692,8 @@ const ExperiencePage: React.FC = () => {
           bookingTime={bookingTime}
           onTimeChange={setBookingTime}
           guides={sheetGuides}
-          selectedGuide={hostGuide}
-          onSelectGuide={(g) => {
-            const id = Number(g.id);
-            if (Number.isFinite(id)) setSelectedGuideId(id);
-          }}
+          selectedGuide={selectedGuide}
+          onSelectGuide={(g) => setSelectedGuideId(typeof g.id === 'number' ? g.id : null)}
           onConfirm={handleSheetConfirm}
           error={sheetError}
         />

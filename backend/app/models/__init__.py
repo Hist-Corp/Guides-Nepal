@@ -12,6 +12,7 @@ from .guide_listing import GuideListing as GuideListing
 from .guide_listing import GuideProfile as GuideProfile
 from .guide_listing import GuideStatusUpdate as GuideStatusUpdate
 from .guide_application import GuideApplication as GuideApplication
+from .guide_profile_document import GuideProfileDocument as GuideProfileDocument
 from .host_application import HostApplication as HostApplication
 from .host_guide import HostGuide as HostGuide
 from .host_guide import HostExperienceGuide as HostExperienceGuide

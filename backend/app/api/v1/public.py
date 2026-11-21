@@ -15,6 +15,7 @@ from app.core.security import get_password_hash, validate_password_strength
 from app.models.guide import Guide
 from app.models.guide_application import GuideApplication
 from app.models.guide_listing import GuideExperienceRequest, GuideListing
+from app.models.guide_profile_document import GuideProfileDocument
 from app.models.host_application import HostApplication
 from app.models.host_guide import HostExperienceGuide, HostGuide
 from app.models.booking import HostExperience
@@ -1035,6 +1036,26 @@ def _guide_profile_experiences(
     return entries
 
 
+def _guide_profile_documents(db: Session, guide: Guide) -> list[dict]:
+    rows = (
+        db.query(GuideProfileDocument)
+        .filter(GuideProfileDocument.guide_id == guide.id)
+        .order_by(GuideProfileDocument.uploaded_at.desc())
+        .all()
+    )
+    return [
+        {
+            "id": r.id,
+            "label": r.label,
+            "doc_type": r.doc_type,
+            "stored_name": r.stored_name,
+            "content_type": r.content_type,
+            "uploaded_at": r.uploaded_at.isoformat() if r.uploaded_at else None,
+        }
+        for r in rows
+    ]
+
+
 def _guide_profile_payload(db: Session, guide: Guide) -> dict:
     """Everything the traveller-facing guide profile page shows in one payload."""
     account_id = _guide_account_ids(db, [guide.id]).get(guide.id)
@@ -1064,6 +1085,8 @@ def _guide_profile_payload(db: Session, guide: Guide) -> dict:
         "rating": float(guide.rating or 0.0),
         "reviews": int(guide.reviews or 0),
     }
+    # Certs/documents the guide uploaded for their profile.
+    payload["profile_documents"] = _guide_profile_documents(db, guide)
     return payload
 
 

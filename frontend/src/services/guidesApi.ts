@@ -39,6 +39,15 @@ export interface GuideProfileExperience {
 }
 
 /** Everything the public guide profile page renders. */
+export interface GuideProfileDocument {
+  id: number;
+  label: string;
+  doc_type: string;
+  stored_name: string;
+  content_type: string;
+  uploaded_at: string;
+}
+
 export interface GuideProfile extends Guide {
   memberSince?: string | null;
   region?: string | null;
@@ -50,6 +59,11 @@ export interface GuideProfile extends Guide {
     reviews: number;
   };
   experiences: GuideProfileExperience[];
+  profile_documents?: GuideProfileDocument[];
+}
+
+export interface GuideProfileDocsResponse {
+  profile_documents: GuideProfileDocument[];
 }
 
 export interface Experience {
@@ -117,6 +131,34 @@ export const guidesApi = {
   getExperience: async (slug: string): Promise<Experience> => {
     const response = await axios.get(`${API_BASE_URL}/experiences/${slug}`);
     return response.data;
+  },
+
+  // Signed-in guide uploaded profile documents (certificates/images).
+  getMyProfileDocs: async (token: string): Promise<GuideProfileDocsResponse> => {
+    const { data } = await axios.get(`${API_BASE_URL}/guide/profile/`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return data;
+  },
+
+  uploadCertificate: async (
+    token: string,
+    form: FormData,
+  ): Promise<GuideProfileDocsResponse> => {
+    const { data } = await axios.put(`${API_BASE_URL}/guide/profile/`, form, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return data;
+  },
+
+  deleteProfileDocument: async (
+    token: string,
+    documentId: number,
+  ): Promise<{ status: string }> => {
+    const { data } = await axios.delete(`${API_BASE_URL}/guide/profile/documents/${documentId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return data;
   },
 };
 
