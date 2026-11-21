@@ -1,48 +1,54 @@
+from calendar import monthrange
+from datetime import UTC, datetime, timedelta
+
+from fastapi import HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from app.models.booking import Booking, BookingStatus
-from app.models.host_guide import HostGuide, HostExperienceGuide
-from app.models.guide_listing import GuideListing, GuideProfile
+
+from app.api.v1.public import GUIDE_LISTING_ID_OFFSET, resolve_experience_reference
+from app.core.roles import GUIDE
+from app.models.booking import Booking, BookingStatus, HostExperience
+from app.models.guide import Guide
 from app.models.guide_daily_capacity import GuideDailyCapacity
+from app.models.guide_listing import GuideListing, GuideProfile
+from app.models.host_guide import HostGuide
+from app.models.user import User
+from app.schemas.booking import BookingCreate
 from app.services.guide_availability_service import (
     ACTIVE_BOOKING_STATUSES,
     GuideAvailabilityService,
     as_date,
 )
-from app.models.guide import Guide
-from app.models.user import User
-from app.core.roles import GUIDE
-from fastapi import HTTPException
-from app.schemas.booking import BookingCreate
-from typing import List, Optional
-from calendar import monthrange
-from datetime import datetime, timedelta, timezone
-
-from app.api.v1.public import GUIDE_LISTING_ID_OFFSET, resolve_experience_reference
 
 
 class BookingService:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_user_bookings(self, user_id: int) -> List[Booking]:
+    def get_user_bookings(self, user_id: int) -> list[Booking]:
         return self.db.query(Booking).filter(Booking.user_id == user_id).all()
 
     def get_booking_guide(self) -> User:
         guide = (
             self.db.query(User)
-            .filter(User.email == "guide@guides-nepal.com", User.role == GUIDE, User.is_active.is_(True))
+            .filter(
+                User.email == "guide@guides-nepal.com",
+                User.role == GUIDE,
+                User.is_active.is_(True),
+            )
             .first()
         )
         if not guide:
-            raise HTTPException(status_code=503, detail="The booking guide is unavailable")
+            raise HTTPException(
+                status_code=503, detail="The booking guide is unavailable"
+            )
         return guide
 
     # ------------------------------------------------------------------
     # Daily recurring capacity management
     # ------------------------------------------------------------------
 
-    def reset_daily_capacity(self, guide_user_id: Optional[int] = None) -> int:
+    def reset_daily_capacity(self, guide_user_id: int | None = None) -> int:
         """Refresh the rolling day counter without ever reopening a booked day.
 
         Only rows for today or earlier are considered, and a row is skipped
@@ -50,7 +56,7 @@ class BookingService:
         guests book a day that is already taken. Future rows always keep their
         advance bookings. Optionally scoped to one guide.
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         query = self.db.query(GuideDailyCapacity).filter(
             GuideDailyCapacity.is_active.is_(True),
@@ -62,7 +68,9 @@ class BookingService:
         if not rows:
             return 0
 
-        booking_query = self.db.query(Booking.guide_user_id, func.date(Booking.date)).filter(
+        booking_query = self.db.query(
+            Booking.guide_user_id, func.date(Booking.date)
+        ).filter(
             Booking.status.in_(ACTIVE_BOOKING_STATUSES),
             func.date(Booking.date) <= today_start.date().isoformat(),
         )
@@ -72,7 +80,10 @@ class BookingService:
 
         reset_count = 0
         for row in rows:
-            if (int(row.guide_user_id), row.booking_date.date().isoformat()) in booked_days:
+            if (
+                int(row.guide_user_id),
+                row.booking_date.date().isoformat(),
+            ) in booked_days:
                 continue
             row.booked_capacity = 0
             row.reset_at = now
@@ -87,7 +98,7 @@ class BookingService:
         """Get-or-create the capacity row for (guide, date).  Used when a
         traveller books in advance for a future day that has no row yet."""
         # Normalize to start of day in UTC
-        day_start = booking_date.astimezone(timezone.utc).replace(
+        day_start = booking_date.astimezone(UTC).replace(
             hour=0, minute=0, second=0, microsecond=0
         )
         row = (
@@ -108,7 +119,9 @@ class BookingService:
                 .filter(
                     Booking.guide_user_id == guide_user_id,
                     func.date(Booking.date) == day_start.date().isoformat(),
-                    Booking.status.in_([BookingStatus.upcoming, BookingStatus.accepted]),
+                    Booking.status.in_(
+                        [BookingStatus.upcoming, BookingStatus.accepted]
+                    ),
                 )
                 .scalar()
             )
@@ -124,7 +137,7 @@ class BookingService:
             self.db.flush()
         return row
 
-    def daily_availability(self, date: str, guide_id: Optional[int] = None) -> dict:
+    def daily_availability(self, date: str, guide_id: int | None = None) -> dict:
         """Remaining slots for one date, from that date's capacity row.
 
         This is the same row ``create_booking`` checks, so the numbers agree.
@@ -133,9 +146,16 @@ class BookingService:
         """
         guide_user_id = self._resolve_availability_guide(guide_id)
         if guide_user_id is None:
-            return {"available": False, "remaining": 0, "max_capacity": None, "booked_capacity": 0}
+            return {
+                "available": False,
+                "remaining": 0,
+                "max_capacity": None,
+                "booked_capacity": 0,
+            }
 
-        entry = GuideAvailabilityService(self.db).day_entry(guide_user_id, as_date(date))
+        entry = GuideAvailabilityService(self.db).day_entry(
+            guide_user_id, as_date(date)
+        )
         return {
             "available": entry["status"] == "available",
             "remaining": 0 if entry["status"] == "unavailable" else entry["remaining"],
@@ -147,7 +167,9 @@ class BookingService:
     # Date-first booking search
     # ------------------------------------------------------------------
 
-    def available_guides(self, day: str, exclude_user_id: Optional[int] = None) -> List[dict]:
+    def available_guides(
+        self, day: str, exclude_user_id: int | None = None
+    ) -> list[dict]:
         """Guides who opened ``day``, still have room, and list a bookable experience.
 
         This is step 2 of the date-first flow: the date is chosen before the
@@ -159,9 +181,13 @@ class BookingService:
         try:
             day_date = as_date(day)
         except (TypeError, ValueError):
-            raise HTTPException(status_code=422, detail="Dates must be ISO dates (YYYY-MM-DD).")
-        if day_date < datetime.now(timezone.utc).date():
-            raise HTTPException(status_code=422, detail="Past dates cannot be searched.")
+            raise HTTPException(
+                status_code=422, detail="Dates must be ISO dates (YYYY-MM-DD)."
+            )
+        if day_date < datetime.now(UTC).date():
+            raise HTTPException(
+                status_code=422, detail="Past dates cannot be searched."
+            )
 
         open_ids = GuideAvailabilityService(self.db).open_guide_ids(
             day_date, exclude_user_id=exclude_user_id
@@ -169,7 +195,7 @@ class BookingService:
         if not open_ids:
             return []
 
-        day_start = datetime(day_date.year, day_date.month, day_date.day, tzinfo=timezone.utc)
+        day_start = datetime(day_date.year, day_date.month, day_date.day, tzinfo=UTC)
         capacity = {
             int(row.guide_user_id): row
             for row in self.db.query(GuideDailyCapacity)
@@ -183,13 +209,15 @@ class BookingService:
 
         # A guide is only available while the day's row still has room; a guide
         # whose row is full drops out of the list entirely.
-        room: dict[int, Optional[int]] = {}
+        room: dict[int, int | None] = {}
         for guide_user_id in open_ids:
             row = capacity.get(guide_user_id)
             if row is None:
                 room[guide_user_id] = None
                 continue
-            remaining = max(int(row.max_capacity or 0) - int(row.booked_capacity or 0), 0)
+            remaining = max(
+                int(row.max_capacity or 0) - int(row.booked_capacity or 0), 0
+            )
             if remaining > 0:
                 room[guide_user_id] = remaining
         if not room:
@@ -235,7 +263,9 @@ class BookingService:
         cards = []
         for guide_user_id, account in accounts.items():
             guide_listings = [
-                listing for listing in listings if int(listing.guide_user_id) == guide_user_id
+                listing
+                for listing in listings
+                if int(listing.guide_user_id) == guide_user_id
             ]
             if not guide_listings:
                 continue
@@ -250,17 +280,25 @@ class BookingService:
                     "guide_id": int(profile.id) if profile else guide_user_id,
                     "name": (profile.name if profile and profile.name else account_name)
                     or account.email,
-                    "image": (profile.image if profile and profile.image else account.avatar_url)
+                    "image": (
+                        profile.image
+                        if profile and profile.image
+                        else account.avatar_url
+                    )
                     or "/images/placeholder.svg",
                     "role": profile.role if profile else "Experience Guide",
                     "rating": float(profile.rating or 0) if profile else 0.0,
                     "reviews": int(profile.reviews or 0) if profile else 0,
                     "verified": bool(profile.verified) if profile else False,
                     "cities": cities
-                    or sorted({listing.city for listing in guide_listings if listing.city}),
+                    or sorted(
+                        {listing.city for listing in guide_listings if listing.city}
+                    ),
                     "languages": list(profile.languages or []) if profile else [],
                     "spots_left": room[guide_user_id],
-                    "listings": [self._listing_card(listing) for listing in guide_listings],
+                    "listings": [
+                        self._listing_card(listing) for listing in guide_listings
+                    ],
                 }
             )
 
@@ -291,24 +329,40 @@ class BookingService:
             return None
         link = (
             self.db.query(HostGuide)
-            .filter(HostGuide.guide_id == catalog_guide_id, HostGuide.status == "active")
+            .filter(
+                HostGuide.guide_id == catalog_guide_id, HostGuide.status == "active"
+            )
             .first()
         )
         if link and link.guide_user_id:
-            guide = self.db.query(User).filter(User.id == link.guide_user_id, User.role == GUIDE, User.is_active.is_(True)).first()
+            guide = (
+                self.db.query(User)
+                .filter(
+                    User.id == link.guide_user_id,
+                    User.role == GUIDE,
+                    User.is_active.is_(True),
+                )
+                .first()
+            )
             if guide:
                 return guide.id
         # Fallback: direct user id lookup (legacy / direct account id).
         guide = (
             self.db.query(User)
-            .filter(User.id == catalog_guide_id, User.role == GUIDE, User.is_active.is_(True))
+            .filter(
+                User.id == catalog_guide_id,
+                User.role == GUIDE,
+                User.is_active.is_(True),
+            )
             .first()
         )
         if guide:
             return guide.id
         return None
 
-    def prevent_self_hosted_booking(self, user_id: int, booking_in: BookingCreate) -> None:
+    def prevent_self_hosted_booking(
+        self, user_id: int, booking_in: BookingCreate
+    ) -> None:
         """Reject a booking when the current user hosts the experience they are
         trying to book.
 
@@ -341,23 +395,44 @@ class BookingService:
                 )
         # ``source == "mock"`` has no persistent host record; skip the check.
 
-    def _get_guide_portfolio(self, guide_user_id: int) -> Optional[dict]:
+    def _get_guide_portfolio(self, guide_user_id: int) -> dict | None:
         """Build guide portfolio from guide catalog profile and listings."""
         # Get the guide catalog profile (guides table)
-        link = self.db.query(HostGuide).filter(HostGuide.guide_user_id == guide_user_id, HostGuide.status == "active").first()
+        link = (
+            self.db.query(HostGuide)
+            .filter(
+                HostGuide.guide_user_id == guide_user_id, HostGuide.status == "active"
+            )
+            .first()
+        )
         if not link or not link.guide_id:
             return None
-        
-        catalog_guide = self.db.query(Guide).filter(Guide.id == link.guide_id, Guide.is_active.is_(True)).first()
+
+        catalog_guide = (
+            self.db.query(Guide)
+            .filter(Guide.id == link.guide_id, Guide.is_active.is_(True))
+            .first()
+        )
         if not catalog_guide:
             return None
-        
+
         # Get guide profile
-        profile = self.db.query(GuideProfile).filter(GuideProfile.guide_user_id == guide_user_id).first()
-        
+        profile = (
+            self.db.query(GuideProfile)
+            .filter(GuideProfile.guide_user_id == guide_user_id)
+            .first()
+        )
+
         # Count listings
-        listings_count = self.db.query(GuideListing).filter(GuideListing.guide_user_id == guide_user_id, GuideListing.is_active.is_(True)).count()
-        
+        listings_count = (
+            self.db.query(GuideListing)
+            .filter(
+                GuideListing.guide_user_id == guide_user_id,
+                GuideListing.is_active.is_(True),
+            )
+            .count()
+        )
+
         return {
             "id": catalog_guide.id,
             "name": catalog_guide.name,
@@ -376,7 +451,7 @@ class BookingService:
             "listings_count": listings_count,
         }
 
-    def _resolve_availability_guide(self, guide_id: Optional[int]) -> Optional[int]:
+    def _resolve_availability_guide(self, guide_id: int | None) -> int | None:
         """Resolve the guide account a booking for this guide would land on.
 
         Traveller pages send the *catalog* guide id.  When it does not map to an
@@ -393,7 +468,7 @@ class BookingService:
         except HTTPException:
             return None
 
-    def month_detail(self, year: int, month: int, guide_id: Optional[int] = None) -> dict:
+    def month_detail(self, year: int, month: int, guide_id: int | None = None) -> dict:
         """Per-date capacity for a month, read with a single query.
 
         Only dates that already have a ``guide_daily_capacity`` row are
@@ -410,8 +485,9 @@ class BookingService:
             self.db.query(GuideDailyCapacity)
             .filter(
                 GuideDailyCapacity.guide_user_id == guide_user_id,
-                GuideDailyCapacity.booking_date >= datetime(year, month, 1, tzinfo=timezone.utc),
-                GuideDailyCapacity.booking_date <= datetime(year, month, last_day, tzinfo=timezone.utc),
+                GuideDailyCapacity.booking_date >= datetime(year, month, 1, tzinfo=UTC),
+                GuideDailyCapacity.booking_date
+                <= datetime(year, month, last_day, tzinfo=UTC),
                 GuideDailyCapacity.is_active.is_(True),
             )
             .all()
@@ -427,7 +503,7 @@ class BookingService:
             }
         return detail
 
-    def availability_for_date(self, date: str, guide_id: Optional[int] = None) -> dict:
+    def availability_for_date(self, date: str, guide_id: int | None = None) -> dict:
         """Whether a traveller may book this guide on this date.
 
         A date is bookable only when the guide opened it from the dashboard
@@ -437,12 +513,20 @@ class BookingService:
         if guide_user_id is None:
             return {"available": False, "status": "unavailable"}
 
-        entry = GuideAvailabilityService(self.db).day_entry(guide_user_id, as_date(date))
+        entry = GuideAvailabilityService(self.db).day_entry(
+            guide_user_id, as_date(date)
+        )
         if entry["status"] == "available":
-            return {"available": True, "status": "free", "remaining": entry["remaining"]}
+            return {
+                "available": True,
+                "status": "free",
+                "remaining": entry["remaining"],
+            }
         return {"available": False, "status": entry["status"], "remaining": 0}
 
-    def unavailable_dates(self, year: int, month: int, guide_id: Optional[int] = None) -> list[str]:
+    def unavailable_dates(
+        self, year: int, month: int, guide_id: int | None = None
+    ) -> list[str]:
         """Dates a traveller must not be able to pick in the given month.
 
         Availability is opt-in, so this is every date the guide has not opened
@@ -451,12 +535,17 @@ class BookingService:
         guide_user_id = self._resolve_availability_guide(guide_id)
         if guide_user_id is None:
             _, days_in_month = monthrange(year, month)
-            return [f"{year:04d}-{month:02d}-{day:02d}" for day in range(1, days_in_month + 1)]
+            return [
+                f"{year:04d}-{month:02d}-{day:02d}"
+                for day in range(1, days_in_month + 1)
+            ]
 
-        entries = GuideAvailabilityService(self.db).month_days(guide_user_id, year, month)
+        entries = GuideAvailabilityService(self.db).month_days(
+            guide_user_id, year, month
+        )
         return [entry["date"] for entry in entries if entry["status"] != "available"]
 
-    def _guide_listing_for(self, experience_id: int | None) -> Optional[GuideListing]:
+    def _guide_listing_for(self, experience_id: int | None) -> GuideListing | None:
         """Return the published guide listing behind a public experience id.
 
         Traveller-facing ids are offset (``200000 + listing id``), so they are
@@ -487,15 +576,19 @@ class BookingService:
         if hasattr(booking_date, "date"):
             booking_date = booking_date.date()
         day_start = datetime(
-            booking_date.year, booking_date.month, booking_date.day,
-            tzinfo=timezone.utc,
+            booking_date.year,
+            booking_date.month,
+            booking_date.day,
+            tzinfo=UTC,
         )
 
         # Availability is opt-in: the guide must have opened this date.
-        today = datetime.now(timezone.utc).date()
+        today = datetime.now(UTC).date()
         if booking_date < today:
             raise HTTPException(status_code=422, detail="Past dates cannot be booked.")
-        availability = GuideAvailabilityService(self.db).day_entry(guide.id, booking_date)
+        availability = GuideAvailabilityService(self.db).day_entry(
+            guide.id, booking_date
+        )
         if availability["status"] != "available":
             if availability["status"] == "booked":
                 raise HTTPException(
@@ -518,7 +611,9 @@ class BookingService:
 
         guests = int(booking_in.guests or 0)
         if int(row.booked_capacity or 0) + guests > int(row.max_capacity or 0):
-            remaining = max(int(row.max_capacity or 0) - int(row.booked_capacity or 0), 0)
+            remaining = max(
+                int(row.max_capacity or 0) - int(row.booked_capacity or 0), 0
+            )
             raise HTTPException(
                 status_code=409,
                 detail=(
@@ -536,12 +631,16 @@ class BookingService:
             # Honor recharge period: after the booking date, block availability
             # for the configured number of days so the guide has time to recover.
             if int(listing.recharge_days or 0) > 0:
-                next_available = booking_date + timedelta(days=int(listing.recharge_days or 0))
-                now_date = datetime.now(timezone.utc).date()
+                next_available = booking_date + timedelta(
+                    days=int(listing.recharge_days or 0)
+                )
+                now_date = datetime.now(UTC).date()
                 if next_available > now_date:
                     listing.next_available_date = datetime(
-                        next_available.year, next_available.month, next_available.day,
-                        tzinfo=timezone.utc,
+                        next_available.year,
+                        next_available.month,
+                        next_available.day,
+                        tzinfo=UTC,
                     )
 
         db_booking = Booking(
@@ -555,49 +654,92 @@ class BookingService:
         self.notify_booking_created(db_booking, guide)
         return db_booking
 
-    def cancel_booking(self, user_id: int, booking_id: int) -> Optional[Booking]:
+    def release_capacity(self, booking: Booking) -> None:
+        """Return the slots a cancelled or declined booking held.
+
+        Called only when a booking stops being active, so a trip the guide
+        accepts and later completes keeps its slots.
+        """
+        listing = self._guide_listing_for(booking.experience_id)
+        if listing is not None:
+            listing.booked_guests = max(
+                int(listing.booked_guests or 0) - int(booking.guests or 0), 0
+            )
+
+        booking_date = booking.date
+        if hasattr(booking_date, "date"):
+            booking_date = booking_date.date()
+        day_start = datetime(
+            booking_date.year,
+            booking_date.month,
+            booking_date.day,
+            tzinfo=UTC,
+        )
+        row = (
+            self.db.query(GuideDailyCapacity)
+            .filter(
+                GuideDailyCapacity.guide_user_id == booking.guide_user_id,
+                GuideDailyCapacity.booking_date == day_start,
+                GuideDailyCapacity.is_active.is_(True),
+            )
+            .with_for_update()
+            .first()
+        )
+        if row is not None:
+            row.booked_capacity = max(
+                int(row.booked_capacity or 0) - int(booking.guests or 0), 0
+            )
+
+    def cancel_booking(self, user_id: int, booking_id: int) -> Booking | None:
         booking = (
             self.db.query(Booking)
             .filter(Booking.id == booking_id, Booking.user_id == user_id)
             .first()
         )
         if booking:
-            # Cancelling releases the capacity the booking held on a guide listing.
             if booking.status in (BookingStatus.upcoming, BookingStatus.accepted):
-                listing = self._guide_listing_for(booking.experience_id)
-                if listing is not None:
-                    listing.booked_guests = max(
-                        int(listing.booked_guests or 0) - int(booking.guests or 0), 0
-                    )
-                # Release daily capacity row slots
-                booking_date = booking.date
-                if hasattr(booking_date, "date"):
-                    booking_date = booking_date.date()
-                day_start = datetime(
-                    booking_date.year, booking_date.month, booking_date.day,
-                    tzinfo=timezone.utc,
-                )
-                row = (
-                    self.db.query(GuideDailyCapacity)
-                    .filter(
-                        GuideDailyCapacity.guide_user_id == booking.guide_user_id,
-                        GuideDailyCapacity.booking_date == day_start,
-                        GuideDailyCapacity.is_active.is_(True),
-                    )
-                    .with_for_update()
-                    .first()
-                )
-                if row is not None:
-                    row.booked_capacity = max(
-                        int(row.booked_capacity or 0) - int(booking.guests or 0), 0
-                    )
+                self.release_capacity(booking)
             booking.status = BookingStatus.cancelled  # type: ignore
             self.db.commit()
             self.db.refresh(booking)
             self.notify_booking_cancelled(booking)
         return booking
 
-    def archive_booking(self, user_id: int, booking_id: int) -> Optional[Booking]:
+    def decide_booking(
+        self, guide_user_id: int, booking_id: int, status: str
+    ) -> Booking:
+        """Accept, decline or complete a booking assigned to this guide.
+
+        Declining and cancelling release the day's slots, exactly like a
+        traveller cancellation; accepting and completing keep them.
+        """
+        if status not in {"accepted", "rejected", "completed", "cancelled"}:
+            raise HTTPException(
+                status_code=422,
+                detail="Status must be accepted, rejected, completed or cancelled",
+            )
+        booking = (
+            self.db.query(Booking)
+            .filter(Booking.id == booking_id, Booking.guide_user_id == guide_user_id)
+            .first()
+        )
+        if not booking:
+            raise HTTPException(status_code=404, detail="Booking not found")
+
+        if status in {"rejected", "cancelled"} and booking.status in (
+            BookingStatus.upcoming,
+            BookingStatus.accepted,
+        ):
+            self.release_capacity(booking)
+
+        booking.status = BookingStatus(status)  # type: ignore[assignment]
+        self.db.commit()
+        self.db.refresh(booking)
+        # Notify the traveller so their bookings page reflects the decision.
+        self.notify_booking_decision(booking, status)
+        return booking
+
+    def archive_booking(self, user_id: int, booking_id: int) -> Booking | None:
         booking = (
             self.db.query(Booking)
             .filter(Booking.id == booking_id, Booking.user_id == user_id)
@@ -614,7 +756,7 @@ class BookingService:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _display_name(user: Optional[User]) -> str:
+    def _display_name(user: User | None) -> str:
         if user is None:
             return "A traveller"
         name = f"{user.firstName or ''} {user.lastName or ''}".strip()
@@ -647,11 +789,17 @@ class BookingService:
             )
         )
 
-    def notify_booking_created(self, booking: Booking, guide: Optional[User] = None) -> None:
+    def notify_booking_created(
+        self, booking: Booking, guide: User | None = None
+    ) -> None:
         """Tell the guide a request arrived and confirm the request to the traveller."""
         try:
             traveler = self.db.get(User, booking.user_id)
-            guide = guide or (self.db.get(User, booking.guide_user_id) if booking.guide_user_id else None)
+            guide = guide or (
+                self.db.get(User, booking.guide_user_id)
+                if booking.guide_user_id
+                else None
+            )
             when = self._booking_day(booking)
             if guide is not None:
                 self._queue_notification(
@@ -675,7 +823,7 @@ class BookingService:
                 {"booking_id": booking.id, "guide_user_id": booking.guide_user_id},
             )
             self.db.commit()
-        except Exception:  # pragma: no cover - notifications are best effort
+        except Exception:  # noqa: BLE001 - best-effort notifications
             self.db.rollback()
 
     def notify_booking_decision(self, booking: Booking, status: str) -> None:
@@ -696,7 +844,7 @@ class BookingService:
                 {"booking_id": booking.id, "status": status},
             )
             self.db.commit()
-        except Exception:  # pragma: no cover - notifications are best effort
+        except Exception:  # noqa: BLE001 - best-effort notifications
             self.db.rollback()
 
     def notify_booking_cancelled(self, booking: Booking) -> None:
@@ -713,5 +861,5 @@ class BookingService:
                     {"booking_id": booking.id, "date_iso": str(booking.date)[:10]},
                 )
                 self.db.commit()
-        except Exception:  # pragma: no cover - notifications are best effort
+        except Exception:  # noqa: BLE001 - best-effort notifications
             self.db.rollback()

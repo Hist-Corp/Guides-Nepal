@@ -115,7 +115,7 @@ const BookingsPage: React.FC = () => {
                           <span className="font-medium">{booking.city}</span>
                         </div>
                         <span className="font-bold text-primary text-lg">
-                          <Price amount={booking.price} />
+                          <Price amount={booking.price * booking.guests} />
                         </span>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -222,7 +222,7 @@ const BookingsPage: React.FC = () => {
                       </span>
                     </div>
                     <span className="font-bold text-gray-400 text-sm">
-                      <Price amount={booking.price} />
+                      <Price amount={booking.price * booking.guests} />
                     </span>
                   </div>
                 </div>
