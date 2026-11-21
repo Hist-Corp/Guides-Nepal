@@ -19,6 +19,7 @@ interface GuideBooking {
   status: string;
   traveler_name: string;
   traveler_email: string;
+  traveler_phone: string | null;
 }
 
 const GuideBookingsPage: React.FC = () => {
@@ -92,6 +93,7 @@ const GuideBookingsPage: React.FC = () => {
                   </div>
                   <p className="mt-1 text-sm text-gray-600">
                     {booking.traveler_name} · {booking.traveler_email}
+                    {booking.traveler_phone ? ` · ${booking.traveler_phone}` : ''}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-500">
                     <span className="flex items-center gap-1">

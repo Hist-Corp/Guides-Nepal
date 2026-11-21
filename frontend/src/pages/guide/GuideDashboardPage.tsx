@@ -21,6 +21,7 @@ interface GuideBooking {
   status: string;
   traveler_name: string;
   traveler_email: string;
+  traveler_phone: string | null;
 }
 
 const UPDATE_TYPES = ['availability', 'capacity', 'booking', 'schedule', 'announcement'] as const;
@@ -167,7 +168,10 @@ const GuideDashboardPage: React.FC = () => {
                         <div className="flex flex-wrap items-start justify-between gap-2">
                           <div>
                             <h3 className="font-bold text-gray-900">{b.experience_title}</h3>
-                            <p className="mt-1 text-sm text-gray-600">{b.traveler_name} - {b.traveler_email}</p>
+                            <p className="mt-1 text-sm text-gray-600">
+                              {b.traveler_name} — {b.traveler_email}
+                              {b.traveler_phone ? ` · ${b.traveler_phone}` : ''}
+                            </p>
                             <p className="mt-2 flex flex-wrap gap-3 text-sm text-gray-500">
                               <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{b.city}</span>
                               <span>{new Date(b.date).toLocaleDateString()}</span>
