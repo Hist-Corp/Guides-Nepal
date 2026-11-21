@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useGuideAvailability } from '../../hooks/useGuideAvailability';
 import { StickyBarPortal } from '../../components/common/StickyBarPortal';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGoBack } from '../../utils/backNavigation';
@@ -25,7 +26,6 @@ import { useBookingStore } from '../../store/bookingStore';
 import { BookingLoginPrompt } from '../../components/common/BookingLoginPrompt';
 import { useAuthStore } from '../../store/authStore';
 import { useMessageStore } from '../../store/messageStore';
-import { getApiUrl } from '../../config/api';
 import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
 import { getAvailableGuides, useViewerGuideId } from '../../utils/guides';
 
@@ -213,12 +213,12 @@ const CookingExperiencePage: React.FC = () => {
   const [bookingTime, setBookingTime] = useState('09:00');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [sheetError, setSheetError] = useState<string | null>(null);
-  const [sheetConfirmed, setSheetConfirmed] = useState(false);
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [confirmPopup, setConfirmPopup] = useState(false);
-  const [disabledDates, setDisabledDates] = useState<string[]>([]);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  // Guide whose booking just succeeded; they stay selected and visible.
+  const [bookedGuideId, setBookedGuideId] = useState<number | string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [sendingRequest, setSendingRequest] = useState(false);
 
@@ -230,109 +230,12 @@ const CookingExperiencePage: React.FC = () => {
   const ensureConversation = useMessageStore((s) => s.ensureConversation);
   const sendMessage = useMessageStore((s) => s.sendMessage);
 
-  // Deduplicate in-flight availability requests so rapid guide switches don't
-  // hammer the backend with identical calls.
-  const availabilityInflight = useRef<Map<string, Promise<void>>>(new Map());
-  const availabilityCache = useRef<Map<string, string[]>>(new Map());
-  const availabilityMap = useRef<Map<string, { remaining: number; maxCapacity: number }>>(
-    new Map()
-  );
-
-  const fetchUnavailableDates = useCallback(
-    async (year: number, month: number) => {
-      if (!accessToken) return;
-      const guideId = selectedGuide?.id;
-      const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
-      if (availabilityCache.current.has(cacheKey)) {
-        setDisabledDates(availabilityCache.current.get(cacheKey)!);
-        return;
-      }
-      const existing = availabilityInflight.current.get(cacheKey);
-      if (existing) {
-        await existing;
-        return;
-      }
-      const promise = (async () => {
-        try {
-          const url = getApiUrl(
-            `/bookings/availability/month?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`
-          );
-          const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-          if (res.ok) {
-            const data = await res.json();
-            const unavailable = Array.isArray(data.unavailable) ? data.unavailable : [];
-            availabilityCache.current.set(cacheKey, unavailable);
-            setDisabledDates(unavailable);
-          }
-        } catch {
-          // Silently fail
-        } finally {
-          availabilityInflight.current.delete(cacheKey);
-        }
-      })();
-      availabilityInflight.current.set(cacheKey, promise);
-      await promise;
-    },
-    [accessToken, selectedGuide?.id]
-  );
-
-  /** Fetch per-date remaining spots for both visible months of the selected guide. */
-  const fetchMonthlyAvailability = useCallback(
-    async (year: number, month: number) => {
-      if (!accessToken) return;
-      const guideId = selectedGuide?.id;
-      const cacheKey = `${year}-${month}-${guideId ?? 'default'}`;
-      if (availabilityMap.current.has(cacheKey)) return;
-      const existing = availabilityInflight.current.get(cacheKey);
-      if (existing) {
-        await existing;
-        return;
-      }
-      const promise = (async () => {
-        try {
-          const url = getApiUrl(
-            `/bookings/availability/month-detail?year=${year}&month=${month}${guideId ? '&guide_id=' + guideId : ''}`
-          );
-          const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-          if (res.ok) {
-            const data = await res.json();
-            const avail = data.availability ?? {};
-            for (const [key, v] of Object.entries(avail)) {
-              const val = v as { remaining?: number; max_capacity?: number };
-              availabilityMap.current.set(key, {
-                remaining: val.remaining ?? 0,
-                maxCapacity: val.max_capacity ?? 0,
-              });
-            }
-          }
-        } catch {
-          // Silently fail - spots won't be shown
-        } finally {
-          availabilityInflight.current.delete(cacheKey);
-        }
-      })();
-      availabilityInflight.current.set(cacheKey, promise);
-      await promise;
-    },
-    [accessToken, selectedGuide?.id]
-  );
-
-  /** Combined month-change handler: refresh unavailable dates AND spot counts. */
-  const handleMonthChange = useCallback(
-    (year: number, month: number) => {
-      fetchUnavailableDates(year, month);
-      fetchMonthlyAvailability(year, month);
-    },
-    [fetchUnavailableDates, fetchMonthlyAvailability]
-  );
-
-  useEffect(() => {
-    if (accessToken) {
-      const now = new Date();
-      fetchUnavailableDates(now.getFullYear(), now.getMonth() + 1);
-      fetchMonthlyAvailability(now.getFullYear(), now.getMonth() + 1);
-    }
-  }, [selectedGuide, accessToken, fetchUnavailableDates, fetchMonthlyAvailability]);
+  const {
+    disabledDates,
+    availability,
+    handleMonthChange,
+    refresh: refreshAvailability,
+  } = useGuideAvailability({ accessToken, guideId: selectedGuide?.id });
 
   // A signed-in guide never sees (or books) themselves in "Who you'll meet".
   const viewerGuideId = useViewerGuideId();
@@ -400,6 +303,9 @@ const CookingExperiencePage: React.FC = () => {
 
   const confirmBooking = async () => {
     if (!data) return;
+    // Claim the guide before the request so the selection effect keeps them
+    // instead of falling back while the booking lands.
+    setBookedGuideId(selectedGuide?.id ?? null);
     const success = await addBooking({
       id: Math.random().toString(36).substr(2, 9),
       experienceId: data.id,
@@ -416,6 +322,9 @@ const CookingExperiencePage: React.FC = () => {
     if (success) {
       setConfirmPopup(false);
       setBookingConfirmed(true);
+      void refreshAvailability(checkIn);
+    } else {
+      setBookedGuideId(null);
     }
   };
 
@@ -492,6 +401,7 @@ const CookingExperiencePage: React.FC = () => {
     const found = cookingExperiencesData.find((d) => d.slug === slug);
     if (found) {
       setData(found);
+      setBookedGuideId(null);
       setPricePerPerson(found.price || 65);
       // Default to the first guide if available
       if (found.guides && found.guides.length > 0) {
@@ -500,13 +410,19 @@ const CookingExperiencePage: React.FC = () => {
     }
   }, [slug]);
 
-  // Keep the selection on a visible guide: when the current guide becomes
-  // booked/reserved, fall back to the highest-rated available guide.
+  // Keep the guide just booked selected so the calendar shows their reduced
+  // count; any other guide that drops out of "Who you'll meet" (now reserved or
+  // fully booked) falls back to the highest-rated available one.
   useEffect(() => {
-    if (!selectedGuide || !availableGuides.some((g) => g.id === selectedGuide.id)) {
-      setSelectedGuide(availableGuides[0] ?? null);
+    if (
+      selectedGuide &&
+      ((bookedGuideId !== null && String(selectedGuide.id) === String(bookedGuideId)) ||
+        availableGuides.some((g) => g.id === selectedGuide.id))
+    ) {
+      return;
     }
-  }, [availableGuides, selectedGuide]);
+    setSelectedGuide(availableGuides[0] ?? null);
+  }, [availableGuides, selectedGuide, bookedGuideId]);
 
   const getDaysDifference = () => {
     if (checkIn && checkOut) {
@@ -791,7 +707,6 @@ const CookingExperiencePage: React.FC = () => {
                         type="button"
                         onClick={() => {
                           setSheetError(null);
-                          setSheetConfirmed(false);
                           setIsSheetOpen(true);
                         }}
                         className="text-xs underline font-bold text-gray-900 text-left"
@@ -802,7 +717,6 @@ const CookingExperiencePage: React.FC = () => {
                     <button
                       onClick={() => {
                         setSheetError(null);
-                        setSheetConfirmed(false);
                         setIsSheetOpen(true);
                       }}
                       className="bg-[#ffba0a] hover:bg-[#ffba0a] text-white font-bold py-3 px-6 rounded-lg uppercase tracking-wide"
@@ -850,7 +764,7 @@ const CookingExperiencePage: React.FC = () => {
                           }}
                           idPrefix="card"
                           disabledDates={disabledDates}
-                          availability={Object.fromEntries(availabilityMap.current)}
+                          availability={availability}
                           onMonthChange={handleMonthChange}
                         />
 
@@ -1229,7 +1143,7 @@ const CookingExperiencePage: React.FC = () => {
                         }}
                         idPrefix="form"
                         disabledDates={disabledDates}
-                        availability={Object.fromEntries(availabilityMap.current)}
+                        availability={availability}
                         onMonthChange={handleMonthChange}
                       />
                     </div>
@@ -1358,25 +1272,8 @@ const CookingExperiencePage: React.FC = () => {
           onSelectGuide={(g) => setSelectedGuide(g as Guide)}
           onConfirm={handleSheetConfirm}
           error={sheetError}
-          confirmed={sheetConfirmed}
-          confirmedSummary={
-            <ul className="space-y-1">
-              <li>
-                <span className="font-bold">Dates:</span> {checkIn} - {checkOut}
-              </li>
-              <li>
-                <span className="font-bold">Guests:</span> {guestCount}
-              </li>
-              <li>
-                <span className="font-bold">Start time:</span> {bookingTime}
-              </li>
-              {selectedGuide && (
-                <li>
-                  <span className="font-bold">Guide:</span> {selectedGuide.name}
-                </li>
-              )}
-            </ul>
-          }
+          disabledDates={disabledDates}
+          availability={availability}
         />
       )}
       {/* Guide Profile Modal */}

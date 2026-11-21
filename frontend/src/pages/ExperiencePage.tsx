@@ -770,9 +770,12 @@ const ExperiencePage: React.FC = () => {
   const [bookingTime, setBookingTime] = useState('09:00');
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [sheetError, setSheetError] = useState<string | null>(null);
-  const [sheetConfirmed, setSheetConfirmed] = useState(false);
   const [disabledDates, setDisabledDates] = useState<string[]>([]);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  // The date that was booked. Refreshing availability clears the calendar
+  // selection when the booking fills that date, but the confirmation still has
+  // to name it.
+  const [confirmedDate, setConfirmedDate] = useState('');
 
   // Reviews state
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -1031,39 +1034,32 @@ const ExperiencePage: React.FC = () => {
     }
   }, [slotsLeft, guests]);
 
-  // A successful booking consumes slots, so everything cached for the selected
-  // guide is stale: drop those months and re-read them so the calendar reflects
-  // the new counts.
+  // A booking only consumes the booked date, so drop that month for the
+  // selected guide and re-read it; every other month is still accurate.
   const refreshAvailability = async () => {
+    const booked = new Date(`${selectedDate}T00:00:00`);
+    if (Number.isNaN(booked.getTime())) return;
+    const year = booked.getFullYear();
+    const month = booked.getMonth() + 1;
     const guideKey = selectedGuide ? String(selectedGuide.id) : 'default';
-    const suffix = `-${guideKey}`;
-    const months = new Set<string>();
-    for (const key of [...availabilityLoaded.current]) {
-      if (!key.endsWith(suffix)) continue;
-      availabilityLoaded.current.delete(key);
-      availabilityCache.current.delete(key);
-      const [year, month] = key.split('-');
-      months.add(`${year}-${month}`);
-    }
+    const cacheKey = `${year}-${month}-${guideKey}`;
+    // A request that started before the booking would write pre-booking counts
+    // into the cache, so let it settle before dropping the entries below.
+    await Promise.all([
+      availabilityInflight.current.get(`dates:${cacheKey}`),
+      availabilityInflight.current.get(`counts:${cacheKey}`),
+    ]);
+    availabilityCache.current.delete(cacheKey);
+    availabilityLoaded.current.delete(cacheKey);
+    // Spot counts are keyed by YYYY-MM-DD, so drop just this month's days.
+    const monthPrefix = `${year}-${String(month).padStart(2, '0')}-`;
     setAvailabilityByGuide((prev) => {
-      if (!(guideKey in prev)) return prev;
-      const next = { ...prev };
-      delete next[guideKey];
-      return next;
+      const guide = prev[guideKey];
+      if (!guide) return prev;
+      const kept = Object.entries(guide).filter(([day]) => !day.startsWith(monthPrefix));
+      return { ...prev, [guideKey]: Object.fromEntries(kept) };
     });
-    // Re-read the booked date's month even when it had no counts cached yet.
-    const booked = selectedDate ? new Date(`${selectedDate}T00:00:00`) : new Date();
-    if (!Number.isNaN(booked.getTime())) {
-      months.add(`${booked.getFullYear()}-${booked.getMonth() + 1}`);
-    }
-    for (const entry of months) {
-      const [year, month] = entry.split('-').map(Number);
-      if (!year || !month) continue;
-      await Promise.all([
-        fetchUnavailableDates(year, month),
-        fetchMonthlyAvailability(year, month),
-      ]);
-    }
+    await Promise.all([fetchUnavailableDates(year, month), fetchMonthlyAvailability(year, month)]);
   };
 
   const persistBooking = async () => {
@@ -1083,6 +1079,7 @@ const ExperiencePage: React.FC = () => {
     });
     if (bookingSaved) {
       setIsBooked(true);
+      setConfirmedDate(selectedDate);
       setBookingConfirmed(true);
       void refreshCapacity();
       void refreshAvailability();
@@ -1145,7 +1142,6 @@ const ExperiencePage: React.FC = () => {
 
   const openSheet = () => {
     setSheetError(null);
-    setSheetConfirmed(false);
     setIsSheetOpen(true);
   };
 
@@ -1192,12 +1188,8 @@ const ExperiencePage: React.FC = () => {
   };
 
   const closeSheet = () => {
-    const wasConfirmed = sheetConfirmed;
     setIsSheetOpen(false);
     setSheetError(null);
-    setSheetConfirmed(false);
-    // Mirrors the card flow: once booked, head over to the bookings page.
-    if (wasConfirmed) navigate('/bookings');
   };
 
   const bookmarkId = experience ? `exp-${experience.id}` : '';
@@ -1731,7 +1723,8 @@ const ExperiencePage: React.FC = () => {
                       ariaLabel="Choose experience date"
                       disabledDates={disabledDates}
                       availability={
-                        availabilityByGuide[selectedGuide ? String(selectedGuide.id) : 'default'] ?? {}
+                        availabilityByGuide[selectedGuide ? String(selectedGuide.id) : 'default'] ??
+                        {}
                       }
                       onMonthChange={handleMonthChange}
                     />
@@ -1765,7 +1758,7 @@ const ExperiencePage: React.FC = () => {
                     <div className="text-sm text-green-700 bg-green-50 border border-green-100 rounded-lg px-3 py-2 space-y-1">
                       <p className="font-bold">Booking confirmed!</p>
                       <p>{experience.title}</p>
-                      <p>Date: {selectedDate}</p>
+                      <p>Date: {confirmedDate}</p>
                       <p>Guests: {guests}</p>
                       <p>Total: {formatPrice(unitPrice * guests, 'USD')}</p>
                       <p>City: {experience.city}</p>
@@ -1844,24 +1837,6 @@ const ExperiencePage: React.FC = () => {
           }}
           onConfirm={handleSheetConfirm}
           error={sheetError}
-          confirmed={sheetConfirmed}
-          confirmedSummary={
-            <ul className="space-y-1">
-              <li>
-                <span className="font-bold">Date:</span> {selectedDate}
-              </li>
-              <li>
-                <span className="font-bold">Guests:</span> {guests}
-              </li>
-              <li>
-                <span className="font-bold">Start time:</span> {bookingTime}
-              </li>
-              <li>
-                <span className="font-bold">Host:</span>{' '}
-                {selectedGuide?.name ?? experience.host.name}
-              </li>
-            </ul>
-          }
         />
       )}
 
