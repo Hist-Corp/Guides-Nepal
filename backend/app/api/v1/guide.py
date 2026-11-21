@@ -87,8 +87,10 @@ def guide_bookings(
                 if hasattr(booking.status, "value")
                 else booking.status
             ),
-            "traveler_name": f"{traveler.firstName or ''} {traveler.lastName or ''}".strip(),
+            "traveler_name": f"{traveler.firstName or ''} {traveler.lastName or ''}".strip()
+            or traveler.email,
             "traveler_email": traveler.email,
+            "traveler_phone": traveler.phone,
         }
         for booking, traveler in rows
     ]
