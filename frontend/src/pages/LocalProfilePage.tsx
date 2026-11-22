@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useGoBack } from '../utils/backNavigation';
 import { Header } from '../components/common/Header';
 import { Footer } from '../components/common/Footer';
@@ -32,6 +32,13 @@ import { experienceDetailPath, experienceSlugPath } from '../utils/canonicalExpe
 import { ImageLightbox } from '../components/common/ImageLightbox';
 import guidesApi, { type GuideProfile } from '../services/guidesApi';
 import type { Guide } from '../data/types';
+import { useAuthStore } from '../store/authStore';
+import {
+  readGuideDraft,
+  subscribeGuideDraft,
+  writeGuideDraft,
+  type GuideProfileDraft,
+} from '../utils/guideProfileDraft';
 
 const PLACEHOLDER_IMAGE = '/images/placeholder.svg';
 
@@ -217,6 +224,12 @@ const GuideProfilePage: React.FC = () => {
   const goBack = useGoBack();
   const { formatPrice } = useCurrency();
 
+  // `?preview=1` opens the guide's own editable, unsaved preview of this page.
+  const [searchParams] = useSearchParams();
+  const isPreview = searchParams.get('preview') === '1';
+  const email = useAuthStore((state) => state.user?.email);
+  const [draft, setDraft] = useState<GuideProfileDraft>({});
+
   const [profile, setProfile] = useState<GuideProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isBioExpanded, setIsBioExpanded] = useState(false);
@@ -275,7 +288,22 @@ const GuideProfilePage: React.FC = () => {
     };
   }, [slug, id]);
 
-  const view = useMemo(() => buildView(profile, staticGuide), [profile, staticGuide]);
+  useEffect(() => {
+    if (!isPreview) return;
+    setDraft(readGuideDraft(email));
+    return subscribeGuideDraft(email, (next) => setDraft(next));
+  }, [isPreview, email]);
+
+  const view = useMemo(() => {
+    const base = buildView(profile, staticGuide);
+    if (!isPreview) return base;
+    // Unsaved edits from Account Settings are overlaid on the saved profile.
+    return {
+      ...base,
+      bio: draft.bio ?? base.bio,
+      image: draft.avatarUrl || base.image,
+    };
+  }, [profile, staticGuide, isPreview, draft]);
 
   if (loading) {
     return (
@@ -341,6 +369,13 @@ const GuideProfilePage: React.FC = () => {
   const responseTime = view.responseTime || 'within a few hours';
   const ratingStars = Math.round(view.rating);
   const hasLongBio = view.bio.length > 360;
+  const tripSupport =
+    (isPreview ? draft.tripSupport ?? profile?.trip_support : profile?.trip_support) || '';
+
+  const setDraftField = (patch: GuideProfileDraft) => {
+    setDraft((current) => ({ ...current, ...patch }));
+    writeGuideDraft(email, patch, 'preview');
+  };
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -362,7 +397,63 @@ const GuideProfilePage: React.FC = () => {
       <Header />
 
       <main id="main-content" className="flex-grow bg-gray-50/50">
+        {isPreview && (
+          <div className="border-b border-amber-200 bg-amber-50">
+            <div className="container mx-auto max-w-6xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-sm">
+              <span className="font-bold text-amber-900">
+                Live preview — unsaved changes. Nothing here is published yet.
+              </span>
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/account"
+                  className="rounded-full border border-amber-300 bg-white px-3 py-1.5 text-xs font-bold text-amber-900 hover:bg-amber-100 transition-colors"
+                >
+                  Edit in account settings
+                </Link>
+                <button
+                  onClick={() => navigate(`/guidesprofile/${profileSlug}`)}
+                  className="rounded-full bg-[#213448] px-3 py-1.5 text-xs font-bold text-white hover:bg-[#1a2a3a] transition-colors"
+                >
+                  Exit preview
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="container mx-auto px-4 py-8 max-w-6xl">
+          {isPreview && (
+            <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50/70 p-4 sm:p-5">
+              <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+                <h2 className="text-xs font-bold uppercase tracking-wide text-amber-900">
+                  Edit this preview
+                </h2>
+                <span className="text-xs text-amber-800">
+                  Typing here updates Account Settings too. Save there to publish.
+                </span>
+              </div>
+              <label className="block text-xs font-bold text-gray-600 uppercase">
+                Bio
+                <textarea
+                  rows={3}
+                  value={draft.bio ?? view.bio}
+                  onChange={(e) => setDraftField({ bio: e.target.value })}
+                  className="mt-1 w-full resize-y rounded-lg border border-gray-200 px-3 py-2 text-sm font-normal normal-case text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-yellow"
+                />
+              </label>
+              <label className="mt-3 block text-xs font-bold text-gray-600 uppercase">
+                Trip support
+                <textarea
+                  rows={3}
+                  value={draft.tripSupport ?? profile?.trip_support ?? ''}
+                  onChange={(e) => setDraftField({ tripSupport: e.target.value })}
+                  className="mt-1 w-full resize-y rounded-lg border border-gray-200 px-3 py-2 text-sm font-normal normal-case text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-yellow"
+                />
+              </label>
+              <p className="mt-2 text-xs text-amber-800">
+                Photo and certificates are edited in Account Settings.
+              </p>
+            </div>
+          )}
           <button
             onClick={goBack}
             className="flex items-center gap-2 font-bold text-gray-600 transition-colors hover:text-[#213448] hover:bg-white/20 px-4 py-2 rounded-full"
@@ -664,10 +755,10 @@ const GuideProfilePage: React.FC = () => {
               </section>
 
               {/* Trip Support Section */}
-              {profile?.trip_support && (
+              {tripSupport && (
                 <section className="space-y-3 pt-8 border-t border-gray-200">
                   <h2 className="text-2xl font-bold text-gray-900">Trip Support</h2>
-                  <p className="whitespace-pre-line text-gray-600">{profile.trip_support}</p>
+                  <p className="whitespace-pre-line text-gray-600">{tripSupport}</p>
                 </section>
               )}
 

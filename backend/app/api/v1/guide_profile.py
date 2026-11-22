@@ -10,9 +10,11 @@ Documents are keyed on the catalog ``guides.id`` (the row the public profile
 page is addressed by), so the profile page can surface them.  The signed-in
 account is mapped to that catalog row through ``host_guides``.
 """
+import re
+import unicodedata
 from typing import Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -57,6 +59,13 @@ def _catalog_guide_for_user(db: Session, user: User) -> Optional[Guide]:
     return db.get(Guide, int(row[0]))
 
 
+def _profile_slug(name: Optional[str]) -> str:
+    """The public ``/guidesprofile/:slug`` URL for a guide's name."""
+    normalized = unicodedata.normalize("NFKD", str(name or ""))
+    ascii_name = normalized.encode("ascii", "ignore").decode("ascii").lower()
+    return re.sub(r"[^a-z0-9]+", "-", ascii_name).strip("-") or "guide"
+
+
 def _documents(db: Session, guide_id: int) -> list[dict]:
     rows = (
         db.query(GuideProfileDocument)
@@ -88,10 +97,11 @@ def get_my_profile(
     """
     guide = _catalog_guide_for_user(db, user)
     if guide is None:
-        return {"profile_documents": [], "trip_support": ""}
+        return {"profile_documents": [], "trip_support": "", "public_slug": ""}
     return {
         "profile_documents": _documents(db, guide.id),
         "trip_support": guide.trip_support or "",
+        "public_slug": _profile_slug(guide.name),
     }
 
 
@@ -117,7 +127,7 @@ def update_trip_support(
     db.commit()
     db.refresh(guide)
 
-    return {"trip_support": guide.trip_support or ""}
+    return {"trip_support": guide.trip_support or "", "public_slug": _profile_slug(guide.name)}
 
 
 @router.put("/")
@@ -127,7 +137,9 @@ def upload_certificate(
     certificate: Optional[UploadFile] = File(
         None, description="Certificate / document image (JPG, PNG, WebP, PDF)"
     ),
-    certificate_label: Optional[str] = None,
+    certificate_label: Optional[str] = Form(
+        None, description="Optional label shown next to the document"
+    ),
 ) -> dict:
     """Upload a certificate/document for the guide's public profile.
 

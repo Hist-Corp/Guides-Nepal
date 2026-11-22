@@ -26,6 +26,12 @@ export default defineConfig({
         target: backendTarget,
         changeOrigin: true,
       },
+      // Uploaded guide documents are referenced as /uploads/... by the profile
+      // pages; without this they fall through to the SPA index.html.
+      '/uploads': {
+        target: backendTarget,
+        changeOrigin: true,
+      },
     },
   },
   plugins: [react(), tsconfigPaths()],

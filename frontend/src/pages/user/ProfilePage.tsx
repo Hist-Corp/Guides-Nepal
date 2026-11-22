@@ -7,6 +7,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useBookingStore } from '../../store/bookingStore';
 import { useProfileStore } from '../../store/profileStore';
 import { listConversations } from '../../services/messageApi';
+import { useAvatarUpload } from '../../hooks/useAvatarUpload';
 import { Camera, Trash2, Bookmark, MapPin, Calendar, User as UserIcon, ArrowLeft, MessageCircle, Clock } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
@@ -15,7 +16,12 @@ const ProfilePage: React.FC = () => {
   const { bookings } = useBookingStore();
   const { profile, updateProfile, addPhoto, removePhoto } = useProfileStore();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const avatarInputRef = useRef<HTMLInputElement | null>(null);
+  const {
+    inputRef: avatarInputRef,
+    uploading: uploadingAvatar,
+    error: avatarError,
+    onChange: onAvatarChange,
+  } = useAvatarUpload();
   const [form, setForm] = useState({
     firstName: profile.firstName || user?.firstName || '',
     lastName: profile.lastName || user?.lastName || '',
@@ -80,43 +86,6 @@ const ProfilePage: React.FC = () => {
     e.target.value = '';
   };
 
-  const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-    const file = files[0];
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const headers: Record<string, string> = {};
-      if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
-      const res = await fetch(`${API_BASE}/photos/upload`, {
-        method: 'POST',
-        headers,
-        body: formData
-      });
-      if (res.ok) {
-        const data = await res.json();
-        updateProfile({ avatarUrl: data.url });
-      } else {
-        const reader = new FileReader();
-        reader.onload = (r) => {
-          const dataUrl = r.target?.result as string;
-          if (dataUrl) updateProfile({ avatarUrl: dataUrl });
-        };
-        reader.readAsDataURL(file);
-      }
-    } catch {
-      const reader = new FileReader();
-      reader.onload = (r) => {
-        const dataUrl = r.target?.result as string;
-        if (dataUrl) updateProfile({ avatarUrl: dataUrl });
-      };
-      reader.readAsDataURL(file);
-    } finally {
-      e.target.value = '';
-    }
-  };
-
   useEffect(() => {
     const loadRemote = async () => {
       try {
@@ -133,12 +102,9 @@ const ProfilePage: React.FC = () => {
           bio: data.bio,
           avatarUrl: data.avatarUrl
         });
-        login({
-          firstName: data.firstName || '',
-          lastName: data.lastName || '',
-          email: data.email || '',
-          phone: data.phone || ''
-        });
+        if (data.avatarUrl && user && data.avatarUrl !== user.avatarUrl) {
+          login({ ...user, avatarUrl: data.avatarUrl });
+        }
         setForm({
           firstName: data.firstName || '',
           lastName: data.lastName || '',
@@ -192,15 +158,24 @@ const ProfilePage: React.FC = () => {
                   <p className="text-gray-500 text-sm">{profile.email || user?.email || form.email || 'Add your email'}</p>
                 </div>
                 <div className="ml-auto">
+                  <button
+                    onClick={() => avatarInputRef.current?.click()}
+                    disabled={uploadingAvatar}
+                    className="px-3 py-2 rounded-full bg-gray-100 text-gray-800 text-sm font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors disabled:opacity-50"
+                  >
+                    <Camera className="w-4 h-4" /> {uploadingAvatar ? 'Uploading…' : 'Change photo'}
+                  </button>
                   <input
                     ref={avatarInputRef}
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
                     className="hidden"
                     onChange={onAvatarChange}
+                    aria-label="Profile photo"
                   />
                 </div>
               </div>
+              {avatarError && <p className="mb-4 text-sm text-red-600">{avatarError}</p>}
 
               <div className="space-y-3">
                 <div>

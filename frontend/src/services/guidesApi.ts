@@ -67,6 +67,8 @@ export interface GuideProfile extends Guide {
 export interface GuideProfileDocsResponse {
   profile_documents: GuideProfileDocument[];
   trip_support?: string;
+  /** Public `/guidesprofile/:slug` address, used by the live preview. */
+  public_slug?: string;
 }
 
 export interface Experience {
@@ -158,7 +160,7 @@ export const guidesApi = {
   updateTripSupport: async (
     token: string,
     tripSupport: string,
-  ): Promise<{ trip_support: string }> => {
+  ): Promise<{ trip_support: string; public_slug?: string }> => {
     const { data } = await axios.put(
       `${API_BASE_URL}/guide/profile/support`,
       { trip_support: tripSupport },

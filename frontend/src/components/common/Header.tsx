@@ -273,7 +273,9 @@ export const Header: React.FC = () => {
                     className="h-10 flex items-center gap-2 text-gray-800 transition-all duration-200"
                   >
                     <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-300 transition-all duration-200 hover:scale-110 hover:shadow-md hover:bg-yellow-100 hover:border-yellow-200">
-                      {user?.firstName ? (
+                      {user?.avatarUrl ? (
+                        <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                      ) : user?.firstName ? (
                         <span className="font-bold text-sm text-gray-700">{user.firstName[0]}</span>
                       ) : (
                         <User className="w-5 h-5 text-gray-500" />
@@ -469,7 +471,9 @@ export const Header: React.FC = () => {
                     className="w-10 h-10 bg-white hover:bg-yellow-50 text-gray-800 rounded-full flex items-center justify-center transition-colors shadow-sm"
                   >
                     <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border border-gray-300 transition-all duration-200 hover:scale-110 hover:bg-yellow-100 hover:border-yellow-200">
-                      {user?.firstName ? (
+                      {user?.avatarUrl ? (
+                        <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                      ) : user?.firstName ? (
                         <span className="font-bold text-sm text-gray-700">{user.firstName[0]}</span>
                       ) : (
                         <User className="w-5 h-5 text-gray-500" />

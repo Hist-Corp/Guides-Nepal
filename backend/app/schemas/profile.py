@@ -9,7 +9,6 @@ class ProfileUpdate(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     bio: Optional[str] = None
-    avatar_url: Optional[str] = None
 
 
 class BookmarkBase(BaseModel):

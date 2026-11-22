@@ -18,6 +18,8 @@ class GuideProfileDocsResponse(BaseModel):
     profile_documents: List[GuideProfileDoc] = []
     # Free text the guide wrote about the support they offer during a trip.
     trip_support: str = ""
+    # Public profile URL slug, used to open the live preview.
+    public_slug: str = ""
 
 
 class GuideProfileDocDeleteResponse(BaseModel):
@@ -30,3 +32,4 @@ class GuideTripSupportUpdate(BaseModel):
 
 class GuideTripSupportResponse(BaseModel):
     trip_support: str = ""
+    public_slug: str = ""

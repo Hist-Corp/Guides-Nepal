@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGoBack } from '../../utils/backNavigation';
 import { Header } from '../../components/common/Header';
@@ -6,6 +6,10 @@ import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import { useBookingStore } from '../../store/bookingStore';
 import GuideProfileSection from '../../components/guide/GuideProfileSection';
+import InlineMessage from '../../components/common/InlineMessage';
+import { isSafeImageUrl, useAvatarUpload } from '../../hooks/useAvatarUpload';
+import { slugifyGuideName } from '../../utils/guideUrl';
+import { subscribeGuideDraft, writeGuideDraft } from '../../utils/guideProfileDraft';
 import {
   User as UserIcon,
   Mail,
@@ -13,11 +17,10 @@ import {
   Camera,
   Lock,
   LogOut,
-  Check,
-  AlertCircle,
   UserCog,
   Eye,
   EyeOff,
+  X,
   ArrowLeft,
 } from 'lucide-react';
 
@@ -27,7 +30,6 @@ const AccountSettingsPage: React.FC = () => {
   const { user, login, accessToken, logout } = useAuthStore();
   const navigate = useNavigate();
   const goBack = useGoBack();
-  const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
   // Profile form state
   const [form, setForm] = useState({
@@ -37,9 +39,10 @@ const AccountSettingsPage: React.FC = () => {
     phone: user?.phone || '',
     bio: '',
   });
-  const [avatarUrl, setAvatarUrl] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ type: 'ok' | 'error'; text: string } | null>(null);
+  const [previewSlug, setPreviewSlug] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   // Password form state
   const [currentPassword, setCurrentPassword] = useState('');
@@ -53,6 +56,7 @@ const AccountSettingsPage: React.FC = () => {
 
   // Load the latest profile from the backend on mount
   useEffect(() => {
+    let cancelled = false;
     const load = async () => {
       try {
         const headers: Record<string, string> = {};
@@ -60,6 +64,7 @@ const AccountSettingsPage: React.FC = () => {
         const res = await fetch(`${API_BASE}/profile/me`, { headers });
         if (!res.ok) return;
         const data = await res.json();
+        if (cancelled) return;
         setForm({
           firstName: data.firstName || '',
           lastName: data.lastName || '',
@@ -67,14 +72,43 @@ const AccountSettingsPage: React.FC = () => {
           phone: data.phone || '',
           bio: data.bio || '',
         });
-        setAvatarUrl(data.avatarUrl || '');
+        // Keep the header avatar in step with the saved profile photo.
+        if (data.avatarUrl && user && data.avatarUrl !== user.avatarUrl) {
+          login({ ...user, avatarUrl: data.avatarUrl });
+        }
+        // Seed the live-preview draft with what is saved right now.
+        writeGuideDraft(user?.email, { bio: data.bio || '' }, 'account');
       } catch {
         // keep local values if the request fails
       }
     };
     load();
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Edits made inside the live preview flow back into this form.
+  useEffect(() => {
+    const email = user?.email;
+    if (!email) return;
+    return subscribeGuideDraft(email, (draft, source) => {
+      if (source !== 'preview') return;
+      setForm((current) => ({ ...current, bio: draft.bio ?? current.bio }));
+    });
+  }, [user?.email]);
+
+  const updateField = (key: 'firstName' | 'lastName' | 'bio', value: string) => {
+    setForm((current) => ({ ...current, [key]: value }));
+    // Only the bio is shown on the public guide profile.
+    if (key === 'bio') writeGuideDraft(user?.email, { bio: value }, 'account');
+  };
+
+  const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.email || '';
+  const previewHref = `/guidesprofile/${encodeURIComponent(
+    previewSlug || slugifyGuideName(fullName),
+  )}?preview=1`;
 
   const handleSaveProfile = async () => {
     setSavingProfile(true);
@@ -91,11 +125,11 @@ const AccountSettingsPage: React.FC = () => {
           email: form.email,
           phone: form.phone,
           bio: form.bio,
-          avatar_url: avatarUrl,
         }),
       });
       if (res.ok) {
         login({ ...user, firstName: form.firstName, lastName: form.lastName, email: form.email, phone: form.phone });
+        writeGuideDraft(user?.email, { bio: form.bio }, 'account');
         setProfileMsg({ type: 'ok', text: 'Profile updated successfully.' });
       } else {
         const data = await res.json().catch(() => ({}));
@@ -108,35 +142,19 @@ const AccountSettingsPage: React.FC = () => {
     }
   };
 
+  const {
+    inputRef: avatarInputRef,
+    uploading: uploadingAvatar,
+    error: avatarError,
+    onChange: uploadAvatar,
+  } = useAvatarUpload();
+
   const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-    const file = files[0];
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const headers: Record<string, string> = {};
-      if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
-      const res = await fetch(`${API_BASE}/profile/photos/upload`, {
-        method: 'POST',
-        headers,
-        body: formData,
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setAvatarUrl(data.url);
-      } else {
-        const reader = new FileReader();
-        reader.onload = (r) => r.target?.result && setAvatarUrl(r.target.result as string);
-        reader.readAsDataURL(file);
-      }
-    } catch {
-      const reader = new FileReader();
-      reader.onload = (r) => r.target?.result && setAvatarUrl(r.target.result as string);
-      reader.readAsDataURL(file);
-    } finally {
-      e.target.value = '';
-    }
+    setProfileMsg(null);
+    const url = await uploadAvatar(e);
+    if (!url) return;
+    writeGuideDraft(user?.email, { avatarUrl: url }, 'account');
+    setProfileMsg({ type: 'ok', text: 'Profile photo updated.' });
   };
 
   const handleChangePassword = async () => {
@@ -192,16 +210,7 @@ const AccountSettingsPage: React.FC = () => {
     navigate('/');
   };
 
-  const isSafeImageUrl = (url: string): boolean => {
-    if (!url) return false;
-    const trimmed = url.trim();
-    const lower = trimmed.toLowerCase();
-    if (lower.startsWith('http://') || lower.startsWith('https://')) return true;
-    if (trimmed.startsWith('/')) return true;
-    if (lower.startsWith('data:image/')) return true;
-    return false;
-  };
-  const safeAvatarUrl = isSafeImageUrl(avatarUrl) ? avatarUrl : '';
+  const safeAvatarUrl = isSafeImageUrl(user?.avatarUrl) ? (user?.avatarUrl as string) : '';
 
   const inputClass =
     'w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-yellow';
@@ -214,37 +223,37 @@ const AccountSettingsPage: React.FC = () => {
       <Header />
       <main id="main-content" className="flex-grow container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
-          <div className="mb-2">
-            <button
-              onClick={goBack}
-              className="px-3 py-2 rounded-full bg-gray-100 text-gray-800 text-sm font-bold hover:bg-gray-200 transition-colors flex items-center gap-1 mb-3"
-            >
-              <ArrowLeft className="w-4 h-4" /> Back
-            </button>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <UserCog className="w-6 h-6 text-primary" /> Account Settings
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Manage your personal details, avatar, password, and public guide profile.
-            </p>
+          <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <button
+                onClick={goBack}
+                className="px-3 py-2 rounded-full bg-gray-100 text-gray-800 text-sm font-bold hover:bg-gray-200 transition-colors flex items-center gap-1 mb-3"
+              >
+                <ArrowLeft className="w-4 h-4" /> Back
+              </button>
+              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <UserCog className="w-6 h-6 text-primary" /> Account Settings
+              </h1>
+              <p className="text-sm text-gray-500 mt-1">
+                Manage your personal details, avatar, password, and public guide profile.
+              </p>
+            </div>
+            {user?.role === 'guide' && (
+              <button
+                onClick={() => setShowPreview(true)}
+                className="shrink-0 px-4 py-2 rounded-full bg-primary text-white text-sm font-bold hover:bg-primary-hover transition-colors flex items-center gap-2"
+              >
+                <Eye className="w-4 h-4" /> Edit live preview
+              </button>
+            )}
           </div>
 
           {/* Profile Information */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 sm:p-8">
             <h2 className="text-lg font-bold text-gray-900 mb-4">Profile Information</h2>
 
-            {profileMsg && (
-              <div
-                className={`mb-4 flex items-start gap-2 rounded-lg px-3 py-2 text-sm ${
-                  profileMsg.type === 'ok'
-                    ? 'bg-green-50 border border-green-200 text-green-700'
-                    : 'bg-red-50 border border-red-200 text-red-700'
-                }`}
-              >
-                {profileMsg.type === 'ok' ? <Check className="w-4 h-4 mt-0.5 shrink-0" /> : <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />}
-                <span className="min-w-0 break-words">{profileMsg.text}</span>
-              </div>
-            )}
+            {profileMsg && <InlineMessage type={profileMsg.type} text={profileMsg.text} />}
+            {avatarError && <InlineMessage type="error" text={avatarError} />}
 
             {/* Avatar row */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-3 mb-6">
@@ -259,16 +268,18 @@ const AccountSettingsPage: React.FC = () => {
               </div>
               <button
                 onClick={() => avatarInputRef.current?.click()}
-                className="px-3 py-2 rounded-full bg-gray-100 text-gray-800 text-sm font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors"
+                disabled={uploadingAvatar}
+                className="px-3 py-2 rounded-full bg-gray-100 text-gray-800 text-sm font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors disabled:opacity-50"
               >
-                <Camera className="w-4 h-4 shrink-0" /> Change photo
+                <Camera className="w-4 h-4 shrink-0" /> {uploadingAvatar ? 'Uploading…' : 'Change photo'}
               </button>
               <input
                 ref={avatarInputRef}
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp,image/gif"
                 className="hidden"
                 onChange={onAvatarChange}
+                aria-label="Profile photo"
               />
             </div>
 
@@ -276,11 +287,11 @@ const AccountSettingsPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 sm:gap-x-6 gap-y-4">
               <div>
                 <label className={labelClass}>First Name</label>
-                <input className={inputClass} value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} />
+                <input className={inputClass} value={form.firstName} onChange={(e) => updateField('firstName', e.target.value)} />
               </div>
               <div>
                 <label className={labelClass}>Last Name</label>
-                <input className={inputClass} value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} />
+                <input className={inputClass} value={form.lastName} onChange={(e) => updateField('lastName', e.target.value)} />
               </div>
               <div>
                 <label className={labelClass}>Email</label>
@@ -299,7 +310,7 @@ const AccountSettingsPage: React.FC = () => {
                 rows={3}
                 className={inputClass + ' resize-y'}
                 value={form.bio}
-                onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                onChange={(e) => updateField('bio', e.target.value)}
                 placeholder="Tell us about your travel preferences..."
               />
             </div>
@@ -316,7 +327,7 @@ const AccountSettingsPage: React.FC = () => {
           </div>
 
           {/* Guide-only: Trip Support and certificates shown on the public profile */}
-          {user?.role === 'guide' && <GuideProfileSection />}
+          {user?.role === 'guide' && <GuideProfileSection onPublicSlugChange={setPreviewSlug} />}
 
           {/* Change Password */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 sm:p-8">
@@ -327,18 +338,7 @@ const AccountSettingsPage: React.FC = () => {
               Must be at least 8 characters with an uppercase letter, a number, and a special character.
             </p>
 
-            {pwMsg && (
-              <div
-                className={`mb-4 flex items-start gap-2 rounded-lg px-3 py-2 text-sm ${
-                  pwMsg.type === 'ok'
-                    ? 'bg-green-50 border border-green-200 text-green-700'
-                    : 'bg-red-50 border border-red-200 text-red-700'
-                }`}
-              >
-                {pwMsg.type === 'ok' ? <Check className="w-4 h-4 mt-0.5 shrink-0" /> : <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />}
-                <span className="min-w-0 break-words">{pwMsg.text}</span>
-              </div>
-            )}
+            {pwMsg && <InlineMessage type={pwMsg.type} text={pwMsg.text} />}
 
             <div className="space-y-4">
               <div>
@@ -453,6 +453,35 @@ const AccountSettingsPage: React.FC = () => {
         </div>
       </main>
       <Footer />
+
+      {/* Live preview of the public guide profile, kept beside the editor */}
+      {showPreview && (
+        <div className="fixed inset-0 z-50 flex bg-black/60 sm:p-6">
+          <div className="mx-auto flex h-full w-full max-w-6xl flex-col overflow-hidden bg-white shadow-2xl sm:rounded-2xl">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 bg-gray-50 px-4 py-3">
+              <div>
+                <h2 className="text-sm font-bold text-gray-900">
+                  Live preview of your public profile
+                </h2>
+                <p className="text-xs text-gray-500">
+                  Changes here and in the form stay in sync. Nothing is published until you save.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowPreview(false)}
+                className="rounded-full bg-gray-200 px-3 py-1.5 text-sm font-bold text-gray-800 hover:bg-gray-300 transition-colors flex items-center gap-1"
+              >
+                <X className="w-4 h-4" /> Close preview
+              </button>
+            </div>
+            <iframe
+              title="Public guide profile preview"
+              src={previewHref}
+              className="w-full flex-grow border-0"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
