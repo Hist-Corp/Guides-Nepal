@@ -5,6 +5,7 @@ import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import { useBookingStore } from '../../store/bookingStore';
+import GuideProfileSection from '../../components/guide/GuideProfileSection';
 import {
   User as UserIcon,
   Mail,
@@ -224,7 +225,7 @@ const AccountSettingsPage: React.FC = () => {
               <UserCog className="w-6 h-6 text-primary" /> Account Settings
             </h1>
             <p className="text-sm text-gray-500 mt-1">
-              Manage your personal details, avatar, and password.
+              Manage your personal details, avatar, password, and public guide profile.
             </p>
           </div>
 
@@ -313,6 +314,9 @@ const AccountSettingsPage: React.FC = () => {
               </button>
             </div>
           </div>
+
+          {/* Guide-only: Trip Support and certificates shown on the public profile */}
+          {user?.role === 'guide' && <GuideProfileSection />}
 
           {/* Change Password */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 sm:p-8">

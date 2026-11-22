@@ -25,6 +25,8 @@ from app.models.user import User
 from app.schemas.guide_profile import (
     GuideProfileDocDeleteResponse,
     GuideProfileDocsResponse,
+    GuideTripSupportResponse,
+    GuideTripSupportUpdate,
 )
 from app.services.guide_profile_service import (
     GUIDE_PROFILE_UPLOAD_ROOT,
@@ -86,8 +88,36 @@ def get_my_profile(
     """
     guide = _catalog_guide_for_user(db, user)
     if guide is None:
-        return {"profile_documents": []}
-    return {"profile_documents": _documents(db, guide.id)}
+        return {"profile_documents": [], "trip_support": ""}
+    return {
+        "profile_documents": _documents(db, guide.id),
+        "trip_support": guide.trip_support or "",
+    }
+
+
+@router.put("/support", response_model=GuideTripSupportResponse)
+def update_trip_support(
+    payload: GuideTripSupportUpdate,
+    user: User = Depends(GUIDE_ONLY),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Save the trip support text the guide writes from their profile page."""
+    guide = _catalog_guide_for_user(db, user)
+    if guide is None:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "No public guide profile is linked to this account yet. "
+                "Ask your host to finish setting up your guide profile."
+            ),
+        )
+
+    text = (payload.trip_support or "").strip()
+    guide.trip_support = text or None
+    db.commit()
+    db.refresh(guide)
+
+    return {"trip_support": guide.trip_support or ""}
 
 
 @router.put("/")
@@ -135,7 +165,10 @@ def upload_certificate(
         guide.gallery = gallery
         db.commit()
 
-    return {"profile_documents": _documents(db, guide.id)}
+    return {
+        "profile_documents": _documents(db, guide.id),
+        "trip_support": guide.trip_support or "",
+    }
 
 
 @router.delete(

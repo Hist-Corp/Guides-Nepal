@@ -60,10 +60,13 @@ export interface GuideProfile extends Guide {
   };
   experiences: GuideProfileExperience[];
   profile_documents?: GuideProfileDocument[];
+  /** Support the guide offers travellers during a trip, written by the guide. */
+  trip_support?: string | null;
 }
 
 export interface GuideProfileDocsResponse {
   profile_documents: GuideProfileDocument[];
+  trip_support?: string;
 }
 
 export interface Experience {
@@ -148,6 +151,19 @@ export const guidesApi = {
     const { data } = await axios.put(`${API_BASE_URL}/guide/profile/`, form, {
       headers: { Authorization: `Bearer ${token}` },
     });
+    return data;
+  },
+
+  // Save the "Trip Support" text shown on the public profile.
+  updateTripSupport: async (
+    token: string,
+    tripSupport: string,
+  ): Promise<{ trip_support: string }> => {
+    const { data } = await axios.put(
+      `${API_BASE_URL}/guide/profile/support`,
+      { trip_support: tripSupport },
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
     return data;
   },
 

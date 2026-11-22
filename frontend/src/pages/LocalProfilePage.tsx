@@ -663,6 +663,14 @@ const GuideProfilePage: React.FC = () => {
                 )}
               </section>
 
+              {/* Trip Support Section */}
+              {profile?.trip_support && (
+                <section className="space-y-3 pt-8 border-t border-gray-200">
+                  <h2 className="text-2xl font-bold text-gray-900">Trip Support</h2>
+                  <p className="whitespace-pre-line text-gray-600">{profile.trip_support}</p>
+                </section>
+              )}
+
               {/* Certificates Section */}
               {profile?.profile_documents && profile.profile_documents.length > 0 && (
                 <section className="space-y-6 pt-8 border-t border-gray-200">

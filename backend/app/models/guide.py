@@ -13,6 +13,8 @@ class Guide(Base):
     rating = Column(Float, nullable=False, default=0.0)
     reviews = Column(Integer, nullable=False, default=0)
     bio = Column(Text, nullable=False)
+    # Free text the guide writes about the support they give during a trip.
+    trip_support = Column(Text, nullable=True)
     languages = Column(JSON, nullable=False, default=list)
     verified = Column(Boolean, default=False)
     lives_in = Column(String, nullable=True)

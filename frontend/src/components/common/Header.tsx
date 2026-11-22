@@ -516,13 +516,7 @@ export const Header: React.FC = () => {
                           >
                             My list
                           </Link>
-                          <Link
-                            to="/guide/profile"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary"
-                            onClick={() => setIsProfileDropdownOpen(false)}
-                          >
-                            Profile
-                          </Link>
+
                           <Link
                             to="/messages"
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center gap-2"
@@ -687,7 +681,7 @@ export const Header: React.FC = () => {
                                 My list
                               </Link>
                               <Link
-                                to="/guide/profile"
+                                to="/account"
                                 className="block px-4 py-2 text-gray-800 font-medium hover:text-secondary hover:bg-secondary/10 rounded-lg transition-colors mx-2"
                                 onClick={() => setIsMenuOpen(false)}
                               >

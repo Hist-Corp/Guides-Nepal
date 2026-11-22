@@ -1087,6 +1087,8 @@ def _guide_profile_payload(db: Session, guide: Guide) -> dict:
     }
     # Certs/documents the guide uploaded for their profile.
     payload["profile_documents"] = _guide_profile_documents(db, guide)
+    # Trip support text the guide wrote about helping travellers on a trip.
+    payload["trip_support"] = guide.trip_support or None
     return payload
 
 

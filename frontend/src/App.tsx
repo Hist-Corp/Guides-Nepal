@@ -69,7 +69,6 @@ import RegionalExperienceRequestReview from './pages/regional/RegionalExperience
 import BookingsPage from './pages/user/BookingsPage';
 import FindGuidePage from './pages/user/FindGuidePage';
 import GuideBookingsPage from './pages/guide/GuideBookingsPage';
-import GuideProfileSettingsPage from './pages/guide/GuideProfileSettingsPage';
 import GuideAvailabilityPage from './pages/guide/GuideAvailabilityPage';
 import RoleProfilePage from './pages/user/RoleProfilePage';
 import PublicGuideListingsPage from './pages/user/PublicGuideListingsPage';
@@ -183,7 +182,9 @@ function App() {
             <Route path="/guide/proposals/:id/edit" element={<GuideProposalFormPage />} />
             <Route path="/guide/change-requests/:id" element={<GuideChangeRequestDetailPage />} />
             <Route path="/guide/bookings" element={<GuideBookingsPage />} />
-            <Route path="/guide/profile" element={<GuideProfileSettingsPage />} />
+            {/* Guide profile settings now live with the rest of the account
+                settings; keep the old URL working. */}
+            <Route path="/guide/profile" element={<Navigate to="/account" replace />} />
             <Route path="/guide/availability" element={<GuideAvailabilityPage />} />
             <Route path="/regional/guide-applications" element={<RegionalGuideApplications />} />
             <Route
