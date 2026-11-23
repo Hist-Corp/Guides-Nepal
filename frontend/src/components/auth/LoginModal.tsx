@@ -30,17 +30,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  // Freeze the page behind the modal so scrolling outside the card doesn't
-  // move the blurred background (same pattern as CurrencyPickerModal).
-  useEffect(() => {
-    if (!isOpen) return;
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [isOpen]);
-
   if (!isOpen) return null;
 
   const validateEmail = (email: string) => {
@@ -244,8 +233,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
-              {passwordError && <div className="text-red-600 text-xs mt-1">{passwordError}</div>}
             </div>
+            {passwordError && <div className="text-red-600 text-xs mt-1">{passwordError}</div>}
 
             {error && <div className="text-red-600 text-sm">{error}</div>}
 

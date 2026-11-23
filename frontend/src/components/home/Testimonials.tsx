@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Card } from '../common/Card';
 import { SafeImage } from '../common/SafeImage';
 import { Reveal } from '../common/Reveal';
@@ -43,27 +43,58 @@ export const Testimonials: React.FC = () => {
   const subtitle = cms?.content?.subtitle || 'Real reviews from real travelers in Nepal';
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const handleScroll = () => {
+  const [cardsPerView, setCardsPerView] = useState(1);
+
+  // Detect how many cards fit in the viewport at each breakpoint so we can
+  // enable/disable the prev/next buttons only when there are hidden cards.
+  useEffect(() => {
+    const updateCardsPerView = () => {
+      const width = window.innerWidth;
+      if (width >= 1024) {
+        // lg breakpoint — 3 cards per view
+        setCardsPerView(3);
+      } else if (width >= 768) {
+        // md breakpoint — 2 cards per view
+        setCardsPerView(2);
+      } else {
+        // mobile — 1 card per view
+        setCardsPerView(1);
+      }
+    };
+    updateCardsPerView();
+    window.addEventListener('resize', updateCardsPerView);
+    return () => window.removeEventListener('resize', updateCardsPerView);
+  }, []);
+
+  const maxScrollIndex = Math.max(0, testimonials.length - cardsPerView);
+  const isPrevDisabled = activeIndex <= 0;
+  const isNextDisabled = activeIndex >= maxScrollIndex;
+
+  const handleScroll = useCallback(() => {
     if (scrollContainerRef.current) {
       const card = scrollContainerRef.current.firstElementChild as HTMLElement;
       const cardWidth = card ? card.offsetWidth + 16 : scrollContainerRef.current.clientWidth;
       const { scrollLeft } = scrollContainerRef.current;
       const index = Math.round(scrollLeft / cardWidth);
-      setActiveIndex(Math.min(Math.max(0, index), testimonials.length - 1));
+      setActiveIndex(Math.min(Math.max(0, index), maxScrollIndex));
     }
-  };
+  }, [maxScrollIndex]);
 
-  const scrollToIndex = (index: number) => {
-    if (scrollContainerRef.current) {
-      const card = scrollContainerRef.current.firstElementChild as HTMLElement;
-      const cardWidth = card ? card.offsetWidth + 16 : scrollContainerRef.current.clientWidth;
-      scrollContainerRef.current.scrollTo({
-        left: index * cardWidth,
-        behavior: 'smooth',
-      });
-      setActiveIndex(index);
-    }
-  };
+  const scrollToIndex = useCallback(
+    (index: number) => {
+      if (scrollContainerRef.current) {
+        const card = scrollContainerRef.current.firstElementChild as HTMLElement;
+        const cardWidth = card ? card.offsetWidth + 16 : scrollContainerRef.current.clientWidth;
+        const clampedIndex = Math.min(Math.max(0, index), maxScrollIndex);
+        scrollContainerRef.current.scrollTo({
+          left: clampedIndex * cardWidth,
+          behavior: 'smooth',
+        });
+        setActiveIndex(clampedIndex);
+      }
+    },
+    [maxScrollIndex]
+  );
   return (
     <section
       data-cms-id="home-testimonials"
@@ -82,30 +113,32 @@ export const Testimonials: React.FC = () => {
         {/* Responsive scroll: 1/2/3 cards per view with prev/next */}
         <div className="relative px-12">
           <button
-            onClick={() => scrollToIndex(Math.max(0, activeIndex - 1))}
-            disabled={activeIndex === 0}
-            className={`hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center border border-slate-200 transition-colors ${activeIndex === 0 ? 'text-slate-300 cursor-not-allowed opacity-50' : 'text-slate-700 hover:bg-slate-50'}`}
+            onClick={() => scrollToIndex(activeIndex - 1)}
+            disabled={isPrevDisabled}
             aria-label="Previous testimonial"
+            className={`absolute top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center border border-slate-200 transition-colors left-0 ${isPrevDisabled ? 'text-slate-300 cursor-not-allowed opacity-50' : 'text-slate-700 hover:bg-slate-50'}`}
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <div
             ref={scrollContainerRef}
             onScroll={handleScroll}
-            className="flex overflow-x-auto gap-4 pb-4 px-2 snap-x snap-mandatory lg:overflow-visible lg:justify-center [&::-webkit-scrollbar]:hidden"
+            className="flex overflow-x-auto gap-4 pb-4 px-2 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {testimonials.map((testimonial) => (
               <div
                 key={testimonial.id}
-                className="flex-shrink-0 w-full lg:max-w-[calc(33.333%-1rem)] snap-center"
+                className="flex-shrink-0 w-full snap-center md:max-w-[calc(50%-0.5rem)] lg:max-w-[calc(33.333%-0.67rem)]"
               >
                 <Card className="group p-6 border-none shadow-sm h-full flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                   <div>
                     <div className="text-primary text-4xl font-serif mb-4 leading-none transition-all duration-300 group-hover:scale-110 group-hover:text-brand-yellow">
                       “
                     </div>
-                    <p className="text-slate-700 mb-6 italic leading-relaxed">{testimonial.quote}</p>
+                    <p className="text-slate-700 mb-6 italic leading-relaxed">
+                      {testimonial.quote}
+                    </p>
                   </div>
                   <div className="flex items-center gap-3">
                     <SafeImage
@@ -125,15 +158,14 @@ export const Testimonials: React.FC = () => {
             ))}
           </div>
           <button
-            onClick={() => scrollToIndex(Math.min(testimonials.length - 1, activeIndex + 1))}
-            disabled={activeIndex >= testimonials.length - 1}
-            className={`hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center border border-slate-200 transition-colors ${activeIndex >= testimonials.length - 1 ? 'text-slate-300 cursor-not-allowed opacity-50' : 'text-slate-700 hover:bg-slate-50'}`}
+            onClick={() => scrollToIndex(activeIndex + 1)}
+            disabled={isNextDisabled}
             aria-label="Next testimonial"
+            className={`absolute top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white shadow-md rounded-full flex items-center justify-center border border-slate-200 transition-colors right-0 ${isNextDisabled ? 'text-slate-300 cursor-not-allowed opacity-50' : 'text-slate-700 hover:bg-slate-50'}`}
           >
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
-
       </div>
     </section>
   );

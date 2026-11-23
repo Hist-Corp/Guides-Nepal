@@ -27,17 +27,6 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Freeze the page behind the modal so scrolling outside the card doesn't
-  // move the blurred background (same pattern as CurrencyPickerModal).
-  useEffect(() => {
-    if (!isOpen) return;
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [isOpen]);
-
   if (!isOpen) return null;
 
   const validateEmail = (value: string) => {

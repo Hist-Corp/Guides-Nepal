@@ -157,17 +157,34 @@ export const Header: React.FC = () => {
     // re-adding it per-scroll would race with rapid scroll events
   }, []);
 
-  // Disable body scroll when menu is open
+  // Disable body scroll when any modal is open (menu, search, auth, currency picker).
+  // Centralising this here prevents race conditions when switching between modals
+  // (e.g. Login → Signup) where one modal's cleanup restores overflow before the
+  // next one re-applies it, briefly letting the background scroll.
   useEffect(() => {
-    if (isMenuOpen || isSearchOpen) {
+    const anyModalOpen =
+      isMenuOpen ||
+      isSearchOpen ||
+      isLoginOpen ||
+      isSignupOpen ||
+      isForgotPasswordOpen ||
+      isCurrencyPickerOpen;
+    if (anyModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
     };
-  }, [isMenuOpen, isSearchOpen]);
+  }, [
+    isMenuOpen,
+    isSearchOpen,
+    isLoginOpen,
+    isSignupOpen,
+    isForgotPasswordOpen,
+    isCurrencyPickerOpen,
+  ]);
 
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const mobileProfileDropdownRef = useRef<HTMLDivElement>(null);
