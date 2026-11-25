@@ -6,6 +6,7 @@ import { Footer } from '../../components/common/Footer';
 import { PageBackButton } from '../../components/common/PageBackButton';
 import { useAuthStore } from '../../store/authStore';
 import hostApi, { type HostBooking } from '../../services/hostApi';
+import { formatDate } from '../../utils/date';
 
 type TabKey = 'all' | 'upcoming' | 'accepted' | 'rejected' | 'completed';
 
@@ -125,8 +126,6 @@ const HostBookingsPage: React.FC = () => {
     );
   };
 
-  const formatDateOnly = (dateStr: string) => new Date(dateStr).toLocaleDateString();
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       <Header />
@@ -213,7 +212,7 @@ const HostBookingsPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-gray-900 text-sm font-medium">
-                      {formatDateOnly(b.date)}
+                      {formatDate(b.date)}
                     </td>
                     <td className="px-6 py-4 text-gray-600 text-sm">
                       <Users className="w-4 h-4 inline mr-1" /> {b.guests}

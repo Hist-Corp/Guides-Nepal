@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react';
+import { getApiUrl } from '../config/api';
+import { toIsoDate } from './date';
 import { useAuthStore } from '../store/authStore';
 import type { Booking } from '../store/bookingStore';
 
@@ -52,6 +55,96 @@ export function isOwnGuide(
     guide.userId !== undefined &&
     Number(guide.userId) === Number(viewerGuideId)
   );
+}
+
+export interface GuideAvailabilityQuery {
+  accessToken?: string | null;
+  experienceId?: number | string | null;
+  date?: string | null;
+  checkout?: string | null;
+  /** Catalog guide ids to check; the response only names the available ones. */
+  guideIds: (number | string)[];
+}
+
+/**
+ * Catalog guide ids with every night of the stay open for this experience.
+ *
+ * `null` when the check cannot be made (signed out, no date, no guides, or the
+ * request failed), so callers keep the list they already have instead of
+ * hiding every guide on a network hiccup.
+ */
+export async function fetchAvailableGuideIds({
+  accessToken,
+  experienceId,
+  date,
+  checkout,
+  guideIds,
+}: GuideAvailabilityQuery): Promise<Set<string> | null> {
+  const first = toIsoDate(date);
+  if (
+    !accessToken ||
+    !first ||
+    experienceId === null ||
+    experienceId === undefined ||
+    !guideIds.length
+  ) {
+    return null;
+  }
+  const params = new URLSearchParams({
+    date: first,
+    experience_id: String(experienceId),
+    guide_ids: guideIds.map(String).join(','),
+  });
+  const last = toIsoDate(checkout);
+  if (last) params.set('checkout', last);
+
+  try {
+    const response = await fetch(
+      getApiUrl(`/bookings/availability/guides?${params.toString()}`),
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    if (!response.ok) return null;
+    const data = await response.json();
+    const ids = Array.isArray(data?.guide_ids) ? data.guide_ids : [];
+    return new Set(ids.map(String));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The guides (from `guideIds`) still bookable for the selected date or stay,
+ * re-read whenever the date, the stay or the guide list changes. `null` while
+ * unknown, so the caller shows the full list until the answer arrives.
+ */
+export function useGuidesAvailableOnDate(
+  query: GuideAvailabilityQuery
+): Set<string> | null {
+  const { accessToken, experienceId, date, checkout } = query;
+  const idsKey = query.guideIds.map(String).join(',');
+  const [available, setAvailable] = useState<Set<string> | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!date || !accessToken || !idsKey) {
+      setAvailable(null);
+      return;
+    }
+    void fetchAvailableGuideIds({
+      accessToken,
+      experienceId,
+      date,
+      checkout,
+      guideIds: idsKey.split(','),
+    }).then((ids) => {
+      if (!cancelled) setAvailable(ids);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken, experienceId, date, checkout, idsKey]);
+
+  return available;
 }
 
 /**

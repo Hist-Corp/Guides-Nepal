@@ -10,6 +10,7 @@ import {
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { Button } from '../../components/common/Button';
+import { formatDate } from '../../utils/date';
 import { useAuthStore } from '../../store/authStore';
 import { guideDashboardApi, GuideExperienceRequest, GuideExperienceRequestReview } from '../../services/guideDashboardApi';
 
@@ -219,7 +220,7 @@ const RegionalExperienceRequestReview: React.FC = () => {
                     {req.booking_date && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-medium text-gray-500">Date</span>
-                        <span className="text-sm text-gray-600">{new Date(req.booking_date).toLocaleDateString()}</span>
+                        <span className="text-sm text-gray-600">{formatDate(req.booking_date)}</span>
                       </div>
                     )}
                   </div>

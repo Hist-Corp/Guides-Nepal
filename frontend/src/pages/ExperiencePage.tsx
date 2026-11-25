@@ -20,7 +20,11 @@ import { BookingLoginPrompt } from '../components/common/BookingLoginPrompt';
 import { useAuthStore } from '../store/authStore';
 import { useProfileStore } from '../store/profileStore';
 import guidesApi from '../services/guidesApi';
-import { useViewerGuideId, getAvailableGuides } from '../utils/guides';
+import {
+  useViewerGuideId,
+  getAvailableGuides,
+  useGuidesAvailableOnDate,
+} from '../utils/guides';
 import { mergeGuides, useAssignedGuides } from '../utils/approvedGuides';
 import { guideContactPath } from '../utils/guideUrl';
 import { guideDashboardApi } from '../services/guideDashboardApi';
@@ -792,17 +796,27 @@ const ExperiencePage: React.FC = () => {
     () => mergeGuides(experience?.guides ?? [], assignedGuides),
     [experience, assignedGuides]
   );
-  const visibleGuides = useMemo(
-    () =>
-      getAvailableGuides(
-        guidePool,
-        bookings,
-        experienceId ?? '',
-        experience?.city ?? '',
-        viewerGuideId
-      ),
-    [guidePool, bookings, experienceId, experience, viewerGuideId]
-  );
+  // Only guides who opened the selected date for this experience belong in
+  // "Who you'll meet". null means no date is chosen (or the check could not be
+  // reached), so the full list stays visible.
+  const guidesOnDates = useGuidesAvailableOnDate({
+    accessToken,
+    experienceId: experience?.id,
+    date: selectedDate,
+    guideIds: guidePool.map((guide) => guide.id),
+  });
+  const visibleGuides = useMemo(() => {
+    const list = getAvailableGuides(
+      guidePool,
+      bookings,
+      experienceId ?? '',
+      experience?.city ?? '',
+      viewerGuideId
+    );
+    return guidesOnDates
+      ? list.filter((guide) => guidesOnDates.has(String(guide.id)))
+      : list;
+  }, [guidePool, bookings, experienceId, experience, viewerGuideId, guidesOnDates]);
   // The booked guide stays selectable (and keeps their calendar) even after the
   // booking marks them reserved and drops them out of "Who you'll meet".
   const bookedGuide =
@@ -820,7 +834,7 @@ const ExperiencePage: React.FC = () => {
     availability,
     handleMonthChange,
     refresh: refreshAvailability,
-  } = useGuideAvailability({ accessToken, guideId: selectedGuide?.id });
+  } = useGuideAvailability({ accessToken, guideId: selectedGuide?.id, experienceId: experience?.id });
 
   // A date is only valid on the calendar of the guide it was picked for; when a
   // different guide is selected, drop a date that guide has not opened.
@@ -865,9 +879,18 @@ const ExperiencePage: React.FC = () => {
     };
   }, [experience, isAuthenticated, accessToken]);
 
-  // The guide the traveller picked out of "Who you'll meet". Guides quote their
-  // own per-person price, so the booking card prices the booking for them.
-  const unitPrice = selectedGuide?.price ?? experience?.price ?? 0;
+  // The price the guide set for the chosen date is what the booking is written
+  // with, so it wins over the picked guide's quote and the listing price.
+  const datePrice = selectedDate ? availability[selectedDate]?.pricePerPerson ?? null : null;
+  const unitPrice = datePrice ?? selectedGuide?.price ?? experience?.price ?? 0;
+
+  // A date can be picked before its month is read; fetch that month so the
+  // date's own price is known instead of falling back to the listing price.
+  useEffect(() => {
+    if (!selectedDate) return;
+    const [year, month] = selectedDate.split('-').map(Number);
+    if (year && month) void handleMonthChange(year, month);
+  }, [selectedDate, handleMonthChange]);
 
   // A new experience resets the choice so its own price shows first.
   useEffect(() => {
@@ -977,9 +1000,11 @@ const ExperiencePage: React.FC = () => {
     if (apiDate) {
       try {
         const guideParam = selectedGuide ? `&guide_id=${selectedGuide.id}` : '';
-        const res = await fetch(getApiUrl(`/bookings/availability?date=${apiDate}${guideParam}`), {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        const experienceParam = experience ? `&experience_id=${experience.id}` : '';
+        const res = await fetch(
+          getApiUrl(`/bookings/availability?date=${apiDate}${guideParam}${experienceParam}`),
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
         if (res.ok) {
           const data = await res.json();
           if (!data.available) {
@@ -1032,9 +1057,11 @@ const ExperiencePage: React.FC = () => {
     if (apiDate) {
       try {
         const guideParam = selectedGuide ? `&guide_id=${selectedGuide.id}` : '';
-        const res = await fetch(getApiUrl(`/bookings/availability?date=${apiDate}${guideParam}`), {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        const experienceParam = experience ? `&experience_id=${experience.id}` : '';
+        const res = await fetch(
+          getApiUrl(`/bookings/availability?date=${apiDate}${guideParam}${experienceParam}`),
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
         if (res.ok) {
           const data = await res.json();
           if (!data.available) {

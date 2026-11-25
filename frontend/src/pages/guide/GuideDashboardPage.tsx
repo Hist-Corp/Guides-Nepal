@@ -18,6 +18,7 @@ import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import { getApiUrl } from '../../config/api';
+import { formatDate } from '../../utils/date';
 import {
   guideDashboardApi,
   type GuideDashboardPayload,
@@ -284,7 +285,7 @@ const GuideDashboardPage: React.FC = () => {
                                 <MapPin className="h-4 w-4" />
                                 {b.city}
                               </span>
-                              <span>{new Date(b.date).toLocaleDateString()}</span>
+                              <span>{formatDate(b.date)}</span>
                               <span className="flex items-center gap-1">
                                 <Users className="h-4 w-4" />
                                 {b.guests}

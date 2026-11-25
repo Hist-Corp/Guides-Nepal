@@ -22,6 +22,7 @@ import { Guide } from '../../data/types';
 
 import { Price } from '../../components/common/Price';
 import { BookingCalendar } from '../../components/common/BookingCalendar';
+import { formatDate, toIsoDate } from '../../utils/date';
 import { GuestPicker } from '../../components/common/GuestPicker';
 import { TimePicker } from '../../components/common/TimePicker';
 import { useBookingStore } from '../../store/bookingStore';
@@ -29,7 +30,11 @@ import { BookingLoginPrompt } from '../../components/common/BookingLoginPrompt';
 import { useAuthStore } from '../../store/authStore';
 import { useMessageStore } from '../../store/messageStore';
 import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
-import { getAvailableGuides, useViewerGuideId } from '../../utils/guides';
+import {
+  getAvailableGuides,
+  useGuidesAvailableOnDate,
+  useViewerGuideId,
+} from '../../utils/guides';
 import { mergeGuides, useAssignedGuides } from '../../utils/approvedGuides';
 import { isPredefinedTrip } from '../../utils/experienceBooking';
 import { BookmarkButton } from '../../components/common/BookmarkButton';
@@ -119,25 +124,59 @@ const LalitpurExperiencePage: React.FC = () => {
     availability,
     handleMonthChange,
     refresh: refreshAvailability,
-  } = useGuideAvailability({ accessToken, guideId: selectedGuide?.id });
+  } = useGuideAvailability({ accessToken, guideId: selectedGuide?.id, experienceId: data?.id });
+
+  // The guide can price a date differently from the listing; once that date's
+  // month has loaded, show and send the date's price instead.
+  useEffect(() => {
+    if (!checkIn) return;
+    const isoDate = toIsoDate(checkIn);
+    setPricePerPerson(
+      (isoDate ? availability[isoDate]?.pricePerPerson : null) ?? data?.price ?? 45
+    );
+  }, [availability, checkIn, data]);
+
+  // A date picked in a month the calendar has not read yet carries no price,
+  // so make sure that month's availability is fetched.
+  useEffect(() => {
+    if (!checkIn) return;
+    const isoDate = toIsoDate(checkIn);
+    if (!isoDate) return;
+    const [year, month] = isoDate.split('-').map(Number);
+    if (year && month) void handleMonthChange(year, month);
+  }, [checkIn, handleMonthChange]);
 
   // Guides approved for this experience by a Regional Head (backend catalog).
   const assignedGuides = useAssignedGuides(data?.slug, data?.title);
   // A signed-in guide never sees (or books) themselves in "Who you'll meet".
   const viewerGuideId = useViewerGuideId();
-  const availableGuides = useMemo(
-    () =>
-      data
-        ? getAvailableGuides(
-            mergeGuides(data.guides ?? [], assignedGuides),
-            bookings,
-            data.id,
-            data.city ?? '',
-            viewerGuideId
-          )
-        : [],
-    [data, bookings, assignedGuides, viewerGuideId]
+  const guidePool = useMemo(
+    () => mergeGuides(data?.guides ?? [], assignedGuides),
+    [data, assignedGuides]
   );
+  // Only guides who opened every night of the selected stay for this experience
+  // belong in "Who you'll meet". null means no date is chosen (or the check
+  // could not be reached), so the full list stays visible.
+  const guidesOnDates = useGuidesAvailableOnDate({
+    accessToken,
+    experienceId: data?.id,
+    date: checkIn,
+    checkout: checkOut || undefined,
+    guideIds: guidePool.map((guide) => guide.id),
+  });
+  const availableGuides = useMemo(() => {
+    if (!data) return [];
+    const list = getAvailableGuides(
+      guidePool,
+      bookings,
+      data.id,
+      data.city ?? '',
+      viewerGuideId
+    );
+    return guidesOnDates
+      ? list.filter((guide) => guidesOnDates.has(String(guide.id)))
+      : list;
+  }, [data, bookings, guidePool, viewerGuideId, guidesOnDates]);
 
   const handleBookNow = async (): Promise<boolean> => {
     if (!isAuthenticated) {
@@ -204,6 +243,7 @@ const LalitpurExperiencePage: React.FC = () => {
       experienceTitle: data.title,
       city: data.city ?? '',
       date: checkIn,
+      checkout: checkOut || undefined,
       guests: guestCount,
       price: total,
       image: data.heroImage,
@@ -309,6 +349,7 @@ const LalitpurExperiencePage: React.FC = () => {
         experienceTitle: data.title,
         city: data.city ?? '',
         date,
+        checkout: checkOut || undefined,
         guests: guestCount,
         price: total,
         image: data.heroImage,
@@ -766,11 +807,11 @@ const LalitpurExperiencePage: React.FC = () => {
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-500">Date</span>
                           <span className="font-bold text-gray-900">
-                            {new Date(checkIn).toLocaleDateString()}
+                            {formatDate(checkIn)}
                             {!singleDateTrip &&
                               days > 1 &&
                               checkOut &&
-                              ` - ${new Date(checkOut).toLocaleDateString()}`}
+                              ` - ${formatDate(checkOut)}`}
                           </span>
                         </div>
                         {!singleDateTrip && days > 1 && (
@@ -1085,7 +1126,7 @@ const LalitpurExperiencePage: React.FC = () => {
             setIsSheetOpen(false);
             setSheetError(null);
           }}
-          pricePerPerson={data.price || 45}
+          pricePerPerson={pricePerPerson}
           cleaningFee={cleaningFee}
           serviceFee={serviceFee}
           rating={data.rating || 0}
@@ -1278,7 +1319,7 @@ const LalitpurExperiencePage: React.FC = () => {
               <div className="flex justify-between border-b pb-2">
                 <span>Price per person</span>
                 <span className="font-medium">
-                  <Price amount={data.price ?? 45} />
+                  <Price amount={pricePerPerson} />
                 </span>
               </div>
               <div className="flex justify-between border-b pb-2 font-bold text-primary">

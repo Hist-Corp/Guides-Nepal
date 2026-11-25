@@ -21,6 +21,7 @@ import { Price } from '../../components/common/Price';
 import { getApiUrl } from '../../config/api';
 import { useAuthStore } from '../../store/authStore';
 import { useBookingStore } from '../../store/bookingStore';
+import { formatDate as formatCalendarDate, todayIso } from '../../utils/date';
 
 /** One bookable experience listed by a guide, as the search returns it. */
 interface GuideListingOption {
@@ -50,10 +51,23 @@ interface AvailableGuide {
   listings: GuideListingOption[];
 }
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
+/**
+ * Fetch with the signed-in user's token, refreshing it once on 401.
+ *
+ * Access tokens are short-lived, so a tab left open past the expiry would
+ * otherwise surface the backend's "Invalid token" as the search error.
+ */
+const authFetch = async (path: string) => {
+  const attempt = (token: string | null) =>
+    fetch(getApiUrl(path), { headers: { Authorization: `Bearer ${token ?? ''}` } });
+  const first = await attempt(useAuthStore.getState().accessToken);
+  if (first.status !== 401) return first;
+  if (!(await useAuthStore.getState().refreshTokens())) return first;
+  return attempt(useAuthStore.getState().accessToken);
+};
 
 const formatDate = (iso: string) =>
-  new Date(`${iso}T00:00:00`).toLocaleDateString('en-US', {
+  formatCalendarDate(iso, 'en-US', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
@@ -62,7 +76,6 @@ const formatDate = (iso: string) =>
 
 const FindGuidePage: React.FC = () => {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const accessToken = useAuthStore((s) => s.accessToken);
   const addBooking = useBookingStore((s) => s.addBooking);
 
   // 1 date → 2 guide → 3 confirm → 4 confirmation
@@ -87,11 +100,12 @@ const FindGuidePage: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch(getApiUrl(`/bookings/available-guides?date=${date}`), {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      const res = await authFetch(`/bookings/available-guides?date=${date}`);
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          throw new Error('Your session has expired. Sign in again, then retry.');
+        }
         throw new Error(
           typeof body?.detail === 'string' ? body.detail : 'Could not load guides for that date.'
         );
@@ -114,9 +128,8 @@ const FindGuidePage: React.FC = () => {
     try {
       // Re-check the exact day the booking will be written to, so a guide who
       // was just filled drops out before the traveller reaches the confirm step.
-      const res = await fetch(
-        getApiUrl(`/bookings/availability/daily?date=${date}&guide_id=${guide.guide_id}`),
-        { headers: { Authorization: `Bearer ${accessToken}` } }
+      const res = await authFetch(
+        `/bookings/availability/daily?date=${date}&guide_id=${guide.guide_id}`
       );
       const body = await res.json().catch(() => ({}));
       if (res.ok && body.available === false) {
@@ -269,7 +282,7 @@ const FindGuidePage: React.FC = () => {
                       <input
                         type="date"
                         value={date}
-                        min={todayISO()}
+                        min={todayIso()}
                         onChange={(event) => setDate(event.target.value)}
                         className="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                       />

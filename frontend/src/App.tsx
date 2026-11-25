@@ -186,6 +186,7 @@ function App() {
                 settings; keep the old URL working. */}
             <Route path="/guide/profile" element={<Navigate to="/account" replace />} />
             <Route path="/guide/availability" element={<GuideAvailabilityPage />} />
+            <Route path="/guide/availability/:experienceId" element={<GuideAvailabilityPage />} />
             <Route path="/regional/guide-applications" element={<RegionalGuideApplications />} />
             <Route
               path="/regional/experience-requests"

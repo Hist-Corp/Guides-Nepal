@@ -4,6 +4,7 @@ import { Calendar, MapPin, Users, ArrowLeft } from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { getApiUrl } from '../../config/api';
+import { formatDate } from '../../utils/date';
 import { useAuthStore } from '../../store/authStore';
 import { useGoBack } from '../../utils/backNavigation';
 import { useCurrency } from '../../contexts/CurrencyContext';
@@ -102,7 +103,7 @@ const GuideBookingsPage: React.FC = () => {
                     </span>
                     <span className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
-                      {new Date(booking.date).toLocaleDateString()}
+                      {formatDate(booking.date)}
                     </span>
                     <span className="flex items-center gap-1">
                       <Users className="h-4 w-4" />

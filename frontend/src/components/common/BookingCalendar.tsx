@@ -1,5 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  formatDate,
+  formatDayMonth,
+  formatMonthYear,
+  fromIsoDate,
+  nightsBetween,
+  toDayKey,
+  toIsoDate,
+} from '../../utils/date';
 
 interface BookingCalendarProps {
   checkIn: string;
@@ -24,28 +33,9 @@ interface BookingCalendarProps {
   onMonthChange?: (year: number, month: number) => void;
 }
 
-const toKey = (d: Date): string => {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-};
-
-const parseKey = (key: string): Date | null => {
-  if (!key) return null;
-  const [y, m, d] = key.split('-').map(Number);
-  if (!y || !m || !d) return null;
-  return new Date(y, m - 1, d);
-};
-
 /** Formats a yyyy-mm-dd key as the DD/MM/YYYY text shown in the inputs. */
-const formatFromKey = (key: string): string => {
-  const d = parseKey(key);
-  if (!d) return '';
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${dd}/${mm}/${d.getFullYear()}`;
-};
+const formatFromKey = (key: string): string =>
+  formatDate(key, 'en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
 /** Formats consecutive typed digits as DD/MM/YYYY (05102026 -> 05/10/2026). */
 const formatAsTyped = (digits: string): string => {
@@ -64,50 +54,23 @@ const formatAsTyped = (digits: string): string => {
 const normalizeTyped = (raw: string): string => formatAsTyped(raw.replace(/\D/g, ''));
 
 /**
- * Parses user-typed date text. Accepts DD/MM/YYYY (the order the inputs
- * display and auto-format into), MM/DD/YYYY when the trailing value cannot
- * be a month, a bare DD/MM (current year), YYYY-MM-DD, YYYYMMDD and textual
- * dates like "5 Oct 2026".
+ * Parses user-typed date text into a `YYYY-MM-DD` key, or null.
+ *
+ * Every full date goes through the shared parser, which reads DD/MM/YYYY (the
+ * order the inputs display), YYYY-MM-DD and YYYYMMDD. Only a bare DD/MM (current
+ * year) and textual dates like "5 Oct 2026" need handling here.
  */
-const parseTyped = (text: string): Date | null => {
-  const t = text.trim();
-  if (!t) return null;
-
-  const build = (y: number, m: number, day: number): Date | null => {
-    if (!y || !m || !day) return null;
-    const date = new Date(y, m - 1, day);
-    // Reject impossible dates such as 02/30/2026.
-    if (date.getFullYear() !== y || date.getMonth() !== m - 1 || date.getDate() !== day) {
-      return null;
-    }
-    return date;
-  };
-
-  const parts = t.split(/[/\-.]/).map((p) => p.trim());
-  const currentYear = new Date().getFullYear();
-  const fromDayMonth = (a: number, b: number, year: number): Date | null => {
-    // Day-first is the displayed order, so it is also the default. When the
-    // trailing value cannot be a month the user must have typed MM/DD.
-    if (b > 12 && a <= 12) return build(year, a, b);
-    return build(year, b, a);
-  };
-
-  if (parts.length === 3 && parts.every((p) => /^\d{1,4}$/.test(p))) {
-    const [a, b, c] = parts.map(Number);
-    if (a >= 1000) return build(a, b, c);
-    return fromDayMonth(a, b, c < 100 ? 2000 + c : c);
+const parseTyped = (text: string): string | null => {
+  const trimmed = text.trim();
+  const iso = toIsoDate(trimmed);
+  if (iso) return iso;
+  const dayMonth = trimmed.match(/^(\d{1,2})[/.-](\d{1,2})$/);
+  if (dayMonth) {
+    return toIsoDate(`${dayMonth[1]}/${dayMonth[2]}/${new Date().getFullYear()}`);
   }
-  if (parts.length === 2 && parts.every((p) => /^\d{1,2}$/.test(p))) {
-    const [a, b] = parts.map(Number);
-    return fromDayMonth(a, b, currentYear);
-  }
-  if (parts.length === 1 && /^\d{8}$/.test(t)) {
-    return build(Number(t.slice(0, 4)), Number(t.slice(4, 6)), Number(t.slice(6, 8)));
-  }
-  // Lenient fallback for textual dates like "5 Oct 2026".
-  if (/[a-z]/i.test(t)) {
-    const d = new Date(t);
-    if (!Number.isNaN(d.getTime())) return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  if (/[a-z]/i.test(trimmed)) {
+    const parsed = new Date(trimmed);
+    return Number.isNaN(parsed.getTime()) ? null : toDayKey(parsed);
   }
   return null;
 };
@@ -152,7 +115,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     return t;
   }, []);
   const [visibleMonth, setVisibleMonth] = useState(() => {
-    const anchor = parseKey(checkIn) ?? today;
+    const anchor = fromIsoDate(checkIn) ?? today;
     return new Date(anchor.getFullYear(), anchor.getMonth(), 1);
   });
 
@@ -181,7 +144,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     ? 'checkin'
     : (focusOverride ?? (!checkIn || (checkIn && checkOut) ? 'checkin' : 'checkout'));
 
-  const minKey = minDate || toKey(today);
+  const minKey = minDate || toDayKey(today);
   const isDisabled = (key: string): boolean => {
     if (key < minKey) return true;
     if (maxDate && key > maxDate) return true;
@@ -225,7 +188,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     }
     onChange(key, checkOut && key < checkOut ? checkOut : '');
     setFocusOverride('checkout');
-    const anchor = parseKey(key);
+    const anchor = fromIsoDate(key);
     if (anchor) setVisibleMonth(new Date(anchor.getFullYear(), anchor.getMonth(), 1));
   };
 
@@ -260,9 +223,8 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
       return true;
     }
 
-    const parsed = parseTyped(trimmed);
-    const key = parsed ? toKey(parsed) : '';
-    if (!parsed || isDisabled(key)) {
+    const key = parseTyped(trimmed);
+    if (!key || isDisabled(key)) {
       // With the popup already closed there is nowhere to show an error,
       // so fall back to the last committed date instead.
       if (!isOpen) {
@@ -273,7 +235,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
       }
       setTypeErr({
         field,
-        msg: parsed ? 'This date is not available.' : 'Enter a valid date as DD/MM/YYYY.',
+        msg: key ? 'This date is not available.' : 'Enter a valid date as DD/MM/YYYY.',
       });
       return false;
     }
@@ -326,18 +288,10 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     return false;
   };
 
-  const nights = useMemo(() => {
-    if (single || !checkIn || !checkOut) return 0;
-    const a = parseKey(checkIn);
-    const b = parseKey(checkOut);
-    if (!a || !b) return 0;
-    return Math.round((b.getTime() - a.getTime()) / 86_400_000);
-  }, [single, checkIn, checkOut]);
-
-  const formatDayMonth = (key: string): string => {
-    const d = parseKey(key);
-    return d ? d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '';
-  };
+  const nights = useMemo(
+    () => (single ? 0 : nightsBetween(checkIn, checkOut)),
+    [single, checkIn, checkOut]
+  );
 
   /** Airbnb-style hint shown under "Select dates" in the popup header. */
   const panelSubtitle = single
@@ -428,11 +382,9 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     setPendingFocus(null);
   }, [pendingFocus, isOpen]);
 
-  const monthLabel = (d: Date) => d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-
   /** Earliest browsable month (derived from minDate, defaulting to today). */
   const minMonth = useMemo(() => {
-    const m = parseKey(minKey);
+    const m = fromIsoDate(minKey);
     const base = m ?? today;
     return new Date(base.getFullYear(), base.getMonth(), 1);
   }, [minKey, today]);
@@ -450,7 +402,7 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const cells: (string | null)[] = [
       ...Array.from({ length: startPad }, () => null),
-      ...Array.from({ length: daysInMonth }, (_, i) => toKey(new Date(year, month, i + 1))),
+      ...Array.from({ length: daysInMonth }, (_, i) => toDayKey(new Date(year, month, i + 1))),
     ];
 
     return (
@@ -714,10 +666,10 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
 
               {/* Two-month grid */}
               <div className="flex gap-8">
-                {renderMonth(visibleMonth, monthLabel(visibleMonth))}
+                {renderMonth(visibleMonth, formatMonthYear(visibleMonth))}
                 {!single && (
                   <div className="hidden min-w-0 flex-1 md:block">
-                    {renderMonth(secondMonth, monthLabel(secondMonth))}
+                    {renderMonth(secondMonth, formatMonthYear(secondMonth))}
                   </div>
                 )}
               </div>

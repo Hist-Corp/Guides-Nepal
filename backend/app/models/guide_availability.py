@@ -16,6 +16,7 @@ from sqlalchemy import (
     Index,
     Integer,
     String,
+    Text,
     UniqueConstraint,
 )
 from sqlalchemy.sql import func
@@ -33,6 +34,16 @@ class GuideAvailabilityDate(Base):
     # ("unavailable" rows) without a schema change; today only "available"
     # rows are written.
     status = Column(String(16), nullable=False, default="available")
+    # Public experience ids this date is open for, comma separated.  Null or
+    # empty means the date is open for every experience (shared rows).  A
+    # leading "!" flips the list to exclusions: open for every experience
+    # except those, so one experience can be closed without closing the date.
+    experience_ids = Column(String(255), nullable=True)
+    # The guide's offer for this date, as JSON ``{"<experience id>": {"slots":
+    # n, "price": p}}``.  One date row can serve several experiences, so this
+    # keeps opening one from rewriting another's slots or price; the ``"*"``
+    # entry is the date's default (whole-date openings) and the fallback.
+    offers = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

@@ -111,6 +111,12 @@ export interface GuideAvailabilityDay {
   bookings: number;
   /** Null until the day has a capacity row (i.e. before its first booking). */
   remaining: number | null;
+  /** Guest slots the guide chose when opening the date; null if not set. */
+  max_slots?: number | null;
+  /** Price per person the guide set for the date; null if not set. */
+  price_per_person?: number | null;
+  /** Bookable slots for the date (the chosen slots, else the capacity row). */
+  capacity?: number | null;
 }
 
 export interface GuideAvailabilityCalendar {
@@ -273,10 +279,12 @@ export const guideDashboardApi = {
     token: string,
     start: string,
     end: string,
+    experienceId?: number,
   ): Promise<GuideAvailabilityCalendar> => {
+    const scope = experienceId ? `&experience_id=${experienceId}` : '';
     const res = await authenticatedFetch(
       token,
-      `${API_BASE_URL}/guide/availability?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`,
+      `${API_BASE_URL}/guide/availability?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}${scope}`,
     );
     if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Unable to load availability.');
     return res.json();
@@ -285,10 +293,19 @@ export const guideDashboardApi = {
     token: string,
     dates: string[],
     status: 'available' | 'unavailable',
+    experienceId?: number,
+    maxSlots?: number,
+    pricePerPerson?: number,
   ): Promise<{ status: string; dates: string[]; changed: number }> => {
     const res = await authenticatedFetch(token, `${API_BASE_URL}/guide/availability`, {
       method: 'PUT',
-      body: JSON.stringify({ dates, status }),
+      body: JSON.stringify({
+        dates,
+        status,
+        experience_id: experienceId ?? null,
+        max_slots: maxSlots ?? null,
+        price_per_person: pricePerPerson ?? null,
+      }),
     });
     if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || 'Unable to update availability.');
     return res.json();

@@ -17,11 +17,14 @@ TRAVELER_OR_GUIDE = require_role(TRAVELER, GUIDE)
 def booking_availability(
     date: str = Query(pattern=r"^\d{4}-\d{2}-\d{2}$"),
     guide_id: int | None = Query(default=None),
+    experience_id: int | None = Query(default=None),
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ) -> dict:
     """Availability of the currently bookable guide for a calendar date."""
-    return BookingService(db).availability_for_date(date, guide_id=guide_id)
+    return BookingService(db).availability_for_date(
+        date, guide_id=guide_id, experience_id=experience_id
+    )
 
 
 @router.get("/availability/month")
@@ -29,6 +32,7 @@ def booking_availability_month(
     year: int = Query(ge=2020, le=2100),
     month: int = Query(ge=1, le=12),
     guide_id: int | None = Query(default=None),
+    experience_id: int | None = Query(default=None),
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ) -> dict:
@@ -39,7 +43,7 @@ def booking_availability_month(
     """
     return {
         "unavailable": BookingService(db).unavailable_dates(
-            year, month, guide_id=guide_id
+            year, month, guide_id=guide_id, experience_id=experience_id
         )
     }
 
@@ -48,6 +52,7 @@ def booking_availability_month(
 def booking_availability_daily(
     date: str = Query(pattern=r"^\d{4}-\d{2}-\d{2}$"),
     guide_id: int | None = Query(default=None),
+    experience_id: int | None = Query(default=None),
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ) -> dict:
@@ -56,7 +61,9 @@ def booking_availability_daily(
     Read from the day's ``guide_daily_capacity`` row — the same row a booking
     is checked against — so the number matches what a booking will accept.
     """
-    return BookingService(db).daily_availability(date, guide_id=guide_id)
+    return BookingService(db).daily_availability(
+        date, guide_id=guide_id, experience_id=experience_id
+    )
 
 
 @router.get("/availability/month-detail")
@@ -64,6 +71,7 @@ def booking_availability_month_detail(
     year: int = Query(ge=2020, le=2100),
     month: int = Query(ge=1, le=12),
     guide_id: int | None = Query(default=None),
+    experience_id: int | None = Query(default=None),
     db: Session = Depends(get_db),
     _: User = Depends(get_current_user),
 ) -> dict:
@@ -75,7 +83,38 @@ def booking_availability_month_detail(
     not honour.
     """
     return {
-        "availability": BookingService(db).month_detail(year, month, guide_id=guide_id)
+        "availability": BookingService(db).month_detail(
+            year, month, guide_id=guide_id, experience_id=experience_id
+        )
+    }
+
+
+@router.get("/availability/guides")
+def booking_availability_guides(
+    date: str = Query(pattern=r"^\d{4}-\d{2}-\d{2}$"),
+    experience_id: int = Query(ge=1),
+    checkout: str | None = Query(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$"),
+    guide_ids: str | None = Query(default=None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(TRAVELER_OR_GUIDE),
+) -> dict:
+    """Which of these guides can take this experience on the requested dates.
+
+    Powers the traveller pages: "Who you'll meet" only lists guides whose
+    calendar has every night of the stay open for this experience, and the
+    booking flow asks again right before writing the reservation.
+    """
+    catalog_ids = [
+        int(part) for part in (guide_ids or "").split(",") if part.strip().isdigit()
+    ]
+    return {
+        "guide_ids": BookingService(db).available_guide_ids(
+            experience_id,
+            date,
+            checkout=checkout,
+            catalog_guide_ids=catalog_ids,
+            exclude_user_id=current_user.id,
+        )
     }
 
 

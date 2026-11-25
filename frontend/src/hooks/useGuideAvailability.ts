@@ -4,6 +4,8 @@ import { getApiUrl } from '../config/api';
 export interface DateAvailability {
   remaining: number;
   maxCapacity: number;
+  /** The guide's price for this date, when they set one for it. */
+  pricePerPerson: number | null;
 }
 
 export type AvailabilityCounts = Record<string, DateAvailability>;
@@ -12,6 +14,8 @@ interface UseGuideAvailabilityOptions {
   accessToken: string | null;
   /** Catalog guide id, or null for the backend's default bookable guide. */
   guideId?: number | string | null;
+  /** Public experience id, so only dates opened for that experience show. */
+  experienceId?: number | string | null;
 }
 
 /**
@@ -21,8 +25,19 @@ interface UseGuideAvailabilityOptions {
  * never shows another guide's numbers. `refresh` re-reads a single month after
  * a booking, because only the booked date's capacity can have changed.
  */
-export function useGuideAvailability({ accessToken, guideId }: UseGuideAvailabilityOptions) {
+export function useGuideAvailability({
+  accessToken,
+  guideId,
+  experienceId,
+}: UseGuideAvailabilityOptions) {
   const guideKey = guideId === null || guideId === undefined ? 'default' : String(guideId);
+  const experienceKey =
+    experienceId === null || experienceId === undefined ? 'default' : String(experienceId);
+  // One calendar per guide *and* experience, so neither leaks into the other.
+  const scopeKey = `${guideKey}:${experienceKey}`;
+  const params =
+    (guideKey === 'default' ? '' : `&guide_id=${guideKey}`) +
+    (experienceKey === 'default' ? '' : `&experience_id=${experienceKey}`);
   const [disabledByGuide, setDisabledByGuide] = useState<Record<string, string[]>>({});
   const [countsByGuide, setCountsByGuide] = useState<Record<string, AvailabilityCounts>>({});
   // In-flight requests, so identical calls share one round trip. The `dates:` /
@@ -43,68 +58,67 @@ export function useGuideAvailability({ accessToken, guideId }: UseGuideAvailabil
   const fetchUnavailableDates = useCallback(
     async (year: number, month: number) => {
       if (!accessToken) return;
-      const cacheKey = `${year}-${month}-${guideKey}`;
+      const cacheKey = `${year}-${month}-${scopeKey}`;
       const cached = dateLists.current.get(cacheKey);
       if (cached) {
-        setDisabledByGuide((prev) => ({ ...prev, [guideKey]: cached }));
+        setDisabledByGuide((prev) => ({ ...prev, [scopeKey]: cached }));
         return;
       }
-      const guideParam = guideKey === 'default' ? '' : `&guide_id=${guideKey}`;
       await loadOnce(`dates:${cacheKey}`, async () => {
         try {
           const url = getApiUrl(
-            `/bookings/availability/month?year=${year}&month=${month}${guideParam}`
+            `/bookings/availability/month?year=${year}&month=${month}${params}`
           );
           const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
           if (!res.ok) return;
           const data = await res.json();
           const unavailable: string[] = Array.isArray(data.unavailable) ? data.unavailable : [];
           dateLists.current.set(cacheKey, unavailable);
-          setDisabledByGuide((prev) => ({ ...prev, [guideKey]: unavailable }));
+          setDisabledByGuide((prev) => ({ ...prev, [scopeKey]: unavailable }));
         } catch {
           // Silently fail - dates won't be disabled
         }
       });
     },
-    [accessToken, guideKey, loadOnce]
+    [accessToken, params, scopeKey, loadOnce]
   );
 
   const fetchMonthCounts = useCallback(
     async (year: number, month: number) => {
       if (!accessToken) return;
-      const cacheKey = `${year}-${month}-${guideKey}`;
+      const cacheKey = `${year}-${month}-${scopeKey}`;
       if (loadedMonths.current.has(cacheKey)) return;
-      const guideParam = guideKey === 'default' ? '' : `&guide_id=${guideKey}`;
       await loadOnce(`counts:${cacheKey}`, async () => {
         try {
           const url = getApiUrl(
-            `/bookings/availability/month-detail?year=${year}&month=${month}${guideParam}`
+            `/bookings/availability/month-detail?year=${year}&month=${month}${params}`
           );
           const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
           if (!res.ok) return;
           const data = await res.json();
           const days = (data.availability ?? {}) as Record<
             string,
-            { remaining?: number; max_capacity?: number }
+            { remaining?: number; max_capacity?: number; price_per_person?: number | null }
           >;
           const counts: AvailabilityCounts = {};
           for (const [date, value] of Object.entries(days)) {
             counts[date] = {
               remaining: value.remaining ?? 0,
               maxCapacity: value.max_capacity ?? 0,
+              pricePerPerson: value.price_per_person ?? null,
             };
           }
           loadedMonths.current.add(cacheKey);
           setCountsByGuide((prev) => ({
             ...prev,
-            [guideKey]: { ...(prev[guideKey] ?? {}), ...counts },
+            [scopeKey]: { ...(prev[scopeKey] ?? {}), ...counts },
           }));
         } catch {
           // Silently fail - spots won't be shown
         }
       });
     },
-    [accessToken, guideKey, loadOnce]
+    [accessToken, params, scopeKey, loadOnce]
   );
 
   const loadMonth = useCallback(
@@ -128,7 +142,7 @@ export function useGuideAvailability({ accessToken, guideId }: UseGuideAvailabil
       if (Number.isNaN(booked.getTime())) return;
       const year = booked.getFullYear();
       const month = booked.getMonth() + 1;
-      const cacheKey = `${year}-${month}-${guideKey}`;
+      const cacheKey = `${year}-${month}-${scopeKey}`;
       // A request that started before the booking would write pre-booking
       // counts, so let it settle before dropping the cached month.
       await Promise.all([
@@ -140,19 +154,19 @@ export function useGuideAvailability({ accessToken, guideId }: UseGuideAvailabil
       // Spot counts are keyed by YYYY-MM-DD, so drop just this month's days.
       const monthPrefix = `${year}-${String(month).padStart(2, '0')}-`;
       setCountsByGuide((prev) => {
-        const counts = prev[guideKey];
+        const counts = prev[scopeKey];
         if (!counts) return prev;
         const kept = Object.entries(counts).filter(([date]) => !date.startsWith(monthPrefix));
-        return { ...prev, [guideKey]: Object.fromEntries(kept) };
+        return { ...prev, [scopeKey]: Object.fromEntries(kept) };
       });
       await loadMonth(year, month);
     },
-    [guideKey, loadMonth]
+    [scopeKey, loadMonth]
   );
 
   return {
-    disabledDates: disabledByGuide[guideKey] ?? [],
-    availability: countsByGuide[guideKey] ?? {},
+    disabledDates: disabledByGuide[scopeKey] ?? [],
+    availability: countsByGuide[scopeKey] ?? {},
     handleMonthChange: loadMonth,
     refresh,
   };

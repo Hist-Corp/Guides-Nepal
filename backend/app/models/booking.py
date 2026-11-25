@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, Text, Boolean, DateTime, ForeignKey, Enum
+from sqlalchemy import Column, Date, Integer, String, Float, Text, Boolean, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
@@ -78,7 +78,12 @@ class Booking(Base):
     experience_id = Column(Integer, nullable=False)
     experience_title = Column(String, nullable=False)
     city = Column(String, nullable=False)
-    date = Column(DateTime, nullable=False)
+    # The booking's calendar day (the check-in day of a stay), stored as a plain
+    # date so it compares and serialises exactly like the frontend's YYYY-MM-DD.
+    date = Column(Date, nullable=False)
+    # Check-out day of a multi-night stay; every night from ``date`` up to it is
+    # held (and had to be opened by the guide). Null for a single-day booking.
+    checkout = Column(Date, nullable=True)
     guests = Column(Integer, default=1)
     price = Column(Float, nullable=False)
     image = Column(String, nullable=True)

@@ -233,6 +233,7 @@ def guide_dashboard(
 def guide_get_availability(
     start: str = Query(description="First calendar date (YYYY-MM-DD)"),
     end: str = Query(description="Last calendar date (YYYY-MM-DD)"),
+    experience_id: int | None = Query(default=None),
     guide: User = Depends(GUIDE_ONLY),
     db: Session = Depends(get_db),
 ) -> dict:
@@ -250,7 +251,9 @@ def guide_get_availability(
     return {
         "start": start_date.isoformat(),
         "end": end_date.isoformat(),
-        "days": service.calendar(int(guide.id), start_date, end_date),
+        "days": service.calendar(
+            int(guide.id), start_date, end_date, experience_id
+        ),
     }
 
 
@@ -268,7 +271,12 @@ def guide_set_availability(
     is also how traveller-facing availability changes propagate.
     """
     return GuideAvailabilityService(db).set_dates(
-        int(guide.id), payload.dates, payload.status
+        int(guide.id),
+        payload.dates,
+        payload.status,
+        payload.experience_id,
+        payload.max_slots,
+        payload.price_per_person,
     )
 
 

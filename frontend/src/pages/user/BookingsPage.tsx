@@ -15,6 +15,7 @@ import {
   Luggage,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { formatDate } from '../../utils/date';
 
 const BookingsPage: React.FC = () => {
   const { bookings, cancelBooking } = useBookingStore();
@@ -122,7 +123,7 @@ const BookingsPage: React.FC = () => {
                         <div className="flex items-center gap-1.5">
                           <Calendar className="w-4 h-4 shrink-0" />
                           <span>
-                            {new Date(booking.date).toLocaleDateString('en-US', {
+                            {formatDate(booking.date, 'en-US', {
                               month: 'short',
                               day: 'numeric',
                               year: 'numeric',
@@ -215,7 +216,7 @@ const BookingsPage: React.FC = () => {
                       <span className="text-gray-300">·</span>
                       <Calendar className="w-3.5 h-3.5 shrink-0" />
                       <span>
-                        {new Date(booking.date).toLocaleDateString('en-US', {
+                        {formatDate(booking.date, 'en-US', {
                           month: 'short',
                           day: 'numeric',
                         })}

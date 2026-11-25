@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
   CalendarDays,
@@ -16,16 +16,13 @@ import { useAuthStore } from '../../store/authStore';
 import {
   guideDashboardApi,
   type GuideAvailabilityDay,
+  type GuideListing,
 } from '../../services/guideDashboardApi';
+import { getGuideListedExperiences } from '../../data/guideListedExperiences';
+import { formatMonthYear, toDayKey } from '../../utils/date';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
 
-const iso = (date: Date) =>
-  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 const startOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth(), 1);
 const endOfMonth = (date: Date) => new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
@@ -44,9 +41,16 @@ const emptyDay = (date: string): GuideAvailabilityDay => ({
  * toggles it (shift-click fills the range from the last click), and closing a
  * date that still holds a booking is refused by the API with the reason, which
  * is surfaced inline.
+ *
+ * The calendar is scoped to one listing experience at a time (its id lives in
+ * the URL); the dates opened here are only bookable for that experience.
  */
 const GuideAvailabilityPage: React.FC = () => {
   const { accessToken, isAuthenticated, user } = useAuthStore();
+  const navigate = useNavigate();
+  const { experienceId: routeExperienceId } = useParams<{ experienceId: string }>();
+  const selectedExperienceId = Number(routeExperienceId) || 0;
+  const [listings, setListings] = useState<GuideListing[]>([]);
   const [anchor, setAnchor] = useState(() => startOfMonth(new Date()));
   const [days, setDays] = useState<Record<string, GuideAvailabilityDay>>({});
   const [loading, setLoading] = useState(true);
@@ -54,10 +58,42 @@ const GuideAvailabilityPage: React.FC = () => {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [lastClicked, setLastClicked] = useState<string | null>(null);
+  // Slots and price are the guide's offer, set before opening dates.
+  const [slots, setSlots] = useState(10);
+  const [price, setPrice] = useState('');
 
-  const monthStart = iso(startOfMonth(anchor));
-  const monthEnd = iso(endOfMonth(anchor));
-  const today = iso(new Date());
+  // Owned listings are addressed publicly as 200000 + row id; assignments
+  // already carry the experience id they point at.
+  const listingSlugs = new Set(
+    listings.map((listing) => listing.public_slug).filter((slug): slug is string => Boolean(slug)),
+  );
+  // City catalogue pages list their guides in static data, so those
+  // experiences are not in the API response and are read here instead.
+  const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ');
+  const catalogueExperiences = getGuideListedExperiences([user?.firstName, fullName])
+    .filter((experience) => !listingSlugs.has(experience.slug))
+    .map((experience) => ({
+      id: experience.id,
+      label: `${experience.title} · ${experience.city}`,
+    }));
+  const experiences = [
+    ...listings.map((listing) => ({
+      id: listing.experience_id ?? 200_000 + listing.id,
+      label: `${listing.title} · ${listing.city}`,
+    })),
+    ...catalogueExperiences,
+  ].filter((experience, index, all) => all.findIndex((item) => item.id === experience.id) === index);
+  const selectedExperience = experiences.find((item) => item.id === selectedExperienceId);
+  // The guide's own offer for the selected experience pre-fills the form; any
+  // experience can still be opened at whatever slots and price they choose.
+  const selectedListing = listings.find(
+    (listing) => (listing.experience_id ?? 200_000 + listing.id) === selectedExperienceId,
+  );
+  const priceValue = Number(price);
+
+  const monthStart = toDayKey(startOfMonth(anchor));
+  const monthEnd = toDayKey(endOfMonth(anchor));
+  const today = toDayKey(new Date());
 
   const load = useCallback(
     async (start: string, end: string, quiet = false) => {
@@ -65,7 +101,12 @@ const GuideAvailabilityPage: React.FC = () => {
       if (!quiet) setLoading(true);
       setError('');
       try {
-        const data = await guideDashboardApi.getAvailability(accessToken, start, end);
+        const data = await guideDashboardApi.getAvailability(
+          accessToken,
+          start,
+          end,
+          selectedExperienceId || undefined,
+        );
         const map: Record<string, GuideAvailabilityDay> = {};
         data.days.forEach((day) => {
           map[day.date] = day;
@@ -77,23 +118,50 @@ const GuideAvailabilityPage: React.FC = () => {
         setLoading(false);
       }
     },
-    [accessToken],
+    [accessToken, selectedExperienceId],
   );
 
   useEffect(() => {
     if (accessToken && user?.role === 'guide') void load(monthStart, monthEnd);
   }, [accessToken, user?.role, monthStart, monthEnd, load]);
 
+  // Each experience has its own natural defaults: its guest limit and price.
+  useEffect(() => {
+    setSlots(selectedListing?.max_guests ?? 10);
+    setPrice(selectedListing ? String(selectedListing.price) : '');
+  }, [selectedExperienceId, selectedListing?.id, selectedListing?.max_guests, selectedListing?.price]);
+
+  useEffect(() => {
+    if (!accessToken || user?.role !== 'guide') return;
+    guideDashboardApi
+      .listListings(accessToken)
+      .then(setListings)
+      .catch(() => setListings([]));
+  }, [accessToken, user?.role]);
+
   const apply = useCallback(
     async (dates: string[], status: 'available' | 'unavailable') => {
       if (!accessToken || dates.length === 0) return;
+      if (status === 'available' && (!Number.isFinite(priceValue) || priceValue <= 0)) {
+        setError('Set a price per person greater than 0 before opening dates.');
+        return;
+      }
       setSaving(true);
       setError('');
       setNotice('');
       try {
-        const result = await guideDashboardApi.setAvailability(accessToken, dates, status);
+        const result = await guideDashboardApi.setAvailability(
+          accessToken,
+          dates,
+          status,
+          selectedExperienceId || undefined,
+          status === 'available' ? slots : undefined,
+          status === 'available' ? priceValue : undefined,
+        );
         setNotice(
-          `${result.dates.length} date${result.dates.length === 1 ? '' : 's'} marked ${status}.`,
+          status === 'available'
+            ? `${result.dates.length} date${result.dates.length === 1 ? '' : 's'} opened with ${slots} slot${slots === 1 ? '' : 's'} at ${priceValue.toFixed(2)} per person.`
+            : `${result.dates.length} date${result.dates.length === 1 ? '' : 's'} marked ${status}.`,
         );
         await load(monthStart, monthEnd, true);
       } catch (saveError) {
@@ -102,7 +170,7 @@ const GuideAvailabilityPage: React.FC = () => {
         setSaving(false);
       }
     },
-    [accessToken, load, monthStart, monthEnd],
+    [accessToken, load, monthStart, monthEnd, selectedExperienceId, slots, priceValue],
   );
 
   const toggle = (day: GuideAvailabilityDay, shiftKey: boolean) => {
@@ -151,7 +219,7 @@ const GuideAvailabilityPage: React.FC = () => {
     const total = endOfMonth(anchor).getDate();
     const out: (GuideAvailabilityDay | null)[] = Array.from({ length: offset }, () => null);
     for (let day = 1; day <= total; day += 1) {
-      const key = iso(new Date(anchor.getFullYear(), anchor.getMonth(), day));
+      const key = toDayKey(new Date(anchor.getFullYear(), anchor.getMonth(), day));
       out.push(days[key] ?? emptyDay(key));
     }
     while (out.length % 7 !== 0) out.push(null);
@@ -214,7 +282,81 @@ const GuideAvailabilityPage: React.FC = () => {
           </Link>
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+          <label htmlFor="availability-experience" className="text-sm font-bold text-gray-900">
+            Listing experience
+          </label>
+          <p className="mt-1 text-xs text-gray-500">
+            Pick the experience first — the dates you open below are bookable for that experience
+            only.
+          </p>
+          <select
+            id="availability-experience"
+            value={routeExperienceId ?? ''}
+            onChange={(event) =>
+              navigate(
+                event.target.value
+                  ? `/guide/availability/${event.target.value}`
+                  : '/guide/availability',
+              )
+            }
+            className="mt-3 w-full max-w-xl rounded-xl border border-gray-300 bg-white p-2.5 text-sm font-semibold text-gray-800"
+          >
+            <option value="">All experiences (shared dates)</option>
+            {experiences.map((experience) => (
+              <option key={experience.id} value={experience.id}>
+                {experience.label}
+              </option>
+            ))}
+          </select>
+          {experiences.length === 0 && (
+            <p className="mt-2 text-xs text-gray-500">You have no listing experiences yet.</p>
+          )}
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+          <h2 className="text-sm font-bold text-gray-900">What travellers get</h2>
+          <p className="mt-1 text-xs text-gray-500">
+            Set these before opening dates: every date you open takes this many guests and is
+            sold at this price per person. Bookings on the date use both.
+          </p>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">
+            <label htmlFor="availability-slots" className="block text-sm font-semibold text-gray-800">
+              Slots per date
+              <input
+                id="availability-slots"
+                type="number"
+                min={1}
+                max={100}
+                value={slots}
+                onChange={(event) => setSlots(Math.max(1, Number(event.target.value) || 1))}
+                className="mt-2 w-full rounded-xl border border-gray-300 p-2.5 text-sm font-semibold text-gray-800 focus:border-[#213448] focus:outline-none"
+              />
+              <span className="mt-1 block text-xs font-normal text-gray-500">
+                Guests you can take on each opened date. Bookings beyond this are refused.
+              </span>
+            </label>
+            <label htmlFor="availability-price" className="block text-sm font-semibold text-gray-800">
+              Price per person (USD)
+              <input
+                id="availability-price"
+                type="number"
+                min={0}
+                step="0.01"
+                value={price}
+                onChange={(event) => setPrice(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-gray-300 p-2.5 text-sm font-semibold text-gray-800 focus:border-[#213448] focus:outline-none"
+              />
+              <span className="mt-1 block text-xs font-normal text-gray-500">
+                {selectedListing
+                  ? 'Pre-filled from this experience’s price. Change it to sell these dates for more or less.'
+                  : 'The price travellers pay per person on the dates you open.'}
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -226,7 +368,7 @@ const GuideAvailabilityPage: React.FC = () => {
               <ChevronLeft className="h-4 w-4" />
             </button>
             <p className="min-w-44 text-center text-lg font-bold text-gray-900">
-              {MONTHS[anchor.getMonth()]} {anchor.getFullYear()}
+              {formatMonthYear(anchor)}
             </p>
             <button
               type="button"
@@ -270,6 +412,9 @@ const GuideAvailabilityPage: React.FC = () => {
         )}
 
         <section className="mt-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+          <p className="mb-3 text-sm font-bold text-gray-800">
+            {selectedExperience ? selectedExperience.label : 'Shared dates (all experiences)'}
+          </p>
           {loading ? (
             <p className="flex items-center gap-2 py-16 text-sm text-gray-500">
               <Loader2 className="h-4 w-4 animate-spin" /> Loading your calendar…
@@ -302,7 +447,9 @@ const GuideAvailabilityPage: React.FC = () => {
                         <span className="text-[11px] font-semibold">
                           {day.bookings > 0 && day.remaining !== null && day.remaining > 0
                             ? `Open · ${day.remaining} left`
-                            : 'Open'}
+                            : day.max_slots != null
+                              ? `Open · ${day.max_slots} slot${day.max_slots === 1 ? '' : 's'}`
+                              : 'Open'}
                         </span>
                       )}
                       {day.status === 'booked' && (

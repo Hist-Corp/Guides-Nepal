@@ -9,6 +9,7 @@ import { useProfileStore } from '../../store/profileStore';
 import { listConversations } from '../../services/messageApi';
 import { useAvatarUpload } from '../../hooks/useAvatarUpload';
 import { Camera, Trash2, Bookmark, MapPin, Calendar, User as UserIcon, ArrowLeft, MessageCircle, Clock } from 'lucide-react';
+import { formatDate } from '../../utils/date';
 
 const ProfilePage: React.FC = () => {
   const goBack = useGoBack();
@@ -302,7 +303,7 @@ const ProfilePage: React.FC = () => {
                           <MapPin className="w-3 h-3" /> {b.city}
                         </div>
                         <div className="text-xs text-gray-600 flex items-center gap-2">
-                          <Calendar className="w-3 h-3" /> {new Date(b.date).toLocaleDateString()}
+                          <Calendar className="w-3 h-3" /> {formatDate(b.date)}
                         </div>
                       </div>
                     </div>
@@ -326,7 +327,7 @@ const ProfilePage: React.FC = () => {
                           <MapPin className="w-3 h-3" /> {b.city}
                         </div>
                         <div className="text-xs text-gray-600 flex items-center gap-2">
-                          <Calendar className="w-3 h-3" /> {new Date(b.date).toLocaleDateString()}
+                          <Calendar className="w-3 h-3" /> {formatDate(b.date)}
                         </div>
                       </div>
                     </div>

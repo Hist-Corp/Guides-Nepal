@@ -1,16 +1,15 @@
 import type { CartItem } from '../contexts/CartContext';
 import type { Booking } from '../store/bookingStore';
+import { formatDate } from './date';
 
 /**
  * Formats a yyyy-mm-dd booking date as DD/MM/YYYY, the format the booking
  * calendar and confirmations already display. Falls back to the raw value so
  * malformed dates never render as "Invalid Date".
  */
-export const formatBookingDate = (date: string): string => {
-  const [y, m, d] = date.split('-').map(Number);
-  if (!y || !m || !d) return date;
-  return `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`;
-};
+export const formatBookingDate = (date: string): string =>
+  formatDate(date, 'en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) ||
+  date;
 
 /**
  * Maps a confirmed booking onto its shopping-cart line so every booking made

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
-from datetime import datetime
+from datetime import date, datetime
 from enum import Enum
 
 
@@ -38,7 +38,11 @@ class BookingBase(BaseModel):
     experience_id: int
     experience_title: str
     city: str
-    date: datetime
+    # Calendar day (``YYYY-MM-DD``): the check-in day of a stay.
+    date: date
+    # Check-out day for a multi-night stay; every night in the range must be
+    # opened by the guide. Omitted (or equal to ``date``) for a single day.
+    checkout: Optional[date] = None
     guests: int
     price: float
     image: Optional[str] = None

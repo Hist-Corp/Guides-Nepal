@@ -36,10 +36,6 @@ def _user(db, email, role):
     return u
 
 
-def _tomorrow_datetime():
-    return datetime(TOMORROW.year, TOMORROW.month, TOMORROW.day, tzinfo=UTC)
-
-
 def test_self_hosted_guide_listing_is_rejected(db_session):
     host = _user(db_session, "host-listing@example.com", "guide")
     listing = GuideListing(
@@ -60,7 +56,7 @@ def test_self_hosted_guide_listing_is_rejected(db_session):
         experience_id=PUBLIC_GUIDE_LISTING_ID_OFFSET + int(listing.id),
         experience_title=listing.title,
         city=listing.city,
-        date=_tomorrow_datetime(),
+        date=TOMORROW,
         guests=2,
         price=50.0,
         guide_id=None,
@@ -94,7 +90,7 @@ def test_self_hosted_host_experience_is_rejected(db_session):
         experience_id=PUBLIC_HOST_EXPERIENCE_ID_OFFSET + int(experience.id),
         experience_title=experience.title,
         city=experience.city,
-        date=_tomorrow_datetime(),
+        date=TOMORROW,
         guests=2,
         price=60.0,
         guide_id=None,
@@ -116,7 +112,7 @@ def test_mock_experience_is_not_rejected_by_the_self_hosted_guard(db_session):
         experience_id=1,  # MOCK_EXPERIENCES[0].id
         experience_title="Bhaktapur Heritage Walk",
         city="Bhaktapur",
-        date=_tomorrow_datetime(),
+        date=TOMORROW,
         guests=2,
         price=50.0,
         guide_id=None,

@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { getApiUrl } from '../config/api';
 import { useAuthStore } from './authStore';
+import { toIsoDate } from '../utils/date';
+import { fetchAvailableGuideIds } from '../utils/guides';
 
 export interface Booking {
   id: string;
@@ -9,6 +11,8 @@ export interface Booking {
   experienceTitle: string;
   city: string;
   date: string;
+  /** Check-out day of a multi-night stay; every night in the range must be open. */
+  checkout?: string;
   guests: number;
   price: number;
   image: string;
@@ -40,6 +44,33 @@ export const useBookingStore = create<BookingStore>()(
         const { accessToken, refreshTokens } = useAuthStore.getState();
         if (!accessToken) return null;
 
+        // Re-check the guide right before confirming, because their calendar
+        // can change while the form is open (another traveller books, or the
+        // guide closes the date). An unreachable check falls through: the
+        // booking request validates the same night-by-night rules server-side.
+        const checkIn = toIsoDate(booking.date);
+        if (
+          booking.guideId !== undefined &&
+          booking.guideId !== null &&
+          checkIn
+        ) {
+          const open = await fetchAvailableGuideIds({
+            accessToken,
+            experienceId: booking.experienceId,
+            date: checkIn,
+            checkout: booking.checkout ? toIsoDate(booking.checkout) : null,
+            guideIds: [booking.guideId],
+          });
+          if (open && !open.has(String(booking.guideId))) {
+            alert(
+              `This guide is no longer available for the selected ${
+                booking.checkout ? 'dates' : 'date'
+              }. Please choose another date or guide.`
+            );
+            return null;
+          }
+        }
+
         const attempt = async (token: string) => {
           const response = await fetch(getApiUrl('/bookings/'), {
             method: 'POST',
@@ -52,6 +83,7 @@ export const useBookingStore = create<BookingStore>()(
               experience_title: booking.experienceTitle,
               city: booking.city,
               date: booking.date,
+              ...(booking.checkout ? { checkout: booking.checkout } : {}),
               guests: booking.guests,
               price: booking.price,
               image: booking.image,
