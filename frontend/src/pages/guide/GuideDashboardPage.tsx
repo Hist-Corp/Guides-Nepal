@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom';
 import {
   Calendar,
   CalendarDays,
+  ExternalLink,
   LayoutDashboard,
   BadgeCheck,
   Lock,
@@ -22,6 +23,7 @@ import {
   type GuideDashboardPayload,
   type GuideStatusItem,
 } from '../../services/guideDashboardApi';
+import { getGuideListedExperiences } from '../../data/guideListedExperiences';
 
 interface GuideBooking {
   id: number;
@@ -114,17 +116,39 @@ const GuideDashboardPage: React.FC = () => {
   };
 
   const stats = data?.stats;
+
+  // City catalogue pages (treks, hikes, tours…) list their guides in static
+  // data, which the backend never sees.  They are merged here so My List shows
+  // every experience the guide is publicly listed on.
+  const backendListings = data?.listings ?? [];
+  const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ');
+  const listedExperiences = getGuideListedExperiences([user?.firstName, fullName]);
+  const backendSlugs = new Set(
+    backendListings
+      .map((listing) => listing.public_slug)
+      .filter((slug): slug is string => Boolean(slug))
+  );
+  const backendTitles = new Set(
+    backendListings.map((listing) => listing.title.trim().toLowerCase())
+  );
+  const extraExperiences = listedExperiences.filter(
+    (experience) =>
+      !backendSlugs.has(experience.slug) &&
+      !backendTitles.has(experience.title.trim().toLowerCase())
+  );
+  const totalListings = backendListings.length + extraExperiences.length;
+
   const cards = [
     {
       label: 'Experience listings',
-      value: stats?.listings ?? 0,
+      value: totalListings,
       icon: LayoutDashboard,
       color: 'bg-blue-50 text-blue-600 border-blue-100',
       iconColor: 'bg-blue-100 text-blue-600',
     },
     {
       label: 'Assigned experiences',
-      value: stats?.assigned_listings ?? 0,
+      value: (stats?.assigned_listings ?? 0) + extraExperiences.length,
       icon: BadgeCheck,
       color: 'bg-emerald-50 text-emerald-600 border-emerald-100',
       iconColor: 'bg-emerald-100 text-emerald-600',
@@ -348,9 +372,14 @@ const GuideDashboardPage: React.FC = () => {
             </div>
 
             <section className="mt-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="flex items-center gap-2 text-xl font-bold text-gray-900">
-                  <Compass className="h-5 w-5" /> Your experiences and capacity
+                  <Compass className="h-5 w-5" /> My List
+                  {totalListings > 0 && (
+                    <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-bold text-gray-600">
+                      {totalListings}
+                    </span>
+                  )}
                 </h2>
                 <Link
                   to="/guide/listings"
@@ -359,7 +388,7 @@ const GuideDashboardPage: React.FC = () => {
                   Manage all
                 </Link>
               </div>
-              {(data?.listings ?? []).length === 0 ? (
+              {totalListings === 0 ? (
                 <div className="mt-6 text-center py-8">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
                     <Compass className="h-8 w-8 text-gray-400" />
@@ -377,7 +406,7 @@ const GuideDashboardPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2">
-                  {(data?.listings ?? []).slice(0, 4).map((l) => (
+                  {backendListings.map((l) => (
                     <div
                       key={l.id}
                       className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
@@ -417,6 +446,36 @@ const GuideDashboardPage: React.FC = () => {
                           </div>
                         </>
                       )}
+                    </div>
+                  ))}
+                  {extraExperiences.map((experience) => (
+                    <div
+                      key={experience.key}
+                      className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold uppercase text-gray-500 truncate">
+                            {experience.category} - {experience.city}
+                          </p>
+                          <h3 className="mt-1 font-bold text-gray-900 truncate">
+                            {experience.title}
+                          </h3>
+                        </div>
+                        <span className="shrink-0 rounded-full bg-sky-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-sky-700">
+                          Listed
+                        </span>
+                      </div>
+                      <p className="mt-3 text-sm text-gray-600">
+                        {experience.duration}
+                        {experience.price > 0 ? ` · from $${experience.price}` : ''}
+                      </p>
+                      <Link
+                        to={experience.path}
+                        className="mt-2 inline-flex items-center gap-1 text-sm font-bold text-primary hover:underline"
+                      >
+                        View experience <ExternalLink className="h-3.5 w-3.5" />
+                      </Link>
                     </div>
                   ))}
                 </div>

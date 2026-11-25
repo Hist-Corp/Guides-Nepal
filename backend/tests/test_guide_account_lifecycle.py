@@ -164,7 +164,10 @@ def test_guide_listings_include_regional_manager_assignments(client, db_session)
 
     db_session.expire_all()
     link = db_session.query(HostGuide).filter_by(guide_user_id=user.id).one()
+    # A realistic host-experience id: ids 1-12 are also the traveller
+    # catalogue's ids, and a raw id is published on both experiences.
     experience = HostExperience(
+        id=5000,
         host_id=reviewer.id,
         title="Assigned Heritage Walk",
         slug="assigned-heritage-walk",

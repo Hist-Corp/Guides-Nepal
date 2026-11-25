@@ -1,12 +1,22 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { ArrowLeft, BadgeCheck, ExternalLink, Pencil, Plus, RefreshCw, Trash2, Users } from 'lucide-react';
+import {
+  ArrowLeft,
+  BadgeCheck,
+  ExternalLink,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Trash2,
+  Users,
+} from 'lucide-react';
 import { Header } from '../../components/common/Header';
 import { Footer } from '../../components/common/Footer';
 import { useAuthStore } from '../../store/authStore';
 import { useGoBack } from '../../utils/backNavigation';
 import { guideDashboardApi, type GuideListing } from '../../services/guideDashboardApi';
 import { useCurrency } from '../../contexts/CurrencyContext';
+import { getGuideListedExperiences } from '../../data/guideListedExperiences';
 
 /**
  * My Listings for a guide.
@@ -63,6 +73,15 @@ const GuideListingsPage: React.FC = () => {
   const owned = listings.filter((listing) => (listing.source ?? 'owned') === 'owned');
   const assigned = listings.filter((listing) => listing.source === 'assigned');
 
+  // City catalogue pages list their guides in static data, so those
+  // experiences are read here rather than coming from the API.
+  const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ');
+  const listedExperiences = getGuideListedExperiences([user?.firstName, fullName]);
+  const listedSlugs = new Set(
+    listings.map((listing) => listing.public_slug).filter((slug): slug is string => Boolean(slug))
+  );
+  const catalogue = listedExperiences.filter((experience) => !listedSlugs.has(experience.slug));
+
   const remove = async (id: number) => {
     if (!accessToken || !window.confirm('Remove this listing?')) return;
     try {
@@ -94,7 +113,10 @@ const GuideListingsPage: React.FC = () => {
     <div className="flex min-h-screen flex-col bg-gray-50 font-sans">
       <Header />
       <main id="main-content" className="container mx-auto max-w-6xl flex-grow px-4 py-10">
-        <button onClick={goBack} className="mb-6 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 shadow-sm text-gray-700 font-medium text-sm transition-all duration-200 hover:bg-gray-50 hover:border-gray-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+        <button
+          onClick={goBack}
+          className="mb-6 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 shadow-sm text-gray-700 font-medium text-sm transition-all duration-200 hover:bg-gray-50 hover:border-gray-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        >
           <ArrowLeft className="h-4 w-4" />
           <span>Back</span>
         </button>
@@ -102,8 +124,8 @@ const GuideListingsPage: React.FC = () => {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Your experiences</h1>
             <p className="mt-2 text-gray-600">
-              Your own listings sit alongside the experiences your Regional Manager has assigned
-              to you. Assignments are read-only and sync automatically.
+              Your own listings sit alongside the experiences your Regional Manager has assigned to
+              you. Assignments are read-only and sync automatically.
             </p>
             {lastSynced && (
               <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-gray-500">
@@ -126,7 +148,7 @@ const GuideListingsPage: React.FC = () => {
           <p className="mt-8 rounded-xl border border-red-200 bg-red-50 p-4 text-red-600">
             {error}
           </p>
-        ) : listings.length === 0 ? (
+        ) : listings.length === 0 && catalogue.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-gray-100 bg-white p-10 text-center text-gray-500">
             No listings yet. Create your first trek, tour or specialized activity.
           </div>
@@ -194,6 +216,54 @@ const GuideListingsPage: React.FC = () => {
               </section>
             )}
 
+            {catalogue.length > 0 && (
+              <section>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Catalogue experiences</h2>
+                    <p className="mt-1 text-sm text-gray-600">
+                      You are listed as the guide on these experiences. They live on the city pages
+                      and are read-only here.
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-bold text-sky-700">
+                    {catalogue.length} listed
+                  </span>
+                </div>
+                <div className="mt-4 space-y-4">
+                  {catalogue.map((experience) => (
+                    <article
+                      key={experience.key}
+                      className="rounded-2xl border border-sky-100 bg-white p-5 shadow-sm"
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="text-xs font-bold uppercase text-gray-500">
+                            {experience.category} - {experience.city}
+                          </p>
+                          <h3 className="mt-1 text-lg font-bold text-gray-900">
+                            {experience.title}
+                          </h3>
+                          <p className="mt-1 flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                            {experience.duration && <span>{experience.duration}</span>}
+                            {experience.price > 0 && (
+                              <span>{formatPrice(experience.price, 'USD')}</span>
+                            )}
+                          </p>
+                        </div>
+                        <Link
+                          to={experience.path}
+                          className="flex items-center gap-1 rounded-full border border-gray-300 px-4 py-1.5 text-xs font-bold text-gray-700 hover:bg-gray-100"
+                        >
+                          <ExternalLink className="h-3 w-3" /> View public page
+                        </Link>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            )}
+
             <section>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
@@ -210,10 +280,7 @@ const GuideListingsPage: React.FC = () => {
               {owned.length === 0 ? (
                 <div className="mt-4 rounded-2xl border border-dashed border-gray-200 bg-white p-8 text-center text-gray-500">
                   You have no owned listings yet.{' '}
-                  <Link
-                    to="/guide/listings/new"
-                    className="font-bold text-primary hover:underline"
-                  >
+                  <Link to="/guide/listings/new" className="font-bold text-primary hover:underline">
                     Create one
                   </Link>
                   .
@@ -234,8 +301,8 @@ const GuideListingsPage: React.FC = () => {
                           <h3 className="mt-1 text-lg font-bold text-gray-900">{l.title}</h3>
                           <p className="mt-1 flex items-center gap-1 text-sm text-gray-600">
                             <Users className="h-4 w-4" />
-                            {l.booked_guests}/{l.max_guests ?? 0} guests -{' '}
-                            {l.available_spots ?? 0} spots left - {formatPrice(l.price, 'USD')}
+                            {l.booked_guests}/{l.max_guests ?? 0} guests - {l.available_spots ?? 0}{' '}
+                            spots left - {formatPrice(l.price, 'USD')}
                           </p>
                         </div>
                         <div className="flex gap-2">
@@ -266,9 +333,7 @@ const GuideListingsPage: React.FC = () => {
                           max={100}
                           placeholder={`Max guests (now ${l.max_guests ?? 0})`}
                           value={capEdits[l.id] ?? ''}
-                          onChange={(e) =>
-                            setCapEdits((c) => ({ ...c, [l.id]: e.target.value }))
-                          }
+                          onChange={(e) => setCapEdits((c) => ({ ...c, [l.id]: e.target.value }))}
                           className="w-48 rounded-xl border border-gray-300 p-2 text-sm"
                         />
                         <button
