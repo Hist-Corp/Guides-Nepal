@@ -17,6 +17,9 @@ export default defineConfig({
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
   },
   resolve: {
+    // React is hoisted to the workspace root and shared with the testing
+    // libraries there; dedupe keeps a single instance for the renderer too.
+    dedupe: ['react', 'react-dom'],
     alias: {
       '@': resolve(__dirname, './src'),
       '@components': resolve(__dirname, './src/components'),

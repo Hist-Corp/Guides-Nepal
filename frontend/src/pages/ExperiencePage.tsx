@@ -23,8 +23,10 @@ import guidesApi from '../services/guidesApi';
 import {
   useViewerGuideId,
   getAvailableGuides,
+  guideProfileHref,
   useGuidesAvailableOnDate,
 } from '../utils/guides';
+import { GuideAvailabilityNotice } from '../components/common/GuideAvailabilityNotice';
 import { mergeGuides, useAssignedGuides } from '../utils/approvedGuides';
 import { guideContactPath } from '../utils/guideUrl';
 import { guideDashboardApi } from '../services/guideDashboardApi';
@@ -761,6 +763,9 @@ const ExperiencePage: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [guests, setGuests] = useState(2);
   const [bookingError, setBookingError] = useState<string | null>(null);
+  // True while the confirmation is re-checking the guide and writing the
+  // reservation, so the button cannot be pressed twice.
+  const [bookingInFlight, setBookingInFlight] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -797,9 +802,14 @@ const ExperiencePage: React.FC = () => {
     [experience, assignedGuides]
   );
   // Only guides who opened the selected date for this experience belong in
-  // "Who you'll meet". null means no date is chosen (or the check could not be
-  // reached), so the full list stays visible.
-  const guidesOnDates = useGuidesAvailableOnDate({
+  // "Who you'll meet". `ids` is null when there is nothing to filter (no date
+  // chosen); it stays empty while the check runs or after it failed, so a
+  // guide the server has not confirmed is never shown.
+  const {
+    ids: availableGuideIds,
+    status: guideAvailabilityStatus,
+    retry: retryGuideAvailability,
+  } = useGuidesAvailableOnDate({
     accessToken,
     experienceId: experience?.id,
     date: selectedDate,
@@ -813,10 +823,10 @@ const ExperiencePage: React.FC = () => {
       experience?.city ?? '',
       viewerGuideId
     );
-    return guidesOnDates
-      ? list.filter((guide) => guidesOnDates.has(String(guide.id)))
+    return availableGuideIds
+      ? list.filter((guide) => availableGuideIds.has(String(guide.id)))
       : list;
-  }, [guidePool, bookings, experienceId, experience, viewerGuideId, guidesOnDates]);
+  }, [guidePool, bookings, experienceId, experience, viewerGuideId, availableGuideIds]);
   // The booked guide stays selectable (and keeps their calendar) even after the
   // booking marks them reserved and drops them out of "Who you'll meet".
   const bookedGuide =
@@ -837,13 +847,16 @@ const ExperiencePage: React.FC = () => {
   } = useGuideAvailability({ accessToken, guideId: selectedGuide?.id, experienceId: experience?.id });
 
   // A date is only valid on the calendar of the guide it was picked for; when a
-  // different guide is selected, drop a date that guide has not opened.
+  // different guide is selected, drop a date that guide has not opened. A
+  // failed availability check knows nothing about any guide, so it must not
+  // take the traveller's date away.
   useEffect(() => {
+    if (guideAvailabilityStatus === 'failed') return;
     if (selectedDate && disabledDates.includes(selectedDate)) {
       setSelectedDate('');
       setBookingError(null);
     }
-  }, [disabledDates, selectedDate]);
+  }, [disabledDates, selectedDate, guideAvailabilityStatus]);
 
   // Load reviews for this experience and check whether the traveller is
   // eligible to leave one (completed booking + not yet reviewed).
@@ -949,6 +962,10 @@ const ExperiencePage: React.FC = () => {
 
   const persistBooking = async () => {
     if (!experience) return false;
+    // The confirmation is the last moment the guide's calendar can be trusted:
+    // the store re-checks the same availability the page filters on and the
+    // server re-validates it again when the request lands.
+    setBookingError(null);
     // Claim the guide before the request so they stay selected (and keep
     // showing their spot counts) once the booking marks them reserved.
     setBookedGuideId(selectedGuide?.id ?? null);
@@ -964,6 +981,14 @@ const ExperiencePage: React.FC = () => {
       image: experience.images[0],
       status: 'upcoming',
       ...(selectedGuide ? { guideId: selectedGuide.id, guideName: selectedGuide.name } : {}),
+    }, {
+      // Keep the traveller in the confirmation dialog: the refusal is shown
+      // there and the calendar is refreshed with the guide's real availability.
+      onRefused: (message) => {
+        setBookingError(message);
+        setBookedGuideId(null);
+        void refreshAvailability(selectedDate);
+      },
     });
     if (bookingSaved) {
       setIsBooked(true);
@@ -1027,8 +1052,13 @@ const ExperiencePage: React.FC = () => {
   };
 
   const confirmBooking = async () => {
-    if (await persistBooking()) {
-      setConfirmPopup(false);
+    setBookingInFlight(true);
+    try {
+      if (await persistBooking()) {
+        setConfirmPopup(false);
+      }
+    } finally {
+      setBookingInFlight(false);
     }
   };
 
@@ -1383,6 +1413,15 @@ const ExperiencePage: React.FC = () => {
                 </div>
               </div>
               {/* Who you'll meet — approved guides assigned to this experience */}
+              {visibleGuides.length === 0 && guideAvailabilityStatus !== 'unfiltered' && (
+                <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm space-y-2">
+                  <h2 className="text-xl font-bold text-slate-900">Who you'll meet</h2>
+                  <GuideAvailabilityNotice
+                    status={guideAvailabilityStatus}
+                    onRetry={retryGuideAvailability}
+                  />
+                </div>
+              )}
               {visibleGuides.length > 0 && (
                 <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm space-y-4">
                   <div>
@@ -1394,6 +1433,7 @@ const ExperiencePage: React.FC = () => {
                   <div className="flex flex-wrap gap-4">
                     {visibleGuides.map((g) => {
                       const isSelected = selectedGuideId === g.id;
+                      const profileHref = guideProfileHref(g);
                       const remainingSlots =
                         typeof g.availableSlots === 'number' ? g.availableSlots : null;
                       const isLowStock =
@@ -1457,13 +1497,15 @@ const ExperiencePage: React.FC = () => {
                               </div>
                             )}
                           </button>
-                          <Link
-                            to={`/guidesprofile/${g.slug || g.id}`}
-                            aria-label={`View ${g.name}'s profile`}
-                            className="text-xs font-bold text-primary hover:underline"
-                          >
-                            View profile
-                          </Link>
+                          {profileHref && (
+                            <Link
+                              to={profileHref}
+                              aria-label={`View ${g.name}'s profile`}
+                              className="text-xs font-bold text-primary hover:underline"
+                            >
+                              View profile
+                            </Link>
+                          )}
                           {isSelected && !isFullyBooked && (
                             <span className="text-xs font-bold uppercase tracking-wider text-primary">
                               Selected
@@ -1847,20 +1889,30 @@ const ExperiencePage: React.FC = () => {
                 <span className="font-bold">{formatPrice(unitPrice * guests, 'USD')}</span>
               </div>
             </div>
+            {bookingError && (
+              <p
+                role="alert"
+                className="mb-4 rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-600"
+              >
+                {bookingError}
+              </p>
+            )}
             <div className="flex gap-3">
               <button
                 type="button"
                 onClick={() => setConfirmPopup(false)}
-                className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-bold hover:bg-gray-50 transition-colors"
+                disabled={bookingInFlight}
+                className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-bold hover:bg-gray-50 transition-colors disabled:opacity-60"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={confirmBooking}
-                className="flex-1 py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20"
+                disabled={bookingInFlight}
+                className="flex-1 py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20 disabled:opacity-60"
               >
-                Confirm booking
+                {bookingInFlight ? 'Checking availability…' : 'Confirm booking'}
               </button>
             </div>
           </div>
@@ -1887,10 +1939,19 @@ const ExperiencePage: React.FC = () => {
               Your booking has been confirmed. You can view it in your bookings.
             </p>
             <button
-              onClick={() => setBookingConfirmed(false)}
+              onClick={() => {
+                setBookingConfirmed(false);
+                navigate('/bookings');
+              }}
               className="mt-6 w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-primary/90 active:scale-[0.98]"
             >
-              OK
+              View my bookings
+            </button>
+            <button
+              onClick={() => setBookingConfirmed(false)}
+              className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-50"
+            >
+              Keep browsing
             </button>
           </div>
         </div>

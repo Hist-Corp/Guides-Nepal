@@ -30,9 +30,11 @@ import { useMessageStore } from '../../store/messageStore';
 import { MobileBookingSheet } from '../../components/common/MobileBookingSheet';
 import {
   getAvailableGuides,
+  keepSelectedGuide,
   useGuidesAvailableOnDate,
   useViewerGuideId,
 } from '../../utils/guides';
+import { GuideAvailabilityNotice } from '../../components/common/GuideAvailabilityNotice';
 import { mergeGuides, useAssignedGuides } from '../../utils/approvedGuides';
 import { isPredefinedTrip } from '../../utils/experienceBooking';
 import { BookmarkButton } from '../../components/common/BookmarkButton';
@@ -159,9 +161,14 @@ const KathmanduExperiencePage: React.FC = () => {
     [data, assignedGuides]
   );
   // Only guides who opened every night of the selected stay for this experience
-  // belong in "Who you'll meet". null means no date is chosen (or the check
-  // could not be reached), so the full list stays visible.
-  const guidesOnDates = useGuidesAvailableOnDate({
+  // belong in "Who you'll meet". `ids` is null when there is nothing to filter
+  // (no date chosen); it stays empty while the check runs or after it failed,
+  // so a guide the server has not confirmed is never shown.
+  const {
+    ids: availableGuideIds,
+    status: guideAvailabilityStatus,
+    retry: retryGuideAvailability,
+  } = useGuidesAvailableOnDate({
     accessToken,
     experienceId: data?.id,
     date: checkIn,
@@ -177,10 +184,10 @@ const KathmanduExperiencePage: React.FC = () => {
       data.city ?? '',
       viewerGuideId
     );
-    return guidesOnDates
-      ? list.filter((guide) => guidesOnDates.has(String(guide.id)))
+    return availableGuideIds
+      ? list.filter((guide) => availableGuideIds.has(String(guide.id)))
       : list;
-  }, [data, bookings, guidePool, viewerGuideId, guidesOnDates]);
+  }, [data, bookings, guidePool, viewerGuideId, availableGuideIds]);
 
   const handleBookNow = async (): Promise<boolean> => {
     if (!isAuthenticated) {
@@ -313,15 +320,10 @@ const KathmanduExperiencePage: React.FC = () => {
   // count; any other guide that drops out of "Who you'll meet" (now reserved or
   // fully booked) falls back to the highest-rated available one.
   useEffect(() => {
-    if (
-      selectedGuide &&
-      ((bookedGuideId !== null && String(selectedGuide.id) === String(bookedGuideId)) ||
-        availableGuides.some((g) => g.id === selectedGuide.id))
-    ) {
-      return;
-    }
-    setSelectedGuide(availableGuides[0] ?? null);
-  }, [availableGuides, selectedGuide, bookedGuideId]);
+    setSelectedGuide((current) =>
+      keepSelectedGuide(availableGuides, current, guideAvailabilityStatus, bookedGuideId)
+    );
+  }, [availableGuides, guideAvailabilityStatus, bookedGuideId]);
 
   const getDaysDifference = () => {
     if (checkIn && checkOut) {
@@ -516,10 +518,10 @@ const KathmanduExperiencePage: React.FC = () => {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500">
-                      All guides for this experience are currently booked — new dates open up
-                      regularly.
-                    </p>
+                    <GuideAvailabilityNotice
+                      status={guideAvailabilityStatus}
+                      onRetry={retryGuideAvailability}
+                    />
                   )
                 ) : (
                   // Fallback if no guides defined (using host data)

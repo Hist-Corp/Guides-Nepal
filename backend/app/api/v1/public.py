@@ -742,6 +742,49 @@ def _user_to_host_payload(user: Optional[User]) -> dict:
     }
 
 
+def _listing_owner_guide(db: Session, listing: GuideListing) -> Optional[dict]:
+    """The guide who owns a listing, as a "Who you'll meet" card.
+
+    A guide's own listing has no HostExperienceGuide assignment, so without
+    this she never appears for the dates she opened.      Her catalog profile is
+    used when she has one; otherwise her account id stands in, but only while
+    that id still resolves to her.
+    """
+    if listing.guide_user_id is None:
+        return None
+    link = (
+        db.query(HostGuide)
+        .filter(
+            HostGuide.guide_user_id == int(listing.guide_user_id),
+            HostGuide.status == "active",
+            HostGuide.guide_id.isnot(None),
+        )
+        .order_by(HostGuide.id.desc())
+        .first()
+    )
+    guide = db.get(Guide, int(link.guide_id)) if link is not None else None
+    if guide is not None and guide.is_active:
+        return _guide_to_host_payload(guide, int(listing.guide_user_id))
+    user = db.get(User, listing.guide_user_id)
+    if user is None:
+        return None
+    # The account id only stands in for a profile when the booking path
+    # resolves it back to this guide.  A catalog profile linked to the same id
+    # would win that lookup and put the traveller on someone else's calendar.
+    claimed = (
+        db.query(HostGuide.guide_user_id)
+        .filter(
+            HostGuide.guide_id == int(user.id),
+            HostGuide.status == "active",
+            HostGuide.guide_user_id.isnot(None),
+        )
+        .first()
+    )
+    if claimed is not None and int(claimed[0]) != int(user.id):
+        return None
+    return _user_to_host_payload(user)
+
+
 def _guide_listing_to_public(db: Session, listing: GuideListing) -> Optional[dict]:
     """Map a published GuideListing (approved proposal) to the public experience shape."""
     user = db.get(User, listing.guide_user_id)
@@ -770,11 +813,13 @@ def _guide_listing_to_public(db: Session, listing: GuideListing) -> Optional[dic
         "category": _GUIDE_LISTING_CATEGORY_MAP.get(listing.category, listing.category),
         "host": host,
     }
-    # Guides approved for this listing are added next to its owner, so the
-    # "Who you'll meet" section stays in step with the assignment requests.
+    # The owner leads her own listing, then the guides approved for it.
     guides = _experience_guides(db, payload["id"])
+    owner = _listing_owner_guide(db, listing)
+    if owner is not None:
+        guides = [owner, *[g for g in guides if g["id"] != owner["id"]]]
     if guides:
-        payload["guides"] = guides
+        payload["guides"] = _with_guide_terms(db, payload["id"], guides)
     return payload
 
 

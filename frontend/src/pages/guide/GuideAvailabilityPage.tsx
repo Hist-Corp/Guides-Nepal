@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
   CalendarDays,
+  Check,
   ChevronLeft,
   ChevronRight,
   Info,
@@ -38,9 +39,10 @@ const emptyDay = (date: string): GuideAvailabilityDay => ({
  *
  * Availability is opt-in: every date starts closed, and only dates the guide
  * opens here become bookable on the public experience pages. Clicking a date
- * toggles it (shift-click fills the range from the last click), and closing a
- * date that still holds a booking is refused by the API with the reason, which
- * is surfaced inline.
+ * stages a change locally (shift-click stages the range from the last click) —
+ * nothing is saved until the guide presses Confirm, which sends the staged
+ * opens and closes in one pass and then reloads the month. Closing a date that
+ * still holds a booking is refused by the API with the reason, surfaced inline.
  *
  * The calendar is scoped to one listing experience at a time (its id lives in
  * the URL); the dates opened here are only bookable for that experience.
@@ -61,6 +63,8 @@ const GuideAvailabilityPage: React.FC = () => {
   // Slots and price are the guide's offer, set before opening dates.
   const [slots, setSlots] = useState(10);
   const [price, setPrice] = useState('');
+  // Dates clicked here are only staged; the confirm button writes them.
+  const [pending, setPending] = useState<Record<string, 'available' | 'unavailable'>>({});
 
   // Owned listings are addressed publicly as 200000 + row id; assignments
   // already carry the experience id they point at.
@@ -125,6 +129,11 @@ const GuideAvailabilityPage: React.FC = () => {
     if (accessToken && user?.role === 'guide') void load(monthStart, monthEnd);
   }, [accessToken, user?.role, monthStart, monthEnd, load]);
 
+  // Staged dates belong to the view they were picked in.
+  useEffect(() => {
+    setPending({});
+  }, [selectedExperienceId, monthStart]);
+
   // Each experience has its own natural defaults: its guest limit and price.
   useEffect(() => {
     setSlots(selectedListing?.max_guests ?? 10);
@@ -139,39 +148,62 @@ const GuideAvailabilityPage: React.FC = () => {
       .catch(() => setListings([]));
   }, [accessToken, user?.role]);
 
-  const apply = useCallback(
-    async (dates: string[], status: 'available' | 'unavailable') => {
-      if (!accessToken || dates.length === 0) return;
-      if (status === 'available' && (!Number.isFinite(priceValue) || priceValue <= 0)) {
-        setError('Set a price per person greater than 0 before opening dates.');
-        return;
-      }
-      setSaving(true);
-      setError('');
-      setNotice('');
-      try {
+  const confirmPending = async () => {
+    const entries = Object.entries(pending);
+    if (!accessToken || entries.length === 0) return;
+    const toOpen = entries.filter(([, status]) => status === 'available').map(([date]) => date);
+    const toClose = entries.filter(([, status]) => status === 'unavailable').map(([date]) => date);
+    if (toOpen.length > 0 && (!Number.isFinite(priceValue) || priceValue <= 0)) {
+      setError('Set a price per person greater than 0 before opening dates.');
+      return;
+    }
+    setSaving(true);
+    setError('');
+    setNotice('');
+    try {
+      const messages: string[] = [];
+      if (toOpen.length > 0) {
         const result = await guideDashboardApi.setAvailability(
           accessToken,
-          dates,
-          status,
+          toOpen,
+          'available',
           selectedExperienceId || undefined,
-          status === 'available' ? slots : undefined,
-          status === 'available' ? priceValue : undefined,
+          slots,
+          priceValue,
         );
-        setNotice(
-          status === 'available'
-            ? `${result.dates.length} date${result.dates.length === 1 ? '' : 's'} opened with ${slots} slot${slots === 1 ? '' : 's'} at ${priceValue.toFixed(2)} per person.`
-            : `${result.dates.length} date${result.dates.length === 1 ? '' : 's'} marked ${status}.`,
+        messages.push(
+          `${result.dates.length} date${result.dates.length === 1 ? '' : 's'} opened with ${slots} slot${slots === 1 ? '' : 's'} at ${priceValue.toFixed(2)} per person.`,
         );
-        await load(monthStart, monthEnd, true);
-      } catch (saveError) {
-        setError(saveError instanceof Error ? saveError.message : 'Unable to save availability.');
-      } finally {
-        setSaving(false);
       }
-    },
-    [accessToken, load, monthStart, monthEnd, selectedExperienceId, slots, priceValue],
-  );
+      if (toClose.length > 0) {
+        const result = await guideDashboardApi.setAvailability(
+          accessToken,
+          toClose,
+          'unavailable',
+          selectedExperienceId || undefined,
+        );
+        messages.push(
+          `${result.dates.length} date${result.dates.length === 1 ? '' : 's'} closed.`,
+        );
+      }
+      setPending({});
+      setNotice(messages.join(' '));
+      await load(monthStart, monthEnd, true);
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : 'Unable to save availability.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const stageAll = (dates: string[], status: 'available' | 'unavailable') =>
+    setPending((current) => {
+      const next = { ...current };
+      dates.forEach((date) => {
+        next[date] = status;
+      });
+      return next;
+    });
 
   const toggle = (day: GuideAvailabilityDay, shiftKey: boolean) => {
     if (saving) return;
@@ -179,7 +211,8 @@ const GuideAvailabilityPage: React.FC = () => {
       setError('Past dates cannot be changed.');
       return;
     }
-    const target: 'available' | 'unavailable' = day.status === 'available' ? 'unavailable' : 'available';
+    const target: 'available' | 'unavailable' =
+      (pending[day.date] ?? day.status) === 'available' ? 'unavailable' : 'available';
     let dates = [day.date];
     if (shiftKey && lastClicked && lastClicked !== day.date) {
       const [from, to] = [lastClicked, day.date].sort();
@@ -189,6 +222,7 @@ const GuideAvailabilityPage: React.FC = () => {
       // Closing a date with bookings is refused by the API; leaving those out
       // keeps the rest of the range from failing with them.
       dates = inRange
+        .filter((entry) => (pending[entry.date] ?? entry.status) !== target)
         .filter((entry) => target === 'available' || entry.bookings === 0)
         .map((entry) => entry.date);
       if (dates.length === 0) {
@@ -197,21 +231,30 @@ const GuideAvailabilityPage: React.FC = () => {
       }
     }
     setLastClicked(day.date);
-    void apply(dates, target);
+    setError('');
+    // Clicking a staged date again cancels that particular change.
+    setPending((current) => {
+      const next = { ...current };
+      dates.forEach((date) => {
+        if (current[date] === target) delete next[date];
+        else next[date] = target;
+      });
+      return next;
+    });
   };
 
   const openRemaining = () => {
     const dates = Object.values(days)
       .filter((day) => day.date >= today && day.status === 'unavailable')
       .map((day) => day.date);
-    void apply(dates, 'available');
+    stageAll(dates, 'available');
   };
 
   const closeOpenDays = () => {
     const dates = Object.values(days)
       .filter((day) => day.date >= today && day.status === 'available' && day.bookings === 0)
       .map((day) => day.date);
-    void apply(dates, 'unavailable');
+    stageAll(dates, 'unavailable');
   };
 
   const cells = useMemo(() => {
@@ -245,12 +288,18 @@ const GuideAvailabilityPage: React.FC = () => {
   const shiftMonth = (delta: number) =>
     setAnchor((current) => new Date(current.getFullYear(), current.getMonth() + delta, 1));
 
-  const cellClass = (day: GuideAvailabilityDay) => {
+  const cellClass = (day: GuideAvailabilityDay, status: string, isPending: boolean) => {
     if (day.date < today) return 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed';
-    if (day.status === 'available') return 'border-emerald-300 bg-emerald-50 text-emerald-900 hover:border-emerald-400';
-    if (day.status === 'booked') return 'border-amber-300 bg-amber-50 text-amber-900 cursor-not-allowed';
-    return 'border-gray-200 bg-white text-gray-500 hover:border-[#213448] hover:text-[#213448]';
+    const base =
+      status === 'available'
+        ? 'border-emerald-300 bg-emerald-50 text-emerald-900 hover:border-emerald-400'
+        : status === 'booked'
+          ? 'border-amber-300 bg-amber-50 text-amber-900 cursor-not-allowed'
+          : 'border-gray-200 bg-white text-gray-500 hover:border-[#213448] hover:text-[#213448]';
+    return isPending ? `${base} ring-2 ring-[#213448] ring-offset-1` : base;
   };
+
+  const pendingCount = Object.keys(pending).length;
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 font-sans">
@@ -382,9 +431,18 @@ const GuideAvailabilityPage: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <button
               type="button"
+              onClick={() => void confirmPending()}
+              disabled={saving || pendingCount === 0}
+              className="inline-flex items-center gap-2 rounded-full bg-[#213448] px-4 py-2 font-bold text-white hover:bg-[#1a2a3a] disabled:opacity-50"
+            >
+              <Check className="h-4 w-4" /> Confirm changes
+              {pendingCount > 0 ? ` (${pendingCount})` : ''}
+            </button>
+            <button
+              type="button"
               onClick={openRemaining}
               disabled={saving || stats.unavailable === 0}
-              className="inline-flex items-center gap-2 rounded-full bg-[#213448] px-4 py-2 font-bold text-white hover:bg-[#1a2a3a] disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-full border border-gray-300 px-4 py-2 font-bold text-gray-700 hover:bg-gray-100 disabled:opacity-50"
             >
               <Unlock className="h-4 w-4" /> Open all remaining dates
             </button>
@@ -432,18 +490,20 @@ const GuideAvailabilityPage: React.FC = () => {
                 {cells.map((day, index) => {
                   if (!day) return <div key={`pad-${index}`} className="min-h-24 rounded-xl" />;
                   const isPast = day.date < today;
+                  const pendingStatus = pending[day.date];
+                  const status = pendingStatus ?? day.status;
                   return (
                     <button
                       key={day.date}
                       type="button"
                       onClick={(event) => toggle(day, event.shiftKey)}
-                      disabled={isPast}
-                      aria-pressed={day.status === 'available'}
-                      aria-label={`${day.date}: ${day.status}${day.bookings ? `, ${day.bookings} booking(s)` : ''}`}
-                      className={`flex min-h-24 flex-col items-start gap-1 rounded-xl border p-2 text-left transition-colors ${cellClass(day)}`}
+                      disabled={isPast || saving}
+                      aria-pressed={status === 'available'}
+                      aria-label={`${day.date}: ${status}${day.bookings ? `, ${day.bookings} booking(s)` : ''}${pendingStatus ? ' (not saved yet)' : ''}`}
+                      className={`flex min-h-24 flex-col items-start gap-1 rounded-xl border p-2 text-left transition-colors ${cellClass(day, status, Boolean(pendingStatus))}`}
                     >
                       <span className="text-sm font-bold">{Number(day.date.slice(-2))}</span>
-                      {day.status === 'available' && (
+                      {status === 'available' && (
                         <span className="text-[11px] font-semibold">
                           {day.bookings > 0 && day.remaining !== null && day.remaining > 0
                             ? `Open · ${day.remaining} left`
@@ -452,13 +512,18 @@ const GuideAvailabilityPage: React.FC = () => {
                               : 'Open'}
                         </span>
                       )}
-                      {day.status === 'booked' && (
+                      {status === 'booked' && (
                         <span className="flex items-center gap-1 text-[11px] font-semibold">
                           <Lock className="h-3 w-3" /> Booked
                         </span>
                       )}
-                      {day.status === 'unavailable' && !isPast && (
+                      {status === 'unavailable' && !isPast && (
                         <span className="text-[11px] text-gray-400">Closed</span>
+                      )}
+                      {pendingStatus && (
+                        <span className="text-[10px] font-bold uppercase tracking-wide text-[#213448]">
+                          Unsaved
+                        </span>
                       )}
                       {day.bookings > 0 && (
                         <span className="mt-auto text-[11px] text-gray-500">
@@ -488,7 +553,7 @@ const GuideAvailabilityPage: React.FC = () => {
             </span>
           </div>
           <span className="inline-flex items-center gap-2 text-xs text-gray-500">
-            <Info className="h-4 w-4" /> Tip: click a date to toggle it, shift-click a second date to fill the range.
+            <Info className="h-4 w-4" /> Tip: click dates to stage changes, then press Confirm. Shift-click a second date to stage the range.
           </span>
         </div>
       </main>

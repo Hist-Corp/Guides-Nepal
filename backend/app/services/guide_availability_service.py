@@ -134,6 +134,13 @@ def as_date(value: str | date | datetime) -> date:
         raise ValueError("Dates must be ISO dates (YYYY-MM-DD).") from exc
 
 
+def _nights(first: date, checkout: date | None) -> list[date]:
+    """Every night a stay holds the guide: check-in up to (not including) check-out."""
+    if checkout is None or checkout <= first:
+        return [first]
+    return [first + timedelta(days=offset) for offset in range((checkout - first).days)]
+
+
 class GuideAvailabilityService:
     def __init__(self, db: Session):
         self.db = db
@@ -251,16 +258,7 @@ class GuideAvailabilityService:
 
         held: dict[date, int] = {}
         for booking in query.all():
-            first = booking.date
-            checkout = booking.checkout
-            if checkout and checkout > first:
-                nights = [
-                    first + timedelta(days=offset)
-                    for offset in range((checkout - first).days)
-                ]
-            else:
-                nights = [first]
-            for night in nights:
+            for night in _nights(booking.date, booking.checkout):
                 if start <= night <= end:
                     held[night] = held.get(night, 0) + int(booking.guests or 0)
         return held
@@ -273,6 +271,51 @@ class GuideAvailabilityService:
     ) -> int:
         """Guests already held on a date, for one experience when given."""
         return self._held_by_day(guide_user_id, day, day, experience_id).get(day, 0)
+
+    def day_capacity(
+        self,
+        guide_user_id: int | Sequence[int],
+        day: date,
+        fallback: int,
+    ) -> int:
+        """Guest slots that day's offers add up to, in total.
+
+        The guide-day capacity row is one number per guide and date, so it
+        carries the sum of the slots the guide opened that day rather than the
+        listing's guest limit. Each experience's own limit is still enforced
+        separately when a booking is made. Dates with no slots recorded fall
+        back to ``fallback`` (the listing's guest limit).
+        """
+        rows = (
+            self.db.query(GuideAvailabilityDate)
+            .filter(
+                GuideAvailabilityDate.guide_user_id.in_(_account_ids(guide_user_id)),
+                GuideAvailabilityDate.date == day,
+                GuideAvailabilityDate.status == "available",
+            )
+            .all()
+        )
+        fallback = max(int(fallback or 1), 1)
+        if not rows:
+            return fallback
+
+        total = 0
+        for row in rows:
+            offers = _offers(row.offers)
+            excluded, keys = _scope(row.experience_ids)
+            if not keys or excluded:
+                # Whole-date (or "all but these") opening: its default offer is
+                # what the date carries, not one copy per experience.
+                entry = offers.get(DEFAULT_OFFER_KEY) or {}
+                total += int(entry.get("slots") or fallback)
+                continue
+            for key in keys:
+                entry = {
+                    **(offers.get(DEFAULT_OFFER_KEY) or {}),
+                    **(offers.get(key) or {}),
+                }
+                total += int(entry.get("slots") or fallback)
+        return max(total, 1)
 
     @staticmethod
     def _write_offer(
@@ -470,7 +513,9 @@ class GuideAvailabilityService:
         - dates in the past are rejected (422) — history is immutable;
         - closing a date that still holds an active booking is rejected (409)
           so a traveller's confirmed trip can never be silently dropped;
-          with ``experience_id`` only that experience's bookings block it.
+          a multi-night stay blocks every night it covers, not just its
+          check-in day; with ``experience_id`` only that experience's bookings
+          block it.
         """
         if status not in ("available", "unavailable"):
             raise HTTPException(status_code=422, detail="status must be available or unavailable")
@@ -524,13 +569,22 @@ class GuideAvailabilityService:
                     )
 
         if not opening:
+            # A stay holds every night up to its check-out, so a booking that
+            # started earlier still blocks closing a night inside it.
+            blocking = self.db.query(Booking).filter(
+                Booking.guide_user_id.in_(_account_ids(guide_user_id)),
+                Booking.status.in_(ACTIVE_BOOKING_STATUSES),
+                Booking.date <= days[-1],
+                or_(Booking.checkout.is_(None), Booking.checkout > days[0]),
+            )
+            if experience_id is not None:
+                blocking = blocking.filter(Booking.experience_id == int(experience_id))
+            wanted = set(days)
             blocked: dict[str, int] = {}
-            for booking in self._active_bookings(
-                guide_user_id, days[0], days[-1], experience_id
-            ):
-                booking_day = booking.date
-                if booking_day in days:
-                    blocked[booking_day.isoformat()] = blocked.get(booking_day.isoformat(), 0) + 1
+            for booking in blocking.all():
+                for night in _nights(booking.date, booking.checkout):
+                    if night in wanted:
+                        blocked[night] = blocked.get(night, 0) + 1
             if blocked:
                 first = min(blocked)
                 raise HTTPException(

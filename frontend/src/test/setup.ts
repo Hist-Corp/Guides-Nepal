@@ -106,5 +106,11 @@ afterAll(() => {
   console.error = originalError;
 });
 
-// Import jest-dom matchers after mocks are set up
-import '@testing-library/jest-dom/vitest';
+// Import jest-dom matchers after mocks are set up. Imported through `matchers`
+// rather than the `/vitest` entry: the package is hoisted to the workspace
+// root, where `vitest` is not installed, so its `/vitest` entry cannot resolve
+// `import { expect } from 'vitest'` from there.
+import { expect } from 'vitest';
+import * as matchers from '@testing-library/jest-dom/matchers';
+
+expect.extend(matchers as Parameters<typeof expect.extend>[0]);

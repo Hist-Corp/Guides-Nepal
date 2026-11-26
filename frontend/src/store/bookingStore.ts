@@ -22,11 +22,18 @@ export interface Booking {
   guideName?: string;
 }
 
+/** Shown when a booking was refused before it reached the server. */
+export type BookingRefused = (message: string) => void;
+
 interface BookingStore {
   bookings: Booking[];
   /** Persists the booking and returns it as stored, with the server's id;
    * null when the guide/date was rejected or the user is signed out. */
-  addBooking: (booking: Booking) => Promise<Booking | null>;
+  addBooking: (
+    booking: Booking,
+    /** `onRefused` shows the refusal inline instead of in an alert. */
+    options?: { onRefused?: BookingRefused }
+  ) => Promise<Booking | null>;
   /** Cancels the booking on the server (releasing the date's capacity) and
    * marks it cancelled locally; false when the server refused. */
   cancelBooking: (id: string) => Promise<boolean>;
@@ -40,9 +47,13 @@ export const useBookingStore = create<BookingStore>()(
   persist(
     (set) => ({
       bookings: [],
-      addBooking: async (booking) => {
+      addBooking: async (booking, options) => {
         const { accessToken, refreshTokens } = useAuthStore.getState();
         if (!accessToken) return null;
+        const refuse = (message: string) => {
+          if (options?.onRefused) options.onRefused(message);
+          else alert(message);
+        };
 
         // Re-check the guide right before confirming, because their calendar
         // can change while the form is open (another traveller books, or the
@@ -62,7 +73,7 @@ export const useBookingStore = create<BookingStore>()(
             guideIds: [booking.guideId],
           });
           if (open && !open.has(String(booking.guideId))) {
-            alert(
+            refuse(
               `This guide is no longer available for the selected ${
                 booking.checkout ? 'dates' : 'date'
               }. Please choose another date or guide.`
@@ -110,7 +121,10 @@ export const useBookingStore = create<BookingStore>()(
           const response = await attempt(accessToken);
           if (!response.ok) {
             const error = await response.json().catch(() => ({}));
-            alert(error.detail || 'This guide is unavailable. Please choose another guide or another date.');
+            refuse(
+              error.detail ||
+                'This guide is unavailable. Please choose another guide or another date.'
+            );
             return null;
           }
           // The server assigns the booking id; keep it so the confirmation can
@@ -124,7 +138,7 @@ export const useBookingStore = create<BookingStore>()(
           return savedBooking;
         } catch (error) {
           console.error('Failed to save booking:', error);
-          alert('Unable to save your booking. Please choose another guide or another date.');
+          refuse('Unable to save your booking. Please choose another guide or another date.');
           return null;
         }
       },

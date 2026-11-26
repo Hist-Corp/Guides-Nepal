@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getApiUrl } from '../config/api';
 import { toIsoDate } from './date';
 import { useAuthStore } from '../store/authStore';
@@ -69,9 +69,9 @@ export interface GuideAvailabilityQuery {
 /**
  * Catalog guide ids with every night of the stay open for this experience.
  *
- * `null` when the check cannot be made (signed out, no date, no guides, or the
- * request failed), so callers keep the list they already have instead of
- * hiding every guide on a network hiccup.
+ * `null` when there is nothing to check (no token, date or guides) or the
+ * request could not be answered, so callers fall through to the server's own
+ * validation. A returned set is the server's answer, and may be empty.
  */
 export async function fetchAvailableGuideIds({
   accessToken,
@@ -112,24 +112,51 @@ export async function fetchAvailableGuideIds({
   }
 }
 
+export type GuideAvailabilityStatus = 'unfiltered' | 'checking' | 'verified' | 'failed';
+
+/** What the "Who you'll meet" list knows about the selected dates. */
+export interface GuideAvailabilityState {
+  /**
+   * The last answer: the verified ids, or the ids that were verified before a
+   * new date started checking (empty when the check failed). `null` when there
+   * is nothing to filter.
+   */
+  ids: Set<string> | null;
+  status: GuideAvailabilityStatus;
+  /** Re-runs the check after `status: 'failed'`. */
+  retry: () => void;
+}
+
 /**
  * The guides (from `guideIds`) still bookable for the selected date or stay,
- * re-read whenever the date, the stay or the guide list changes. `null` while
- * unknown, so the caller shows the full list until the answer arrives.
+ * re-read whenever the date, the stay or the guide list changes.
+ *
+ * A date with no open guides (`verified`, empty) is a different answer from a
+ * check that could not be completed (`failed`): the first hides the list, the
+ * second offers a retry. Both show no guides, so availability is never assumed.
  */
 export function useGuidesAvailableOnDate(
   query: GuideAvailabilityQuery
-): Set<string> | null {
+): GuideAvailabilityState {
   const { accessToken, experienceId, date, checkout } = query;
   const idsKey = query.guideIds.map(String).join(',');
-  const [available, setAvailable] = useState<Set<string> | null>(null);
+  const [state, setState] = useState<{
+    status: GuideAvailabilityStatus;
+    ids: Set<string> | null;
+  }>({ status: 'unfiltered', ids: null });
+  const [attempt, setAttempt] = useState(0);
+  const retry = useCallback(() => setAttempt((count) => count + 1), []);
 
   useEffect(() => {
     let cancelled = false;
     if (!date || !accessToken || !idsKey) {
-      setAvailable(null);
+      setState({ status: 'unfiltered', ids: null });
       return;
     }
+    // Keep the answer already on screen while the new date is checked: a
+    // pending check is not an answer, so it must not blank the picker or drop
+    // the traveller's choice.
+    setState((previous) => ({ status: 'checking', ids: previous.ids ?? new Set() }));
     void fetchAvailableGuideIds({
       accessToken,
       experienceId,
@@ -137,14 +164,43 @@ export function useGuidesAvailableOnDate(
       checkout,
       guideIds: idsKey.split(','),
     }).then((ids) => {
-      if (!cancelled) setAvailable(ids);
+      if (cancelled) return;
+      setState(
+        ids === null
+          ? { status: 'failed', ids: new Set() }
+          : { status: 'verified', ids }
+      );
     });
     return () => {
       cancelled = true;
     };
-  }, [accessToken, experienceId, date, checkout, idsKey]);
+  }, [accessToken, experienceId, date, checkout, idsKey, attempt]);
 
-  return available;
+  return { ...state, retry };
+}
+
+/**
+ * The guide the picker keeps selected after an availability answer.
+ *
+ * A check that is still running or could not be completed is not an answer:
+ * the traveller keeps the guide they picked. Once the server answers, a guide
+ * who is still listed stays selected and one who dropped out falls back to the
+ * first available guide (or to nothing when nobody is open). `keepId` pins a
+ * guide that must survive the fallback, such as the one just booked.
+ */
+export function keepSelectedGuide<T extends { id: number | string }>(
+  available: T[],
+  current: T | null,
+  status: GuideAvailabilityStatus,
+  keepId?: number | string | null
+): T | null {
+  if (status === 'checking' || status === 'failed') return current;
+  const pinned = keepId !== null && keepId !== undefined ? String(keepId) : null;
+  const stays =
+    current !== null &&
+    (available.some((g) => g.id === current.id) ||
+      (pinned !== null && String(current.id) === pinned));
+  return stays ? current : (available[0] ?? null);
 }
 
 /**
@@ -188,4 +244,15 @@ export function getAvailableGuides<T extends GuideLike>(
       );
     })
     .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.reviews ?? 0) - (a.reviews ?? 0));
+}
+
+/**
+ * Profile link for a guide card, or `null` when there is no profile to open.
+ *
+ * Only a catalog profile gets a slug; a guide who lists from an account alone
+ * has none, and linking her account id would land on a 404.
+ */
+export function guideProfileHref(guide: { slug?: string | null }): string | null {
+  const slug = guide.slug?.trim();
+  return slug ? `/guidesprofile/${slug}` : null;
 }

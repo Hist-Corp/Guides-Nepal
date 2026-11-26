@@ -2,7 +2,7 @@ from calendar import monthrange
 from datetime import UTC, date, datetime, timedelta
 
 from fastapi import HTTPException
-from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.v1.public import GUIDE_LISTING_ID_OFFSET, resolve_experience_reference
@@ -99,50 +99,94 @@ class BookingService:
             self.db.commit()
         return reset_count
 
-    def ensure_daily_capacity_row(
-        self, guide_user_id: int, booking_date: datetime, max_capacity: int
+    def _claim_day(
+        self, guide_user_id: int, night: date, fallback_limit: int
     ) -> GuideDailyCapacity:
-        """Get-or-create the capacity row for (guide, date).  Used when a
-        traveller books in advance for a future day that has no row yet."""
-        # Normalize to start of day in UTC
-        day_start = booking_date.astimezone(UTC).replace(
-            hour=0, minute=0, second=0, microsecond=0
+        """Create, size and lock the guide-day row before deciding a booking.
+
+        The lock is the serialization point that makes the slot check atomic:
+        every booking for this guide and night waits here, so the guests read
+        for the limit can never be a stale snapshot.  A no-op UPDATE is used
+        instead of ``SELECT ... FOR UPDATE`` because SQLite ignores the latter
+        and the race would stay open there; on Postgres the UPDATE takes the
+        same row lock.
+
+        The row's ``max_capacity`` is the guide's own offer for that day (the
+        sum of the slots they opened), not the listing's guest limit, so every
+        reader of the row agrees with what a booking will accept.
+        """
+        day_start = _utc_midnight(night)
+        scope = (
+            GuideDailyCapacity.guide_user_id == guide_user_id,
+            GuideDailyCapacity.booking_date == day_start,
         )
-        row = (
-            self.db.query(GuideDailyCapacity)
-            .filter(
-                GuideDailyCapacity.guide_user_id == guide_user_id,
-                GuideDailyCapacity.booking_date == day_start,
+
+        def lock() -> int:
+            # A write is deliberately the first statement of the claim: SQLite
+            # then takes its write lock here (a read that upgrades later can
+            # fail immediately instead of waiting) and Postgres locks the row.
+            return (
+                self.db.query(GuideDailyCapacity)
+                .filter(*scope)
+                .update(
+                    {"booked_capacity": GuideDailyCapacity.booked_capacity},
+                    synchronize_session=False,
+                )
             )
-            .with_for_update()
-            .first()
-        )
-        if row is None:
-            # Seed the row with guests already booked that day.  Bookings made
-            # before this per-day table existed never held a row, and without
-            # this the first new booking would ignore them.
-            already_booked = (
-                self.db.query(func.coalesce(func.sum(Booking.guests), 0))
+
+        if not lock():
+            # Seed the row with guests already booked that day, so bookings made
+            # before this per-day table existed are still counted.
+            already_booked = sum(
+                int(booking.guests or 0)
+                for booking in self.db.query(Booking)
                 .filter(
                     Booking.guide_user_id == guide_user_id,
-                    Booking.date == day_start.date(),
+                    Booking.date == night,
                     Booking.status.in_(
                         [BookingStatus.upcoming, BookingStatus.accepted]
                     ),
                 )
-                .scalar()
+                .all()
             )
-            row = GuideDailyCapacity(
-                guide_user_id=guide_user_id,
-                booking_date=day_start,
-                max_capacity=max_capacity,
-                booked_capacity=int(already_booked or 0),
-                is_active=True,
-                reset_at=None,
-            )
-            self.db.add(row)
-            self.db.flush()
+            try:
+                with self.db.begin_nested():
+                    self.db.add(
+                        GuideDailyCapacity(
+                            guide_user_id=guide_user_id,
+                            booking_date=day_start,
+                            max_capacity=max(int(fallback_limit or 1), 1),
+                            booked_capacity=already_booked,
+                            is_active=True,
+                            reset_at=None,
+                        )
+                    )
+                    self.db.flush()
+            except IntegrityError:  # a concurrent request created it first
+                pass
+            lock()
+
+        row = (
+            self.db.query(GuideDailyCapacity).filter(*scope).populate_existing().one()
+        )
+        capacity = GuideAvailabilityService(self.db).day_capacity(
+            guide_user_id, night, int(fallback_limit or 1)
+        )
+        if int(row.max_capacity or 0) != capacity:
+            row.max_capacity = capacity
         return row
+
+    def _day_row(self, guide_user_id: int, night: date) -> GuideDailyCapacity:
+        """The current guide-day row, re-read after its lock was taken."""
+        return (
+            self.db.query(GuideDailyCapacity)
+            .filter(
+                GuideDailyCapacity.guide_user_id == guide_user_id,
+                GuideDailyCapacity.booking_date == _utc_midnight(night),
+            )
+            .populate_existing()
+            .one()
+        )
 
     def daily_availability(
         self, date: str, guide_id: int | None = None, experience_id: int | None = None
@@ -273,6 +317,13 @@ class BookingService:
             .order_by(GuideListing.price.asc())
             .all()
         )
+        # A listing can carry a forced recharge date on top of being open; the
+        # date-first search must not offer it before that date either.
+        listings = [
+            listing
+            for listing in listings
+            if not self._listing_closed_reason(listing, day_date)
+        ]
 
         cards = []
         for guide_user_id, account in accounts.items():
@@ -417,6 +468,13 @@ class BookingService:
         nights = _nights(first, checkout_date)
         availability = GuideAvailabilityService(self.db)
 
+        # A paused listing, or one inside its forced recharge window, is not
+        # available at all: keeping it in "Who you'll meet" would offer a guide
+        # the booking path then refuses.
+        listing = self._guide_listing_for(int(experience_id))
+        if listing is not None and self._listing_closed_reason(listing, first):
+            return []
+
         available: list[int] = []
         for catalog_guide_id in catalog_guide_ids or []:
             accounts = [
@@ -545,9 +603,9 @@ class BookingService:
         calendar and the booking would disagree.
         """
         if guide_id is not None:
-            resolved = self._guide_user_ids(guide_id)
-            if resolved:
-                return resolved
+            # A guide id that does not resolve is a closed calendar, not an
+            # invitation to read the default guide's one.
+            return self._guide_user_ids(guide_id)
         try:
             return [int(self.get_booking_guide().id)]
         except HTTPException:
@@ -650,6 +708,35 @@ class BookingService:
         return self.db.get(GuideListing, resolved["record_id"])
 
     @staticmethod
+    def _listing_closed_reason(
+        listing: GuideListing, booking_date: date
+    ) -> str | None:
+        """Why the listing itself refuses this date, or ``None`` when open.
+
+        Availability is opt-in per date, but a guide can also pause the whole
+        listing or have a forced recharge break after a trip; neither clears
+        the calendar, so every surface that offers (or accepts) this experience
+        has to honour them too.
+        """
+        if (listing.availability_status or "open") != "open":
+            return "This guide has paused bookings for this experience."
+        reopen = listing.next_available_date
+        if reopen is not None:
+            reopen_day = reopen.date() if isinstance(reopen, datetime) else reopen
+            if booking_date < reopen_day:
+                return (
+                    "This experience is not taking bookings until "
+                    f"{reopen_day.isoformat()}."
+                )
+        return None
+
+    def _ensure_listing_open(self, listing: GuideListing, booking_date: date) -> None:
+        """Reject a booking the listing itself has switched off."""
+        reason = self._listing_closed_reason(listing, booking_date)
+        if reason:
+            raise HTTPException(status_code=409, detail=reason)
+
+    @staticmethod
     def _booking_nights(booking_in: BookingCreate) -> list[date]:
         """Every night the booking keeps the guide: check-in up to check-out.
 
@@ -660,9 +747,30 @@ class BookingService:
         return _nights(booking_in.date, booking_in.checkout)
 
     def create_booking(self, user_id: int, booking_in: BookingCreate) -> Booking:
-        # Honor the guide/host the traveler selected when it maps to an active
-        # guide account; otherwise fall back to the default bookable guide.
-        account_ids = self._guide_user_ids(booking_in.guide_id)
+        # The guide the traveller picked, or the owner of the experience they
+        # picked.  There is deliberately no default account to fall back to:
+        # silently booking someone else's calendar is how a reservation lands
+        # on a guide the traveller never selected (or on a date that guide had
+        # closed), so an unresolvable guide is a client error instead.
+        if booking_in.guide_id is not None:
+            account_ids = self._guide_user_ids(booking_in.guide_id)
+            if not account_ids:
+                raise HTTPException(
+                    status_code=422,
+                    detail="That guide is not available for this experience.",
+                )
+        else:
+            owner = self._guide_listing_for(booking_in.experience_id)
+            account_ids = (
+                [int(owner.guide_user_id)]
+                if owner is not None and owner.guide_user_id
+                else []
+            )
+            if not account_ids:
+                raise HTTPException(
+                    status_code=422,
+                    detail="Select a guide for this experience before booking.",
+                )
         # A guide cannot book themselves as the guide for an experience.
         if any(int(account_id) == int(user_id) for account_id in account_ids):
             raise HTTPException(
@@ -696,11 +804,13 @@ class BookingService:
                 calendar_ids = [account_id]
                 break
         if guide is None:
-            if account_ids:
-                guide = self.db.query(User).filter(User.id == account_ids[0]).first()
-            else:
-                guide = self.get_booking_guide()
-                calendar_ids = [int(guide.id)]
+            guide = self.db.query(User).filter(User.id == account_ids[0]).first()
+            calendar_ids = [int(account_ids[0])]
+        if guide is None or not guide.is_active:
+            raise HTTPException(
+                status_code=409,
+                detail="That guide is no longer taking bookings.",
+            )
 
         # Every night of the stay must be open for this experience, not just the
         # check-in date; otherwise a traveller could hold a whole week off one
@@ -739,11 +849,24 @@ class BookingService:
 
         listing = self._guide_listing_for(booking_in.experience_id)
         guests = int(booking_in.guests or 0)
+        # A paused listing, or one the guide scheduled to re-open later, closes
+        # its dates even while the calendar still has them open; both switches
+        # have to reach the booking path or they disagree.
+        if listing is not None:
+            self._ensure_listing_open(listing, booking_date)
+
+        default_limit = int(listing.max_guests or 10) if listing else 10
+        # Claim (and lock) every night before deciding, in one ascending order
+        # so concurrent bookings queue here instead of reading stale guests.
+        for night in nights:
+            self._claim_day(guide.id, night, default_limit)
+        self.db.flush()
+        self.db.expire_all()
+
         # Slots belong to this date *and* this experience: the limit is the
         # guide's offer for the date (or the listing's own guest limit), never
         # the guide-day capacity row, which only aggregates guests and is
         # shared with every other experience.
-        default_limit = int(listing.max_guests or 10) if listing else 10
         for night in nights:
             entry = availability_service.day_entry(
                 calendar_ids, night, booking_in.experience_id
@@ -762,9 +885,10 @@ class BookingService:
                     ),
                 )
 
-        # Hold the slots of every night in the same transaction as the insert.
+        # The locks are held until this transaction commits, so no other
+        # booking can fit between the check above and these increments.
         for night in nights:
-            row = self.ensure_daily_capacity_row(guide.id, _utc_midnight(night), default_limit)
+            row = self._day_row(guide.id, night)
             row.booked_capacity = int(row.booked_capacity or 0) + guests
 
         # Also keep the legacy listing counter in sync for any code paths that
